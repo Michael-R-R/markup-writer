@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    QDataStream,
+)
+
 from PyQt6.QtWidgets import (
     QMainWindow,
     QSplitter,
@@ -40,4 +44,10 @@ class MainWindow(QMainWindow):
         vLayout.addStretch()
         
         self.setCentralWidget(vWidget)
+
+    def __rlshift__(self, sOut: QDataStream) -> QDataStream:
+        return sOut
+    
+    def __rrshift__(self, sIn: QDataStream) -> QDataStream:
+        return sIn
         

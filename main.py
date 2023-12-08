@@ -8,6 +8,7 @@ try:
     import PyQt6.QtGui
 except Exception:
     print("ERROR::markupWriter::cannot import PyQt6 dependecies")
+    sys.exit(1)
 
 if __name__ == "__main__":
     from markupwriter.core import application
