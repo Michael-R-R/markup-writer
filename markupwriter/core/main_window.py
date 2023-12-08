@@ -6,44 +6,23 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtWidgets import (
     QMainWindow,
-    QSplitter,
-    QVBoxLayout,
-    QHBoxLayout,
-    QPushButton,
-    QWidget,
 )
 
 from markupwriter.config import (
     config_app
 )
 
+from markupwriter.widgets.main_menu_bar import MainMenuBar;
+from .central_widget import CentralWidget
+
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
+        self.setContentsMargins(0, 0, 0, 0)
 
         self.setWindowTitle(config_app.APP_NAME)
-
-        vWidget = QWidget(self)
-
-        hSplitter = QSplitter()
-        hSplitter.addWidget(QPushButton("button1", vWidget))
-        hSplitter.addWidget(QPushButton("button2", vWidget))
-        hSplitter.addWidget(QPushButton("button3", vWidget))
-
-        vLayout = QVBoxLayout(vWidget)
-        vLayout.addWidget(QPushButton("Top", vWidget))
-        vLayout.addWidget(hSplitter)
-
-        hWidget = QWidget()
-        hLayout = QHBoxLayout(hWidget)
-        hLayout.addWidget(QPushButton("Bottom1", hWidget))
-        hLayout.addWidget(QPushButton("Bottom2", hWidget))
-        hLayout.addWidget(QPushButton("Bottom3", hWidget))
-        vLayout.addWidget(hWidget)
-
-        vLayout.addStretch()
-        
-        self.setCentralWidget(vWidget)
+        self.setMenuBar(MainMenuBar(self))
+        self.setCentralWidget(CentralWidget(self))
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return sOut
