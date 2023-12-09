@@ -15,15 +15,19 @@ from PyQt6.QtCore import (
     QRegularExpression,
 )
 
+from markupwriter.config.config_highlighter import (
+    Config,
+)
+
 class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument):
         super().__init__(document)
 
         self.__behaviours: dict[str, HighlightBehaviour] = dict()
-        self.addBehaviour("char-tags", HighlightWordBehaviour(QColor(255, 0, 0), {}, "[A-Za-z0-9]+"))
-        self.addBehaviour("loc-tags", HighlightWordBehaviour(QColor(0, 255, 0), {}, "[A-Za-z0-9]+"))
-        self.addBehaviour("comment-tag", HighlightExprBehaviour(QColor(30, 30, 30), "%(.*)"))
-        self.addBehaviour("import-tag", HighlightExprBehaviour(QColor(0, 0, 255), "^@(char|loc)\\:"))
+        self.addBehaviour("char-tags", HighlightWordBehaviour(Config.charCol, {}, "[A-Za-z0-9]+"))
+        self.addBehaviour("loc-tags", HighlightWordBehaviour(Config.locCol, {}, "[A-Za-z0-9]+"))
+        self.addBehaviour("comment-tag", HighlightExprBehaviour(Config.commentCol, "%(.*)"))
+        self.addBehaviour("import-tag", HighlightExprBehaviour(Config.importCol, "^@(char|loc)\\:"))
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self.__behaviours.items():

@@ -6,8 +6,8 @@ from PyQt6.QtWidgets import (
     QApplication,
 )
 
-from markupwriter.config import (
-    config_app,
+from markupwriter.config.config_app import (
+    Config,
 )
 
 from .main_window import (
@@ -16,7 +16,7 @@ from .main_window import (
 
 def run(argv: list[str]):
     app = QApplication(argv)
-    app.setApplicationName(config_app.APP_NAME)
+    app.setApplicationName(Config.APP_NAME)
 
     window = MainWindow()
     window.show()
