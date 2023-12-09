@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QPlainTextDocumentLayout,
 )
 
-from markupwriter.widgetsupport.documenteditor.highlighter import (
+from .highlighter import (
     Highlighter,
 )
 
