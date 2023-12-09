@@ -7,7 +7,7 @@ try:
     import PyQt6.QtWidgets
     import PyQt6.QtGui
 except Exception:
-    print("ERROR::markupWriter::cannot import PyQt6 dependecies")
+    print("ERROR::main::cannot import PyQt6 dependecies")
     sys.exit(1)
 
 from markupwriter.core.application import (

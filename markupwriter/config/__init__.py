@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
+    QDir,
     QDataStream,
     QSize,
 )
@@ -28,7 +29,7 @@ class BaseConfig():
 
     
 class AppConfig(BaseConfig):
-    INI_PATH = "./resources/configs/appConfig.ini"
+    INI_PATH = QDir("./resources/configs/appConfig.ini").absolutePath()
     APP_NAME = "Markup Writer"
     mainWindowSize = QSize(800, 600)
     docTreeSize = QSize(100, 100)
@@ -57,7 +58,7 @@ class AppConfig(BaseConfig):
     
 
 class HighlighterConfig(BaseConfig):
-    INI_PATH = "./resources/configs/highlighterConfig.ini"
+    INI_PATH = QDir("./resources/configs/highlighterConfig.ini").absolutePath()
     # Base-line: 70% lightness, 50% saturation
     refTagCol = QColor(64, 191, 142)
     aliasTagCol = QColor(255, 0, 0) # TODO add color
