@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-import sys
-
 from PyQt6.QtWidgets import (
     QApplication,
 )
@@ -14,17 +12,17 @@ from markupwriter.config import (
 
 from .main_window import MainWindow
 
-def run(argv: list[str]):
+def start():
     readConfig()
 
+def run(argv: list[str]):
     app = QApplication(argv)
     app.setApplicationName(AppConfig.APP_NAME)
 
     window = MainWindow()
     window.show()
 
-    syscode = app.exec()
+    return app.exec()
 
+def close():
     writeConfig()
-
-    sys.exit(syscode)
