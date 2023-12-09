@@ -13,12 +13,12 @@ from markupwriter.util.serialize import (
 )
 
 def readConfig():
-    Serialize.read(AppConfig, "./resources/configs/appConfig.ini")
-    Serialize.read(HighlighterConfig, "./resources/configs/highlighterConfig.ini")
+    Serialize.read(AppConfig, AppConfig.INI_PATH)
+    Serialize.read(HighlighterConfig, HighlighterConfig.INI_PATH)
 
 def writeConfig():
-    Serialize.write("./resources/configs/appConfig.ini", AppConfig())
-    Serialize.write("./resources/configs/highlighterConfig.ini", HighlighterConfig())
+    Serialize.write(AppConfig.INI_PATH, AppConfig())
+    Serialize.write(HighlighterConfig.INI_PATH, HighlighterConfig())
 
 
 class BaseConfig():
@@ -27,6 +27,7 @@ class BaseConfig():
 
     
 class AppConfig(BaseConfig):
+    INI_PATH = "./resources/configs/appConfig.ini"
     APP_NAME = "Markup Writer"
 
     def reset():
@@ -40,6 +41,7 @@ class AppConfig(BaseConfig):
     
 
 class HighlighterConfig(BaseConfig):
+    INI_PATH = "./resources/configs/highlighterConfig.ini"
     # Base-line: 70% lightness, 50% saturation
     tagsCol = QColor(64, 191, 142)
     commentCol = QColor(121, 210, 121)
