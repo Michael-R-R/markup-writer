@@ -39,6 +39,8 @@ class CentralWidget(QWidget):
         vSplitter.addWidget(terminal)
         hSplitter.addWidget(documentPreview)
 
+        # TODO fix resize issue
+
         vLayout.addWidget(hSplitter)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:

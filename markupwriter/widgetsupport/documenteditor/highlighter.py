@@ -22,9 +22,11 @@ class Highlighter(QSyntaxHighlighter):
         super().__init__(document)
 
         self.__behaviours: dict[str, HighlightBehaviour] = dict()
-        self.addBehaviour("tags", HighlightWordBehaviour(HighlighterConfig.tagsCol, { }, "[A-Za-z0-9'-]+"))
+        # TODO fix regular expressions for ref/alias tags
+        self.addBehaviour("ref-tags", HighlightWordBehaviour(HighlighterConfig.refTagCol, { "dog" }, "[A-Za-z0-9'\\-\\s]+"))
+        self.addBehaviour("alias-tags", HighlightWordBehaviour(HighlighterConfig.aliasTagCol, { "big dog" }, "[A-Za-z0-9'\\-\\s]+"))
         self.addBehaviour("comment", HighlightExprBehaviour(HighlighterConfig.commentCol, "%(.*)"))
-        self.addBehaviour("import", HighlightExprBehaviour(HighlighterConfig.importCol, "^@import\\:"))
+        self.addBehaviour("import", HighlightExprBehaviour(HighlighterConfig.importCol, "@(create|import|as|from) "))
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self.__behaviours.items():

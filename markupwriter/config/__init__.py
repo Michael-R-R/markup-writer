@@ -59,23 +59,27 @@ class AppConfig(BaseConfig):
 class HighlighterConfig(BaseConfig):
     INI_PATH = "./resources/configs/highlighterConfig.ini"
     # Base-line: 70% lightness, 50% saturation
-    tagsCol = QColor(64, 191, 142)
+    refTagCol = QColor(64, 191, 142)
+    aliasTagCol = QColor(255, 0, 0) # TODO add color
     commentCol = QColor(121, 210, 121)
     importCol = QColor(217, 140, 179)
 
     def reset():
-        HighlighterConfig.tagsCol = QColor(64, 191, 142)
+        HighlighterConfig.refTagCol = QColor(64, 191, 142)
+        HighlighterConfig.aliasTagCol = QColor(255, 0, 0) # TODO add color
         HighlighterConfig.commentCol = QColor(121, 210, 121)
         HighlighterConfig.importCol = QColor(217, 140, 179)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        sOut << HighlighterConfig.tagsCol
+        sOut << HighlighterConfig.refTagCol
+        sOut << HighlighterConfig.aliasTagCol
         sOut << HighlighterConfig.commentCol
         sOut << HighlighterConfig.importCol
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        sIn >> HighlighterConfig.tagsCol
+        sIn >> HighlighterConfig.refTagCol
+        sIn >> HighlighterConfig.aliasTagCol
         sIn >> HighlighterConfig.commentCol
         sIn >> HighlighterConfig.importCol
         return sIn
