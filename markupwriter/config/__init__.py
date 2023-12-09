@@ -13,12 +13,12 @@ from markupwriter.util.serialize import (
 )
 
 def readConfig():
-    Serialize.read(AppConfig, "./resources/config/appConfig.ini")
-    Serialize.read(HighlighterConfig, "./resources/config/highlighterConfig.ini")
+    Serialize.read(AppConfig, "./resources/configs/appConfig.ini")
+    Serialize.read(HighlighterConfig, "./resources/configs/highlighterConfig.ini")
 
 def writeConfig():
-    Serialize.write("./resources/config/appConfig.ini", AppConfig())
-    Serialize.write("./resources/config/highlighterConfig.ini", HighlighterConfig())
+    Serialize.write("./resources/configs/appConfig.ini", AppConfig())
+    Serialize.write("./resources/configs/highlighterConfig.ini", HighlighterConfig())
 
 
 class BaseConfig():

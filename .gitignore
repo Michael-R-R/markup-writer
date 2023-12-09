@@ -3,4 +3,4 @@
 __pycache__/
 
 resources/.tests/
-resources/config/
+resources/configs/
