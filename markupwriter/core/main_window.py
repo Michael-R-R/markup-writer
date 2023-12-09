@@ -8,10 +8,7 @@ from PyQt6.QtWidgets import (
     QMainWindow,
 )
 
-from markupwriter.config.config_app import (
-    Config
-)
-
+from markupwriter.config import AppConfig
 from markupwriter.widgets.main_menu_bar import MainMenuBar;
 from .central_widget import CentralWidget
 
@@ -20,7 +17,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
 
-        self.setWindowTitle(Config.APP_NAME)
+        self.setWindowTitle(AppConfig.APP_NAME)
         self.setMenuBar(MainMenuBar(self))
         self.setCentralWidget(CentralWidget(self))
 

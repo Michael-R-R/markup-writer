@@ -6,19 +6,25 @@ from PyQt6.QtWidgets import (
     QApplication,
 )
 
-from markupwriter.config.config_app import (
-    Config,
+from markupwriter.config import (
+    readConfig,
+    writeConfig,
+    AppConfig
 )
 
-from .main_window import (
-    MainWindow,
-)
+from .main_window import MainWindow
 
 def run(argv: list[str]):
+    readConfig()
+
     app = QApplication(argv)
-    app.setApplicationName(Config.APP_NAME)
+    app.setApplicationName(AppConfig.APP_NAME)
 
     window = MainWindow()
     window.show()
 
-    sys.exit(app.exec())
+    syscode = app.exec()
+
+    writeConfig()
+
+    sys.exit(syscode)
