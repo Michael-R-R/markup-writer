@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+from PyQt6.QtGui import (
+    QResizeEvent,
+)
+
 from PyQt6.QtCore import (
     QDataStream,
 )
@@ -16,10 +20,14 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
-
+        self.resize(AppConfig.mainWindowSize)
         self.setWindowTitle(AppConfig.APP_NAME)
         self.setMenuBar(MainMenuBar(self))
         self.setCentralWidget(CentralWidget(self))
+
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        AppConfig.mainWindowSize = a0.size()
+        return super().resizeEvent(a0)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return sOut
