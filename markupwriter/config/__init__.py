@@ -61,13 +61,13 @@ class HighlighterConfig(BaseConfig):
     INI_PATH = QDir("./resources/configs/highlighterConfig.ini").absolutePath()
     # Base-line: 70% lightness, 50% saturation
     refTagCol = QColor(64, 191, 142)
-    aliasTagCol = QColor(255, 0, 0) # TODO add color
+    aliasTagCol = QColor(224, 224, 133)
     commentCol = QColor(121, 210, 121)
     importCol = QColor(217, 140, 179)
 
     def reset():
         HighlighterConfig.refTagCol = QColor(64, 191, 142)
-        HighlighterConfig.aliasTagCol = QColor(255, 0, 0) # TODO add color
+        HighlighterConfig.aliasTagCol = QColor(224, 224, 133)
         HighlighterConfig.commentCol = QColor(121, 210, 121)
         HighlighterConfig.importCol = QColor(217, 140, 179)
 

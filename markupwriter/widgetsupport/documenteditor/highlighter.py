@@ -22,9 +22,8 @@ class Highlighter(QSyntaxHighlighter):
         super().__init__(document)
 
         self.__behaviours: dict[str, HighlightBehaviour] = dict()
-        # TODO fix regular expressions for ref/alias tags
-        self.addBehaviour("ref-tags", HighlightWordBehaviour(HighlighterConfig.refTagCol, { "dog" }, "[A-Za-z0-9'\\-\\s]+"))
-        self.addBehaviour("alias-tags", HighlightWordBehaviour(HighlighterConfig.aliasTagCol, { "big dog" }, "[A-Za-z0-9'\\-\\s]+"))
+        self.addBehaviour("ref-tags", HighlightWordBehaviour(HighlighterConfig.refTagCol, { }, "[a-zA-Z0-9'_]+"))
+        self.addBehaviour("alias-tags", HighlightWordBehaviour(HighlighterConfig.aliasTagCol, { }, "[a-zA-Z0-9'_]+"))
         self.addBehaviour("comment", HighlightExprBehaviour(HighlighterConfig.commentCol, "%(.*)"))
         self.addBehaviour("import", HighlightExprBehaviour(HighlighterConfig.importCol, "@(create|import|as|from) "))
 
@@ -127,7 +126,7 @@ class HighlightExprBehaviour(HighlightBehaviour):
         while it.hasNext():
             match = it.next()
             if not match.captured(0) in text:
-                return
+                continue
             
             highlighter.updateFormat(match.capturedStart(),
                                      match.capturedLength(),
