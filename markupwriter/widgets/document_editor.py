@@ -18,7 +18,6 @@ class DocumentEditor(QPlainTextEdit):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         
-        self.resize(AppConfig.docEditorSize)
         self.setDocument(PlainDocument())
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:

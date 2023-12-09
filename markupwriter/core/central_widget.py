@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
+from markupwriter.config import AppConfig
 from markupwriter.widgets.document_tree import DocumentTree
 from markupwriter.widgets.document_editor import DocumentEditor
 from markupwriter.widgets.terminal import Terminal
@@ -39,7 +40,11 @@ class CentralWidget(QWidget):
         vSplitter.addWidget(terminal)
         hSplitter.addWidget(documentPreview)
 
-        # TODO fix resize issue
+        hSplitter.setSizes([AppConfig.docTreeSize.width(),
+                            AppConfig.docEditorSize.width(),
+                            AppConfig.docPreviewSize.width()])
+        vSplitter.setSizes([AppConfig.docEditorSize.height(),
+                            AppConfig.terminalSize.height()])
 
         vLayout.addWidget(hSplitter)
 
