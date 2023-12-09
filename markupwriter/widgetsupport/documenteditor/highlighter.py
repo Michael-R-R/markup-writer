@@ -24,10 +24,9 @@ class Highlighter(QSyntaxHighlighter):
         super().__init__(document)
 
         self.__behaviours: dict[str, HighlightBehaviour] = dict()
-        self.addBehaviour("char-tags", HighlightWordBehaviour(Config.charCol, {}, "[A-Za-z0-9]+"))
-        self.addBehaviour("loc-tags", HighlightWordBehaviour(Config.locCol, {}, "[A-Za-z0-9]+"))
-        self.addBehaviour("comment-tag", HighlightExprBehaviour(Config.commentCol, "%(.*)"))
-        self.addBehaviour("import-tag", HighlightExprBehaviour(Config.importCol, "^@(char|loc)\\:"))
+        self.addBehaviour("tags", HighlightWordBehaviour(Config.tagsCol, { }, "[A-Za-z0-9'-]+"))
+        self.addBehaviour("comment", HighlightExprBehaviour(Config.commentCol, "%(.*)"))
+        self.addBehaviour("import", HighlightExprBehaviour(Config.importCol, "^@import\\:"))
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self.__behaviours.items():
