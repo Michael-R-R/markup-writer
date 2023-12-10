@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from PyQt6.QtWidgets import (
     QMenuBar,
     QWidget,

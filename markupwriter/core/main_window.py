@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
-from markupwriter.widgets.main_menu_bar import MainMenuBar;
+from markupwriter.widgets import MainMenuBar
 from .central_widget import CentralWidget
 
 class MainWindow(QMainWindow):

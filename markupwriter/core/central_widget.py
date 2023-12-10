@@ -13,10 +13,12 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
-from markupwriter.widgets.document_tree import DocumentTree
-from markupwriter.widgets.document_editor import DocumentEditor
-from markupwriter.widgets.terminal import Terminal
-from markupwriter.widgets.document_preview import DocumentPreview
+from markupwriter.widgets import (
+    DocumentTree,
+    DocumentEditor,
+    DocumentPreview,
+    Terminal
+)
 
 class CentralWidget(QWidget):
     def __init__(self, parent: QWidget):
