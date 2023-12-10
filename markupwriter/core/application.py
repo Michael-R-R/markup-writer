@@ -12,10 +12,10 @@ from markupwriter.config import (
 
 from .main_window import MainWindow
 
-def start():
+def appStart():
     readConfig()
 
-def run(argv: list[str]):
+def appRun(argv: list[str]):
     app = QApplication(argv)
     app.setApplicationName(AppConfig.APP_NAME)
 
@@ -24,5 +24,5 @@ def run(argv: list[str]):
 
     return app.exec()
 
-def close():
+def appClose():
     writeConfig()
