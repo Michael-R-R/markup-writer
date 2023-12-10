@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-12-09T18:07:17.439Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="UbEqmjzdc9W5e34A2u6G" version="22.1.2" type="device" pages="2">
+<mxfile host="Electron" modified="2023-12-10T21:24:18.396Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="w3CNG5IZ1ITKt84ZAm96" version="22.1.2" type="device" pages="2">
   <diagram name="overview" id="FzUdrfkBhp2PZ2tnmgH8">
-    <mxGraphModel dx="3114" dy="1604" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3560" dy="2086" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -107,99 +107,108 @@
     </mxGraphModel>
   </diagram>
   <diagram id="TJgQccEb8gtOzzWVurKG" name="RefTag">
-    <mxGraphModel dx="1694" dy="843" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1266" dy="1390" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-1" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;@import &amp;lt;name&amp;gt;&lt;/font&gt;" style="text;html=1;fillColor=#0050ef;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#001DBC;fontColor=#ffffff;" vertex="1" parent="1">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-1" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;@import &amp;lt;name&amp;gt;&lt;/font&gt;" style="text;html=1;fillColor=#0050ef;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#001DBC;fontColor=#ffffff;" parent="1" vertex="1">
           <mxGeometry x="-69" y="277" width="399" height="66" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-2" value="&lt;h1&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Notes&lt;/span&gt;&lt;/h1&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;+ @create is used to make a reference tag.&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;+ @create &amp;lt;...&amp;gt; @as &amp;lt;...&amp;gt; can be used to make a comma seperated list of alias names.&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;+ once created that document becomes the entire reference.&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;-------------------------------------------------&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;+ @import&amp;lt;...&amp;gt; is used when adding a reference to a document.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;+ @from &amp;lt;...&amp;gt; @import &amp;lt;...&amp;gt; is used to import a alias from a master reference to be used in that document.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;+ once added to a document, that imported tag will allow for syntax highlighting and hover over information.&lt;/div&gt;" style="text;html=1;strokeColor=#314354;fillColor=#647687;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;fontColor=#ffffff;" vertex="1" parent="1">
-          <mxGeometry x="380" y="83" width="235" height="395" as="geometry" />
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-2" value="&lt;h1&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Notes&lt;/span&gt;&lt;/h1&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;+ @create is used to make a reference tag.&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;+ @create &amp;lt;...&amp;gt; @as &amp;lt;...&amp;gt; can be used to make a comma seperated list of alias names.&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;+ once created that document becomes the entire reference.&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;-------------------------------------------------&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;+ @import&amp;lt;...&amp;gt; is used when adding a reference to a document.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;+ @from &amp;lt;...&amp;gt; @import &amp;lt;...&amp;gt; is used to import a alias from a master reference to be used in that document.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;+ once added to a document, that imported tag will allow for syntax highlighting and hover over information.&lt;/div&gt;" style="text;html=1;strokeColor=#314354;fillColor=#647687;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;fontColor=#ffffff;" parent="1" vertex="1">
+          <mxGeometry x="375" y="53" width="235" height="395" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-3" value="&lt;span style=&quot;font-size: 24px;&quot;&gt;@create &amp;lt;name&amp;gt; @as &amp;lt;aliases&amp;gt;&lt;/span&gt;" style="text;html=1;fillColor=#008a00;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#005700;fontColor=#ffffff;" vertex="1" parent="1">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-3" value="&lt;span style=&quot;font-size: 24px;&quot;&gt;@create &amp;lt;name&amp;gt; @as &amp;lt;aliases&amp;gt;&lt;/span&gt;" style="text;html=1;fillColor=#008a00;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#005700;fontColor=#ffffff;" parent="1" vertex="1">
           <mxGeometry x="-69" y="132" width="400" height="66" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-12" value="RefTag" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="672" y="83" width="241" height="190" as="geometry" />
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-12" value="RefTag" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="90" y="492" width="241" height="268" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-13" value="- path: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-13" value="- path: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-12" vertex="1">
           <mxGeometry y="26" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-17" value="- name: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-17" value="- name: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-12" vertex="1">
           <mxGeometry y="52" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-34" value="- alias_set: set[AliasTag]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
+        <mxCell id="TzBk11rLfjOoUa_SHrHC-5" value="- hash: u64&lt;br&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
           <mxGeometry y="78" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-31" value="- ref_set: set[str]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-34" value="- alias_set: set[AliasTag]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-12" vertex="1">
           <mxGeometry y="104" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-14" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
-          <mxGeometry y="130" width="241" height="8" as="geometry" />
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-31" value="- ref_set: set[str]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-12" vertex="1">
+          <mxGeometry y="130" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-15" value="+ getter/setters" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
-          <mxGeometry y="138" width="241" height="26" as="geometry" />
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-14" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="J-gtvcApfh8FxLfmaqBg-12" vertex="1">
+          <mxGeometry y="156" width="241" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-25" value="+ overload &amp;lt;, ==" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-15" value="+ getter/setters" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-12" vertex="1">
           <mxGeometry y="164" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-19" value="RefTagManager" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="672" y="310" width="244" height="268" as="geometry" />
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-25" value="+ overload &amp;lt;, ==" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-12" vertex="1">
+          <mxGeometry y="190" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-20" value="- tag_set: set[RefTag]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
+        <mxCell id="TzBk11rLfjOoUa_SHrHC-1" value="+ addAlias(str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
+          <mxGeometry y="216" width="241" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="TzBk11rLfjOoUa_SHrHC-2" value="+ removeAlias(str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-12">
+          <mxGeometry y="242" width="241" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-19" value="RefTagManager" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-182" y="492" width="244" height="242" as="geometry" />
+        </mxCell>
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-20" value="- tag_set: set[RefTag]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-19" vertex="1">
           <mxGeometry y="26" width="244" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-21" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-21" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="J-gtvcApfh8FxLfmaqBg-19" vertex="1">
           <mxGeometry y="52" width="244" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-22" value="+ addTag(RefTag): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-22" value="+ addTag(RefTag): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-19" vertex="1">
           <mxGeometry y="60" width="244" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-23" value="+ removeTag(str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-23" value="+ removeTag(str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-19" vertex="1">
           <mxGeometry y="86" width="244" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-27" value="+ renameTag(str, str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-27" value="+ renameTag(str, str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-19" vertex="1">
           <mxGeometry y="112" width="244" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-29" value="+ addRef(str, str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-29" value="+ addRef(str, str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-19" vertex="1">
           <mxGeometry y="138" width="244" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-30" value="+ removeRef(str, str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-30" value="+ removeRef(str, str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-19" vertex="1">
           <mxGeometry y="164" width="244" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-33" value="+ renameRef(str, str, str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-28" value="+ getRefs(str): set[str]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-19" vertex="1">
           <mxGeometry y="190" width="244" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-28" value="+ getRefs(str): set[str]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-32" value="+ tagHasRef(str, str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-19" vertex="1">
           <mxGeometry y="216" width="244" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-32" value="+ tagHasRef(str, str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-19">
-          <mxGeometry y="242" width="244" height="26" as="geometry" />
-        </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-35" value="&lt;span style=&quot;font-size: 24px;&quot;&gt;@create &amp;lt;name&amp;gt;&lt;/span&gt;" style="text;html=1;fillColor=#008a00;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#005700;fontColor=#ffffff;" vertex="1" parent="1">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-35" value="&lt;span style=&quot;font-size: 24px;&quot;&gt;@create &amp;lt;name&amp;gt;&lt;/span&gt;" style="text;html=1;fillColor=#008a00;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#005700;fontColor=#ffffff;" parent="1" vertex="1">
           <mxGeometry x="-69" y="53" width="400" height="66" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-36" value="&lt;span style=&quot;font-size: 24px;&quot;&gt;@from &amp;lt;name&amp;gt; @import &amp;lt;alias&amp;gt;&lt;/span&gt;" style="text;html=1;fillColor=#0050ef;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#001DBC;fontColor=#ffffff;" vertex="1" parent="1">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-36" value="&lt;span style=&quot;font-size: 24px;&quot;&gt;@from &amp;lt;name&amp;gt; @import &amp;lt;alias&amp;gt;&lt;/span&gt;" style="text;html=1;fillColor=#0050ef;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#001DBC;fontColor=#ffffff;" parent="1" vertex="1">
           <mxGeometry x="-68" y="362" width="399" height="66" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-37" value="AliasTag" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="937" y="83" width="241" height="138" as="geometry" />
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-37" value="AliasTag" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="357" y="492" width="241" height="164" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-38" value="- parent: RefTag" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-37">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-38" value="- parent: RefTag" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-37" vertex="1">
           <mxGeometry y="26" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-39" value="- name: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-37">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-39" value="- name: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-37" vertex="1">
           <mxGeometry y="52" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-42" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-37">
-          <mxGeometry y="78" width="241" height="8" as="geometry" />
+        <mxCell id="TzBk11rLfjOoUa_SHrHC-4" value="- hash: u64" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-37">
+          <mxGeometry y="78" width="241" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-43" value="+ getter/setters" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-37">
-          <mxGeometry y="86" width="241" height="26" as="geometry" />
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-42" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="J-gtvcApfh8FxLfmaqBg-37" vertex="1">
+          <mxGeometry y="104" width="241" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="J-gtvcApfh8FxLfmaqBg-44" value="+ overload &amp;lt;, ==" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="J-gtvcApfh8FxLfmaqBg-37">
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-43" value="+ getter/setters" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-37" vertex="1">
           <mxGeometry y="112" width="241" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="J-gtvcApfh8FxLfmaqBg-44" value="+ overload &amp;lt;, ==" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="J-gtvcApfh8FxLfmaqBg-37" vertex="1">
+          <mxGeometry y="138" width="241" height="26" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

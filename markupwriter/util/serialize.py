@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from PyQt6.QtCore import (
     QDataStream, 
     QFile, 
