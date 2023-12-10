@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
-from markupwriter.widgetsupport.documenteditor.plain_document import (
+from markupwriter.widgetsupport.documenteditor import (
     PlainDocument,
 )
 
