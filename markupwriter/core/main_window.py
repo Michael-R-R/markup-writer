@@ -19,11 +19,11 @@ from .central_widget import CentralWidget
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setContentsMargins(0, 0, 0, 0)
-        self.resize(AppConfig.mainWindowSize)
         self.setWindowTitle(AppConfig.APP_NAME)
+        self.resize(AppConfig.mainWindowSize)
         self.setMenuBar(MainMenuBar(self))
         self.setCentralWidget(CentralWidget(self))
+        self.setContentsMargins(0, 0, 0, 0)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         AppConfig.mainWindowSize = a0.size()
