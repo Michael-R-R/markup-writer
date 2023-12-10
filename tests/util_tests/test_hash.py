@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
-from markupwriter.util.hash import (
-    getHash
-)
+from markupwriter.util import getHash
 
 def testHash_emptyIsZero():
     hash1 = getHash("")

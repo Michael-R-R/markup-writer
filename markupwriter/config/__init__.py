@@ -2,4 +2,4 @@
 
 from .app import AppConfig
 from .highlighter import HighlighterConfig
-from .util import (readConfig, writeConfig)
+from .serialize_config import (readConfig, writeConfig)
