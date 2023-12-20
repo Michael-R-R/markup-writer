@@ -8,21 +8,20 @@ class RefTag(object):
     def __init__(self, path: str, name: str) -> None:
         self._path = path
         self._name = name
-        self._hash = getHash(path)
-        self._aliasSet: set[AliasTag] = set()
+        self._aliasDict: dict[str, AliasTag] = dict()
         self._docRefSet: set[str] = set()
 
     def __eq__(self, other: RefTag) -> bool:
-        return self._hash == other._hash
+        return self._path == other._path
     
     def __ne__(self, other: RefTag) -> bool:
-        return self._hash != other._hash
+        return self._path != other._path
 
     def __lt__(self, other: RefTag) -> bool:
-        return self._hash < other._hash
+        return self._path < other._path
     
     def __hash__(self) -> int:
-        return self._hash
+        return getHash(self._path)
     
     def path(self) -> str:
         return self._path
@@ -30,34 +29,29 @@ class RefTag(object):
     def name(self) -> str:
         return self._name
     
-    def aliasSet(self) -> set[AliasTag]:
-        return self._aliasSet
+    def aliasDict(self) -> dict[str, AliasTag]:
+        return self._aliasDict
     
     def docRefSet(self) -> set[str]:
         return self._docRefSet
     
     def addAlias(self, name: str) -> bool:
-        if AliasTag(None, name) in self._aliasSet:
+        if name in self._aliasDict:
             return False
-        self._aliasSet.add(AliasTag(self, name))
+        self._aliasDict[name] = AliasTag(self, name)
         return True
     
     def removeAlias(self, name: str) -> bool:
-        temp = AliasTag(None, name)
-        if not temp in self._aliasSet:
+        if not name in self._aliasDict:
             return False
-        self._aliasSet.remove(temp)
+        self._aliasDict.pop(name)
         return True
     
     def getAlias(self, name: str) -> AliasTag | None:
-        temp = AliasTag(None, name)
-        if not temp in self._aliasSet:
+        if not name in self._aliasDict:
             return None
         
-        # TODO this doesn't work
-        # cannot retrieve values from sets
-        # need to change the data structure
-        return self._aliasSet[temp]
+        return self._aliasDict[name]
     
     def addDocRef(self, path: str) -> bool:
         if path in self._docRefSet:
@@ -72,28 +66,15 @@ class RefTag(object):
         return True
     
     def hasAlias(self, name: str) -> bool:
-        return AliasTag(None, name) in self._aliasSet
+        return name in self._aliasDict
     
     def hasDocRef(self, name: str) -> bool:
         return name in self._docRefSet
     
 class AliasTag(object):
-    def __init__(self, parent: RefTag | None, name: str) -> None:
+    def __init__(self, parent: RefTag, name: str) -> None:
         self._parent = parent
         self._name = name
-        self._hash = getHash(name)
-
-    def __eq__(self, other: AliasTag) -> bool:
-        return self._hash == other._hash
-    
-    def __ne__(self, other: RefTag) -> bool:
-        return self._hash != other._hash
-
-    def __lt__(self, other: AliasTag) -> bool:
-        return self._hash < other._hash
-    
-    def __hash__(self) -> int:
-        return self._hash
     
     def parent(self) -> RefTag:
         return self._parent

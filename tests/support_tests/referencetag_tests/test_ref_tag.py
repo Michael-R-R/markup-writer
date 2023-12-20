@@ -1,4 +1,4 @@
-from markupwriter.support.referencetag import RefTag, AliasTag
+from markupwriter.support.referencetag import RefTag
 
 def testRefTag_tagsMatch():
     t1 = RefTag("fake/path/test.doc", "Frank")
@@ -7,7 +7,7 @@ def testRefTag_tagsMatch():
 
 def testRefTag_tagsDoNotMatch():
     t1 = RefTag("fake/path/test.doc", "Frank")
-    t2 = RefTag("fake/path/path/test.doc", "Bob")
+    t2 = RefTag("fake/path/path/test.doc", "Frank")
     assert(t1 != t2)
 
 def testRefTag_addAlias():
