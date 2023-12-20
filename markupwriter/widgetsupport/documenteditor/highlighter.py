@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from __future__ import annotations
+from enum import Enum
 
 from PyQt6.QtGui import (
     QSyntaxHighlighter,
@@ -17,15 +18,21 @@ from PyQt6.QtCore import (
 
 from markupwriter.config import HighlighterConfig
 
+class BEHAVIOUR(Enum):
+    ref = 1
+    alias = 2
+    comment = 3
+    keyword = 4
+
 class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument):
         super().__init__(document)
 
-        self.__behaviours: dict[str, HighlightBehaviour] = dict()
-        self.addBehaviour("ref-tags", HighlightWordBehaviour(HighlighterConfig.refTagCol, { }, "[a-zA-Z0-9'_]+"))
-        self.addBehaviour("alias-tags", HighlightWordBehaviour(HighlighterConfig.aliasTagCol, { }, "[a-zA-Z0-9'_]+"))
-        self.addBehaviour("comment", HighlightExprBehaviour(HighlighterConfig.commentCol, "%(.*)"))
-        self.addBehaviour("import", HighlightExprBehaviour(HighlighterConfig.importCol, "@(create|import|as|from) "))
+        self.__behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
+        self.addBehaviour(BEHAVIOUR.ref, HighlightWordBehaviour(HighlighterConfig.refTagCol, { }, "[a-zA-Z0-9'_]+"))
+        self.addBehaviour(BEHAVIOUR.alias, HighlightWordBehaviour(HighlighterConfig.aliasTagCol, { }, "[a-zA-Z0-9'_]+"))
+        self.addBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, "%(.*)"))
+        self.addBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.importCol, "@(create|import|as|from) "))
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self.__behaviours.items():
@@ -34,22 +41,22 @@ class Highlighter(QSyntaxHighlighter):
     def updateFormat(self, start: int, end: int, format: QTextCharFormat):
         self.setFormat(start, end, format)
 
-    def addBehaviour(self, key: str, val: HighlightBehaviour) -> bool:
-        if key in self.__behaviours:
+    def addBehaviour(self, type: BEHAVIOUR, val: HighlightBehaviour) -> bool:
+        if type in self.__behaviours:
             return False
-        self.__behaviours[key] = val
+        self.__behaviours[type] = val
         return True
     
-    def removeBehaviour(self, key: str) -> bool:
-        if not key in self.__behaviours:
+    def removeBehaviour(self, type: BEHAVIOUR) -> bool:
+        if not type in self.__behaviours:
             return False
-        self.__behaviours.pop(key)
+        self.__behaviours.pop(type)
         return True
     
-    def getBehaviour(self, key: str) -> HighlightWordBehaviour | HighlightExprBehaviour | None:
-        if not key in self.__behaviours:
+    def getBehaviour(self, type: BEHAVIOUR) -> HighlightWordBehaviour | HighlightExprBehaviour | None:
+        if not type in self.__behaviours:
             return None
-        return self.__behaviours[key]
+        return self.__behaviours[type]
 
 
 class HighlightBehaviour(object):
