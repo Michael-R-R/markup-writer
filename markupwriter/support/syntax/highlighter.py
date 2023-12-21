@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from __future__ import annotations
-from enum import Enum
 
 from PyQt6.QtGui import (
     QSyntaxHighlighter,
@@ -17,12 +16,7 @@ from PyQt6.QtCore import (
 )
 
 from markupwriter.config import HighlighterConfig
-
-class BEHAVIOUR(Enum):
-    ref = 1
-    alias = 2
-    comment = 3
-    keyword = 4
+from . import BEHAVIOUR
 
 class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument):
@@ -32,7 +26,7 @@ class Highlighter(QSyntaxHighlighter):
         self.addBehaviour(BEHAVIOUR.ref, HighlightWordBehaviour(HighlighterConfig.refTagCol, { }, "[a-zA-Z0-9'_]+"))
         self.addBehaviour(BEHAVIOUR.alias, HighlightWordBehaviour(HighlighterConfig.aliasTagCol, { }, "[a-zA-Z0-9'_]+"))
         self.addBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, "%(.*)"))
-        self.addBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.importCol, "@(create|import|as|from) "))
+        self.addBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.keywordCol, "@(create|import|as|from) "))
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self.__behaviours.items():

@@ -17,24 +17,24 @@ class HighlighterConfig(BaseConfig):
     refTagCol = QColor(64, 191, 142)
     aliasTagCol = QColor(224, 224, 133)
     commentCol = QColor(121, 210, 121)
-    importCol = QColor(217, 140, 179)
+    keywordCol = QColor(217, 140, 179)
 
     def reset():
         HighlighterConfig.refTagCol = QColor(64, 191, 142)
         HighlighterConfig.aliasTagCol = QColor(224, 224, 133)
         HighlighterConfig.commentCol = QColor(121, 210, 121)
-        HighlighterConfig.importCol = QColor(217, 140, 179)
+        HighlighterConfig.keywordCol = QColor(217, 140, 179)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << HighlighterConfig.refTagCol
         sOut << HighlighterConfig.aliasTagCol
         sOut << HighlighterConfig.commentCol
-        sOut << HighlighterConfig.importCol
+        sOut << HighlighterConfig.keywordCol
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         sIn >> HighlighterConfig.refTagCol
         sIn >> HighlighterConfig.aliasTagCol
         sIn >> HighlighterConfig.commentCol
-        sIn >> HighlighterConfig.importCol
+        sIn >> HighlighterConfig.keywordCol
         return sIn

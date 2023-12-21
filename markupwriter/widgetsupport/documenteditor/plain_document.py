@@ -8,8 +8,9 @@ from PyQt6.QtWidgets import (
     QPlainTextDocumentLayout,
 )
 
-from .highlighter import (
+from markupwriter.support.syntax import (
     Highlighter,
+    Parser,
 )
 
 class PlainDocument(QTextDocument):
@@ -18,3 +19,4 @@ class PlainDocument(QTextDocument):
         
         self.setDocumentLayout(QPlainTextDocumentLayout(self))
         self._highlighter = Highlighter(self)
+        self._parser = Parser(self._highlighter)
