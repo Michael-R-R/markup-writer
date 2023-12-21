@@ -19,6 +19,7 @@ class DocumentEditor(QPlainTextEdit):
         super().__init__(parent)
         
         self.setDocument(PlainDocument())
+        self.setTabStopDistance(20.0)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorSize = e.size()
