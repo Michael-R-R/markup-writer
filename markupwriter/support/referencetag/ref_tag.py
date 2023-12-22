@@ -56,6 +56,15 @@ class RefTag(object):
         self.__aliasDict.pop(name)
         return True
     
+    def renameAlias(self, old: str, new: str) -> bool:
+        if not old in self.__aliasDict:
+            return False
+        if new in self.__aliasDict:
+            return False
+        self.__aliasDict[old].rename(new)
+        self.__aliasDict[new] = self.__aliasDict.pop(old)
+        return True
+    
     def getAlias(self, name: str) -> AliasTag | None:
         if not name in self.__aliasDict:
             return None
