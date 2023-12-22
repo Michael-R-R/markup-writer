@@ -10,7 +10,10 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.support.syntax import (
     Highlighter,
-    Parser,
+)
+
+from markupwriter.support.referencetag import (
+    RefTagManager,
 )
 
 class PlainDocument(QTextDocument):
@@ -18,11 +21,12 @@ class PlainDocument(QTextDocument):
         super().__init__()
         
         self.setDocumentLayout(QPlainTextDocumentLayout(self))
-        self._highlighter = Highlighter(self)
-        self._parser = Parser(self._highlighter)
+        self.__highlighter = Highlighter(self)
+        self.__refTagManager = RefTagManager()
 
-        self.contentsChange.connect(self.showChanged)
-
-    def showChanged(self, pos: int, removed: int, added: int):
-        print(pos, removed, added)
+    def highlighter(self) -> Highlighter:
+        return self.__highlighter
+    
+    def refTagManager(self) -> RefTagManager:
+        return self.__refTagManager
         

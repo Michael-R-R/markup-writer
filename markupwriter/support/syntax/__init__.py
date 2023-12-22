@@ -6,4 +6,3 @@ from .highlighter import (
     HighlightWordBehaviour, 
     HighlightExprBehaviour
 )
-from .parser import Parser

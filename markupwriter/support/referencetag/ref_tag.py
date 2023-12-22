@@ -41,6 +41,9 @@ class RefTag(object):
     def docRefSet(self) -> set[str]:
         return self.__docRefSet
     
+    def rename(self, name: str):
+        self.__name = name
+    
     def addAlias(self, name: str) -> bool:
         if name in self.__aliasDict:
             return False
@@ -79,11 +82,14 @@ class RefTag(object):
     
 class AliasTag(object):
     def __init__(self, parent: RefTag, name: str) -> None:
-        self._parent = parent
-        self._name = name
+        self.__parent = parent
+        self.__name = name
     
     def parent(self) -> RefTag:
-        return self._parent
+        return self.__parent
     
     def name(self) -> str:
-        return self._name
+        return self.__name
+    
+    def rename(self, name: str):
+        self.__name = name
