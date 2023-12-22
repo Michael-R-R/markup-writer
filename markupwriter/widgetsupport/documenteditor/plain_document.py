@@ -20,3 +20,9 @@ class PlainDocument(QTextDocument):
         self.setDocumentLayout(QPlainTextDocumentLayout(self))
         self._highlighter = Highlighter(self)
         self._parser = Parser(self._highlighter)
+
+        self.contentsChange.connect(self.showChanged)
+
+    def showChanged(self, pos: int, removed: int, added: int):
+        print(pos, removed, added)
+        
