@@ -45,6 +45,8 @@ class RefTag(object):
         self.__name = name
     
     def addAlias(self, name: str) -> bool:
+        if name == "":
+            return False
         if name in self.__aliasDict:
             return False
         self.__aliasDict[name] = AliasTag(self, name)
@@ -65,13 +67,21 @@ class RefTag(object):
         self.__aliasDict[new] = self.__aliasDict.pop(old)
         return True
     
+    def clearAliases(self):
+        self.__aliasDict.clear()
+    
     def getAlias(self, name: str) -> AliasTag | None:
         if not name in self.__aliasDict:
             return None
         
         return self.__aliasDict[name]
     
+    def hasAlias(self, name: str) -> bool:
+        return name in self.__aliasDict
+    
     def addDocRef(self, path: str) -> bool:
+        if path == "":
+            return False
         if path in self.__docRefSet:
             return False
         self.__docRefSet.add(path)
@@ -83,12 +93,13 @@ class RefTag(object):
         self.__docRefSet.remove(path)
         return True
     
-    def hasAlias(self, name: str) -> bool:
-        return name in self.__aliasDict
+    def clearDocRefs(self):
+        self.__docRefSet.clear()
     
     def hasDocRef(self, name: str) -> bool:
         return name in self.__docRefSet
     
+
 class AliasTag(object):
     def __init__(self, parent: RefTag, name: str) -> None:
         self.__parent = parent

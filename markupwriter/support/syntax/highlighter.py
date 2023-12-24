@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
 from __future__ import annotations
+import re
+
+from collections import Counter
 
 from PyQt6.QtGui import (
     QSyntaxHighlighter,
@@ -23,10 +26,10 @@ class Highlighter(QSyntaxHighlighter):
         super().__init__(document)
 
         self.__behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
-        self.addBehaviour(BEHAVIOUR.ref, HighlightWordBehaviour(HighlighterConfig.refTagCol, { }, "[a-zA-Z0-9'_]+"))
-        self.addBehaviour(BEHAVIOUR.alias, HighlightWordBehaviour(HighlighterConfig.aliasTagCol, { }, "[a-zA-Z0-9'_]+"))
-        self.addBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, "%(.*)"))
-        self.addBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.keywordCol, "@(create|import|as|from) "))
+        self.addBehaviour(BEHAVIOUR.refTag, HighlightWordBehaviour(HighlighterConfig.refTagCol, set(), r"[\w']+"))
+        self.addBehaviour(BEHAVIOUR.aliasTag, HighlightWordBehaviour(HighlighterConfig.aliasTagCol, set(), "[a-zA-Z0-9'_]+"))
+        self.addBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, r"%(.*)"))
+        self.addBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.keywordCol, r"@(create|import|as) "))
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self.__behaviours.items():
@@ -57,7 +60,7 @@ class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
         self._color = color
         self._format = QTextCharFormat()
-        self._expression = QRegularExpression(expr)
+        self._expr = expr
 
         self._format.setFontWeight(QFont.Weight.Bold)
         self._format.setForeground(QBrush(self._color))
@@ -71,7 +74,7 @@ class HighlightBehaviour(object):
         self._format.setForeground(QBrush(self._color))
 
     def setExpression(self, expr: str):
-        self._expression = QRegularExpression(expr)
+        self._expr = expr
         
 
 class HighlightWordBehaviour(HighlightBehaviour):
@@ -80,16 +83,19 @@ class HighlightWordBehaviour(HighlightBehaviour):
         self._wordSet = wordSet
 
     def process(self, highlighter: Highlighter, text: str):
-        it = self._expression.globalMatch(text)
-        while it.hasNext():
-            match = it.next()
-            if not match.captured(0) in self._wordSet:
+        wordCounter = Counter(re.findall(self._expr, text))
+        for word, _ in wordCounter.items():
+            if not word in self._wordSet:
                 continue
-            
-            highlighter.updateFormat(match.capturedStart(),
-                                     match.capturedLength(),
-                                     self._format)
-            
+
+            start = text.find(word, 0)
+            while start > -1:
+                length = len(word)
+                highlighter.updateFormat(start,
+                                         length,
+                                         self._format)
+                start = text.find(word, start + length)
+
     def addWord(self, word: str) -> bool:
         if word in self._wordSet:
             return False
@@ -123,12 +129,8 @@ class HighlightExprBehaviour(HighlightBehaviour):
         super().__init__(color, expr)
             
     def process(self, highlighter: Highlighter, text: str):
-        it = self._expression.globalMatch(text)
-        while it.hasNext():
-            match = it.next()
-            if not match.captured(0) in text:
-                continue
-            
-            highlighter.updateFormat(match.capturedStart(),
-                                     match.capturedLength(),
-                                     self._format)
+        it = re.finditer(self._expr, text)
+        for w in it:
+            start = w.start()
+            end = w.end() - start
+            highlighter.updateFormat(start, end, self._format)

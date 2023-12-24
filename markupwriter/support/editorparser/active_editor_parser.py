@@ -6,26 +6,24 @@ from markupwriter.widgetsupport.documenteditor import (
     PlainDocument,
 )
 
-from markupwriter.support.syntax import (
-    Highlighter,
-    HighlightWordBehaviour,
-)
-
 from markupwriter.support.referencetag import (
     RefTagManager,
 )
 
 class ActiveEditorParser(object):
     def __init__(self) -> None:
-        self.__tokenList: list[Token] = [CreateToken()]
+        self.__tokenDict = {
+            "@create": CreateToken(),
+            "@import": ImportToken(),
+        }
 
     def tokenize(self, doc: PlainDocument, docPath: str, line: str):
-        if not line.startswith("@"):
+        found = re.search("^@(create|import)", line)
+        if found is None:
             return
 
-        for t in self.__tokenList:
-            if t.tokenize(doc, docPath, line):
-                return
+        token = self.__tokenDict.get(found.group(0))
+        token.tokenize(doc, docPath, line)
 
 
 class Token(object):
@@ -41,18 +39,25 @@ class CreateToken(Token):
         super().__init__()
 
     def tokenize(self, doc: PlainDocument, docPath: str, line: str) -> bool:
-        if not line.startswith("@create "):
+        tag = re.search("(?<=@create )[a-zA-Z'\s]+(?=@as)?", line)
+        if tag is None:
             return False
         
-        tag = re.search("(?<=@create )[a-zA-Z'\s]+(?=@as)", line)
-        if tag is None:
-            tag = re.search("(?<=@create )[a-zA-Z'\s]+", line)
-
-        if tag is not None:
-            print("tag:", tag.group(0))
+        tag = tag.group(0).strip(" \n\r")
 
         aliases = re.search("(?<=@as )[a-zA-Z',\s]+", line)
         if aliases is not None:
-            print("aliases:", aliases.group(0))
+            aliases = aliases.group(0).strip(" \n\r")
+
+        print("tag:", tag)
+        print("aliases:", aliases)
 
         return True
+
+
+class ImportToken(Token):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def tokenize(self, doc: PlainDocument, docPath: str, line: str) -> bool:
+        return False

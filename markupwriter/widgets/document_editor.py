@@ -38,7 +38,6 @@ class DocumentEditor(QPlainTextEdit):
     
     def onTextChanged(self):
         cursor = self.textCursor()
-        cursor.clearSelection()
         cursor.movePosition(QTextCursor.MoveOperation.EndOfLine)
         cursor.select(QTextCursor.SelectionType.LineUnderCursor)
         self.__activeParser.tokenize(self.__document, 
