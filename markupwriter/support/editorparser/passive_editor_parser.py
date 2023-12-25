@@ -12,39 +12,41 @@ from markupwriter.support.referencetag import (
 
 class PassiveEditorParser(object):
     def __init__(self) -> None:
-        self.__prevParsed: dict[int, (str, str)] = dict()
+        self.__pattern = re.compile(r"^@(create|import)\s")
+        self.__prevParsed: list[(str, str)] = list()
         self.__tokenDict = {
             "@create ": CreateToken(),
             "@import ": ImportToken(),
         }
 
     def tokenize(self, doc: PlainDocument, docPath: str, text: str):
-        currParsed: dict[int, (str, str)] = dict()
-        textList = text.split("\n")
-        for i in range(len(textList)):
-            line = textList[i]
-            found = re.search("^@(create|import) ", line)
-            if found is None:
+        currParsed: list[(str, str)] = list()
+        lineIndex = 0
+        while lineIndex > -1:
+            lineIndex = text.find("\n")
+            line = text[:lineIndex+1].strip()
+            text = text[lineIndex+1:]
+            if line == "":
                 continue
 
-            currParsed[i] = (found.group(0), line)
+            found = self.__pattern.search(line)
+            if found is None:
+                break
 
-        for key, val in currParsed.items():
-            prevLine = ""
-            currLine = val[1]
-            if key in self.__prevParsed:
-                temp = self.__prevParsed.pop(key)
-                prevLine = temp[1]
-            
-            token: Token = self.__tokenDict.get(val[0])
-            token.tokenize(doc, docPath, prevLine, currLine)
+            currParsed.append((found.group(0), line))
 
-        for key, val in self.__prevParsed.items():
-            prevLine = val[1]
-            currLine = ""
+        if currParsed == self.__prevParsed:
+            return
 
-            token: Token = self.__tokenDict.get(val[0])
-            token.tokenize(doc, docPath, prevLine, currLine)
+        for prev in self.__prevParsed:
+            prevLine = prev[1]
+            token: Token = self.__tokenDict.get(prev[0])
+            token.tokenize(doc, docPath, prevLine, "")
+
+        for curr in currParsed:
+            currLine = curr[1]
+            token: Token = self.__tokenDict.get(curr[0])
+            token.tokenize(doc, docPath, "", currLine)
 
         self.__prevParsed = currParsed
 
@@ -71,32 +73,20 @@ class CreateToken(Token):
         tagPattern = re.compile(r"(?<=@create )[\w']+(?=@as)?")
         prevTag = re.search(tagPattern, prevLine)
         currTag = re.search(tagPattern, currLine)
-        if prevTag is None and currTag is None:
-            return
 
         rtm = doc.refTagManager()
 
-        if prevTag is None:
-            currTag = currTag.group(0)
-            refTag = rtm.addRefTag(currTag, docPath)
-        elif currTag is None:
-            prevTag = prevTag.group(0)
-            rtm.removeRefTag(prevTag)
-            return
-        else:
-            prevTag = prevTag.group(0)
-            currTag = currTag.group(0)
-            refTag = rtm.renameRefTag(prevTag, currTag)
+        # remove operation
+        if prevTag is not None:
+            rtm.removeRefTag(prevTag.group(0))
 
-        if refTag is not None:
+        # add operation
+        if currTag is not None:
+            refTag = rtm.addRefTag(currTag.group(0), docPath)
             aliasPattern = re.compile(r"(?<=@as )[\w',]+")
             aliases = re.findall(aliasPattern, currLine)
-            print(aliases)
-            refTag.clearAliases()
-            for alias in aliases:
-                refTag.addAlias(alias)
-
-        # TODO aliases are getting checked
+            refTag.addAliases(aliases)
+            print(refTag.aliasDict())
 
 
 class ImportToken(Token):

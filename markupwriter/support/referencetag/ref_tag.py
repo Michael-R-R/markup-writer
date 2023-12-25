@@ -52,6 +52,10 @@ class RefTag(object):
         self.__aliasDict[name] = AliasTag(self, name)
         return True
     
+    def addAliases(self, nameList: list[str]) -> bool:
+        for name in nameList:
+            self.addAlias(name)
+    
     def removeAlias(self, name: str) -> bool:
         if not name in self.__aliasDict:
             return False
