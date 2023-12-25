@@ -56,7 +56,7 @@ class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
         self._color = color
         self._format = QTextCharFormat()
-        self._expr = expr
+        self._expr = re.compile(expr)
 
         self._format.setFontWeight(QFont.Weight.Bold)
         self._format.setForeground(QBrush(self._color))
@@ -70,7 +70,7 @@ class HighlightBehaviour(object):
         self._format.setForeground(QBrush(self._color))
 
     def setExpression(self, expr: str):
-        self._expr = expr
+        self._expr = re.compile(expr)
         
 
 class HighlightWordBehaviour(HighlightBehaviour):
@@ -79,7 +79,7 @@ class HighlightWordBehaviour(HighlightBehaviour):
         self._wordSet = wordSet
 
     def process(self, highlighter: Highlighter, text: str):
-        wordCounter = Counter(re.findall(self._expr, text))
+        wordCounter = Counter(self._expr.findall(text))
         for word, _ in wordCounter.items():
             if not word in self._wordSet:
                 continue
@@ -125,7 +125,7 @@ class HighlightExprBehaviour(HighlightBehaviour):
         super().__init__(color, expr)
             
     def process(self, highlighter: Highlighter, text: str):
-        it = re.finditer(self._expr, text)
+        it = self._expr.finditer(text)
         for w in it:
             start = w.start()
             end = w.end() - start
