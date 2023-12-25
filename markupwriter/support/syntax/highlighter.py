@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 from __future__ import annotations
-import re
 
+import re
 from collections import Counter
 
 from PyQt6.QtGui import (
@@ -12,10 +12,6 @@ from PyQt6.QtGui import (
     QColor,
     QBrush,
     QFont,
-)
-
-from PyQt6.QtCore import (
-    QRegularExpression,
 )
 
 from markupwriter.config import HighlighterConfig

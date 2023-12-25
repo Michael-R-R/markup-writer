@@ -59,6 +59,8 @@ class RefTag(object):
         return True
     
     def renameAlias(self, old: str, new: str) -> bool:
+        if new == "":
+            return False
         if not old in self.__aliasDict:
             return False
         if new in self.__aliasDict:

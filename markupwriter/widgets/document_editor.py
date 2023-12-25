@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    QTimer,
+)
+
 from PyQt6.QtGui import (
     QResizeEvent,
     QTextCursor,
@@ -10,14 +14,16 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from markupwriter.config import AppConfig
+from markupwriter.config import (
+    AppConfig,
+)
 
 from markupwriter.widgetsupport.documenteditor import (
     PlainDocument,
 )
 
 from markupwriter.support.editorparser import (
-    ActiveEditorParser,
+    PassiveEditorParser,
 )
 
 class DocumentEditor(QPlainTextEdit):
@@ -25,21 +31,22 @@ class DocumentEditor(QPlainTextEdit):
         super().__init__(parent)
 
         self.__document = PlainDocument()
-        self.__activeParser = ActiveEditorParser()
+        self.__passiveParser = PassiveEditorParser()
         
         self.setDocument(self.__document)
         self.setTabStopDistance(20.0)
 
-        self.textChanged.connect(self.onTextChanged)
+        self.__autoTimer = QTimer(self)
+        self.__autoTimer.timeout.connect(self.onAutoTimer)
+        self.__autoTimer.start(1000)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorSize = e.size()
         return super().resizeEvent(e)
     
-    def onTextChanged(self):
-        cursor = self.textCursor()
-        cursor.movePosition(QTextCursor.MoveOperation.EndOfLine)
-        cursor.select(QTextCursor.SelectionType.LineUnderCursor)
-        self.__activeParser.tokenize(self.__document, 
-                                     "todo/add/real/activepath.doc",
-                                     cursor.selectedText())
+    def onAutoTimer(self):
+        document = self.__document
+        parser = self.__passiveParser
+        parser.tokenize(document,
+                        "todo/add/real/activepath.doc",
+                        document.toPlainText())

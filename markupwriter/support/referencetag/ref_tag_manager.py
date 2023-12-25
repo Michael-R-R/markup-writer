@@ -6,11 +6,14 @@ class RefTagManager:
     def __init__(self) -> None:
         self.__refTagDict: dict[str, RefTag] = dict()
 
-    def addRefTag(self, name: str, path: str) -> bool:
+    def addRefTag(self, name: str, path: str) -> RefTag | None:
+        if name == "":
+            return None
         if name in self.__refTagDict:
-            return False
-        self.__refTagDict[name] = RefTag(path, name)
-        return True
+            return None
+        refTag = RefTag(path, name)
+        self.__refTagDict[name] = refTag
+        return refTag
     
     def removeRefTag(self, name: str) -> bool:
         if not name in self.__refTagDict:
@@ -18,14 +21,17 @@ class RefTagManager:
         self.__refTagDict.pop(name)
         return True
     
-    def renameRefTag(self, old: str, new: str) -> bool:
+    def renameRefTag(self, old: str, new: str) -> RefTag | None:
+        if new == "":
+            return None
         if not old in self.__refTagDict:
-            return False
+            return None
         if new in self.__refTagDict:
-            return False
-        self.__refTagDict[old].rename(new)
-        self.__refTagDict[new] = self.__refTagDict.pop(old)
-        return True
+            return None
+        refTag = self.__refTagDict.pop(old)
+        refTag.rename(new)
+        self.__refTagDict[new] = refTag
+        return refTag
     
     def getRefTag(self, name: str) -> RefTag | None:
         if not name in self.__refTagDict:
@@ -36,6 +42,8 @@ class RefTagManager:
         return name in self.__refTagDict
     
     def addDocToTag(self, tagName: str, docPath: str) -> bool:
+        if docPath == "":
+            return False
         if not tagName in self.__refTagDict:
             return False
         refTag = self.__refTagDict[tagName]
