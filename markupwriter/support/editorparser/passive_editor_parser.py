@@ -11,10 +11,6 @@ from markupwriter.support.syntax import (
     HighlightWordBehaviour,
 )
 
-from markupwriter.support.referencetag import (
-    AliasTag,
-)
-
 class PassiveEditorParser(object):
     def __init__(self) -> None:
         self.__pattern = re.compile(r"^@(create|import)\s")

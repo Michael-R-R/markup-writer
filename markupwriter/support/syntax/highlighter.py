@@ -56,7 +56,7 @@ class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
         self._color = color
         self._format = QTextCharFormat()
-        self._expr = re.compile(expr, re.I)
+        self._expr = re.compile(expr)
 
         self._format.setFontWeight(QFont.Weight.Bold)
         self._format.setForeground(QBrush(self._color))
@@ -84,13 +84,12 @@ class HighlightWordBehaviour(HighlightBehaviour):
             if not word in self._wordSet:
                 continue
 
-            start = text.find(word, 0)
-            while start > -1:
-                length = len(word)
-                highlighter.updateFormat(start,
-                                         length,
-                                         self._format)
-                start = text.find(word, start + length)
+            word = r"\b" + word + r"\b"
+            it = re.finditer(word, text)
+            for m in it:
+                start = m.start()
+                end = m.end() - start
+                highlighter.updateFormat(start, end, self._format)
 
     def addWord(self, word: str) -> bool:
         if word in self._wordSet:
