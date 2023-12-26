@@ -20,9 +20,6 @@ class PassiveEditorParser(object):
         }
 
     def tokenize(self, doc: PlainDocument, docPath: str, text: str):
-        rtm = doc.refTagManager()
-        print(len(rtm.refTagDict()), rtm.refTagDict())
-
         currParsed: list[(str, str)] = list()
         lineIndex = 0
         while lineIndex > -1:
