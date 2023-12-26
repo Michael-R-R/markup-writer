@@ -16,13 +16,13 @@ class HighlighterConfig(BaseConfig):
     # Base-line: 70% lightness, 50% saturation
     refTagCol = QColor(64, 191, 142)
     aliasTagCol = QColor(224, 224, 133)
-    commentCol = QColor(121, 210, 121)
+    commentCol = QColor(128, 128, 128)
     keywordCol = QColor(217, 140, 179)
 
     def reset():
         HighlighterConfig.refTagCol = QColor(64, 191, 142)
         HighlighterConfig.aliasTagCol = QColor(224, 224, 133)
-        HighlighterConfig.commentCol = QColor(121, 210, 121)
+        HighlighterConfig.commentCol = QColor(128, 128, 128)
         HighlighterConfig.keywordCol = QColor(217, 140, 179)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
