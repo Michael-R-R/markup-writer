@@ -6,8 +6,13 @@ from markupwriter.widgetsupport.documenteditor import (
     PlainDocument,
 )
 
+from markupwriter.support.syntax import (
+    BEHAVIOUR,
+    HighlightWordBehaviour,
+)
+
 from markupwriter.support.referencetag import (
-    RefTagManager,
+    AliasTag,
 )
 
 class PassiveEditorParser(object):
@@ -21,11 +26,11 @@ class PassiveEditorParser(object):
 
     def tokenize(self, doc: PlainDocument, docPath: str, text: str):
         currParsed: list[(str, str)] = list()
-        lineIndex = 0
-        while lineIndex > -1:
-            lineIndex = text.find("\n")
-            line = text[:lineIndex+1].strip()
-            text = text[lineIndex+1:]
+        index = 0
+        while index > -1:
+            index = text.find("\n")
+            line = text[:index+1].strip()
+            text = text[index+1:]
             if line == "":
                 continue
 
@@ -76,7 +81,11 @@ class CreateToken(Token):
         
         rtm = doc.refTagManager()
         refTag = rtm.addRefTag(tag.group(0), docPath)
-        aliases = self.__aliasPattern.findall(line)
+        aliases = self.__aliasPattern.search(line)
+        if aliases is None:
+            return
+        
+        aliases = aliases.group(0).split(",")
         refTag.addAliases(aliases)
 
     def remove(self, doc: PlainDocument, line: str):
@@ -91,6 +100,54 @@ class CreateToken(Token):
 class ImportToken(Token):
     def __init__(self) -> None:
         super().__init__()
+        self.__tagPattern = re.compile(r"(?<=@import )[\w']+(?=@as)?")
+        self.__aliasPattern = re.compile(r"(?<=@as )[\w',]+")
 
     def add(self, doc: PlainDocument, docPath: str, line: str):
-        pass
+        tag = self.__tagPattern.search(line)
+        if tag is None:
+            return
+        tag = tag.group(0)
+        
+        rtm = doc.refTagManager()
+        refTag = rtm.getRefTag(tag)
+        if refTag is None:
+            return
+        
+        h = doc.highlighter()
+        refBehaviour: HighlightWordBehaviour = h.getBehaviour(BEHAVIOUR.refTag)
+        aliasBehaviour: HighlightWordBehaviour = h.getBehaviour(BEHAVIOUR.aliasTag)
+
+        refBehaviour.addWord(refTag.name())
+        
+        aliases = self.__aliasPattern.search(line)
+        if aliases is not None:
+            aliases = aliases.group(0).split(",")
+            aliasTags: list[AliasTag] = list()
+            for alias in aliases:
+                aliasTag = refTag.getAlias(alias)
+                if aliasTag is None:
+                    continue
+                aliasTags.append(aliasTag)
+                aliasBehaviour.addWord(alias)
+        
+        h.rehighlight()
+
+
+    def remove(self, doc: PlainDocument, line: str):
+        tag = self.__tagPattern.search(line)
+        if tag is None:
+            return
+
+        h = doc.highlighter()
+        refBehaviour: HighlightWordBehaviour = h.getBehaviour(BEHAVIOUR.refTag)
+        aliasBehaviour: HighlightWordBehaviour = h.getBehaviour(BEHAVIOUR.aliasTag)
+
+        refBehaviour.removeWord(tag.group(0))
+        
+        aliases = self.__aliasPattern.search(line)
+        if aliases is not None:
+            aliases = aliases.group(0).split(",")
+            aliasBehaviour.removeWords(aliases)
+
+        h.rehighlight()

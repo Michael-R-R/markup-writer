@@ -56,7 +56,7 @@ class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
         self._color = color
         self._format = QTextCharFormat()
-        self._expr = re.compile(expr)
+        self._expr = re.compile(expr, re.I)
 
         self._format.setFontWeight(QFont.Weight.Bold)
         self._format.setForeground(QBrush(self._color))
@@ -98,11 +98,19 @@ class HighlightWordBehaviour(HighlightBehaviour):
         self._wordSet.add(word)
         return True
     
+    def addWords(self, words: list[str]):
+        for word in words:
+            self.addWord(word)
+    
     def removeWord(self, word: str) -> bool:
         if not word in self._wordSet:
             return False
         self._wordSet.remove(word)
         return True
+    
+    def removeWords(self, words: list[str]):
+        for word in words:
+            self.removeWord(word)
     
     def renameWord(self, old: str, new: str) -> bool:
         if not old in self._wordSet:
@@ -112,6 +120,9 @@ class HighlightWordBehaviour(HighlightBehaviour):
         self._wordSet.remove(old)
         self._wordSet.add(new)
         return True
+    
+    def clearWords(self):
+        self._wordSet.clear()
     
     def getWords(self) -> set:
         return self._wordSet

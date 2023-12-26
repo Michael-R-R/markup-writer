@@ -52,7 +52,7 @@ class RefTag(object):
         self.__aliasDict[name] = AliasTag(self, name)
         return True
     
-    def addAliases(self, nameList: list[str]) -> bool:
+    def addAliases(self, nameList: list[str]):
         for name in nameList:
             self.addAlias(name)
     
