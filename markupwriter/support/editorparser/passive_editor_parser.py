@@ -53,7 +53,7 @@ class PassiveEditorParser(object):
 
         self.__prevParsed = currParsed
 
-    def clear(self):
+    def reset(self):
         self.__prevParsed.clear()
 
 
