@@ -20,6 +20,9 @@ class PassiveEditorParser(object):
         }
 
     def tokenize(self, doc: PlainDocument, docPath: str, text: str):
+        rtm = doc.refTagManager()
+        print(len(rtm.refTagDict()), rtm.refTagDict())
+
         currParsed: list[(str, str)] = list()
         lineIndex = 0
         while lineIndex > -1:
@@ -39,14 +42,12 @@ class PassiveEditorParser(object):
             return
 
         for prev in self.__prevParsed:
-            prevLine = prev[1]
             token: Token = self.__tokenDict.get(prev[0])
-            token.tokenize(doc, docPath, prevLine, "")
+            token.remove(doc, prev[1])
 
         for curr in currParsed:
-            currLine = curr[1]
             token: Token = self.__tokenDict.get(curr[0])
-            token.tokenize(doc, docPath, "", currLine)
+            token.add(doc, docPath, curr[1])
 
         self.__prevParsed = currParsed
 
@@ -58,40 +59,41 @@ class Token(object):
     def __init__(self) -> None:
         pass
 
-    def tokenize(self, doc: PlainDocument, docPath: str, prevLine: str, currLine: str):
-        raise NotImplementedError
+    def add(self, doc: PlainDocument, docPath: str, line: str):
+        raise NotImplementedError()
+    
+    def remove(self, doc: PlainDocument, line: str):
+        raise NotImplementedError()
 
     
 class CreateToken(Token):
     def __init__(self) -> None:
         super().__init__()
+        self.__tagPattern = re.compile(r"(?<=@create )[\w']+(?=@as)?")
+        self.__aliasPattern = re.compile(r"(?<=@as )[\w',]+")
 
-    def tokenize(self, doc: PlainDocument, docPath: str, prevLine: str, currLine: str):
-        if prevLine == currLine:
+    def add(self, doc: PlainDocument, docPath: str, line: str):
+        tag = self.__tagPattern.search(line)
+        if tag is None:
             return
         
-        tagPattern = re.compile(r"(?<=@create )[\w']+(?=@as)?")
-        prevTag = re.search(tagPattern, prevLine)
-        currTag = re.search(tagPattern, currLine)
-
         rtm = doc.refTagManager()
+        refTag = rtm.addRefTag(tag.group(0), docPath)
+        aliases = self.__aliasPattern.findall(line)
+        refTag.addAliases(aliases)
 
-        # remove operation
-        if prevTag is not None:
-            rtm.removeRefTag(prevTag.group(0))
-
-        # add operation
-        if currTag is not None:
-            refTag = rtm.addRefTag(currTag.group(0), docPath)
-            aliasPattern = re.compile(r"(?<=@as )[\w',]+")
-            aliases = re.findall(aliasPattern, currLine)
-            refTag.addAliases(aliases)
-            print(refTag.aliasDict())
+    def remove(self, doc: PlainDocument, line: str):
+        tag = self.__tagPattern.search(line)
+        if tag is  None:
+            return
+        
+        rtm = doc.refTagManager()
+        rtm.removeRefTag(tag.group(0))
 
 
 class ImportToken(Token):
     def __init__(self) -> None:
         super().__init__()
 
-    def tokenize(self, doc: PlainDocument, docPath: str, prevLine: str, currLine: str):
+    def add(self, doc: PlainDocument, docPath: str, line: str):
         pass
