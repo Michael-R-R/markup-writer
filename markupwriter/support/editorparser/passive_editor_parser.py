@@ -107,10 +107,9 @@ class ImportToken(Token):
         tag = self.__tagPattern.search(line)
         if tag is None:
             return
-        tag = tag.group(0)
         
         rtm = doc.refTagManager()
-        refTag = rtm.getRefTag(tag)
+        refTag = rtm.getRefTag(tag.group(0))
         if refTag is None:
             return
         
@@ -123,12 +122,9 @@ class ImportToken(Token):
         aliases = self.__aliasPattern.search(line)
         if aliases is not None:
             aliases = aliases.group(0).split(",")
-            aliasTags: list[AliasTag] = list()
             for alias in aliases:
-                aliasTag = refTag.getAlias(alias)
-                if aliasTag is None:
+                if not refTag.hasAlias(alias):
                     continue
-                aliasTags.append(aliasTag)
                 aliasBehaviour.addWord(alias)
         
         h.rehighlight()
