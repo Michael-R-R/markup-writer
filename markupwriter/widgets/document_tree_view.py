@@ -22,6 +22,7 @@ class DocumentTreeView(QWidget):
         vLayout = QVBoxLayout(self)
         vLayout.setContentsMargins(0, 0, 0, 0)
         vLayout.setSpacing(0)
+        
         vLayout.addWidget(DocumentTreeBar(self))
         vLayout.addWidget(DocumentTree(self))
 

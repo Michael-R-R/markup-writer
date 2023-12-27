@@ -9,10 +9,10 @@ from PyQt6.QtGui import (
     QColor,
 )
 
-from .base import BaseConfig
+from .base_config import BaseConfig
 
 class HighlighterConfig(BaseConfig):
-    INI_PATH = QDir("./resources/configs/highlighterConfig.ini").absolutePath()
+    INI_PATH = QDir.cleanPath("./resources/configs/highlighterConfig.ini")
     # Base-line: 70% lightness, 50% saturation
     refTagCol = QColor(64, 191, 142)
     aliasTagCol = QColor(224, 224, 133)

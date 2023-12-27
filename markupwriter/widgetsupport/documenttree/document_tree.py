@@ -25,3 +25,8 @@ class DocumentTree(QTreeWidget):
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setFrameStyle(QFrame.Shape.NoFrame)
         self.setHeaderHidden(True)
+
+        item = QTreeWidgetItem()
+        folder = DocumentTreeItem("Folder", "", item, self)
+        self.addTopLevelItem(item)
+        self.setItemWidget(item, 0, folder)

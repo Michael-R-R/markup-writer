@@ -10,6 +10,10 @@ except Exception:
     print("ERROR::main::cannot import PyQt6 dependecies")
     sys.exit(1)
 
+from PyQt6.QtCore import (
+    QDir,
+)
+
 from markupwriter.core import (
     appStart,
     appRun,
@@ -17,6 +21,8 @@ from markupwriter.core import (
 )
 
 if __name__ == "__main__":
+    QDir.addSearchPath("icons", "./resources/icons/")
+
     appStart()
     status = appRun(sys.argv[1:])
     appClose()

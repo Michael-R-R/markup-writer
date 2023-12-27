@@ -1,5 +1,5 @@
 #!/usr/bin/python
 
-from .app import AppConfig
-from .highlighter import HighlighterConfig
+from .app_config import AppConfig
+from .highlighter_config import HighlighterConfig
 from .serialize_config import (readConfig, writeConfig)

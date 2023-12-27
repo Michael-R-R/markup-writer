@@ -6,10 +6,10 @@ from PyQt6.QtCore import (
     QSize,
 )
 
-from .base import BaseConfig
+from .base_config import BaseConfig
 
 class AppConfig(BaseConfig):
-    INI_PATH = QDir("./resources/configs/appConfig.ini").absolutePath()
+    INI_PATH = QDir.cleanPath("./resources/configs/appConfig.ini")
     APP_NAME = "Markup Writer"
     mainWindowSize = QSize(800, 600)
     docTreeViewSize = QSize(100, 100)
