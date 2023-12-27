@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import AppConfig
 from markupwriter.widgets import (
-    DocumentTree,
+    DocumentTreeView,
     DocumentEditor,
     DocumentPreview,
     Terminal
@@ -31,18 +31,18 @@ class CentralWidget(QWidget):
         hSplitter = QSplitter(Qt.Orientation.Horizontal)
         vSplitter = QSplitter(Qt.Orientation.Vertical)
 
-        documentTree = DocumentTree(self)
+        documentTreeView = DocumentTreeView(self)
         documentEditor = DocumentEditor(self)
         terminal = Terminal(self)
         documentPreview = DocumentPreview(self)
 
-        hSplitter.addWidget(documentTree)
+        hSplitter.addWidget(documentTreeView)
         hSplitter.addWidget(vSplitter)
         vSplitter.addWidget(documentEditor)
         vSplitter.addWidget(terminal)
         hSplitter.addWidget(documentPreview)
 
-        hSplitter.setSizes([AppConfig.docTreeSize.width(),
+        hSplitter.setSizes([AppConfig.docTreeViewSize.width(),
                             AppConfig.docEditorSize.width(),
                             AppConfig.docPreviewSize.width()])
         vSplitter.setSizes([AppConfig.docEditorSize.height(),
