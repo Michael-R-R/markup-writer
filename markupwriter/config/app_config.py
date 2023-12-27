@@ -11,6 +11,7 @@ from .base_config import BaseConfig
 class AppConfig(BaseConfig):
     INI_PATH = QDir.cleanPath("./resources/configs/appConfig.ini")
     APP_NAME = "Markup Writer"
+    ICON_SIZE = QSize(12, 12)
     mainWindowSize = QSize(800, 600)
     docTreeViewSize = QSize(100, 100)
     docEditorSize = QSize(100, 100)

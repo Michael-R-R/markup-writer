@@ -6,6 +6,8 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtGui import (
     QIcon,
+    QPixmap,
+    QColor,
 )
 
 class Icon(object):
@@ -26,3 +28,7 @@ class Icon(object):
     SCENE_FILE = QIcon("icons:file.svg")
     SECTION_FILE = QIcon("icons:file.svg")
     MISC_FILE = QIcon("icons:file.svg")
+
+    # Misc
+    CHECK = QIcon("icons:check.svg")
+    UNCHECK = QIcon("icons:uncheck.svg")
