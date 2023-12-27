@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
-from .document_tree_item import (
-    DocumentTreeItem,
+from .base_tree_item import (
+    BaseTreeItem,
+)
+
+from .folder_tree_item import (
+    FOLDER,
+    FolderTreeItem,
 )

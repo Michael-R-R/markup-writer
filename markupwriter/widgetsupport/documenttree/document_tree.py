@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
     QFrame,
 )
 
-from .treeitem import DocumentTreeItem
+from .treeitem import FOLDER, FolderTreeItem
 
 class DocumentTree(QTreeWidget):
     def __init__(self, parent: QWidget):
@@ -27,6 +27,6 @@ class DocumentTree(QTreeWidget):
         self.setHeaderHidden(True)
 
         item = QTreeWidgetItem()
-        folder = DocumentTreeItem("Novel", "", item, self)
+        folder = FolderTreeItem(FOLDER.root, "Novel", "", item, self)
         self.addTopLevelItem(item)
         self.setItemWidget(item, 0, folder)

@@ -5,6 +5,7 @@ from PyQt6.QtCore import (
 )
 
 from PyQt6.QtGui import (
+    QIcon,
     QPixmap,
     QColor,
 )
@@ -24,7 +25,7 @@ from markupwriter.support.iconprovider import (
     Icon,
 )
 
-class DocumentTreeItem(QWidget):
+class BaseTreeItem(QWidget):
     W_ICON = 1
     W_TITLE = 2
     W_COUNT = 3
@@ -89,6 +90,10 @@ class DocumentTreeItem(QWidget):
         if path == "":
             return
         self._path = path
+
+    def setIcon(self, icon: QIcon):
+        label: QLabel = self.children()[self.W_ICON]
+        label.setPixmap(icon.pixmap(AppConfig.ICON_SIZE))
 
     def setTitle(self, text: str):
         if text == "":
