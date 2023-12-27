@@ -11,4 +11,4 @@ class DocumentTreeBar(QWidget):
         super().__init__(parent)
 
         hLayout = QHBoxLayout(self)
-        hLayout.addWidget(QLabel("<b>Content<b>", self))
+        hLayout.addWidget(QLabel("<b>Project Content<b>", self))

@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
     QFrame,
 )
 
-from .documentitem import DocumentTreeItem
+from .treeitem import DocumentTreeItem
 
 class DocumentTree(QTreeWidget):
     def __init__(self, parent: QWidget):
