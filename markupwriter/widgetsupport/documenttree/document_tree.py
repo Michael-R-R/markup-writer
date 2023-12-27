@@ -27,6 +27,6 @@ class DocumentTree(QTreeWidget):
         self.setHeaderHidden(True)
 
         item = QTreeWidgetItem()
-        folder = DocumentTreeItem("Folder", "", item, self)
+        folder = DocumentTreeItem("Novel", "", item, self)
         self.addTopLevelItem(item)
         self.setItemWidget(item, 0, folder)

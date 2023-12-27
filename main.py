@@ -21,8 +21,6 @@ from markupwriter.core import (
 )
 
 if __name__ == "__main__":
-    QDir.addSearchPath("icons", "./resources/icons/")
-
     appStart()
     status = appRun(sys.argv[1:])
     appClose()

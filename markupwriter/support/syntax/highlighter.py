@@ -20,7 +20,7 @@ from . import BEHAVIOUR
 class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument):
         super().__init__(document)
-
+        
         self.__behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
         self.addBehaviour(BEHAVIOUR.refTag, HighlightWordBehaviour(HighlighterConfig.refTagCol, set(), r"[\w']+"))
         self.addBehaviour(BEHAVIOUR.aliasTag, HighlightWordBehaviour(HighlighterConfig.aliasTagCol, set(), r"[\w']+"))

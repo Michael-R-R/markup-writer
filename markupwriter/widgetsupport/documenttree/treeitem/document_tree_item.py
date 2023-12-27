@@ -1,18 +1,14 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    QDir,
-)
-
-from PyQt6.QtGui import (
-    QIcon,
-)
-
 from PyQt6.QtWidgets import (
     QWidget,
     QTreeWidgetItem,
     QHBoxLayout,
     QLabel,
+)
+
+from markupwriter.support.iconprovider import (
+    Icon,
 )
 
 class DocumentTreeItem(QWidget):
@@ -27,12 +23,14 @@ class DocumentTreeItem(QWidget):
         hLayout = QHBoxLayout(self)
         hLayout.setContentsMargins(0, 0, 0, 0)
 
+        self._icon = QLabel("", self)
         self._title = QLabel(title, self)
         self._wordCount = QLabel("~", self)
         self._activeStatus = QLabel("~", self)
         self._groupStatus = QLabel("~", self)
         self._priorityStatus = QLabel("~", self)
 
+        hLayout.addWidget(self._icon)
         hLayout.addWidget(self._title)
         hLayout.addStretch()
         hLayout.addWidget(self._wordCount)

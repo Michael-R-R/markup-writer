@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-from enum import Enum
+from enum import Enum, auto
 
 class BEHAVIOUR(Enum):
-    refTag = 1
-    aliasTag = 2
-    comment = 3
-    keyword = 4
+    refTag = auto()
+    aliasTag = auto()
+    comment = auto()
+    keyword = auto()
