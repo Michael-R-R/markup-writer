@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from enum import Enum, auto
 from collections import Counter
 
 from PyQt6.QtGui import (
@@ -15,7 +16,12 @@ from PyQt6.QtGui import (
 )
 
 from markupwriter.config import HighlighterConfig
-from . import BEHAVIOUR
+
+class BEHAVIOUR(Enum):
+    refTag = 0
+    aliasTag = auto()
+    comment = auto()
+    keyword = auto()
 
 class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument):

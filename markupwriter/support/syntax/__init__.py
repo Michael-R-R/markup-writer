@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-from .behaviour import BEHAVIOUR
 from .highlighter import (
+    BEHAVIOUR,
     Highlighter, 
     HighlightWordBehaviour, 
-    HighlightExprBehaviour
+    HighlightExprBehaviour,
 )

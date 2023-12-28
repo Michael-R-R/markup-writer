@@ -1,51 +1,72 @@
 #!/usr/bin/python
 
-from enum import Enum, auto
+from enum import auto, Enum
+
+from PyQt6.QtCore import (
+    QDataStream,
+)
 
 from PyQt6.QtWidgets import (
     QTreeWidgetItem, 
     QWidget,
 )
 
-from .base_tree_item import BaseTreeItem
+from .base_tree_item import (
+    BaseTreeItem,
+)
 
 from markupwriter.support.iconprovider import(
     Icon,
 )
 
 class FOLDER(Enum):
-    root = auto(),
-    plot = auto(),
-    timeline = auto(),
-    characters = auto(),
-    locations = auto(),
-    objects = auto(),
-    misc = auto(),
+    root = 0
+    plot = auto()
+    timeline = auto()
+    characters = auto()
+    locations = auto()
+    objects = auto()
+    misc = auto()
 
 class FolderTreeItem(BaseTreeItem):
     def __init__(self,
-                 type: FOLDER,
-                 title: str, path: str,
+                 folderType: FOLDER,
+                 path: str,
+                 title: str,
                  item: QTreeWidgetItem,
                  parent: QWidget):
-        super().__init__(title, path, item, parent)
-        self._type = type
+        super().__init__(path, title, item, True, parent)
+        self._folderType = folderType
 
         self.applyIcon()
 
+    def folderType(self, folderType: FOLDER):
+        self._folderType = folderType
+        self.applyIcon()
+    folderType = property(lambda self: self._folderType, folderType)
+
     def applyIcon(self):
-        match self._type:
+        match self._folderType:
             case FOLDER.root:
-                self.setIcon(Icon.ROOT_FOLDER)
+                self.icon = Icon.ROOT_FOLDER
             case FOLDER.plot:
-                self.setIcon(Icon.PLOT_FOLDER)
+                self.icon = Icon.PLOT_FOLDER
             case FOLDER.timeline:
-                self.setIcon(Icon.TIMELINE_FOLDER)
+                self.icon = Icon.TIMELINE_FOLDER
             case FOLDER.characters:
-                self.setIcon(Icon.CHARACTERS_FOLDER)
+                self.icon = Icon.CHARACTERS_FOLDER
             case FOLDER.locations:
-                self.setIcon(Icon.LOCATIONS_FOLDER)
+                self.icon = Icon.LOCATIONS_FOLDER
             case FOLDER.objects:
-                self.setIcon(Icon.OBJECTS_FOLDER)
+                self.icon = Icon.OBJECTS_FOLDER
             case FOLDER.misc:
-                self.setIcon(Icon.MISC_FILE)
+                self.icon = Icon.MISC_FILE
+    
+    def __rlshift__(self, sOut: QDataStream) -> QDataStream:
+        sOut.writeInt(self._folderType.value)
+        return super().__rlshift__(sOut)
+
+    def __rrshift__(self, sIn: QDataStream) -> QDataStream:
+        self._folderType = FOLDER(sIn.readInt())
+        return super().__rrshift__(sIn)
+    
