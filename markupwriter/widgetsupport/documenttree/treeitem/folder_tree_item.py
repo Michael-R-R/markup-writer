@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import annotations
 from enum import auto, Enum
 
 from PyQt6.QtCore import (
@@ -31,14 +32,21 @@ class FOLDER(Enum):
 class FolderTreeItem(BaseTreeItem):
     def __init__(self,
                  folderType: FOLDER,
-                 path: str,
                  title: str,
                  item: QTreeWidgetItem,
                  parent: QWidget):
-        super().__init__(path, title, item, True, parent)
+        super().__init__(title, item, True, parent)
         self._folderType = folderType
 
         self.applyIcon()
+
+    def deepcopy(self, parent: QWidget):
+        myCopy = FolderTreeItem(self.folderType,
+                                self.title,
+                                self.item,
+                                parent)
+        myCopy.applyIcon()
+        return myCopy
 
     def folderType(self, folderType: FOLDER):
         self._folderType = folderType

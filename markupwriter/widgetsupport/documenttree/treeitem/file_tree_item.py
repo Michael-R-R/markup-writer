@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import annotations
 from enum import auto, Enum
 from PyQt6.QtCore import QDataStream
 
@@ -26,16 +27,23 @@ class FILE(Enum):
 class FileTreeItem(BaseTreeItem):
     def __init__(self,
                  fileType: FILE,
-                 path: str,
                  title: str,
                  content: str,
                  item: QTreeWidgetItem,
                  parent: QWidget):
-        super().__init__(path, title, item, False, parent)
+        super().__init__(title, item, False, parent)
         self._fileType = fileType
         self._content = content
-
         self.applyIcon()
+
+    def deepcopy(self, parent: QWidget):
+        myCopy = FileTreeItem(self.fileType,
+                              self.title,
+                              self.content,
+                              self.item,
+                              parent)
+        myCopy.applyIcon()
+        return myCopy
 
     def fileType(self, val: FILE):
         self._fileType = val

@@ -34,7 +34,6 @@ class BaseTreeItem(QWidget):
     PRIORITY = 6
 
     def __init__(self,
-                 path: str,
                  title: str,
                  item: QTreeWidgetItem, 
                  isFolder: bool,
@@ -42,7 +41,6 @@ class BaseTreeItem(QWidget):
         super().__init__(parent)
 
         self._item = item
-        self._path = path
         self._title = title
         self._wordCount = "0"
         self._isActive = False
@@ -74,16 +72,14 @@ class BaseTreeItem(QWidget):
         self.groupStatus = self._groupStatus
         self.priorityStatus= self._priorityStatus
 
+    def item(self, val: QTreeWidgetItem):
+        self._item = val
+    item = property(lambda self: self._item, item)
+
     def icon(self, icon: QIcon):
         label: QLabel = self.children()[self.ICON]
         label.setPixmap(icon.pixmap(AppConfig.ICON_SIZE))
     icon = property(None, icon)
-
-    def path(self, text: str):
-        if text == "":
-            return
-        self._path = text
-    path = property(lambda self: self._path, path)
 
     def title(self, text: str):
         if text == "":
@@ -128,7 +124,6 @@ class BaseTreeItem(QWidget):
         self.isActive = not self.isActive
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        sOut.writeString(self._path)
         sOut.writeString(self._title)
         sOut.writeString(self._wordCount)
         sOut.writeBool(self._isActive)
@@ -138,7 +133,6 @@ class BaseTreeItem(QWidget):
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        self._path = sIn.readString()
         self._title = sIn.readString()
         self._wordCount = sIn.readString()
         self._isActive = sIn.readBool()
