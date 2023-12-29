@@ -31,3 +31,5 @@ class Icon(object):
     # Misc
     CHECK = QIcon("icons:check.svg")
     UNCHECK = QIcon("icons:uncheck.svg")
+    UP_ARROW = QIcon("icons:up_arrow.svg")
+    DOWN_ARROW = QIcon("icons:down_arrow.svg")

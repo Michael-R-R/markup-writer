@@ -9,7 +9,7 @@ from PyQt6.QtCore import (
 from .base_config import BaseConfig
 
 class AppConfig(BaseConfig):
-    INI_PATH = QDir.cleanPath("./resources/configs/appConfig.ini")
+    INI_PATH = QDir.cleanPath("./resources/configs/app.ini")
     APP_NAME = "Markup Writer"
     ICON_SIZE = QSize(12, 12)
     mainWindowSize = QSize(800, 600)
