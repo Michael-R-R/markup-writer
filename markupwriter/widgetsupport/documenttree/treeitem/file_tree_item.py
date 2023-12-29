@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 from enum import auto, Enum
-from PyQt6.QtCore import QDataStream
+import uuid
+
+from PyQt6.QtCore import (
+    QDataStream,
+)
 
 from PyQt6.QtWidgets import (
     QTreeWidgetItem, 
@@ -26,15 +30,29 @@ class FILE(Enum):
 
 class FileTreeItem(BaseTreeItem):
     def __init__(self,
-                 fileType: FILE,
-                 title: str,
-                 content: str,
-                 item: QTreeWidgetItem,
-                 parent: QWidget):
+                 fileType: FILE=None,
+                 title: str=None,
+                 content: str=None,
+                 item: QTreeWidgetItem=None,
+                 parent: QWidget=None):
         super().__init__(title, item, False, parent)
+        self._hash = str(uuid.uuid1())
         self._fileType = fileType
         self._content = content
+        self.applyChanges()
+
+    def hash(self, value: str) -> str:
+        self._hash = value
+    hash = property(lambda self: self._hash, hash)
+
+    def fileType(self, fileType: FILE):
+        self._fileType = fileType
         self.applyIcon()
+    fileType = property(lambda self: self._fileType, fileType)
+
+    def content(self, text: str):
+        self._content = text
+    content = property(lambda self: self._content, content)
 
     def deepcopy(self, parent: QWidget):
         myCopy = FileTreeItem(self.fileType,
@@ -42,17 +60,9 @@ class FileTreeItem(BaseTreeItem):
                               self.content,
                               self.item,
                               parent)
+        myCopy.hash = self.hash
         myCopy.applyIcon()
         return myCopy
-
-    def fileType(self, val: FILE):
-        self._fileType = val
-        self.applyIcon()
-    fileType = property(lambda self: self._fileType, fileType)
-
-    def content(self, text: str):
-        self._content = text
-    content = property(lambda self: self._content, content)
 
     def applyIcon(self):
         match self._fileType:
@@ -68,11 +78,13 @@ class FileTreeItem(BaseTreeItem):
                 self.icon = Icon.MISC_FILE
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
+        sOut.writeQString(self._hash)
         sOut.writeInt(self._fileType.value)
-        sOut.writeString(self._content)
+        sOut.writeQString(self._content)
         return super().__rlshift__(sOut)
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
+        self._hash = sIn.readQString()
         self._fileType = FILE(sIn.readInt())
-        self._content = sIn.readString()
+        self._content = sIn.readQString()
         return super().__rrshift__(sIn)

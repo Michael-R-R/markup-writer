@@ -31,14 +31,18 @@ class FOLDER(Enum):
 
 class FolderTreeItem(BaseTreeItem):
     def __init__(self,
-                 folderType: FOLDER,
-                 title: str,
-                 item: QTreeWidgetItem,
-                 parent: QWidget):
+                 folderType: FOLDER=None,
+                 title: str=None,
+                 item: QTreeWidgetItem=None,
+                 parent: QWidget=None):
         super().__init__(title, item, True, parent)
         self._folderType = folderType
+        self.applyChanges()
 
+    def folderType(self, folderType: FOLDER):
+        self._folderType = folderType
         self.applyIcon()
+    folderType = property(lambda self: self._folderType, folderType)
 
     def deepcopy(self, parent: QWidget):
         myCopy = FolderTreeItem(self.folderType,
@@ -47,12 +51,7 @@ class FolderTreeItem(BaseTreeItem):
                                 parent)
         myCopy.applyIcon()
         return myCopy
-
-    def folderType(self, folderType: FOLDER):
-        self._folderType = folderType
-        self.applyIcon()
-    folderType = property(lambda self: self._folderType, folderType)
-
+    
     def applyIcon(self):
         match self._folderType:
             case FOLDER.root:

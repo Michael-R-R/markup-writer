@@ -48,6 +48,9 @@ class BaseTreeItem(QWidget):
         self._priorityStatus = QColor(64, 64, 64)
         self._isFolder = isFolder
 
+        self.setup()
+
+    def setup(self):
         hLayout = QHBoxLayout(self)
         hLayout.setContentsMargins(0, 0, 0, 0)
         hLayout.addWidget(QLabel("icon", self))
@@ -58,19 +61,22 @@ class BaseTreeItem(QWidget):
         hLayout.addWidget(QLabel("group", self))
         hLayout.addWidget(QLabel("priority", self))
 
-        self.applyChanges()
-
-    isFolder = property(lambda self: self._isFolder, None)
+    def deepcopy(self, parent: QWidget):
+        raise NotImplementedError()
 
     def applyIcon(self):
         raise NotImplementedError()
 
     def applyChanges(self):
+        self.applyIcon()
         self.title = self._title
         self.wordCount = self._wordCount
         self.isActive = self._isActive
         self.groupStatus = self._groupStatus
         self.priorityStatus= self._priorityStatus
+
+    def isFolder(self) -> bool:
+        return self._isFolder
 
     def item(self, val: QTreeWidgetItem):
         self._item = val
@@ -124,8 +130,8 @@ class BaseTreeItem(QWidget):
         self.isActive = not self.isActive
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        sOut.writeString(self._title)
-        sOut.writeString(self._wordCount)
+        sOut.writeQString(self._title)
+        sOut.writeQString(self._wordCount)
         sOut.writeBool(self._isActive)
         sOut << self._groupStatus
         sOut << self._priorityStatus
@@ -133,8 +139,8 @@ class BaseTreeItem(QWidget):
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        self._title = sIn.readString()
-        self._wordCount = sIn.readString()
+        self._title = sIn.readQString()
+        self._wordCount = sIn.readQString()
         self._isActive = sIn.readBool()
         sIn >> self._groupStatus
         sIn >> self._priorityStatus

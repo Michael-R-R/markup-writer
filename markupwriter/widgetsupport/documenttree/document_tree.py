@@ -18,10 +18,12 @@ from PyQt6.QtWidgets import (
 )
 
 from .treeitem import (
+    BaseTreeItem,
     FOLDER, FolderTreeItem,
     FILE, FileTreeItem,
-    BaseTreeItem,
 )
+
+from markupwriter.util.serialize import serialize, deserialize
 
 class DocumentTree(QTreeWidget):
     fileDoubleClicked = pyqtSignal(FileTreeItem)
@@ -33,8 +35,7 @@ class DocumentTree(QTreeWidget):
         self.setUniformRowHeights(True)
         self.setAllColumnsShowFocus(True)
         self.setDragDropMode(self.DragDropMode.InternalMove)
-        self.setSelectionBehavior(self.SelectionBehavior.SelectRows)
-        self.setSelectionMode(self.SelectionMode.ExtendedSelection)
+        self.setSelectionMode(self.SelectionMode.SingleSelection)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setFrameStyle(QFrame.Shape.NoFrame)
         self.setHeaderHidden(True)
@@ -44,7 +45,20 @@ class DocumentTree(QTreeWidget):
 
         self.itemDoubleClicked.connect(self.onItemDoubleClick)
 
-    def addItemAtTop(self, item: BaseTreeItem):
+        # TODO test
+        item = QTreeWidgetItem()
+        folder1 = FolderTreeItem(FOLDER.root, "Novel 1", item, self)
+        self.addItemAtRoot(folder1)
+
+        item = QTreeWidgetItem()
+        folder2 = FolderTreeItem(FOLDER.root, "Novel 2", item, self)
+        self.addItemAtRoot(folder2)
+
+        item = QTreeWidgetItem()
+        file1 = FileTreeItem(FILE.title, "Title Page", "", item, self)
+        self.addChildItem(folder1, file1)
+
+    def addItemAtRoot(self, item: BaseTreeItem):
         self.addTopLevelItem(item.item)
         self.setItemWidget(item.item, 0, item)
 
@@ -66,10 +80,10 @@ class DocumentTree(QTreeWidget):
         self.removeItemWidget(parent, 0)
 
     def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
-        item = self.itemWidget(item, col)
-        if not isinstance(item, FileTreeItem):
+        widget: BaseTreeItem = self.itemWidget(item, col)
+        if widget.isFolder():
             return
-        self.fileDoubleClicked.emit(item)
+        self.fileDoubleClicked.emit(widget)
 
     def dragEnterEvent(self, e: QDragEnterEvent) -> None:
         self._draggedItem = self.currentItem()
@@ -82,25 +96,21 @@ class DocumentTree(QTreeWidget):
         if self._draggedItem is None:
             return
 
-        result = self.rebuildAt(self._draggedItem, list())
+        result = self.copyItemsAt(self._draggedItem, list())
         super().dropEvent(e)
         [self.setItemWidget(i.item, 0, i) for i in result]
+        self.clearSelection()
         self._draggedItem = None
 
-    def rebuildAt(self, parent: QTreeWidgetItem, itemList: list[BaseTreeItem]) -> list[BaseTreeItem]:
+    def copyItemsAt(self, parent: QTreeWidgetItem, itemList: list[BaseTreeItem]) -> list[BaseTreeItem]:
         result = itemList
 
         for i in range(parent.childCount()):
             child = parent.child(i)
-            result = self.rebuildAt(child, result)
+            result = self.copyItemsAt(child, result)
 
-        widget = self.itemWidget(parent, 0)
-        if isinstance(widget, FolderTreeItem):
-            widget: FolderTreeItem = widget
-            result.append(widget.deepcopy(self))
-        else:
-            widget: FileTreeItem = widget
-            result.append(widget.deepcopy(self))
+        widget: BaseTreeItem = self.itemWidget(parent, 0)
+        result.append(widget.deepcopy(self))
 
         return result
 
