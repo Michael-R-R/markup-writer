@@ -43,27 +43,6 @@ class DocumentTree(QTreeWidget):
 
         self.itemDoubleClicked.connect(self.onItemDoubleClick)
 
-        # TODO test
-        item = QTreeWidgetItem()
-        folder1 = FolderTreeItem(FOLDER.root, "Novel 1", item, self)
-        self.addItemAtRoot(folder1)
-
-        item = QTreeWidgetItem()
-        folder2 = FolderTreeItem(FOLDER.root, "Novel 2", item, self)
-        self.addItemAtRoot(folder2)
-
-        item = QTreeWidgetItem()
-        file1 = FileTreeItem(FILE.title, "Title Page", "", item, self)
-        self.addChildItem(folder1, file1)
-
-        item = QTreeWidgetItem()
-        file2 = FileTreeItem(FILE.chapter, "Chapter One", "", item, self)
-        self.addChildItem(folder1, file2)
-
-        item = QTreeWidgetItem()
-        file3 = FileTreeItem(FILE.scene, "Scene One", "", item, self)
-        self.addChildItem(folder1, file3)
-
     def addItemAtRoot(self, item: BaseTreeItem):
         self.addTopLevelItem(item.item)
         self.setItemWidget(item.item, 0, item)
