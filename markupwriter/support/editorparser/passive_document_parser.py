@@ -11,16 +11,17 @@ from markupwriter.support.syntax import (
     HighlightWordBehaviour,
 )
 
-class PassiveEditorParser(object):
-    def __init__(self) -> None:
-        self.__pattern = re.compile(r"^@(create|import)\s")
-        self.__prevParsed: list[(str, str)] = list()
-        self.__tokenDict = {
+class PassiveDocumentParser(object):
+    def __init__(self, doc: PlainDocument) -> None:
+        self._doc = doc
+        self._pattern = re.compile(r"^@(create|import)\s")
+        self._prevParsed: list[(str, str)] = list()
+        self._tokenDict = {
             "@create ": CreateToken(),
             "@import ": ImportToken(),
         }
 
-    def tokenize(self, doc: PlainDocument, docPath: str, text: str):
+    def tokenize(self, path: str, text: str):
         currParsed: list[(str, str)] = list()
         index = 0
         while index > -1:
@@ -30,34 +31,34 @@ class PassiveEditorParser(object):
             if line == "":
                 continue
 
-            found = self.__pattern.search(line)
+            found = self._pattern.search(line)
             if found is None:
                 break
 
             currParsed.append((found.group(0), line))
 
-        if currParsed == self.__prevParsed:
+        if currParsed == self._prevParsed:
             return
 
-        for prev in self.__prevParsed:
-            token: Token = self.__tokenDict.get(prev[0])
-            token.remove(doc, prev[1])
+        for prev in self._prevParsed:
+            token: Token = self._tokenDict.get(prev[0])
+            token.remove(self._doc, prev[1])
 
         for curr in currParsed:
-            token: Token = self.__tokenDict.get(curr[0])
-            token.add(doc, docPath, curr[1])
+            token: Token = self._tokenDict.get(curr[0])
+            token.add(self._doc, path, curr[1])
 
-        self.__prevParsed = currParsed
+        self._prevParsed = currParsed
 
     def reset(self):
-        self.__prevParsed.clear()
+        self._prevParsed.clear()
 
 
 class Token(object):
     def __init__(self) -> None:
         pass
 
-    def add(self, doc: PlainDocument, docPath: str, line: str):
+    def add(self, doc: PlainDocument, path: str, line: str):
         raise NotImplementedError()
     
     def remove(self, doc: PlainDocument, line: str):
@@ -70,13 +71,13 @@ class CreateToken(Token):
         self.__tagPattern = re.compile(r"(?<=@create )[\w']+(?=@as)?")
         self.__aliasPattern = re.compile(r"(?<=@as )[\w',]+")
 
-    def add(self, doc: PlainDocument, docPath: str, line: str):
+    def add(self, doc: PlainDocument, path: str, line: str):
         tag = self.__tagPattern.search(line)
         if tag is None:
             return
         
         rtm = doc.refTagManager()
-        refTag = rtm.addRefTag(tag.group(0), docPath)
+        refTag = rtm.addRefTag(tag.group(0), path)
         aliases = self.__aliasPattern.search(line)
         if aliases is None:
             return
@@ -99,7 +100,7 @@ class ImportToken(Token):
         self.__tagPattern = re.compile(r"(?<=@import )[\w']+(?=@as)?")
         self.__aliasPattern = re.compile(r"(?<=@as )[\w',]+")
 
-    def add(self, doc: PlainDocument, docPath: str, line: str):
+    def add(self, doc: PlainDocument, path: str, line: str):
         tag = self.__tagPattern.search(line)
         if tag is None:
             return
@@ -124,7 +125,6 @@ class ImportToken(Token):
                 aliasBehaviour.addWord(alias)
         
         h.rehighlight()
-
 
     def remove(self, doc: PlainDocument, line: str):
         tag = self.__tagPattern.search(line)

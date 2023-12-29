@@ -23,17 +23,17 @@ from markupwriter.widgetsupport.documenteditor import (
 )
 
 from markupwriter.support.editorparser import (
-    PassiveEditorParser,
+    PassiveDocumentParser,
 )
 
 class DocumentEditor(QPlainTextEdit):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
-        self.__document = PlainDocument()
-        self.__passiveParser = PassiveEditorParser()
+        self._document = PlainDocument()
+        self._passiveParser = PassiveDocumentParser(self._document)
         
-        self.setDocument(self.__document)
+        self.setDocument(self._document)
         self.setTabStopDistance(20.0)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:

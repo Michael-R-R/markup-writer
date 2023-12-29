@@ -1,3 +1,3 @@
 #!/usr/bin/python
 
-from .passive_editor_parser import PassiveEditorParser
+from .passive_document_parser import PassiveDocumentParser

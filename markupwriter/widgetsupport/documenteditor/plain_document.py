@@ -21,12 +21,12 @@ class PlainDocument(QTextDocument):
         super().__init__()
         
         self.setDocumentLayout(QPlainTextDocumentLayout(self))
-        self.__highlighter = Highlighter(self)
-        self.__refTagManager = RefTagManager()
+        self._highlighter = Highlighter(self)
+        self._refTagManager = RefTagManager()
 
     def highlighter(self) -> Highlighter:
-        return self.__highlighter
+        return self._highlighter
     
     def refTagManager(self) -> RefTagManager:
-        return self.__refTagManager
+        return self._refTagManager
         
