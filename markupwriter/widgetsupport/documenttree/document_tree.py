@@ -23,8 +23,6 @@ from .treeitem import (
     FILE, FileTreeItem,
 )
 
-from markupwriter.util.serialize import serialize, deserialize
-
 class DocumentTree(QTreeWidget):
     fileDoubleClicked = pyqtSignal(FileTreeItem)
 
@@ -44,19 +42,6 @@ class DocumentTree(QTreeWidget):
         self._draggedItem = None
 
         self.itemDoubleClicked.connect(self.onItemDoubleClick)
-
-        # TODO test
-        item = QTreeWidgetItem()
-        folder1 = FolderTreeItem(FOLDER.root, "Novel 1", item, self)
-        self.addItemAtRoot(folder1)
-
-        item = QTreeWidgetItem()
-        folder2 = FolderTreeItem(FOLDER.root, "Novel 2", item, self)
-        self.addItemAtRoot(folder2)
-
-        item = QTreeWidgetItem()
-        file1 = FileTreeItem(FILE.title, "Title Page", "", item, self)
-        self.addChildItem(folder1, file1)
 
     def addItemAtRoot(self, item: BaseTreeItem):
         self.addTopLevelItem(item.item)
@@ -86,7 +71,14 @@ class DocumentTree(QTreeWidget):
         self.fileDoubleClicked.emit(widget)
 
     def dragEnterEvent(self, e: QDragEnterEvent) -> None:
-        self._draggedItem = self.currentItem()
+        item = self.currentItem()
+        widget: BaseTreeItem = self.itemWidget(item, 0)
+        if widget.isFolder():
+            widget: FolderTreeItem = widget
+            if widget.folderType != FOLDER.misc:
+                return
+            
+        self._draggedItem = item
 
         return super().dragEnterEvent(e)
     
@@ -115,7 +107,7 @@ class DocumentTree(QTreeWidget):
         return result
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        return sOut
+        raise NotImplementedError()
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        return sIn
+        raise NotImplementedError()

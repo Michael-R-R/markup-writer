@@ -27,6 +27,7 @@ class FOLDER(Enum):
     characters = auto()
     locations = auto()
     objects = auto()
+    trash = auto()
     misc = auto()
 
 class FolderTreeItem(BaseTreeItem):
@@ -66,8 +67,10 @@ class FolderTreeItem(BaseTreeItem):
                 self.icon = Icon.LOCATIONS_FOLDER
             case FOLDER.objects:
                 self.icon = Icon.OBJECTS_FOLDER
+            case FOLDER.trash:
+                self.icon = Icon.TRASH_FOLDER
             case FOLDER.misc:
-                self.icon = Icon.MISC_FILE
+                self.icon = Icon.MISC_FOLDER
     
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut.writeInt(self._folderType.value)
