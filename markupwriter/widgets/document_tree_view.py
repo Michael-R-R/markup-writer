@@ -23,8 +23,11 @@ class DocumentTreeView(QWidget):
         vLayout.setContentsMargins(0, 0, 0, 0)
         vLayout.setSpacing(0)
         
-        vLayout.addWidget(DocumentTreeBar(self))
-        vLayout.addWidget(DocumentTree(self))
+        treeBar = DocumentTreeBar(self)
+        tree = DocumentTree(self)
+
+        vLayout.addWidget(treeBar)
+        vLayout.addWidget(tree)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docTreeViewSize = e.size()
