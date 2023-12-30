@@ -56,7 +56,7 @@ class AddItemMenu(QMenu):
         action.triggered.connect(lambda: self.createFile(fileType))
 
     def createFolder(self, folderType: FOLDER):
-        result: (str, bool) = StrDialog.run("Enter Name", None)
+        result: (str, bool) = StrDialog.run("Enter Name", "Folder", None)
         if not result[1]:
             return
 
@@ -64,7 +64,7 @@ class AddItemMenu(QMenu):
         self.itemCreated.emit(folder)
     
     def createFile(self, fileType: FILE):
-        result: (str, bool) = StrDialog.run("Enter Name", None)
+        result: (str, bool) = StrDialog.run("Enter Name", "File", None)
         if not result[1]:
             return
         

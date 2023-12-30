@@ -7,9 +7,9 @@ from PyQt6.QtWidgets import (
 )
 
 class StrDialog(object):
-    def run(title: str, parent: QWidget | None) -> (str, bool):
+    def run(title: str, label: str, parent: QWidget | None) -> (str, bool):
         return QInputDialog.getText(parent,
                                     title,
                                     "Text",
                                     QLineEdit.EchoMode.Normal,
-                                    "Default")
+                                    label)
