@@ -24,6 +24,10 @@ from markupwriter.support.iconprovider import (
     Icon,
 )
 
+from markupwriter.dialogs.modal import (
+    StrDialog,
+)
+
 class AddItemMenu(QMenu):
     itemCreated = pyqtSignal(BaseTreeItem)
 
@@ -52,9 +56,17 @@ class AddItemMenu(QMenu):
         action.triggered.connect(lambda: self.createFile(fileType))
 
     def createFolder(self, folderType: FOLDER):
-        folder = FolderTreeItem(folderType, "No Name", QTreeWidgetItem())
+        result: (str, bool) = StrDialog.run("Enter Name", None)
+        if not result[1]:
+            return
+
+        folder = FolderTreeItem(folderType, result[0], QTreeWidgetItem())
         self.itemCreated.emit(folder)
     
     def createFile(self, fileType: FILE):
-        file = FileTreeItem(fileType, "No Name", "", QTreeWidgetItem())
+        result: (str, bool) = StrDialog.run("Enter Name", None)
+        if not result[1]:
+            return
+        
+        file = FileTreeItem(fileType, result[0], "", QTreeWidgetItem())
         self.itemCreated.emit(file)
