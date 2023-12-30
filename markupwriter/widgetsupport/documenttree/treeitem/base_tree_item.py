@@ -35,8 +35,10 @@ class BaseTreeItem(QWidget):
 
     def __init__(self,
                  title: str,
-                 item: QTreeWidgetItem, 
+                 isDraggable: bool,
+                 isEditable: bool,
                  isFolder: bool,
+                 item: QTreeWidgetItem, 
                  parent: QWidget):
         super().__init__(parent)
 
@@ -46,6 +48,8 @@ class BaseTreeItem(QWidget):
         self._isActive = False
         self._groupStatus = QColor(64, 64, 64)
         self._priorityStatus = QColor(64, 64, 64)
+        self._isDraggable = isDraggable
+        self._isEditable = isEditable
         self._isFolder = isFolder
 
         self.setup()
@@ -61,7 +65,7 @@ class BaseTreeItem(QWidget):
         hLayout.addWidget(QLabel("group", self))
         hLayout.addWidget(QLabel("priority", self))
 
-    def deepcopy(self, parent: QWidget):
+    def deepcopy(self):
         raise NotImplementedError()
 
     def applyIcon(self):
@@ -77,6 +81,14 @@ class BaseTreeItem(QWidget):
 
     def isFolder(self) -> bool:
         return self._isFolder
+    
+    def isDraggable(self) -> bool:
+        return self._isDraggable
+    isDraggable = property(lambda self: self._isDraggable, isDraggable)
+
+    def isEditable(self) -> bool:
+        return self._isEditable
+    isEditable = property(lambda self: self._isEditable, isEditable)
 
     def item(self, val: QTreeWidgetItem):
         self._item = val
@@ -135,6 +147,8 @@ class BaseTreeItem(QWidget):
         sOut.writeBool(self._isActive)
         sOut << self._groupStatus
         sOut << self._priorityStatus
+        sOut.writeBool(self._isDraggable)
+        sOut.writeBool(self._isEditable)
         sOut.writeBool(self._isFolder)
         return sOut
     
@@ -144,5 +158,7 @@ class BaseTreeItem(QWidget):
         self._isActive = sIn.readBool()
         sIn >> self._groupStatus
         sIn >> self._priorityStatus
+        self._isDraggable = sIn.readBool()
+        self._isEditable = sIn.readBool()
         self._isFolder = sIn.readBool()
         return sIn

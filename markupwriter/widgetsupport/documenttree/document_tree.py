@@ -4,6 +4,7 @@ from PyQt6.QtCore import (
     Qt,
     QDataStream,
     pyqtSignal,
+    QPoint,
 )
 from PyQt6.QtGui import (
     QDragEnterEvent,
@@ -19,12 +20,21 @@ from PyQt6.QtWidgets import (
 
 from .treeitem import (
     BaseTreeItem,
-    FOLDER, FolderTreeItem,
-    FILE, FileTreeItem,
+    BaseFileItem,
+    PlotFolderItem,
+    TimelineFolderItem,
+    CharsFolderItem,
+    LocFolderItem,
+    ObjFolderItem,
+    TrashFolderItem,
+)
+
+from markupwriter.menus.documenttree import (
+    TreeContextMenu,
 )
 
 class DocumentTree(QTreeWidget):
-    fileDoubleClicked = pyqtSignal(FileTreeItem)
+    fileDoubleClicked = pyqtSignal(BaseFileItem)
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -40,25 +50,32 @@ class DocumentTree(QTreeWidget):
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self._draggedItem = None
+        self._contextMenu = TreeContextMenu(self)
+        self._contextMenu.addItemMenu.itemCreated.connect(self.addItem)
+        self._contextMenu.moveToTrash.triggered.connect(self.onMoveToTrash)
+
+        self.addItem(PlotFolderItem("Plot", QTreeWidgetItem(), self))
+        self.addItem(TimelineFolderItem("Timeline", QTreeWidgetItem(), self))
+        self.addItem(CharsFolderItem("Characters", QTreeWidgetItem(), self))
+        self.addItem(LocFolderItem("Locations", QTreeWidgetItem(), self))
+        self.addItem(ObjFolderItem("Objects", QTreeWidgetItem(), self))
+        self.addItem(TrashFolderItem("Trash", QTreeWidgetItem(), self))
 
         self.itemDoubleClicked.connect(self.onItemDoubleClick)
+        self.customContextMenuRequested.connect(self.onContextMenuRequest)
 
-    def addItem(self, item: BaseTreeItem):
+    def addItem(self, item: BaseTreeItem, isActive: bool = False):
         parent = self.currentItem()
-        if parent is None: # add to root
+        if parent is None:
             self.addTopLevelItem(item.item)
-        else: # add as child
-            if item.isFolder():
-                folder: FolderTreeItem = item
-                if folder.folderType == FOLDER.root:
-                    self.addTopLevelItem(item.item)
-                else:
-                    parent.addChild(item.item)
-            else:
-                parent.addChild(item.item)
-
+        elif not item.isDraggable:
+            self.addTopLevelItem(item.item)
+        else:
+            parent.addChild(item.item)
+                
         self.setItemWidget(item.item, 0, item)
-        self.setCurrentItem(item.item)
+        if isActive:
+            self.setCurrentItem(item.item)
 
     def removeItem(self, parent: QTreeWidgetItem):
         for i in range(parent.childCount()):
@@ -71,7 +88,7 @@ class DocumentTree(QTreeWidget):
             self.takeTopLevelItem(index)
         self.removeItemWidget(parent, 0)
 
-    def moveSelectedItem(self, direction: int):
+    def moveCurrentItem(self, direction: int):
         child = self.currentItem()
         if child is None:
             return
@@ -82,18 +99,30 @@ class DocumentTree(QTreeWidget):
         if parent is None: # root item
             size = self.topLevelItemCount()
             index = self.indexFromItem(child, 0).row()
-            result = self.copyItemsAt(child, list())
+            result = self.copyItems(child, list())
             child = self.takeTopLevelItem(index)
             self.insertTopLevelItem((index+direction) % size, child)
         else: # child item
             size = parent.childCount()
             index = parent.indexOfChild(child)
-            result = self.copyItemsAt(child, list())
+            result = self.copyItems(child, list())
             child = parent.takeChild(index)
             parent.insertChild((index+direction) % size, child)
         
         [self.setItemWidget(i.item, 0, i) for i in result]
         self.setCurrentItem(child)
+
+    def copyItems(self, parent: QTreeWidgetItem, itemList: list[BaseTreeItem]) -> list[BaseTreeItem]:
+        result = itemList
+
+        for i in range(parent.childCount()):
+            child = parent.child(i)
+            result = self.copyItems(child, result)
+
+        widget: BaseTreeItem = self.itemWidget(parent, 0)
+        result.append(widget.deepcopy())
+
+        return result
 
     def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
         widget: BaseTreeItem = self.itemWidget(item, col)
@@ -101,13 +130,25 @@ class DocumentTree(QTreeWidget):
             return
         self.fileDoubleClicked.emit(widget)
 
+    def onContextMenuRequest(self, pos: QPoint):
+        self._contextMenu.exec(self.mapToGlobal(pos))
+
+    def onMoveToTrash(self):
+        item = self.currentItem()
+        if item is None:
+            return
+        
+        widget: BaseTreeItem = self.itemWidget(item, 0)
+        if not widget.isEditable:
+            return
+
+        # TODO implement
+
     def dragEnterEvent(self, e: QDragEnterEvent) -> None:
         item = self.currentItem()
         widget: BaseTreeItem = self.itemWidget(item, 0)
-        if widget.isFolder():
-            widget: FolderTreeItem = widget
-            if widget.folderType != FOLDER.misc:
-                return
+        if not widget.isDraggable:
+            return
             
         self._draggedItem = item
 
@@ -119,23 +160,11 @@ class DocumentTree(QTreeWidget):
         if self._draggedItem is None:
             return
 
-        result = self.copyItemsAt(self._draggedItem, list())
+        result = self.copyItems(self._draggedItem, list())
         super().dropEvent(e)
         [self.setItemWidget(i.item, 0, i) for i in result]
         self.setCurrentItem(self._draggedItem)
         self._draggedItem = None
-
-    def copyItemsAt(self, parent: QTreeWidgetItem, itemList: list[BaseTreeItem]) -> list[BaseTreeItem]:
-        result = itemList
-
-        for i in range(parent.childCount()):
-            child = parent.child(i)
-            result = self.copyItemsAt(child, result)
-
-        widget: BaseTreeItem = self.itemWidget(parent, 0)
-        result.append(widget.deepcopy(self))
-
-        return result
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         raise NotImplementedError()

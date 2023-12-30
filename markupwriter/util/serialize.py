@@ -32,7 +32,7 @@ def serialize(path: str, data) -> bool:
 
     return True
 
-def deserialize(classType: Type[T], path: str) -> T | None:
+def deserialize(type: Type[T], path: str) -> T | None:
     inFile = QFile(path)
     if not inFile.open(QIODevice.OpenModeFlag.ReadOnly):
         return None
@@ -51,7 +51,7 @@ def deserialize(classType: Type[T], path: str) -> T | None:
     
     inStream.setVersion(__qtVersion)
 
-    obj = classType()
+    obj = type()
     inStream >> obj
 
     inFile.close()

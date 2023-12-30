@@ -4,12 +4,23 @@ from .base_tree_item import (
     BaseTreeItem,
 )
 
-from .folder_tree_item import (
-    FOLDER,
-    FolderTreeItem,
+from .folderitem import (
+    BaseFolderItem,
+    RootFolderItem,
+    PlotFolderItem,
+    TimelineFolderItem,
+    CharsFolderItem,
+    LocFolderItem,
+    ObjFolderItem,
+    TrashFolderItem,
+    MiscFolderItem,
 )
 
-from .file_tree_item import (
-    FILE,
-    FileTreeItem,
+from .fileitem import (
+    BaseFileItem,
+    TitleFileItem,
+    ChapterFileItem,
+    SceneFileItem,
+    SectionFileItem,
+    MiscFileItem,
 )

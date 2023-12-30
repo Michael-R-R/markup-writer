@@ -15,9 +15,14 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.widgetsupport.documenttree.treeitem import (
-    FOLDER, FolderTreeItem,
-    FILE, FileTreeItem,
     BaseTreeItem,
+    RootFolderItem,
+    MiscFolderItem,
+    TitleFileItem,
+    ChapterFileItem,
+    SceneFileItem,
+    SectionFileItem,
+    MiscFileItem,
 )
 
 from markupwriter.support.iconprovider import (
@@ -33,40 +38,41 @@ class AddItemMenu(QMenu):
 
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
+        self.setTitle("Add Item")
 
         self._folderMenu = QMenu("Folder", self)
-        self.setupFolderAction(QAction(Icon.ROOT_FOLDER, "Root", self._folderMenu), FOLDER.root)
-        self.setupFolderAction(QAction(Icon.MISC_FOLDER, "Miscellaneous", self._folderMenu), FOLDER.misc)
+        self.setupFolderAction(QAction(Icon.ROOT_FOLDER, "Root", self._folderMenu), RootFolderItem)
+        self.setupFolderAction(QAction(Icon.MISC_FOLDER, "Miscellaneous", self._folderMenu), MiscFolderItem)
         self.addMenu(self._folderMenu)
 
         self._fileMenu = QMenu("File", self)
-        self.setupFileAction(QAction(Icon.TITLE_FILE, "Title", self._fileMenu), FILE.title)
-        self.setupFileAction(QAction(Icon.CHAPTER_FILE, "Chapter", self._fileMenu), FILE.chapter)
-        self.setupFileAction(QAction(Icon.SCENE_FILE, "Scene", self._fileMenu), FILE.scene)
-        self.setupFileAction(QAction(Icon.SECTION_FILE, "Section", self._fileMenu), FILE.section)
-        self.setupFileAction(QAction(Icon.MISC_FILE, "Miscellaneous", self._fileMenu), FILE.misc)
+        self.setupFileAction(QAction(Icon.TITLE_FILE, "Title", self._fileMenu), TitleFileItem)
+        self.setupFileAction(QAction(Icon.CHAPTER_FILE, "Chapter", self._fileMenu), ChapterFileItem)
+        self.setupFileAction(QAction(Icon.SCENE_FILE, "Scene", self._fileMenu), SceneFileItem)
+        self.setupFileAction(QAction(Icon.SECTION_FILE, "Section", self._fileMenu), SectionFileItem)
+        self.setupFileAction(QAction(Icon.MISC_FILE, "Miscellaneous", self._fileMenu), MiscFileItem)
         self.addMenu(self._fileMenu)
 
-    def setupFolderAction(self, action: QAction, folderType: FOLDER):
+    def setupFolderAction(self, action: QAction, folderClass):
         self._folderMenu.addAction(action)
-        action.triggered.connect(lambda: self.createFolder(folderType))
+        action.triggered.connect(lambda: self.onFolderCreate(folderClass))
 
-    def setupFileAction(self, action: QAction, fileType: FILE):
+    def setupFileAction(self, action: QAction, fileClass):
         self._fileMenu.addAction(action)
-        action.triggered.connect(lambda: self.createFile(fileType))
+        action.triggered.connect(lambda: self.createFile(fileClass))
 
-    def createFolder(self, folderType: FOLDER):
+    def onFolderCreate(self, folderClass):
         result: (str, bool) = StrDialog.run("Enter Name", "Folder", None)
         if not result[1]:
             return
 
-        folder = FolderTreeItem(folderType, result[0], QTreeWidgetItem())
+        folder = folderClass(result[0], QTreeWidgetItem())
         self.itemCreated.emit(folder)
     
-    def createFile(self, fileType: FILE):
+    def createFile(self, fileClass):
         result: (str, bool) = StrDialog.run("Enter Name", "File", None)
         if not result[1]:
             return
         
-        file = FileTreeItem(fileType, result[0], "", QTreeWidgetItem())
+        file = fileClass(result[0], "", QTreeWidgetItem())
         self.itemCreated.emit(file)
