@@ -43,20 +43,27 @@ class DocumentTree(QTreeWidget):
 
         self.itemDoubleClicked.connect(self.onItemDoubleClick)
 
-    def addItemAtRoot(self, item: BaseTreeItem):
-        self.addTopLevelItem(item.item)
+    def addItem(self, item: BaseTreeItem):
+        parent = self.currentItem()
+        if parent is None: # add to root
+            self.addTopLevelItem(item.item)
+        else: # add as child
+            if item.isFolder():
+                folder: FolderTreeItem = item
+                if folder.folderType == FOLDER.root:
+                    self.addTopLevelItem(item.item)
+                else:
+                    parent.addChild(item.item)
+            else:
+                parent.addChild(item.item)
+
         self.setItemWidget(item.item, 0, item)
+        self.setCurrentItem(item.item)
 
-    def addChildItem(self, parent: BaseTreeItem, child: BaseTreeItem):
-        p: QTreeWidgetItem = parent.item
-        c: QTreeWidgetItem = child.item
-        p.addChild(c)
-        self.setItemWidget(c, 0, child)
-
-    def removeItemAt(self, parent: QTreeWidgetItem):
+    def removeItem(self, parent: QTreeWidgetItem):
         for i in range(parent.childCount()):
             child = parent.child(i)
-            self.removeItemAt(child)
+            self.removeItem(child)
             parent.removeChild(child)
 
         index = self.indexOfTopLevelItem(parent)

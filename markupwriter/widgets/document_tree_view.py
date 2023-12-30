@@ -31,6 +31,7 @@ class DocumentTreeView(QWidget):
         self.setupConnections()
 
     def setupConnections(self):
+        self._treeBar.addItemAction.itemCreated.connect(lambda item: self._tree.addItem(item))
         self._treeBar.navUpAction.triggered.connect(lambda: self._tree.moveSelectedItem(-1))
         self._treeBar.navDownAction.triggered.connect(lambda: self._tree.moveSelectedItem(1))
 

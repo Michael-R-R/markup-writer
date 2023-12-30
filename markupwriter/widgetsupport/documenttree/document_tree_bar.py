@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.actions.documenttree import (
+    AddItemAction,
     NavUpAction,
     NavDownAction,
 )
@@ -19,8 +20,10 @@ class DocumentTreeBar(QWidget):
         toolbar = QToolBar(self)
         self.navUpAction = NavUpAction(toolbar)
         self.navDownAction = NavDownAction(toolbar)
+        self.addItemAction = AddItemAction(toolbar)
         toolbar.addAction(self.navUpAction)
         toolbar.addAction(self.navDownAction)
+        toolbar.addAction(self.addItemAction)
 
         hLayout = QHBoxLayout(self)
         hLayout.setContentsMargins(0, 0, 0, 0)
