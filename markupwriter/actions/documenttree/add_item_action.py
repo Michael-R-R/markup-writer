@@ -5,10 +5,7 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtGui import (
     QAction,
-)
-
-from markupwriter.config import (
-    HotkeyConfig,
+    QCursor,
 )
 
 from markupwriter.support.iconprovider import (
@@ -32,3 +29,5 @@ class AddItemAction(QAction):
         self._addItemMenu = AddItemMenu(None)
         self._addItemMenu.itemCreated.connect(lambda item: self.itemCreated.emit(item))
         self.setMenu(self._addItemMenu)
+
+        self.triggered.connect(lambda: self._addItemMenu.popup(QCursor.pos()))
