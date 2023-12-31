@@ -9,6 +9,7 @@ from PyQt6.QtCore import (
 from PyQt6.QtGui import (
     QDragEnterEvent,
     QDropEvent,
+    QMouseEvent,
 )
 
 from PyQt6.QtWidgets import (
@@ -50,21 +51,22 @@ class DocumentTree(QTreeWidget):
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self._draggedItem = None
-        self._contextMenu = TreeContextMenu(self)
+        self._contextMenu = TreeContextMenu()
         self._contextMenu.addItemMenu.itemCreated.connect(self.addItem)
         self._contextMenu.moveToTrash.triggered.connect(self.onMoveToTrash)
+        self._contextMenu.emptyTrash.triggered.connect(self.onEmptyTrash)
 
-        self.addItem(PlotFolderItem("Plot", QTreeWidgetItem(), self))
-        self.addItem(TimelineFolderItem("Timeline", QTreeWidgetItem(), self))
-        self.addItem(CharsFolderItem("Characters", QTreeWidgetItem(), self))
-        self.addItem(LocFolderItem("Locations", QTreeWidgetItem(), self))
-        self.addItem(ObjFolderItem("Objects", QTreeWidgetItem(), self))
-        self.addItem(TrashFolderItem("Trash", QTreeWidgetItem(), self))
+        self.addItem(PlotFolderItem("Plot", QTreeWidgetItem(), self), False)
+        self.addItem(TimelineFolderItem("Timeline", QTreeWidgetItem(), self), False)
+        self.addItem(CharsFolderItem("Characters", QTreeWidgetItem(), self), False)
+        self.addItem(LocFolderItem("Locations", QTreeWidgetItem(), self), False)
+        self.addItem(ObjFolderItem("Objects", QTreeWidgetItem(), self), False)
+        self.addItem(TrashFolderItem("Trash", QTreeWidgetItem(), self), False)
 
         self.itemDoubleClicked.connect(self.onItemDoubleClick)
         self.customContextMenuRequested.connect(self.onContextMenuRequest)
 
-    def addItem(self, item: BaseTreeItem, isActive: bool = False):
+    def addItem(self, item: BaseTreeItem, isActive: bool = True):
         parent = self.currentItem()
         if parent is None:
             self.addTopLevelItem(item.item)
@@ -76,6 +78,8 @@ class DocumentTree(QTreeWidget):
         self.setItemWidget(item.item, 0, item)
         if isActive:
             self.setCurrentItem(item.item)
+        else:
+            self.clearSelection()
 
     def removeItem(self, parent: QTreeWidgetItem):
         for i in range(parent.childCount()):
@@ -93,23 +97,23 @@ class DocumentTree(QTreeWidget):
         if child is None:
             return
         
-        result: list[BaseTreeItem] = list()
+        itemList: list[BaseTreeItem] = list()
         
         parent = child.parent()
         if parent is None: # root item
             size = self.topLevelItemCount()
             index = self.indexFromItem(child, 0).row()
-            result = self.copyItems(child, list())
+            itemList = self.copyItems(child, list())
             child = self.takeTopLevelItem(index)
             self.insertTopLevelItem((index+direction) % size, child)
         else: # child item
             size = parent.childCount()
             index = parent.indexOfChild(child)
-            result = self.copyItems(child, list())
+            itemList = self.copyItems(child, list())
             child = parent.takeChild(index)
             parent.insertChild((index+direction) % size, child)
         
-        [self.setItemWidget(i.item, 0, i) for i in result]
+        self.massSetItemWidgets(itemList)
         self.setCurrentItem(child)
 
     def copyItems(self, parent: QTreeWidgetItem, itemList: list[BaseTreeItem]) -> list[BaseTreeItem]:
@@ -124,6 +128,9 @@ class DocumentTree(QTreeWidget):
 
         return result
 
+    def massSetItemWidgets(self, items: list[BaseTreeItem]):
+        [self.setItemWidget(i.item, 0, i) for i in items]
+
     def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
         widget: BaseTreeItem = self.itemWidget(item, col)
         if widget.isFolder():
@@ -131,7 +138,15 @@ class DocumentTree(QTreeWidget):
         self.fileDoubleClicked.emit(widget)
 
     def onContextMenuRequest(self, pos: QPoint):
-        self._contextMenu.exec(self.mapToGlobal(pos))
+        item = self.itemAt(pos)
+        widget = self.itemWidget(item, 0)
+        pos = self.mapToGlobal(pos)
+        if item is None:
+            self._contextMenu.onEmptyClickMenu(pos)
+        elif isinstance(widget, TrashFolderItem):
+            self._contextMenu.onTrashFolderMenu(pos)
+        else:
+            self._contextMenu.onBaseItemMenu(pos)
 
     def onMoveToTrash(self):
         item = self.currentItem()
@@ -142,7 +157,33 @@ class DocumentTree(QTreeWidget):
         if not widget.isEditable:
             return
 
-        # TODO implement
+        # find trash folder
+        trashItem = None
+        for i in range(self.topLevelItemCount()-1, -1, -1):
+            temp = self.topLevelItem(i)
+            widget = self.itemWidget(temp, 0)
+            if isinstance(widget, TrashFolderItem):
+                trashItem = temp
+                break
+        if trashItem is None:
+            return
+        
+        # take item out
+        itemList = self.copyItems(item, list())
+        parent = item.parent()
+        if parent is None: # root item
+            index = self.indexFromItem(item, 0).row()
+            item = self.takeTopLevelItem(index)
+        else: # child item
+            index = parent.indexOfChild(item)
+            item = parent.takeChild(index)
+
+        # add item to trash folder
+        trashItem.addChild(item)
+        self.massSetItemWidgets(itemList)
+
+    def onEmptyTrash(self):
+        raise NotImplementedError()
 
     def dragEnterEvent(self, e: QDragEnterEvent) -> None:
         item = self.currentItem()
@@ -160,11 +201,18 @@ class DocumentTree(QTreeWidget):
         if self._draggedItem is None:
             return
 
-        result = self.copyItems(self._draggedItem, list())
+        itemList = self.copyItems(self._draggedItem, list())
         super().dropEvent(e)
-        [self.setItemWidget(i.item, 0, i) for i in result]
+        self.massSetItemWidgets(itemList)
         self.setCurrentItem(self._draggedItem)
         self._draggedItem = None
+
+    def mousePressEvent(self, e: QMouseEvent) -> None:
+        index = self.indexAt(e.pos())
+        super().mousePressEvent(e)
+        if not index.isValid():
+            self.clearSelection()
+            self.setCurrentItem(None)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         raise NotImplementedError()

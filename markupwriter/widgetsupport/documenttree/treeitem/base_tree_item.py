@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     QDataStream,
+    QPoint,
 )
 
 from PyQt6.QtGui import (
@@ -52,9 +53,6 @@ class BaseTreeItem(QWidget):
         self._isEditable = isEditable
         self._isFolder = isFolder
 
-        self.setup()
-
-    def setup(self):
         hLayout = QHBoxLayout(self)
         hLayout.setContentsMargins(0, 0, 0, 0)
         hLayout.addWidget(QLabel("icon", self))
