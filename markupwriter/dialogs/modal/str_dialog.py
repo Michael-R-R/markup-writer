@@ -7,9 +7,13 @@ from PyQt6.QtWidgets import (
 )
 
 class StrDialog(object):
-    def run(title: str, label: str, parent: QWidget | None) -> (str, bool):
-        return QInputDialog.getText(parent,
-                                    title,
-                                    "Text",
-                                    QLineEdit.EchoMode.Normal,
-                                    label)
+    def run(title: str, label: str, parent: QWidget | None) -> str | None:
+        result = QInputDialog.getText(parent,
+                                      title,
+                                      "Text",
+                                      QLineEdit.EchoMode.Normal,
+                                      label)
+        if not result[1]:
+            return None
+        
+        return result[0]

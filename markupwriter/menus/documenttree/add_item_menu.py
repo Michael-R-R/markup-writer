@@ -62,17 +62,17 @@ class AddItemMenu(QMenu):
         action.triggered.connect(lambda: self.createFile(fileClass))
 
     def onFolderCreate(self, folderClass):
-        result: (str, bool) = StrDialog.run("Enter Name", "Folder", None)
-        if not result[1]:
+        text = StrDialog.run("Enter Name", "Folder", None)
+        if text is None:
             return
 
-        folder = folderClass(result[0], QTreeWidgetItem())
+        folder = folderClass(text, QTreeWidgetItem())
         self.itemCreated.emit(folder)
     
     def createFile(self, fileClass):
-        result: (str, bool) = StrDialog.run("Enter Name", "File", None)
-        if not result[1]:
+        text = StrDialog.run("Enter Name", "File", None)
+        if text is None:
             return
         
-        file = fileClass(result[0], "", QTreeWidgetItem())
+        file = fileClass(text, "", QTreeWidgetItem())
         self.itemCreated.emit(file)

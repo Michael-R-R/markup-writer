@@ -34,6 +34,10 @@ from markupwriter.contextmenus.documenttree import (
     TreeContextMenu,
 )
 
+from markupwriter.dialogs.modal import (
+    YesNoDialog,
+)
+
 class DocumentTree(QTreeWidget):
     fileAdded = pyqtSignal(BaseFileItem)
     fileRemoved = pyqtSignal(BaseFileItem)
@@ -216,6 +220,9 @@ class DocumentTree(QTreeWidget):
             self._contextMenu.onBaseItemMenu(pos)
 
     def _onMoveToTrash(self):
+        if not YesNoDialog.run("Move to trash?"):
+            return
+
         item = self.currentItem()
         if item is None:
             return
@@ -231,6 +238,9 @@ class DocumentTree(QTreeWidget):
         self._moveItemTo(item, trash)
 
     def _onEmptyTrash(self):
+        if not YesNoDialog.run("Empty trash?"):
+            return
+
         trash = self._findTrashFolder()
         if trash is None:
             return
