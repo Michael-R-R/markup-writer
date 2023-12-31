@@ -32,8 +32,8 @@ class DocumentTreeView(QWidget):
 
     def setupConnections(self):
         self._treeBar.addItemAction.itemCreated.connect(lambda item: self._tree.addItem(item, True))
-        self._treeBar.navUpAction.triggered.connect(lambda: self._tree.moveCurrentItem(-1))
-        self._treeBar.navDownAction.triggered.connect(lambda: self._tree.moveCurrentItem(1))
+        self._treeBar.navUpAction.triggered.connect(lambda: self._tree.translateItem(-1))
+        self._treeBar.navDownAction.triggered.connect(lambda: self._tree.translateItem(1))
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docTreeViewSize = e.size()
