@@ -27,7 +27,7 @@ class LocFolderItem(BaseFolderItem):
         super().__init__(title, False, False, item, parent)
         self.applyChanges()
 
-    def deepcopy(self):
+    def shallowcopy(self):
         folder = LocFolderItem(self.title,
                                 self.item,
                                 self.parentWidget())

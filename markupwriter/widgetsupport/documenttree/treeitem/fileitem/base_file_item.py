@@ -28,7 +28,7 @@ class BaseFileItem(BaseTreeItem):
         self._hash = str(uuid.uuid1())
         self._content = content
 
-    def deepcopy(self):
+    def shallowcopy(self):
         raise NotImplementedError()
 
     def applyIcon(self):

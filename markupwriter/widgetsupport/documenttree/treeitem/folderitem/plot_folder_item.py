@@ -27,7 +27,7 @@ class PlotFolderItem(BaseFolderItem):
         super().__init__(title, False, False, item, parent)
         self.applyChanges()
 
-    def deepcopy(self):
+    def shallowcopy(self):
         folder = PlotFolderItem(self.title,
                                 self.item,
                                 self.parentWidget())

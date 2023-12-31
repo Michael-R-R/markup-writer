@@ -26,7 +26,7 @@ class MiscFileItem(BaseFileItem):
         super().__init__(title, content, True, True, item, parent)
         self.applyChanges()
 
-    def deepcopy(self):
+    def shallowcopy(self):
         myCopy = MiscFileItem(self.title,
                               self.content,
                               self.item,

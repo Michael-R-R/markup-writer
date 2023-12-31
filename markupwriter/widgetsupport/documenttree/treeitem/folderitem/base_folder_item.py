@@ -22,7 +22,7 @@ class BaseFolderItem(BaseTreeItem):
                  parent: QWidget=None):
         super().__init__(title, isDraggable, isEditable, True, item, parent)
 
-    def deepcopy(self):
+    def shallowcopy(self):
         raise NotImplementedError()
     
     def applyIcon(self):

@@ -35,6 +35,8 @@ from markupwriter.contextmenus.documenttree import (
 )
 
 class DocumentTree(QTreeWidget):
+    fileAdded = pyqtSignal(BaseFileItem)
+    fileRemoved = pyqtSignal(BaseFileItem)
     fileDoubleClicked = pyqtSignal(BaseFileItem)
 
     def __init__(self, parent: QWidget):
@@ -80,15 +82,22 @@ class DocumentTree(QTreeWidget):
             self.setCurrentItem(item.item)
             self.collapseItem(item.item)
 
+        if not item.isFolder():
+            self.fileAdded.emit(item.shallowcopy())
+
     def removeItem(self, item: QTreeWidgetItem):
         for i in range(item.childCount()):
             child = item.child(i)
             self.removeItem(child)
-            item.removeChild(child)
+            item.takeChild(i)
 
         index = self.indexOfTopLevelItem(item)
         if index > -1:
             self.takeTopLevelItem(index)
+
+        widget: BaseTreeItem = self.itemWidget(item, 0)
+        if not widget.isFolder():
+            self.fileRemoved.emit(widget.shallowcopy())
 
         self.removeItemWidget(item, 0)
         self.clearSelection()
@@ -108,6 +117,9 @@ class DocumentTree(QTreeWidget):
             size = parent.childCount()
             index = parent.indexOfChild(item)
             self._insertItemAt(item, parent, (index + direction) % size)
+
+    def updateItemWidget(self, item: QTreeWidgetItem, widget: BaseTreeItem):
+        self.setItemWidget(item, 0, widget)
 
     def dragEnterEvent(self, e: QDragEnterEvent) -> None:
         item = self.currentItem()
@@ -181,18 +193,18 @@ class DocumentTree(QTreeWidget):
             result = self._copyWidgets(child, result)
 
         widget: BaseTreeItem = self.itemWidget(parent, 0)
-        result.append(widget.deepcopy())
+        result.append(widget.shallowcopy())
 
         return result
 
     def _setItemWidgetList(self, items: list[BaseTreeItem]):
-        [self.setItemWidget(i.item, 0, i) for i in items]
+        for i in items:
+            self.setItemWidget(i.item, 0, i)
 
     def _onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
         widget: BaseTreeItem = self.itemWidget(item, col)
-        if widget.isFolder():
-            return
-        self.fileDoubleClicked.emit(widget)
+        if not widget.isFolder():
+            self.fileDoubleClicked.emit(widget.shallowcopy())
 
     def _onContextMenuRequest(self, pos: QPoint):
         item = self.itemAt(pos)
@@ -214,11 +226,11 @@ class DocumentTree(QTreeWidget):
         if not widget.isEditable:
             return
         
-        trashItem = self._findTrashFolder()
-        if trashItem is None:
+        trash = self._findTrashFolder()
+        if trash is None:
             return
         
-        self._moveItemTo(item, trashItem)
+        self._moveItemTo(item, trash)
 
     def _onEmptyTrash(self):
         raise NotImplementedError()

@@ -63,7 +63,7 @@ class BaseTreeItem(QWidget):
         hLayout.addWidget(QLabel("group", self))
         hLayout.addWidget(QLabel("priority", self))
 
-    def deepcopy(self):
+    def shallowcopy(self):
         raise NotImplementedError()
 
     def applyIcon(self):

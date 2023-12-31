@@ -27,7 +27,7 @@ class CharsFolderItem(BaseFolderItem):
         super().__init__(title, False, False, item, parent)
         self.applyChanges()
 
-    def deepcopy(self):
+    def shallowcopy(self):
         folder = CharsFolderItem(self.title,
                                 self.item,
                                 self.parentWidget())

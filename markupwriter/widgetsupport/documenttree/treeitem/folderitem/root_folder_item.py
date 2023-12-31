@@ -27,7 +27,7 @@ class RootFolderItem(BaseFolderItem):
         super().__init__(title, False, True, item, parent)
         self.applyChanges()
 
-    def deepcopy(self):
+    def shallowcopy(self):
         folder = RootFolderItem(self.title,
                                 self.item,
                                 self.parentWidget())

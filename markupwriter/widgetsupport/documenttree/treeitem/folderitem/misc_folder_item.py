@@ -27,7 +27,7 @@ class MiscFolderItem(BaseFolderItem):
         super().__init__(title, True, True, item, parent)
         self.applyChanges()
 
-    def deepcopy(self):
+    def shallowcopy(self):
         folder = MiscFolderItem(self.title,
                                 self.item,
                                 self.parentWidget())

@@ -26,7 +26,7 @@ class TitleFileItem(BaseFileItem):
         super().__init__(title, content, True, True, item, parent)
         self.applyChanges()
 
-    def deepcopy(self):
+    def shallowcopy(self):
         myCopy = TitleFileItem(self.title,
                               self.content,
                               self.item,

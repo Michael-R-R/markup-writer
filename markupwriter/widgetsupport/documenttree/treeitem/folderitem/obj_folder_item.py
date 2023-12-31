@@ -27,7 +27,7 @@ class ObjFolderItem(BaseFolderItem):
         super().__init__(title, False, False, item, parent)
         self.applyChanges()
 
-    def deepcopy(self):
+    def shallowcopy(self):
         folder = ObjFolderItem(self.title,
                                 self.item,
                                 self.parentWidget())
