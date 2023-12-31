@@ -34,9 +34,8 @@ class BaseFileItem(BaseTreeItem):
     def applyIcon(self):
         raise NotImplementedError()
     
-    def hash(self, value: str) -> str:
-        self._hash = value
-    hash = property(lambda self: self._hash, hash)
+    def hash(self):
+        return self._hash
 
     def content(self, text: str):
         self._content = text

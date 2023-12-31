@@ -31,7 +31,7 @@ class SceneFileItem(BaseFileItem):
                               self.content,
                               self.item,
                               self.parentWidget())
-        myCopy.hash = self.hash
+        myCopy._hash = self._hash
         myCopy.applyIcon()
         return myCopy
     
