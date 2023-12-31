@@ -80,7 +80,6 @@ class DocumentTree(QTreeWidget):
         self.setItemWidget(item.item, 0, item)
         if isActive:
             self.setCurrentItem(item.item)
-            self.collapseItem(item.item)
 
         if not item.isFolder():
             self.fileAdded.emit(item.shallowcopy())
@@ -142,7 +141,7 @@ class DocumentTree(QTreeWidget):
         super().dropEvent(e)
         self._setItemWidgetList(itemList)
         self.setCurrentItem(self._draggedItem)
-        self.collapseItem(self._draggedItem)
+        self.expandItem(self._draggedItem)
         self._draggedItem = None
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
@@ -161,7 +160,6 @@ class DocumentTree(QTreeWidget):
 
         self._setItemWidgetList(widgetList)
         self.setCurrentItem(item)
-        self.collapseItem(item)
 
     def _insertItemAt(self, item: QTreeWidgetItem, target: QTreeWidgetItem | None, targetIndex: int):
         widgetList = self._takeItemOut(item)
@@ -172,7 +170,6 @@ class DocumentTree(QTreeWidget):
 
         self._setItemWidgetList(widgetList)
         self.setCurrentItem(item)
-        self.collapseItem(item)
 
     def _takeItemOut(self, item: QTreeWidgetItem) -> list[BaseTreeItem]:
         widgetList = self._copyWidgets(item, list())
