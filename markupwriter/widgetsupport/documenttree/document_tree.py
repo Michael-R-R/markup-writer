@@ -85,20 +85,21 @@ class DocumentTree(QTreeWidget):
         if not item.isFolder():
             self.fileAdded.emit(item.shallowcopy())
 
-    def removeItem(self, item: QTreeWidgetItem):
-        for i in range(item.childCount()):
+    def removeItem(self, item: QTreeWidgetItem, parent: QTreeWidgetItem | None):
+        for i in range(item.childCount()-1, -1, -1):
             child = item.child(i)
-            self.removeItem(child)
-            item.takeChild(i)
-
-        index = self.indexOfTopLevelItem(item)
-        if index > -1:
-            self.takeTopLevelItem(index)
-
+            self.removeItem(child, item)
+        
         widget: BaseTreeItem = self.itemWidget(item, 0)
         if not widget.isFolder():
             self.fileRemoved.emit(widget.shallowcopy())
 
+        if parent is None:
+            index = self.indexOfTopLevelItem(item)
+            self.takeTopLevelItem(index)
+        else:
+            parent.removeChild(item)
+        
         self.removeItemWidget(item, 0)
         self.clearSelection()
         self.setCurrentItem(None)
@@ -233,7 +234,12 @@ class DocumentTree(QTreeWidget):
         self._moveItemTo(item, trash)
 
     def _onEmptyTrash(self):
-        raise NotImplementedError()
+        trash = self._findTrashFolder()
+        if trash is None:
+            return
+        
+        for i in range(trash.childCount()-1, -1, -1):
+            self.removeItem(trash.child(i), trash)
 
     def _findTrashFolder(self) -> QTreeWidgetItem | None:
         for i in range(self.topLevelItemCount()-1, -1, -1):
