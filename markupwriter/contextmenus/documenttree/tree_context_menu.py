@@ -32,7 +32,9 @@ class TreeContextMenu(object):
         self.baseItemMenu = QMenu()
         self.baseItemMenu.addMenu(self.addItemMenu)
 
+        self.renameItem = QAction("Rename")
         self.moveToTrash = QAction(Icon.TRASH_FOLDER, "Move to trash")
+        self.baseItemMenu.addAction(self.renameItem)
         self.baseItemMenu.addAction(self.moveToTrash)
 
         # trash folder menu

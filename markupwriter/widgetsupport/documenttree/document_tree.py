@@ -36,6 +36,7 @@ from markupwriter.contextmenus.documenttree import (
 
 from markupwriter.dialogs.modal import (
     YesNoDialog,
+    StrDialog,
 )
 
 class DocumentTree(QTreeWidget):
@@ -59,6 +60,7 @@ class DocumentTree(QTreeWidget):
         self._draggedItem = None
         self._contextMenu = TreeContextMenu()
         self._contextMenu.addItemMenu.itemCreated.connect(self.addItem)
+        self._contextMenu.renameItem.triggered.connect(self._onRenameItem)
         self._contextMenu.moveToTrash.triggered.connect(self._onMoveToTrash)
         self._contextMenu.emptyTrash.triggered.connect(self._onEmptyTrash)
 
@@ -218,6 +220,20 @@ class DocumentTree(QTreeWidget):
             self._contextMenu.onTrashFolderMenu(pos)
         else:
             self._contextMenu.onBaseItemMenu(pos)
+
+    def _onRenameItem(self):
+        item = self.currentItem()
+        if item is None:
+            return
+        
+        widget: BaseTreeItem = self.itemWidget(item, 0)
+        if not widget.isEditable:
+            return
+
+        text = StrDialog.run("Rename", widget.title, None)
+        if text is None:
+            return
+        widget.title = text
 
     def _onMoveToTrash(self):
         if not YesNoDialog.run("Move to trash?"):
