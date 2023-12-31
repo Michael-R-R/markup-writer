@@ -30,7 +30,7 @@ from .treeitem import (
     TrashFolderItem,
 )
 
-from markupwriter.menus.documenttree import (
+from markupwriter.contextmenus.documenttree import (
     TreeContextMenu,
 )
 
@@ -78,8 +78,7 @@ class DocumentTree(QTreeWidget):
         self.setItemWidget(item.item, 0, item)
         if isActive:
             self.setCurrentItem(item.item)
-        else:
-            self.clearSelection()
+            self.collapseItem(item.item)
 
     def removeItem(self, parent: QTreeWidgetItem):
         for i in range(parent.childCount()):
