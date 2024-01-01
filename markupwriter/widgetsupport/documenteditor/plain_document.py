@@ -16,6 +16,10 @@ from markupwriter.support.referencetag import (
     RefTagManager,
 )
 
+from markupwriter.support.editorparser import (
+    PassiveDocumentParser,
+)
+
 class PlainDocument(QTextDocument):
     def __init__(self):
         super().__init__()
@@ -23,6 +27,8 @@ class PlainDocument(QTextDocument):
         self.setDocumentLayout(QPlainTextDocumentLayout(self))
         self._highlighter = Highlighter(self)
         self._refTagManager = RefTagManager()
+        self._passiveParser = PassiveDocumentParser(self._highlighter,
+                                                    self._refTagManager)
 
     def highlighter(self) -> Highlighter:
         return self._highlighter

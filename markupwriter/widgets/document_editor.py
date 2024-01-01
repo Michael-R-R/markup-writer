@@ -1,12 +1,7 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    QTimer,
-)
-
 from PyQt6.QtGui import (
     QResizeEvent,
-    QTextCursor,
 )
 
 from PyQt6.QtWidgets import (
@@ -18,20 +13,13 @@ from markupwriter.config import (
     AppConfig,
 )
 
-from markupwriter.widgetsupport.documenteditor import (
-    PlainDocument,
-)
-
-from markupwriter.support.editorparser import (
-    PassiveDocumentParser,
-)
+import markupwriter.widgetsupport.documenteditor as de
 
 class DocumentEditor(QPlainTextEdit):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
-        self._document = PlainDocument()
-        self._passiveParser = PassiveDocumentParser(self._document)
+        self._document = de.PlainDocument()
         
         self.setDocument(self._document)
         self.setTabStopDistance(20.0)

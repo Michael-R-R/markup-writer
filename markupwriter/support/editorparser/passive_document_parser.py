@@ -2,18 +2,20 @@
 
 import re
 
-from markupwriter.widgetsupport.documenteditor import (
-    PlainDocument,
-)
-
 from markupwriter.support.syntax import (
     BEHAVIOUR,
+    Highlighter,
     HighlightWordBehaviour,
 )
 
+from markupwriter.support.referencetag import (
+    RefTagManager,
+)
+
 class PassiveDocumentParser(object):
-    def __init__(self, doc: PlainDocument) -> None:
-        self._doc = doc
+    def __init__(self, highlighter: Highlighter, manager: RefTagManager) -> None:
+        self._highlighter = highlighter
+        self._refTagManager = manager
         self._pattern = re.compile(r"^@(create|import)\s")
         self._prevParsed: list[(str, str)] = list()
         self._tokenDict = {
@@ -58,10 +60,10 @@ class Token(object):
     def __init__(self) -> None:
         pass
 
-    def add(self, doc: PlainDocument, path: str, line: str):
+    def add(self, parser: PassiveDocumentParser, path: str, line: str):
         raise NotImplementedError()
     
-    def remove(self, doc: PlainDocument, line: str):
+    def remove(self, parser: PassiveDocumentParser, line: str):
         raise NotImplementedError()
 
     
@@ -71,12 +73,12 @@ class CreateToken(Token):
         self.__tagPattern = re.compile(r"(?<=@create )[\w']+(?=@as)?")
         self.__aliasPattern = re.compile(r"(?<=@as )[\w',]+")
 
-    def add(self, doc: PlainDocument, path: str, line: str):
+    def add(self, parser: PassiveDocumentParser, path: str, line: str):
         tag = self.__tagPattern.search(line)
         if tag is None:
             return
         
-        rtm = doc.refTagManager()
+        rtm = parser._refTagManager
         refTag = rtm.addRefTag(tag.group(0), path)
         aliases = self.__aliasPattern.search(line)
         if aliases is None:
@@ -85,12 +87,12 @@ class CreateToken(Token):
         aliases = aliases.group(0).split(",")
         refTag.addAliases(aliases)
 
-    def remove(self, doc: PlainDocument, line: str):
+    def remove(self, parser: PassiveDocumentParser, line: str):
         tag = self.__tagPattern.search(line)
         if tag is  None:
             return
         
-        rtm = doc.refTagManager()
+        rtm = parser._refTagManager
         rtm.removeRefTag(tag.group(0))
 
 
@@ -100,17 +102,17 @@ class ImportToken(Token):
         self.__tagPattern = re.compile(r"(?<=@import )[\w']+(?=@as)?")
         self.__aliasPattern = re.compile(r"(?<=@as )[\w',]+")
 
-    def add(self, doc: PlainDocument, path: str, line: str):
+    def add(self, parser: PassiveDocumentParser, path: str, line: str):
         tag = self.__tagPattern.search(line)
         if tag is None:
             return
         
-        rtm = doc.refTagManager()
+        rtm = parser._refTagManager
         refTag = rtm.getRefTag(tag.group(0))
         if refTag is None:
             return
         
-        h = doc.highlighter()
+        h = parser._highlighter
         refBehaviour: HighlightWordBehaviour = h.getBehaviour(BEHAVIOUR.refTag)
         aliasBehaviour: HighlightWordBehaviour = h.getBehaviour(BEHAVIOUR.aliasTag)
 
@@ -126,12 +128,12 @@ class ImportToken(Token):
         
         h.rehighlight()
 
-    def remove(self, doc: PlainDocument, line: str):
+    def remove(self, parser: PassiveDocumentParser, line: str):
         tag = self.__tagPattern.search(line)
         if tag is None:
             return
 
-        h = doc.highlighter()
+        h = parser._highlighter
         refBehaviour: HighlightWordBehaviour = h.getBehaviour(BEHAVIOUR.refTag)
         aliasBehaviour: HighlightWordBehaviour = h.getBehaviour(BEHAVIOUR.aliasTag)
 
