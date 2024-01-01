@@ -16,7 +16,7 @@ from markupwriter.support.referencetag import (
     RefTagManager,
 )
 
-from markupwriter.support.editorparser import (
+from .parser import (
     PassiveDocumentParser,
 )
 
