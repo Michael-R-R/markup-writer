@@ -98,15 +98,15 @@ class DocumentTreeHelper(object):
         widget.title = text
 
     def onMoveToTrash(self):
-        if not YesNoDialog.run("Move to trash?"):
-            return
-
         item = self.tree.currentItem()
         if item is None:
             return
         
         widget: BaseTreeItem = self.tree.itemWidget(item, 0)
         if not widget.isEditable:
+            return
+        
+        if not YesNoDialog.run("Move to trash?"):
             return
         
         trash = self.tree.findTrashFolder()
@@ -116,11 +116,11 @@ class DocumentTreeHelper(object):
         self.tree.moveItemTo(item, trash)
 
     def onEmptyTrash(self):
-        if not YesNoDialog.run("Empty trash?"):
-            return
-
         trash = self.tree.findTrashFolder()
         if trash is None:
+            return
+        
+        if not YesNoDialog.run("Empty trash?"):
             return
         
         for i in range(trash.childCount()-1, -1, -1):
