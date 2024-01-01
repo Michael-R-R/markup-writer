@@ -4,7 +4,6 @@ from PyQt6.QtCore import (
     Qt,
     QDataStream,
     pyqtSignal,
-    QPoint,
 )
 
 from PyQt6.QtGui import (
@@ -33,10 +32,6 @@ from .treeitem import (
 
 from markupwriter.contextmenus.documenttree import (
     TreeContextMenu,
-)
-
-from markupwriter.dialogs.modal import (
-    YesNoDialog,
 )
 
 import markupwriter.widgetsupport.documenttree as dt
