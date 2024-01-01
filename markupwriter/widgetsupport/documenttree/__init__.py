@@ -7,3 +7,7 @@ from .document_tree_bar import (
 from .document_tree import (
     DocumentTree,
 )
+
+from .document_tree_helper import (
+    DocumentTreeHelper,
+)
