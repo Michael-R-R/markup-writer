@@ -23,7 +23,7 @@ class PassiveDocumentParser(object):
             "@import ": ImportToken(),
         }
 
-    def tokenize(self, path: str, text: str):
+    def tokenize(self, docHash: str, text: str):
         currParsed: list[(str, str)] = list()
         index = 0
         while index > -1:
@@ -44,11 +44,11 @@ class PassiveDocumentParser(object):
 
         for prev in self._prevParsed:
             token: Token = self._tokenDict.get(prev[0])
-            token.remove(self._doc, prev[1])
+            token.remove(self, prev[1])
 
         for curr in currParsed:
             token: Token = self._tokenDict.get(curr[0])
-            token.add(self._doc, path, curr[1])
+            token.add(self, docHash, curr[1])
 
         self._prevParsed = currParsed
 
@@ -60,7 +60,7 @@ class Token(object):
     def __init__(self) -> None:
         pass
 
-    def add(self, parser: PassiveDocumentParser, path: str, line: str):
+    def add(self, parser: PassiveDocumentParser, docHash: str, line: str):
         raise NotImplementedError()
     
     def remove(self, parser: PassiveDocumentParser, line: str):
@@ -73,13 +73,13 @@ class CreateToken(Token):
         self.__tagPattern = re.compile(r"(?<=@create )[\w']+(?=@as)?")
         self.__aliasPattern = re.compile(r"(?<=@as )[\w',]+")
 
-    def add(self, parser: PassiveDocumentParser, path: str, line: str):
+    def add(self, parser: PassiveDocumentParser, docHash: str, line: str):
         tag = self.__tagPattern.search(line)
         if tag is None:
             return
         
         rtm = parser._refTagManager
-        refTag = rtm.addRefTag(tag.group(0), path)
+        refTag = rtm.addRefTag(tag.group(0), docHash)
         aliases = self.__aliasPattern.search(line)
         if aliases is None:
             return
@@ -102,7 +102,7 @@ class ImportToken(Token):
         self.__tagPattern = re.compile(r"(?<=@import )[\w']+(?=@as)?")
         self.__aliasPattern = re.compile(r"(?<=@as )[\w',]+")
 
-    def add(self, parser: PassiveDocumentParser, path: str, line: str):
+    def add(self, parser: PassiveDocumentParser, docHash: str, line: str):
         tag = self.__tagPattern.search(line)
         if tag is None:
             return
