@@ -30,10 +30,6 @@ from .treeitem import (
     TrashFolderItem,
 )
 
-from markupwriter.contextmenus.documenttree import (
-    TreeContextMenu,
-)
-
 import markupwriter.widgetsupport.documenttree as dt
 
 class DocumentTree(QTreeWidget):
@@ -56,12 +52,6 @@ class DocumentTree(QTreeWidget):
 
         self.helper = dt.DocumentTreeHelper(self)
         self.draggedItem = None
-
-        self.contextMenu = TreeContextMenu()
-        self.contextMenu.addItemMenu.itemCreated.connect(self.addItem)
-        self.contextMenu.renameItem.triggered.connect(self.helper.onRenameItem)
-        self.contextMenu.moveToTrash.triggered.connect(self.helper.onMoveToTrash)
-        self.contextMenu.emptyTrash.triggered.connect(self.helper.onEmptyTrash)
 
         self.addItem(PlotFolderItem("Plot", QTreeWidgetItem(), self), False)
         self.addItem(TimelineFolderItem("Timeline", QTreeWidgetItem(), self), False)

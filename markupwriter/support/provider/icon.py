@@ -12,7 +12,7 @@ class Icon(object):
     QDir.addSearchPath("icons", "./resources/icons/")
     
     # Folders
-    ROOT_FOLDER = QIcon("icons:folder.svg")
+    NOVEL_FOLDER = QIcon("icons:folder.svg")
     PLOT_FOLDER = QIcon("icons:folder.svg")
     TIMELINE_FOLDER = QIcon("icons:folder.svg")
     CHARACTERS_FOLDER = QIcon("icons:folder.svg")

@@ -4,8 +4,8 @@ from .base_folder_item import (
     BaseFolderItem
 )
 
-from .root_folder_item import (
-    RootFolderItem,
+from .novel_folder_item import (
+    NovelFolderItem,
 )
 
 from .plot_folder_item import (

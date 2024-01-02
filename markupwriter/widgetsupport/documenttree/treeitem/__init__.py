@@ -6,7 +6,7 @@ from .base_tree_item import (
 
 from .folderitem import (
     BaseFolderItem,
-    RootFolderItem,
+    NovelFolderItem,
     PlotFolderItem,
     TimelineFolderItem,
     CharsFolderItem,

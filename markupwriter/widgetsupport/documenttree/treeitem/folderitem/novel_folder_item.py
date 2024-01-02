@@ -19,7 +19,7 @@ from markupwriter.support.provider import(
     Icon,
 )
 
-class RootFolderItem(BaseFolderItem):
+class NovelFolderItem(BaseFolderItem):
     def __init__(self,
                  title: str = None,
                  item: QTreeWidgetItem = None,
@@ -28,14 +28,14 @@ class RootFolderItem(BaseFolderItem):
         self.applyChanges()
 
     def shallowcopy(self):
-        folder = RootFolderItem(self.title,
-                                self.item,
-                                self.parentWidget())
+        folder = NovelFolderItem(self.title,
+                                 self.item,
+                                 self.parentWidget())
         folder.applyIcon()
         return folder
     
     def applyIcon(self):
-        self.icon = Icon.ROOT_FOLDER
+        self.icon = Icon.NOVEL_FOLDER
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

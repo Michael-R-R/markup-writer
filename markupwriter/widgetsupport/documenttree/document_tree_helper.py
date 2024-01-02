@@ -15,16 +15,13 @@ from PyQt6.QtGui import (
     QMouseEvent,
 ) 
 
+from markupwriter.contextmenus.documenttree import (
+    ItemContextMenu,
+    TrashContextMenu,
+)
+
 from .treeitem import (
     BaseTreeItem,
-)
-
-from markupwriter.dialogs.modal import (
-    StrDialog,
-    YesNoDialog,
-)
-
-from .treeitem import (
     TrashFolderItem,
 )
 
@@ -33,6 +30,9 @@ import markupwriter.widgetsupport.documenttree as dt
 class DocumentTreeHelper(object):
     def __init__(self, tree: dt.DocumentTree):
         self.tree = tree
+
+        self._itemContextMenu = ItemContextMenu(self.tree)
+        self._trashContextMenu = TrashContextMenu(self.tree)
 
     def onDragEnterEvent(self, super: QTreeView, e: QDragEnterEvent):
         item = self.tree.currentItem()
@@ -77,51 +77,8 @@ class DocumentTreeHelper(object):
         widget = self.tree.itemWidget(item, 0)
         pos = self.tree.mapToGlobal(pos)
         if item is None:
-            self.tree.contextMenu.onEmptyClickMenu(pos)
+            pass
         elif isinstance(widget, TrashFolderItem):
-            self.tree.contextMenu.onTrashFolderMenu(pos)
+            self._trashContextMenu.onShowMenu(pos)
         else:
-            self.tree.contextMenu.onBaseItemMenu(pos)
-
-    def onRenameItem(self):
-        item = self.tree.currentItem()
-        if item is None:
-            return
-        
-        widget: BaseTreeItem = self.tree.itemWidget(item, 0)
-        if not widget.isEditable:
-            return
-
-        text = StrDialog.run("Rename", widget.title, None)
-        if text is None:
-            return
-        widget.title = text
-
-    def onMoveToTrash(self):
-        item = self.tree.currentItem()
-        if item is None:
-            return
-        
-        widget: BaseTreeItem = self.tree.itemWidget(item, 0)
-        if not widget.isEditable:
-            return
-        
-        if not YesNoDialog.run("Move to trash?"):
-            return
-        
-        trash = self.tree.findTrashFolder()
-        if trash is None:
-            return
-        
-        self.tree.moveItemTo(item, trash)
-
-    def onEmptyTrash(self):
-        trash = self.tree.findTrashFolder()
-        if trash is None:
-            return
-        
-        if not YesNoDialog.run("Empty trash?"):
-            return
-        
-        for i in range(trash.childCount()-1, -1, -1):
-            self.tree.removeItem(trash.child(i), trash)
+            self._itemContextMenu.onShowMenu(pos)

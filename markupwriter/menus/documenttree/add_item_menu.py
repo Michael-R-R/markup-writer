@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.widgetsupport.documenttree.treeitem import (
     BaseTreeItem,
-    RootFolderItem,
+    NovelFolderItem,
     MiscFolderItem,
     TitleFileItem,
     ChapterFileItem,
@@ -41,7 +41,7 @@ class AddItemMenu(QMenu):
         self.setTitle("Add Item")
 
         self._folderMenu = QMenu("Folder", self)
-        self.setupFolderAction(QAction(Icon.ROOT_FOLDER, "Root", self._folderMenu), RootFolderItem)
+        self.setupFolderAction(QAction(Icon.NOVEL_FOLDER, "Novel", self._folderMenu), NovelFolderItem)
         self.setupFolderAction(QAction(Icon.MISC_FOLDER, "Miscellaneous", self._folderMenu), MiscFolderItem)
         self.addMenu(self._folderMenu)
 
