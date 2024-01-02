@@ -13,13 +13,13 @@ class Icon(object):
     
     # Folders
     NOVEL_FOLDER = QIcon("icons:novel.svg")
-    PLOT_FOLDER = QIcon("icons:folder.svg")
+    PLOT_FOLDER = QIcon("icons:plot.svg")
     TIMELINE_FOLDER = QIcon("icons:timeline.svg")
-    CHARACTERS_FOLDER = QIcon("icons:folder.svg")
+    CHARACTERS_FOLDER = QIcon("icons:characters.svg")
     LOCATIONS_FOLDER = QIcon("icons:locations.svg")
     OBJECTS_FOLDER = QIcon("icons:folder.svg")
     TRASH_FOLDER = QIcon("icons:folder.svg")
-    MISC_FOLDER = QIcon("icons:folder.svg")
+    MISC_FOLDER = QIcon("icons:misc_folder.svg")
 
     # Files
     TITLE_FILE = QIcon("icons:title_page.svg")

@@ -28,6 +28,11 @@ class DefaultContextMenu(TreeContextMenu):
 
     def preprocess(self):
         pass
+
+    def postprocess(self):
+        actions = self._menu.actions()
+        for a in actions:
+            a.setDisabled(False)
     
     def _onItemCreated(self, item: BaseTreeItem):
         self._tree.addWidget(item)
