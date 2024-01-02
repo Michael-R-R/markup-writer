@@ -1,9 +1,5 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    Qt,
-)
-
 from PyQt6.QtGui import (
     QResizeEvent,
     QGuiApplication,
@@ -37,7 +33,6 @@ class DocumentEditor(QPlainTextEdit):
         self.setDocument(self.plainDocument)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setTabStopDistance(20.0)
         self.setViewportMargins(1, 1, 1, 1)
         self.setStyleSheet(Style.EDITOR)
