@@ -12,9 +12,9 @@ class Icon(object):
     QDir.addSearchPath("icons", "./resources/icons/")
     
     # Folders
-    NOVEL_FOLDER = QIcon("icons:folder.svg")
+    NOVEL_FOLDER = QIcon("icons:novel.svg")
     PLOT_FOLDER = QIcon("icons:folder.svg")
-    TIMELINE_FOLDER = QIcon("icons:folder.svg")
+    TIMELINE_FOLDER = QIcon("icons:timeline.svg")
     CHARACTERS_FOLDER = QIcon("icons:folder.svg")
     LOCATIONS_FOLDER = QIcon("icons:folder.svg")
     OBJECTS_FOLDER = QIcon("icons:folder.svg")
@@ -23,10 +23,10 @@ class Icon(object):
 
     # Files
     TITLE_FILE = QIcon("icons:title_page.svg")
-    CHAPTER_FILE = QIcon("icons:file.svg")
-    SCENE_FILE = QIcon("icons:file.svg")
-    SECTION_FILE = QIcon("icons:file.svg")
-    MISC_FILE = QIcon("icons:file.svg")
+    CHAPTER_FILE = QIcon("icons:chapter.svg")
+    SCENE_FILE = QIcon("icons:scene.svg")
+    SECTION_FILE = QIcon("icons:section.svg")
+    MISC_FILE = QIcon("icons:misc_file.svg")
 
     # Misc
     CHECK = QIcon("icons:check.svg")

@@ -4,6 +4,10 @@ from PyQt6.QtGui import (
     QAction,
 )
 
+from PyQt6.QtWidgets import (
+    QTreeWidgetItem,
+)
+
 from markupwriter.support.provider import (
     Icon,
 )
@@ -39,7 +43,7 @@ class ItemContextMenu(TreeContextMenu):
 
         self.renameAction = QAction("Rename")
         self.toTrashAction = QAction(Icon.TRASH_FOLDER, "Move to trash")
-        self.recoverAction = QAction("Recover")
+        self.recoverAction = QAction(Icon.TRASH_FOLDER, "Recover")
         self._menu.addAction(self.renameAction)
         self._menu.addAction(self.toTrashAction)
         self._menu.addAction(self.recoverAction)
@@ -47,12 +51,17 @@ class ItemContextMenu(TreeContextMenu):
         self.addItemMenu.itemCreated.connect(self._onItemCreated)
         self.renameAction.triggered.connect(self._onRename)
         self.toTrashAction.triggered.connect(self._onMoveToTrash)
+        self.recoverAction.triggered.connect(self._onRecover)
 
     def preprocess(self):
         item = self._tree.currentItem()
         if item is None:
             return
         
+        isInTrash = self._isInTrash(item)
+        self.toTrashAction.setDisabled(isInTrash)
+        self.recoverAction.setDisabled(not isInTrash)
+            
         widget: BaseTreeItem = self._tree.itemWidget(item, 0)
         if not widget.hasFlag(ITEM_FLAG.mutable):
             self.renameAction.setDisabled(True)
@@ -93,4 +102,18 @@ class ItemContextMenu(TreeContextMenu):
         self._tree.moveItemTo(item, trash)
 
     def _onRecover(self):
-        pass
+        item = self._tree.currentItem()
+        if item is None:
+            return
+        self._tree.moveItemTo(item, None)
+
+    def _isInTrash(self, item: QTreeWidgetItem) -> bool:
+        trash = self._tree.findTrashFolder()
+
+        prev = None
+        curr = item.parent()
+        while curr is not None:
+            prev = curr
+            curr = curr.parent()
+
+        return prev == trash

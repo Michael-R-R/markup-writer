@@ -16,6 +16,7 @@ from markupwriter.support.provider import(
 )
 
 from .base_folder_item import (
+    ITEM_FLAG,
     BaseFolderItem,
 )
 
@@ -25,6 +26,7 @@ class MiscFolderItem(BaseFolderItem):
                  item: QTreeWidgetItem = None,
                  parent: QWidget = None):
         super().__init__(title, item, parent)
+        self._flags += ITEM_FLAG.draggable + ITEM_FLAG.mutable
         self.applyChanges()
 
     def shallowcopy(self):

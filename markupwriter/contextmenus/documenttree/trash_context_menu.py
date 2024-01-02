@@ -35,8 +35,8 @@ class TrashContextMenu(TreeContextMenu):
         if item is None:
             return
         
-        if item.childCount() < 1:
-            self.emptyAction.setDisabled(True)
+        isEmpty = item.childCount() < 1
+        self.emptyAction.setDisabled(isEmpty)
 
     def postprocess(self):
         actions = self._menu.actions()

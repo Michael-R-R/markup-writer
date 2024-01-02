@@ -32,8 +32,7 @@ class ITEM_FLAG(IntEnum):
     file = 1
     folder = 2
     draggable = 4
-    accepting = 8
-    mutable = 16
+    mutable = 8
 
 class BaseTreeItem(QWidget):
     # Widget indices
@@ -51,7 +50,6 @@ class BaseTreeItem(QWidget):
         super().__init__(parent)
 
         flags = ITEM_FLAG.draggable
-        flags += ITEM_FLAG.accepting
         flags += ITEM_FLAG.mutable
 
         self._item = item

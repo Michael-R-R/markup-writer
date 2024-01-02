@@ -50,7 +50,7 @@ class DocumentTreeHelper(object):
             return
         
         item = self.tree.draggedItem
-        if self.tree.draggedItem is None:
+        if item is None:
             return
         
         itemList = self.tree.copyWidgets(item, list())
