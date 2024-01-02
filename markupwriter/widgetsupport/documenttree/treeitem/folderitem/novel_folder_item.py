@@ -26,6 +26,7 @@ class NovelFolderItem(BaseFolderItem):
                  item: QTreeWidgetItem = None,
                  parent: QWidget = None):
         super().__init__(title, item, parent)
+        self._flags += ITEM_FLAG.mutable
         self.applyChanges()
 
     def shallowcopy(self):
