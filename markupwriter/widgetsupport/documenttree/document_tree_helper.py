@@ -16,6 +16,7 @@ from PyQt6.QtGui import (
 ) 
 
 from markupwriter.contextmenus.documenttree import (
+    DefaultContextMenu,
     ItemContextMenu,
     TrashContextMenu,
 )
@@ -32,6 +33,7 @@ class DocumentTreeHelper(object):
     def __init__(self, tree: dt.DocumentTree):
         self.tree = tree
 
+        self._defaultContextMenu = DefaultContextMenu(self.tree)
         self._itemContextMenu = ItemContextMenu(self.tree)
         self._trashContextMenu = TrashContextMenu(self.tree)
 
@@ -78,7 +80,7 @@ class DocumentTreeHelper(object):
         widget = self.tree.itemWidget(item, 0)
         pos = self.tree.mapToGlobal(pos)
         if item is None:
-            pass
+            self._defaultContextMenu.onShowMenu(pos)
         elif isinstance(widget, TrashFolderItem):
             self._trashContextMenu.onShowMenu(pos)
         else:

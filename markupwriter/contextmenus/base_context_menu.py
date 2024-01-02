@@ -16,7 +16,9 @@ class BaseContextMenu(object):
         raise NotImplementedError()
     
     def postprocess(self):
-        raise NotImplementedError()
+        actions = self._menu.actions()
+        for a in actions:
+            a.setDisabled(False)
 
     def onShowMenu(self, pos: QPoint):
         self.preprocess()

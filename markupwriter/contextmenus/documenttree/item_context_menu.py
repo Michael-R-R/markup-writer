@@ -67,11 +67,6 @@ class ItemContextMenu(TreeContextMenu):
             self.renameAction.setDisabled(True)
             self.toTrashAction.setDisabled(True)
 
-    def postprocess(self):
-        actions = self._menu.actions()
-        for a in actions:
-            a.setDisabled(False)
-
     def _onItemCreated(self, item: BaseTreeItem):
         self._tree.addWidget(item)
 

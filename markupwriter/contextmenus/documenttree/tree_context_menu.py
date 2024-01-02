@@ -16,6 +16,3 @@ class TreeContextMenu(BaseContextMenu):
 
     def preprocess(self):
         raise NotImplementedError()
-    
-    def postprocess(self):
-        raise NotImplementedError()
