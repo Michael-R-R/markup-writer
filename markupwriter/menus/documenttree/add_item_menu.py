@@ -25,7 +25,7 @@ from markupwriter.widgetsupport.documenttree.treeitem import (
     MiscFileItem,
 )
 
-from markupwriter.support.iconprovider import (
+from markupwriter.support.provider import (
     Icon,
 )
 

@@ -12,7 +12,7 @@ from markupwriter.config import (
     HotkeyConfig,
 )
 
-from markupwriter.support.iconprovider import (
+from markupwriter.support.provider import (
     Icon,
 )
 

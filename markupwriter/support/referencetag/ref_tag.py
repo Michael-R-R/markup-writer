@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from markupwriter.util import getHash
+from markupwriter.util import Hash
 
 class RefTag(object):
     def __init__(self, path: str, name: str) -> None:
@@ -27,7 +27,7 @@ class RefTag(object):
         return self.__path < other.__path
     
     def __hash__(self) -> int:
-        return getHash(self.__path)
+        return Hash.compute(self.__path)
     
     def path(self) -> str:
         return self.__path

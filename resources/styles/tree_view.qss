@@ -1,0 +1,5 @@
+QTreeWidget {
+    background-color: rgb(52, 52, 52);
+    padding: 10px;
+    padding-left: 0px;
+}

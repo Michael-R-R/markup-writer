@@ -3,15 +3,15 @@
 from .app_config import AppConfig
 from .highlighter_config import HighlighterConfig
 from .hotkey_config import HotkeyConfig
-from markupwriter.util import (serialize, deserialize)
+from markupwriter.util import Serialize
 
 def writeConfig():
-    serialize(AppConfig.INI_PATH, AppConfig())
-    serialize(HighlighterConfig.INI_PATH, HighlighterConfig())
-    serialize(HotkeyConfig.INI_PATH, HotkeyConfig())
+    Serialize.write(AppConfig.INI_PATH, AppConfig())
+    Serialize.write(HighlighterConfig.INI_PATH, HighlighterConfig())
+    Serialize.write(HotkeyConfig.INI_PATH, HotkeyConfig())
 
 def readConfig():
-    deserialize(AppConfig, AppConfig.INI_PATH)
-    deserialize(HighlighterConfig, HighlighterConfig.INI_PATH)
-    deserialize(HotkeyConfig, HotkeyConfig.INI_PATH)
+    Serialize.read(AppConfig, AppConfig.INI_PATH)
+    Serialize.read(HighlighterConfig, HighlighterConfig.INI_PATH)
+    Serialize.read(HotkeyConfig, HotkeyConfig.INI_PATH)
     

@@ -11,49 +11,50 @@ from typing import (
     Type
 )
 
-T = TypeVar('T')
+class Serialize(object):
+    T = TypeVar('T')
 
-__qtVersion = QDataStream.Version.Qt_6_6
-__masterFormat = 0x00000001
-__masterVersion = 1
+    _qtVersion = QDataStream.Version.Qt_6_6
+    _masterFormat = 0x00000001
+    _masterVersion = 1
 
-def serialize(path: str, data) -> bool:
-    outFile = QFile(path)
-    if not outFile.open(QIODevice.OpenModeFlag.WriteOnly):
-        return False
-    
-    outStream = QDataStream(outFile)
-    outStream.writeInt(__masterFormat)
-    outStream.writeInt(__masterVersion)
-    outStream.setVersion(__qtVersion)
-    outStream << data
+    def read(type: Type[T], path: str) -> T | None:
+        inFile = QFile(path)
+        if not inFile.open(QIODevice.OpenModeFlag.ReadOnly):
+            return None
+        
+        inStream = QDataStream(inFile)
 
-    outFile.close()
+        # Check if the format is supported
+        format = inStream.readInt()
+        if format != Serialize._masterFormat:
+            return None
+        
+        # Check if the version is supported
+        version = inStream.readInt()
+        if version != Serialize._masterVersion:
+            return None
+        
+        inStream.setVersion(Serialize._qtVersion)
 
-    return True
+        obj = type()
+        inStream >> obj
 
-def deserialize(type: Type[T], path: str) -> T | None:
-    inFile = QFile(path)
-    if not inFile.open(QIODevice.OpenModeFlag.ReadOnly):
-        return None
-    
-    inStream = QDataStream(inFile)
+        inFile.close()
 
-    # Check if the format is supported
-    format = inStream.readInt()
-    if format != __masterFormat:
-        return None
-    
-    # Check if the version is supported
-    version = inStream.readInt()
-    if version != __masterVersion:
-        return None
-    
-    inStream.setVersion(__qtVersion)
+        return obj
 
-    obj = type()
-    inStream >> obj
+    def write(path: str, data) -> bool:
+        outFile = QFile(path)
+        if not outFile.open(QIODevice.OpenModeFlag.WriteOnly):
+            return False
+        
+        outStream = QDataStream(outFile)
+        outStream.writeInt(Serialize._masterFormat)
+        outStream.writeInt(Serialize._masterVersion)
+        outStream.setVersion(Serialize._qtVersion)
+        outStream << data
 
-    inFile.close()
+        outFile.close()
 
-    return obj
+        return True

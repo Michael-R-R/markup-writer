@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import (
     QMenu,
 )
 
-from markupwriter.support.iconprovider import (
+from markupwriter.support.provider import (
     Icon,
 )
 

@@ -11,11 +11,11 @@ from PyQt6.QtWidgets import (
     QWidget
 )
 
-from . import (
+from .base_folder_item import (
     BaseFolderItem
 )
 
-from markupwriter.support.iconprovider import(
+from markupwriter.support.provider import(
     Icon,
 )
 

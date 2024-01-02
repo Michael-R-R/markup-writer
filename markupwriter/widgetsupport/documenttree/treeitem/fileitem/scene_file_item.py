@@ -9,11 +9,11 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from . import (
+from .base_file_item import (
     BaseFileItem,
 )
 
-from markupwriter.support.iconprovider import(
+from markupwriter.support.provider import(
     Icon,
 )
 

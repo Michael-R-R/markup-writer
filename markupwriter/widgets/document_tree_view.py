@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
+from markupwriter.support.provider import Style
 from markupwriter.widgetsupport.documenttree import (
     DocumentTreeBar,
     DocumentTree,
@@ -29,6 +30,7 @@ class DocumentTreeView(QWidget):
         vLayout.addWidget(self.docTree)
 
         self.setupConnections()
+        self.setStyleSheet(Style.TREE_VIEW)
 
     def setupConnections(self):
         self.docTreeBar.addItemAction.itemCreated.connect(lambda item: self.docTree.addItem(item, True))

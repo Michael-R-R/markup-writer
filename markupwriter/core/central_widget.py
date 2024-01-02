@@ -31,16 +31,16 @@ class CentralWidget(QWidget):
         hSplitter = QSplitter(Qt.Orientation.Horizontal)
         vSplitter = QSplitter(Qt.Orientation.Vertical)
 
-        documentTreeView = DocumentTreeView(self)
-        documentEditor = DocumentEditor(self)
-        terminal = Terminal(self)
-        documentPreview = DocumentPreview(self)
+        self.documentTreeView = DocumentTreeView(self)
+        self.documentEditor = DocumentEditor(self)
+        self.terminal = Terminal(self)
+        self.documentPreview = DocumentPreview(self)
 
-        hSplitter.addWidget(documentTreeView)
+        hSplitter.addWidget(self.documentTreeView)
         hSplitter.addWidget(vSplitter)
-        vSplitter.addWidget(documentEditor)
-        vSplitter.addWidget(terminal)
-        hSplitter.addWidget(documentPreview)
+        vSplitter.addWidget(self.documentEditor)
+        vSplitter.addWidget(self.terminal)
+        hSplitter.addWidget(self.documentPreview)
 
         hSplitter.setSizes([AppConfig.docTreeViewSize.width(),
                             AppConfig.docEditorSize.width(),

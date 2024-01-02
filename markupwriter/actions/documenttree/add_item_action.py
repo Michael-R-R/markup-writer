@@ -8,7 +8,7 @@ from PyQt6.QtGui import (
     QCursor,
 )
 
-from markupwriter.support.iconprovider import (
+from markupwriter.support.provider import (
     Icon,
 )
 

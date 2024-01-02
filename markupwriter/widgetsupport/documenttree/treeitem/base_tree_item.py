@@ -2,7 +2,6 @@
 
 from PyQt6.QtCore import (
     QDataStream,
-    QPoint,
 )
 
 from PyQt6.QtGui import (
@@ -22,7 +21,7 @@ from markupwriter.config import (
     AppConfig,
 )
 
-from markupwriter.support.iconprovider import (
+from markupwriter.support.provider import (
     Icon,
 )
 
