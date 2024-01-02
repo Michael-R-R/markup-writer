@@ -11,12 +11,13 @@ from PyQt6.QtWidgets import (
     QWidget
 )
 
-from .base_folder_item import (
-    BaseFolderItem
-)
-
 from markupwriter.support.provider import(
     Icon,
+)
+
+from .base_folder_item import (
+    ITEM_FLAG,
+    BaseFolderItem
 )
 
 class CharsFolderItem(BaseFolderItem):
@@ -24,13 +25,15 @@ class CharsFolderItem(BaseFolderItem):
                  title: str = None,
                  item: QTreeWidgetItem = None,
                  parent: QWidget = None):
-        super().__init__(title, False, False, item, parent)
+        flags = ITEM_FLAG.none
+        super().__init__(title, flags, item, parent)
         self.applyChanges()
 
     def shallowcopy(self):
         folder = CharsFolderItem(self.title,
                                 self.item,
                                 self.parentWidget())
+        folder._flags = self._flags
         folder.applyIcon()
         return folder
     

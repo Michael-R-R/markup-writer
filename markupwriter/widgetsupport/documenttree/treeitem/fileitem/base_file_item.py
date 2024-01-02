@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.widgetsupport.documenttree.treeitem import (
+    ITEM_FLAG,
     BaseTreeItem,
 )
 
@@ -20,11 +21,11 @@ class BaseFileItem(BaseTreeItem):
     def __init__(self,
                  title: str=None,
                  content: str=None,
-                 isDraggable: bool=False,
-                 isEditable: bool=False,
+                 flags: int=None,
                  item: QTreeWidgetItem=None,
                  parent: QWidget=None):
-        super().__init__(title, isDraggable, isEditable, False, item, parent)
+        flags += ITEM_FLAG.file
+        super().__init__(title, flags, item, parent)
         self._hash = str(uuid.uuid1())
         self._content = content
 

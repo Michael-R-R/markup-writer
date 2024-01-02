@@ -22,7 +22,7 @@ class Icon(object):
     MISC_FOLDER = QIcon("icons:folder.svg")
 
     # Files
-    TITLE_FILE = QIcon("icons:file.svg")
+    TITLE_FILE = QIcon("icons:title_page.svg")
     CHAPTER_FILE = QIcon("icons:file.svg")
     SCENE_FILE = QIcon("icons:file.svg")
     SECTION_FILE = QIcon("icons:file.svg")

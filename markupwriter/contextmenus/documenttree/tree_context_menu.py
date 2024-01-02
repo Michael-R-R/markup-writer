@@ -13,3 +13,9 @@ class TreeContextMenu(BaseContextMenu):
         super().__init__()
 
         self._tree = tree
+
+    def preprocess(self):
+        raise NotImplementedError()
+    
+    def postprocess(self):
+        raise NotImplementedError()

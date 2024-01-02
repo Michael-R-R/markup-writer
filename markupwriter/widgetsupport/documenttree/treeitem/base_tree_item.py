@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from enum import IntEnum
+
 from PyQt6.QtCore import (
     QDataStream,
 )
@@ -25,7 +27,15 @@ from markupwriter.support.provider import (
     Icon,
 )
 
+class ITEM_FLAG(IntEnum):
+    none = 0
+    file = 1
+    folder = 2
+    draggable = 4
+    mutable = 8
+
 class BaseTreeItem(QWidget):
+    # Widget indices
     ICON = 1
     TITLE = 2
     WORD_COUNT = 3
@@ -35,9 +45,7 @@ class BaseTreeItem(QWidget):
 
     def __init__(self,
                  title: str,
-                 isDraggable: bool,
-                 isEditable: bool,
-                 isFolder: bool,
+                 flags: int,
                  item: QTreeWidgetItem, 
                  parent: QWidget):
         super().__init__(parent)
@@ -48,12 +56,10 @@ class BaseTreeItem(QWidget):
         self._isActive = False
         self._groupStatus = QColor(64, 64, 64)
         self._priorityStatus = QColor(64, 64, 64)
-        self._isDraggable = isDraggable
-        self._isEditable = isEditable
-        self._isFolder = isFolder
+        self._flags = flags
 
         hLayout = QHBoxLayout(self)
-        hLayout.setContentsMargins(0, 0, 0, 0)
+        hLayout.setContentsMargins(1, 2, 1, 2)
         hLayout.addWidget(QLabel("icon", self))
         hLayout.addWidget(QLabel("title", self))
         hLayout.addStretch()
@@ -76,16 +82,12 @@ class BaseTreeItem(QWidget):
         self.groupStatus = self._groupStatus
         self.priorityStatus= self._priorityStatus
 
-    def isFolder(self) -> bool:
-        return self._isFolder
-    
-    def isDraggable(self) -> bool:
-        return self._isDraggable
-    isDraggable = property(lambda self: self._isDraggable, isDraggable)
+    def hasFlag(self, flag: int) -> bool:
+        return (self._flags & flag) == flag
 
-    def isEditable(self) -> bool:
-        return self._isEditable
-    isEditable = property(lambda self: self._isEditable, isEditable)
+    def flags(self, flags: int) -> int:
+        self._flags = flags
+    flags = property(lambda self: self._flags, flags)
 
     def item(self, val: QTreeWidgetItem):
         self._item = val
@@ -144,9 +146,7 @@ class BaseTreeItem(QWidget):
         sOut.writeBool(self._isActive)
         sOut << self._groupStatus
         sOut << self._priorityStatus
-        sOut.writeBool(self._isDraggable)
-        sOut.writeBool(self._isEditable)
-        sOut.writeBool(self._isFolder)
+        sOut.writeInt(self._flags)
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
@@ -155,7 +155,5 @@ class BaseTreeItem(QWidget):
         self._isActive = sIn.readBool()
         sIn >> self._groupStatus
         sIn >> self._priorityStatus
-        self._isDraggable = sIn.readBool()
-        self._isEditable = sIn.readBool()
-        self._isFolder = sIn.readBool()
+        self._flags = sIn.readInt()
         return sIn

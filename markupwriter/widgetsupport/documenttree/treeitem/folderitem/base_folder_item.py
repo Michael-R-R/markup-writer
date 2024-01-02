@@ -10,17 +10,18 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.widgetsupport.documenttree.treeitem import (
+    ITEM_FLAG,
     BaseTreeItem,
 )
 
 class BaseFolderItem(BaseTreeItem):
     def __init__(self,
                  title: str=None,
-                 isDraggable: bool=False,
-                 isEditable: bool=False,
+                 flags: int=None,
                  item: QTreeWidgetItem=None,
                  parent: QWidget=None):
-        super().__init__(title, isDraggable, isEditable, True, item, parent)
+        flags += ITEM_FLAG.folder
+        super().__init__(title, flags, item, parent)
 
     def shallowcopy(self):
         raise NotImplementedError()

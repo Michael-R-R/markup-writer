@@ -30,13 +30,26 @@ class TrashContextMenu(TreeContextMenu):
 
         self.emptyAction.triggered.connect(self._onEmptyTrash)
 
+    def preprocess(self):
+        item = self._tree.currentItem()
+        if item is None:
+            return
+        
+        if item.childCount() < 1:
+            self.emptyAction.setDisabled(True)
+
+    def postprocess(self):
+        actions = self._menu.actions()
+        for a in actions:
+            a.setDisabled(False)
+
     def _onEmptyTrash(self):
-        trash = self._tree.findTrashFolder()
-        if trash is None:
+        item = self._tree.currentItem()
+        if item is None:
             return
         
         if not YesNoDialog.run("Empty trash?"):
             return
         
-        for i in range(trash.childCount()-1, -1, -1):
-            self._tree.removeItem(trash.child(i), trash)
+        for i in range(item.childCount()-1, -1, -1):
+            self._tree.removeItem(item.child(i), item)

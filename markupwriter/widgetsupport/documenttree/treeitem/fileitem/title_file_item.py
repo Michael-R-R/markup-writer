@@ -9,12 +9,13 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from .base_file_item import (
-    BaseFileItem,
-)
-
 from markupwriter.support.provider import(
     Icon,
+)
+
+from .base_file_item import (
+    ITEM_FLAG,
+    BaseFileItem,
 )
 
 class TitleFileItem(BaseFileItem):
@@ -23,7 +24,8 @@ class TitleFileItem(BaseFileItem):
                  content: str = None,
                  item: QTreeWidgetItem = None,
                  parent: QWidget = None):
-        super().__init__(title, content, True, True, item, parent)
+        flags = ITEM_FLAG.draggable + ITEM_FLAG.mutable
+        super().__init__(title, content, flags, item, parent)
         self.applyChanges()
 
     def shallowcopy(self):
@@ -32,6 +34,7 @@ class TitleFileItem(BaseFileItem):
                               self.item,
                               self.parentWidget())
         myCopy._hash = self._hash
+        myCopy._flags = self._flags
         myCopy.applyIcon()
         return myCopy
     

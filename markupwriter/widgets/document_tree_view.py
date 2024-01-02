@@ -33,7 +33,7 @@ class DocumentTreeView(QWidget):
         self.setStyleSheet(Style.TREE_VIEW)
 
     def setupConnections(self):
-        self.docTreeBar.addItemAction.itemCreated.connect(lambda item: self.docTree.addItem(item, True))
+        self.docTreeBar.addItemAction.itemCreated.connect(lambda item: self.docTree.addWidget(item, True))
         self.docTreeBar.navUpAction.triggered.connect(lambda: self.docTree.translateItem(-1))
         self.docTreeBar.navDownAction.triggered.connect(lambda: self.docTree.translateItem(1))
 

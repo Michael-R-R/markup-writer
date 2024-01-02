@@ -21,6 +21,7 @@ from markupwriter.contextmenus.documenttree import (
 )
 
 from .treeitem import (
+    ITEM_FLAG,
     BaseTreeItem,
     TrashFolderItem,
 )
@@ -37,7 +38,7 @@ class DocumentTreeHelper(object):
     def onDragEnterEvent(self, super: QTreeView, e: QDragEnterEvent):
         item = self.tree.currentItem()
         widget: BaseTreeItem = self.tree.itemWidget(item, 0)
-        if not widget.isDraggable:
+        if not widget.hasFlag(ITEM_FLAG.draggable):
             return
             
         self.tree.draggedItem = item
@@ -69,7 +70,7 @@ class DocumentTreeHelper(object):
 
     def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
         widget: BaseTreeItem = self.tree.itemWidget(item, col)
-        if not widget.isFolder():
+        if widget.hasFlag(ITEM_FLAG.file):
             self.tree.fileDoubleClicked.emit(widget.shallowcopy())
 
     def onContextMenuRequest(self, pos: QPoint):
