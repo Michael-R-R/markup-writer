@@ -17,11 +17,10 @@ from markupwriter.widgetsupport.documenttree.treeitem import (
 class BaseFolderItem(BaseTreeItem):
     def __init__(self,
                  title: str=None,
-                 flags: int=None,
                  item: QTreeWidgetItem=None,
                  parent: QWidget=None):
-        flags += ITEM_FLAG.folder
-        super().__init__(title, flags, item, parent)
+        super().__init__(title, item, parent)
+        self._flags += ITEM_FLAG.folder
 
     def shallowcopy(self):
         raise NotImplementedError()

@@ -21,11 +21,10 @@ class BaseFileItem(BaseTreeItem):
     def __init__(self,
                  title: str=None,
                  content: str=None,
-                 flags: int=None,
                  item: QTreeWidgetItem=None,
                  parent: QWidget=None):
-        flags += ITEM_FLAG.file
-        super().__init__(title, flags, item, parent)
+        super().__init__(title, item, parent)
+        self._flags += ITEM_FLAG.file
         self._hash = str(uuid.uuid1())
         self._content = content
 
