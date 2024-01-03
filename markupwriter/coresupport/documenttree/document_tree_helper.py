@@ -27,7 +27,7 @@ from .treeitem import (
     TrashFolderItem,
 )
 
-import markupwriter.widgetsupport.documenttree as dt
+import markupwriter.coresupport.documenttree as dt
 
 class DocumentTreeHelper(object):
     def __init__(self, tree: dt.DocumentTree):

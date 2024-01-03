@@ -12,7 +12,7 @@ from markupwriter.dialogs.modal import (
     YesNoDialog,
 )
 
-from markupwriter.widgetsupport.documenttree import (
+from markupwriter.coresupport.documenttree import (
     DocumentTree,
 )
 

@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
-from markupwriter.widgets import (
+from markupwriter.corewidgets import (
     DocumentTreeView,
     DocumentEditor,
     DocumentPreview,

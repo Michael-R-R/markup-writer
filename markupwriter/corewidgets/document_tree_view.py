@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import AppConfig
 from markupwriter.support.provider import Style
-from markupwriter.widgetsupport.documenttree import (
+from markupwriter.coresupport.documenttree import (
     DocumentTreeBar,
     DocumentTree,
 )

@@ -21,11 +21,11 @@ from markupwriter.dialogs.modal import (
     YesNoDialog,
 )
 
-from markupwriter.widgetsupport.documenttree import (
+from markupwriter.coresupport.documenttree import (
     DocumentTree,
 )
 
-from markupwriter.widgetsupport.documenttree.treeitem import (
+from markupwriter.coresupport.documenttree.treeitem import (
     ITEM_FLAG,
     BaseTreeItem,
 )

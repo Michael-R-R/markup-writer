@@ -20,7 +20,7 @@ from markupwriter.support.provider import (
     Style,
 )
 
-from markupwriter.widgetsupport.documenteditor import (
+from markupwriter.coresupport.documenteditor import (
     PlainDocument,
 )
 

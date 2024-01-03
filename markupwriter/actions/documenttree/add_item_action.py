@@ -12,7 +12,7 @@ from markupwriter.support.provider import (
     Icon,
 )
 
-from markupwriter.widgetsupport.documenttree.treeitem import (
+from markupwriter.coresupport.documenttree.treeitem import (
     BaseTreeItem,
 )
 

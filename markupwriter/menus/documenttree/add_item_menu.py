@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (
     QTreeWidgetItem,
 )
 
-from markupwriter.widgetsupport.documenttree.treeitem import (
+from markupwriter.coresupport.documenttree.treeitem import (
     BaseTreeItem,
     NovelFolderItem,
     MiscFolderItem,

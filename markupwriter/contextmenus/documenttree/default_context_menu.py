@@ -4,11 +4,11 @@ from markupwriter.menus.documenttree import (
     AddItemMenu,
 )
 
-from markupwriter.widgetsupport.documenttree import (
+from markupwriter.coresupport.documenttree import (
     DocumentTree,
 )
 
-from markupwriter.widgetsupport.documenttree.treeitem import (
+from markupwriter.coresupport.documenttree.treeitem import (
     BaseTreeItem,
 )
 

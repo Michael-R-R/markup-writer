@@ -4,7 +4,7 @@ from markupwriter.contextmenus import (
     BaseContextMenu,
 )
 
-from markupwriter.widgetsupport.documenttree import (
+from markupwriter.coresupport.documenttree import (
     DocumentTree,
 )
 

@@ -31,7 +31,7 @@ from .treeitem import (
     TrashFolderItem,
 )
 
-import markupwriter.widgetsupport.documenttree as dt
+import markupwriter.coresupport.documenttree as dt
 
 class DocumentTree(QTreeWidget):
     fileAdded = pyqtSignal(BaseFileItem)

@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from markupwriter.widgetsupport.documenttree.treeitem import (
+from markupwriter.coresupport.documenttree.treeitem import (
     ITEM_FLAG,
     BaseTreeItem,
 )
