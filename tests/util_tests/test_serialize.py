@@ -4,7 +4,7 @@ from PyQt6.QtCore import (
     QDataStream,
 )
 
-from markupwriter.util import (serialize, deserialize)
+from markupwriter.util import Serialize
 
 class TestSquare:
     w = 0
@@ -24,13 +24,13 @@ def testSerialize_write():
     s = TestSquare()
     s.w = 10
     s.h = 10
-    assert(serialize("./resources/.tests/testSerialize.txt", s))
+    assert(Serialize.write("./resources/.tests/testSerialize.txt", s))
 
 def testSerialize_read():
-    s = deserialize(TestSquare, "")
+    s = Serialize.read(TestSquare, "")
     assert(s == None)
 
-    s = deserialize(TestSquare, "./resources/.tests/testSerialize.txt")
+    s = Serialize.read(TestSquare, "./resources/.tests/testSerialize.txt")
     assert(s != None)
     assert(s.w == 10)
     assert(s.h == 10)

@@ -2,54 +2,43 @@
 
 from __future__ import annotations
 
-from markupwriter.util import Hash
-
 class RefTag(object):
-    def __init__(self, path: str, name: str) -> None:
-        self.__path = path
-        self.__name = name
-        self.__aliasDict: dict[str, AliasTag] = dict()
-        self.__docRefSet: set[str] = set()
+    def __init__(self, docUUID: str, name: str) -> None:
+        self._docHash = docUUID
+        self._name = name
+        self._aliasDict: dict[str, AliasTag] = dict()
+        self._docRefSet: set[str] = set()
 
     def __eq__(self, other: RefTag | None) -> bool:
         if other is None:
             return False
-        return self.__path == other.__path
+        return (self._docHash == other._docHash and
+                self._name == other._name)
     
     def __ne__(self, other: RefTag | None) -> bool:
-        if other is None:
-            return True
-        return self.__path != other.__path
-
-    def __lt__(self, other: RefTag | None) -> bool:
-        if other is None:
-            return False
-        return self.__path < other.__path
+        return not self.__eq__(other)
     
-    def __hash__(self) -> int:
-        return Hash.compute(self.__path)
-    
-    def path(self) -> str:
-        return self.__path
+    def docUUID(self) -> str:
+        return self._docHash
     
     def name(self) -> str:
-        return self.__name
+        return self._name
     
     def aliasDict(self) -> dict[str, AliasTag]:
-        return self.__aliasDict
+        return self._aliasDict
     
     def docRefSet(self) -> set[str]:
-        return self.__docRefSet
+        return self._docRefSet
     
     def rename(self, name: str):
-        self.__name = name
+        self._name = name
     
     def addAlias(self, name: str) -> bool:
         if name == "":
             return False
-        if name in self.__aliasDict:
+        if name in self._aliasDict:
             return False
-        self.__aliasDict[name] = AliasTag(self, name)
+        self._aliasDict[name] = AliasTag(self, name)
         return True
     
     def addAliases(self, nameList: list[str]):
@@ -57,53 +46,53 @@ class RefTag(object):
             self.addAlias(name)
     
     def removeAlias(self, name: str) -> bool:
-        if not name in self.__aliasDict:
+        if not name in self._aliasDict:
             return False
-        self.__aliasDict.pop(name)
+        self._aliasDict.pop(name)
         return True
     
     def renameAlias(self, old: str, new: str) -> bool:
         if new == "":
             return False
-        if not old in self.__aliasDict:
+        if not old in self._aliasDict:
             return False
-        if new in self.__aliasDict:
+        if new in self._aliasDict:
             return False
-        self.__aliasDict[old].rename(new)
-        self.__aliasDict[new] = self.__aliasDict.pop(old)
+        self._aliasDict[old].rename(new)
+        self._aliasDict[new] = self._aliasDict.pop(old)
         return True
     
     def clearAliases(self):
-        self.__aliasDict.clear()
+        self._aliasDict.clear()
     
     def getAlias(self, name: str) -> AliasTag | None:
-        if not name in self.__aliasDict:
+        if not name in self._aliasDict:
             return None
         
-        return self.__aliasDict[name]
+        return self._aliasDict[name]
     
     def hasAlias(self, name: str) -> bool:
-        return name in self.__aliasDict
+        return name in self._aliasDict
     
     def addDocRef(self, path: str) -> bool:
         if path == "":
             return False
-        if path in self.__docRefSet:
+        if path in self._docRefSet:
             return False
-        self.__docRefSet.add(path)
+        self._docRefSet.add(path)
         return True
     
     def removeDocRef(self, path: str) -> bool:
-        if not path in self.__docRefSet:
+        if not path in self._docRefSet:
             return False
-        self.__docRefSet.remove(path)
+        self._docRefSet.remove(path)
         return True
     
     def clearDocRefs(self):
-        self.__docRefSet.clear()
+        self._docRefSet.clear()
     
     def hasDocRef(self, name: str) -> bool:
-        return name in self.__docRefSet
+        return name in self._docRefSet
     
 
 class AliasTag(object):

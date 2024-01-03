@@ -25,7 +25,7 @@ class BaseFileItem(BaseTreeItem):
                  parent: QWidget=None):
         super().__init__(title, item, parent)
         self._flags += ITEM_FLAG.file
-        self._hash = str(uuid.uuid1())
+        self._docUUID = str(uuid.uuid1())
         self._content = content
 
     def shallowcopy(self):
@@ -34,19 +34,19 @@ class BaseFileItem(BaseTreeItem):
     def applyIcon(self):
         raise NotImplementedError()
     
-    def hash(self):
-        return self._hash
+    def docUUID(self):
+        return self._docUUID
 
     def content(self, text: str):
         self._content = text
     content = property(lambda self: self._content, content)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        sOut.writeQString(self._hash)
+        sOut.writeQString(self._docUUID)
         sOut.writeQString(self._content)
         return super().__rlshift__(sOut)
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        self._hash = sIn.readQString()
+        self._docUUID = sIn.readQString()
         self._content = sIn.readQString()
         return super().__rrshift__(sIn)

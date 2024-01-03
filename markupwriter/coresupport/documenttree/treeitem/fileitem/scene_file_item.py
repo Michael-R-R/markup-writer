@@ -31,7 +31,7 @@ class SceneFileItem(BaseFileItem):
                               self.content,
                               self.item,
                               self.parentWidget())
-        myCopy._hash = self._hash
+        myCopy._docUUID = self._docUUID
         myCopy._flags = self._flags
         myCopy.applyIcon()
         return myCopy
