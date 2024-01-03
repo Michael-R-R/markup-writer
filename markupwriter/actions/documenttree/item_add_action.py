@@ -10,7 +10,7 @@ from PyQt6.QtGui import (
     QCursor,
 )
 
-from markupwriter.support.provider import (
+from markupwriter.common.provider import (
     Icon,
 )
 

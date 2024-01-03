@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from markupwriter.support.referencetag import RefTagManager
+from markupwriter.common.referencetag import RefTagManager
 
 def testRefTagManager_addRefTag():
     m = RefTagManager()

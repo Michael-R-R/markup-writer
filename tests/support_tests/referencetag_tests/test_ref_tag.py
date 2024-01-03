@@ -1,4 +1,4 @@
-from markupwriter.support.referencetag import RefTag
+from markupwriter.common.referencetag import RefTag
 
 def testRefTag_tagsMatch():
     t1 = RefTag("fake/path/test.doc", "Frank")

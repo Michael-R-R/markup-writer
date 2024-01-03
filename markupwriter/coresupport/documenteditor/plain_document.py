@@ -8,11 +8,11 @@ from PyQt6.QtWidgets import (
     QPlainTextDocumentLayout,
 )
 
-from markupwriter.support.syntax import (
+from markupwriter.common.syntax import (
     Highlighter,
 )
 
-from markupwriter.support.referencetag import (
+from markupwriter.common.referencetag import (
     RefTagManager,
 )
 

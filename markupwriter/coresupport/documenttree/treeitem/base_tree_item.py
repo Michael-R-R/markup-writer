@@ -23,7 +23,7 @@ from markupwriter.config import (
     AppConfig,
 )
 
-from markupwriter.support.provider import (
+from markupwriter.common.provider import (
     Icon,
 )
 

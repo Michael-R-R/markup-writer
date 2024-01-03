@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
     QWidget
 )
 
-from markupwriter.support.provider import(
+from markupwriter.common.provider import(
     Icon,
 )
 
