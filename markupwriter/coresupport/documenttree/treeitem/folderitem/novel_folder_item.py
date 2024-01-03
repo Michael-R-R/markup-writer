@@ -29,6 +29,11 @@ class NovelFolderItem(BaseFolderItem):
         self._flags += ITEM_FLAG.mutable
         self.applyChanges()
 
+        label: QWidget = self.children()[self.TITLE]
+        font = label.font()
+        font.setUnderline(True)
+        label.setFont(font)
+
     def shallowcopy(self):
         folder = NovelFolderItem(self.title,
                                  self.item,
