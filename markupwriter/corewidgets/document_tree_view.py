@@ -9,8 +9,14 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from markupwriter.config import AppConfig
-from markupwriter.support.provider import Style
+from markupwriter.config import (
+    AppConfig,
+)
+
+from markupwriter.support.provider import (
+    Style,
+)
+
 from markupwriter.coresupport.documenttree import (
     DocumentTreeBar,
     DocumentTree,

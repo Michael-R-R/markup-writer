@@ -10,19 +10,13 @@ except Exception:
     print("ERROR::main::cannot import PyQt6 dependecies")
     sys.exit(1)
 
-from PyQt6.QtCore import (
-    QDir,
-)
-
 from markupwriter.core import (
-    appStart,
-    appRun,
-    appClose,
+    Application,
 )
 
 if __name__ == "__main__":
-    appStart()
-    status = appRun(sys.argv[1:])
-    appClose()
+    Application.start()
+    Application.run(sys.argv[1:])
+    Application.close()
 
-    sys.exit(status)
+    sys.exit(Application.status)

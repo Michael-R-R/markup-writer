@@ -12,12 +12,16 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from markupwriter.config import AppConfig
+from markupwriter.config import (
+    AppConfig,
+)
+
 from markupwriter.corewidgets import (
+    MainMenuBar,
     DocumentTreeView,
     DocumentEditor,
     DocumentPreview,
-    Terminal
+    Terminal,
 )
 
 class CentralWidget(QWidget):
@@ -26,6 +30,8 @@ class CentralWidget(QWidget):
         self.setContentsMargins(0, 0, 0, 0)
         self.setSizePolicy(QSizePolicy.Policy.Expanding,
                            QSizePolicy.Policy.Expanding)
+        
+        self.mainMenuBar = MainMenuBar(self)
 
         vLayout = QVBoxLayout(self)
         hSplitter = QSplitter(Qt.Orientation.Horizontal)

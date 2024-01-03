@@ -31,54 +31,54 @@ import markupwriter.coresupport.documenttree as dt
 
 class DocumentTreeHelper(object):
     def __init__(self, tree: dt.DocumentTree):
-        self.tree = tree
+        self._tree = tree
 
-        self._defaultContextMenu = DefaultContextMenu(self.tree)
-        self._itemContextMenu = ItemContextMenu(self.tree)
-        self._trashContextMenu = TrashContextMenu(self.tree)
+        self._defaultContextMenu = DefaultContextMenu(self._tree)
+        self._itemContextMenu = ItemContextMenu(self._tree)
+        self._trashContextMenu = TrashContextMenu(self._tree)
 
     def onDragEnterEvent(self, super: QTreeView, e: QDragEnterEvent):
-        item = self.tree.currentItem()
-        widget: BaseTreeItem = self.tree.itemWidget(item, 0)
+        item = self._tree.currentItem()
+        widget: BaseTreeItem = self._tree.itemWidget(item, 0)
         if not widget.hasFlag(ITEM_FLAG.draggable):
             return
             
-        self.tree.draggedItem = item
+        self._tree.draggedItem = item
 
         super.dragEnterEvent(e)
 
     def onDropEvent(self, super: QTreeView, e: QDropEvent):
-        if not self.tree.currentIndex().isValid():
+        if not self._tree.currentIndex().isValid():
             return
         
-        item = self.tree.draggedItem
+        item = self._tree.draggedItem
         if item is None:
             return
         
-        itemList = self.tree.copyWidgets(item, list())
+        itemList = self._tree.copyWidgets(item, list())
         super.dropEvent(e)
-        self.tree.setItemWidgetList(itemList)
-        self.tree.setCurrentItem(item)
-        self.tree.expandItem(item)
+        self._tree.setItemWidgetList(itemList)
+        self._tree.setCurrentItem(item)
+        self._tree.expandItem(item)
 
-        self.tree.draggedItem = None
+        self._tree.draggedItem = None
 
     def onMousePressEvent(self, super: QTreeView, e: QMouseEvent):
-        index = self.tree.indexAt(e.pos())
+        index = self._tree.indexAt(e.pos())
         super.mousePressEvent(e)
         if not index.isValid():
-            self.tree.clearSelection()
-            self.tree.setCurrentItem(None)
+            self._tree.clearSelection()
+            self._tree.setCurrentItem(None)
 
     def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
-        widget: BaseTreeItem = self.tree.itemWidget(item, col)
+        widget: BaseTreeItem = self._tree.itemWidget(item, col)
         if widget.hasFlag(ITEM_FLAG.file):
-            self.tree.fileDoubleClicked.emit(widget.shallowcopy())
+            self._tree.fileDoubleClicked.emit(widget)
 
     def onContextMenuRequest(self, pos: QPoint):
-        item = self.tree.itemAt(pos)
-        widget = self.tree.itemWidget(item, 0)
-        pos = self.tree.mapToGlobal(pos)
+        item = self._tree.itemAt(pos)
+        widget = self._tree.itemWidget(item, 0)
+        pos = self._tree.mapToGlobal(pos)
         if item is None:
             self._defaultContextMenu.onShowMenu(pos)
         elif isinstance(widget, TrashFolderItem):

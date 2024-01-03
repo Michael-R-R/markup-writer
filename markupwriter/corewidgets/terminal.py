@@ -9,7 +9,9 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from markupwriter.config import AppConfig
+from markupwriter.config import (
+    AppConfig,
+)
 
 class Terminal(QTabWidget):
     def __init__(self, parent: QWidget):

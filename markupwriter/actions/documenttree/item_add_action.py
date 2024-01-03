@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from PyQt6.QtCore import (
     QObject,
     pyqtSignal,
@@ -20,7 +22,7 @@ from markupwriter.menus.documenttree import (
     AddItemMenu,
 )
 
-class AddItemAction(QAction):
+class ItemAddAction(QAction):
     itemCreated = pyqtSignal(BaseTreeItem)
 
     def __init__(self, parent: QObject):

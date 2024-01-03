@@ -8,9 +8,9 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.actions.documenttree import (
-    AddItemAction,
-    NavUpAction,
-    NavDownAction,
+    ItemAddAction,
+    ItemNavUpAction,
+    ItemNavDownAction,
 )
 
 class DocumentTreeBar(QWidget):
@@ -18,9 +18,9 @@ class DocumentTreeBar(QWidget):
         super().__init__(parent)
 
         toolbar = QToolBar(self)
-        self.navUpAction = NavUpAction(toolbar)
-        self.navDownAction = NavDownAction(toolbar)
-        self.addItemAction = AddItemAction(toolbar)
+        self.navUpAction = ItemNavUpAction(toolbar)
+        self.navDownAction = ItemNavDownAction(toolbar)
+        self.addItemAction = ItemAddAction(toolbar)
         toolbar.addAction(self.navUpAction)
         toolbar.addAction(self.navDownAction)
         toolbar.addAction(self.addItemAction)

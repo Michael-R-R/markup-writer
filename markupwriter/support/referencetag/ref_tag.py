@@ -97,14 +97,14 @@ class RefTag(object):
 
 class AliasTag(object):
     def __init__(self, parent: RefTag, name: str) -> None:
-        self.__parent = parent
-        self.__name = name
+        self._parent = parent
+        self._name = name
     
     def parent(self) -> RefTag:
-        return self.__parent
+        return self._parent
     
     def name(self) -> str:
-        return self.__name
+        return self._name
     
     def rename(self, name: str):
-        self.__name = name
+        self._name = name

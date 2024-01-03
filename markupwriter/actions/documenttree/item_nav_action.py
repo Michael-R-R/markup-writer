@@ -16,7 +16,7 @@ from markupwriter.support.provider import (
     Icon,
 )
 
-class NavUpAction(QAction):
+class ItemNavUpAction(QAction):
     def __init__(self, parent: QObject):
         super().__init__(Icon.UP_ARROW, "Move up", parent)
         hotkey = HotkeyConfig.navUp
@@ -24,7 +24,7 @@ class NavUpAction(QAction):
         self.setShortcut(hotkey)
         self.setToolTip("Move up ({})".format(text))
 
-class NavDownAction(QAction):
+class ItemNavDownAction(QAction):
     def __init__(self, parent: QObject):
         super().__init__(Icon.DOWN_ARROW, "Move down", parent)
         hotkey = HotkeyConfig.navDown

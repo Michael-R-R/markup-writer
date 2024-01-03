@@ -2,7 +2,6 @@
 
 from PyQt6.QtCore import (
     QDir,
-    QFile,
 )
 
 from markupwriter.util import (

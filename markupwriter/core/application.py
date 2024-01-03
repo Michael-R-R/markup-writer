@@ -5,24 +5,26 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import (
-    readConfig,
-    writeConfig,
+    SerializeConfig,
     AppConfig
 )
 
 from .main_window import MainWindow
 
-def appStart():
-    readConfig()
+class Application(object):
+    status = -1
 
-def appRun(argv: list[str]):
-    app = QApplication(argv)
-    app.setApplicationName(AppConfig.APP_NAME)
+    def start():
+        SerializeConfig.read()
 
-    window = MainWindow()
-    window.show()
+    def run(argv: list[str]):
+        app = QApplication(argv)
+        app.setApplicationName(AppConfig.APP_NAME)
 
-    return app.exec()
+        window = MainWindow()
+        window.show()
 
-def appClose():
-    writeConfig()
+        Application.status = app.exec()
+
+    def close():
+        SerializeConfig.write()

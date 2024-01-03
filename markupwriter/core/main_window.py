@@ -4,16 +4,12 @@ from PyQt6.QtGui import (
     QResizeEvent,
 )
 
-from PyQt6.QtCore import (
-    QDataStream,
-)
-
 from PyQt6.QtWidgets import (
     QMainWindow,
 )
 
 from markupwriter.config import AppConfig
-from markupwriter.corewidgets import MainMenuBar
+
 from .central_widget import CentralWidget
 
 class MainWindow(QMainWindow):
@@ -21,17 +17,14 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(AppConfig.APP_NAME)
         self.resize(AppConfig.mainWindowSize)
-        self.setMenuBar(MainMenuBar(self))
-        self.setCentralWidget(CentralWidget(self))
         self.setContentsMargins(0, 0, 0, 0)
+
+        self._centralWidget = CentralWidget(self)
+
+        self.setMenuBar(self._centralWidget.mainMenuBar)
+        self.setCentralWidget(self._centralWidget)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         AppConfig.mainWindowSize = a0.size()
         return super().resizeEvent(a0)
-
-    def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        return sOut
-    
-    def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        return sIn
         

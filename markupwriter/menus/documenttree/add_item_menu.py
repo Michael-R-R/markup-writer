@@ -14,6 +14,14 @@ from PyQt6.QtWidgets import (
     QTreeWidgetItem,
 )
 
+from markupwriter.support.provider import (
+    Icon,
+)
+
+from markupwriter.dialogs.modal import (
+    StrDialog,
+)
+
 from markupwriter.coresupport.documenttree.treeitem import (
     BaseTreeItem,
     NovelFolderItem,
@@ -23,14 +31,6 @@ from markupwriter.coresupport.documenttree.treeitem import (
     SceneFileItem,
     SectionFileItem,
     MiscFileItem,
-)
-
-from markupwriter.support.provider import (
-    Icon,
-)
-
-from markupwriter.dialogs.modal import (
-    StrDialog,
 )
 
 class AddItemMenu(QMenu):

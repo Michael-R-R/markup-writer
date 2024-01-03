@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
 from __future__ import annotations
-
-import re
-from enum import Enum, auto
+from enum import auto, Enum
 from collections import Counter
+import re
 
 from PyQt6.QtGui import (
     QSyntaxHighlighter,
@@ -27,35 +26,35 @@ class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument):
         super().__init__(document)
         
-        self.__behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
+        self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
         self.addBehaviour(BEHAVIOUR.refTag, HighlightWordBehaviour(HighlighterConfig.refTagCol, set(), r"[\w']+"))
         self.addBehaviour(BEHAVIOUR.aliasTag, HighlightWordBehaviour(HighlighterConfig.aliasTagCol, set(), r"[\w']+"))
         self.addBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, r"%(.*)"))
         self.addBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.keywordCol, r"@(create|import|as) "))
 
     def highlightBlock(self, text: str | None) -> None:
-        for _, val in self.__behaviours.items():
+        for _, val in self._behaviours.items():
             val.process(self, text)
     
     def updateFormat(self, start: int, end: int, format: QTextCharFormat):
         self.setFormat(start, end, format)
 
     def addBehaviour(self, type: BEHAVIOUR, val: HighlightBehaviour) -> bool:
-        if type in self.__behaviours:
+        if type in self._behaviours:
             return False
-        self.__behaviours[type] = val
+        self._behaviours[type] = val
         return True
     
     def removeBehaviour(self, type: BEHAVIOUR) -> bool:
-        if not type in self.__behaviours:
+        if not type in self._behaviours:
             return False
-        self.__behaviours.pop(type)
+        self._behaviours.pop(type)
         return True
     
     def getBehaviour(self, type: BEHAVIOUR) -> HighlightWordBehaviour | HighlightExprBehaviour | None:
-        if not type in self.__behaviours:
+        if not type in self._behaviours:
             return None
-        return self.__behaviours[type]
+        return self._behaviours[type]
 
 
 class HighlightBehaviour(object):
@@ -97,27 +96,27 @@ class HighlightWordBehaviour(HighlightBehaviour):
                 end = m.end() - start
                 highlighter.updateFormat(start, end, self._format)
 
-    def addWord(self, word: str) -> bool:
+    def add(self, word: str) -> bool:
         if word in self._wordSet:
             return False
         self._wordSet.add(word)
         return True
     
-    def addWords(self, words: list[str]):
+    def addList(self, words: list[str]):
         for word in words:
-            self.addWord(word)
+            self.add(word)
     
-    def removeWord(self, word: str) -> bool:
+    def remove(self, word: str) -> bool:
         if not word in self._wordSet:
             return False
         self._wordSet.remove(word)
         return True
     
-    def removeWords(self, words: list[str]):
+    def removeList(self, words: list[str]):
         for word in words:
-            self.removeWord(word)
+            self.remove(word)
     
-    def renameWord(self, old: str, new: str) -> bool:
+    def rename(self, old: str, new: str) -> bool:
         if not old in self._wordSet:
             return False
         if new in self._wordSet:
@@ -126,7 +125,7 @@ class HighlightWordBehaviour(HighlightBehaviour):
         self._wordSet.add(new)
         return True
     
-    def clearWords(self):
+    def clear(self):
         self._wordSet.clear()
     
     def getWords(self) -> set:

@@ -8,7 +8,7 @@ from PyQt6.QtCore import (
 
 from typing import (
     TypeVar,
-    Type
+    Type,
 )
 
 class Serialize(object):

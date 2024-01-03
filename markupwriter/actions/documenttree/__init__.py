@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
-from .add_item_action import (
-    AddItemAction,
+from .item_add_action import (
+    ItemAddAction,
 )
 
-from .nav_action import (
-    NavUpAction,
-    NavDownAction,
+from .item_nav_action import (
+    ItemNavUpAction,
+    ItemNavDownAction,
 )
