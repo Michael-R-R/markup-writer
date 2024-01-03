@@ -17,8 +17,8 @@ class Icon(object):
     TIMELINE_FOLDER = QIcon("icons:timeline.svg")
     CHARACTERS_FOLDER = QIcon("icons:characters.svg")
     LOCATIONS_FOLDER = QIcon("icons:locations.svg")
-    OBJECTS_FOLDER = QIcon("icons:folder.svg")
-    TRASH_FOLDER = QIcon("icons:folder.svg")
+    OBJECTS_FOLDER = QIcon("icons:objects.svg")
+    TRASH_FOLDER = QIcon("icons:trash.svg")
     MISC_FOLDER = QIcon("icons:misc_folder.svg")
 
     # Files

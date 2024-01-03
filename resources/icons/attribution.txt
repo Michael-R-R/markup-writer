@@ -1,5 +1,21 @@
-Folder: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
-Document: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
+Artist: Kaitlyn Murray
+----------------------
+novel.svg
+plot.svg
+timeline.svg
+characters.svg
+locations.svg
+objects.svg
+trash.svg
+misc_folder.svg
+
+title_page.svg
+chapter.svg
+scene.svg
+section.svg
+misc_file.svg
+----------------------
+
 Check: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 Uncheck: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 Up arrow: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
