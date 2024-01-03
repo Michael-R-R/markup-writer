@@ -5,8 +5,10 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import (
+    AppConfig,
+    HighlighterConfig,
+    HotkeyConfig,
     SerializeConfig,
-    AppConfig
 )
 
 from .main_window import MainWindow
@@ -15,6 +17,9 @@ class Application(object):
     status = -1
 
     def start():
+        AppConfig.init()
+        HighlighterConfig.init()
+        HotkeyConfig.init()
         SerializeConfig.read()
 
     def run(argv: list[str]):

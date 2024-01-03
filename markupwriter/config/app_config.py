@@ -1,25 +1,35 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
-    QDir,
     QDataStream,
     QSize,
 )
 
+from markupwriter.util import File
 from .base_config import BaseConfig
 
 class AppConfig(BaseConfig):
-    INI_PATH = QDir.cleanPath("./resources/configs/app.ini")
-    APP_NAME = "Markup Writer"
-    ICON_SIZE = QSize(18, 18)
-    mainWindowSize = QSize(800, 600)
-    docTreeViewSize = QSize(100, 100)
-    docEditorSize = QSize(100, 100)
-    docPreviewSize = QSize(100, 100)
-    terminalSize = QSize(100, 100)
+    INI_PATH = None
+    APP_NAME = None
+    ICON_SIZE = None
+    mainWindowSize = None
+    docTreeViewSize = None
+    docEditorSize = None
+    docPreviewSize = None
+    terminalSize = None
+
+    def init():
+        AppConfig.INI_PATH = File.path("./resources/configs/app.ini")
+        AppConfig.APP_NAME = "Markup Writer"
+        AppConfig.ICON_SIZE = QSize(18, 18)
+        AppConfig.mainWindowSize = QSize(800, 600)
+        AppConfig.docTreeViewSize = QSize(100, 100)
+        AppConfig.docEditorSize = QSize(100, 100)
+        AppConfig.docPreviewSize = QSize(100, 100)
+        AppConfig.terminalSize = QSize(100, 100)
 
     def reset():
-        pass
+        AppConfig.init()
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << AppConfig.mainWindowSize

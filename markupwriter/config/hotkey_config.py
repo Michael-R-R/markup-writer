@@ -9,11 +9,23 @@ from PyQt6.QtGui import (
     QKeySequence,
 )
 
-class HotkeyConfig(object):
-    INI_PATH = "./resources/configs/hotkey.ini"
-    navUp = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Up)
-    navDown = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Down)
-    newItem = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_N)
+from markupwriter.util import File
+from .base_config import BaseConfig
+
+class HotkeyConfig(BaseConfig):
+    INI_PATH = None
+    navUp = None
+    navDown = None
+    newItem = None
+
+    def init():
+        HotkeyConfig.INI_PATH = File.path("./resources/configs/hotkey.ini")
+        HotkeyConfig.navUp = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Up)
+        HotkeyConfig.navDown = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Down)
+        HotkeyConfig.newItem = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_N)
+
+    def reset():
+        HotkeyConfig.init()
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << HotkeyConfig.navUp
