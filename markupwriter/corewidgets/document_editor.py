@@ -28,6 +28,7 @@ class DocumentEditor(QPlainTextEdit):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
+        self.currUUID = ""
         self.plainDocument = PlainDocument()
         
         self.setDocument(self.plainDocument)
@@ -52,6 +53,26 @@ class DocumentEditor(QPlainTextEdit):
         wH = int(self.height() * 0.1)
 
         self.setViewportMargins(wW, wH, wW, wH)
+
+    def onFileDoubleClicked(self, uuid: str):
+        if self.currUUID == uuid:
+            return
+
+        if self.currUUID != "":
+            # TODO: save the contents of the current document
+            pass
+
+        self.currUUID = uuid
+        print(uuid)
+        
+        # TODO: read file and add contents to document
+
+    def onFileRemoved(self, uuid: str):
+        if self.currUUID != uuid:
+            return
+        
+        self.currUUID = ""
+        self.plainDocument.clear()
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorSize = e.size()

@@ -5,13 +5,13 @@ from PyQt6.QtCore import (
     QSize,
 )
 
-from markupwriter.util import File
 from .base_config import BaseConfig
 
 class AppConfig(BaseConfig):
     INI_PATH: str = None
     APP_NAME: str = None
     ICON_SIZE: QSize = None
+    projectPath: str = None
     mainWindowSize: QSize  = None
     docTreeViewSize: QSize  = None
     docEditorSize: QSize  = None
@@ -19,9 +19,10 @@ class AppConfig(BaseConfig):
     terminalSize: QSize  = None
 
     def init():
-        AppConfig.INI_PATH = File.path("./resources/configs/app.ini")
+        AppConfig.INI_PATH = "./resources/configs/app.ini"
         AppConfig.APP_NAME = "Markup Writer"
         AppConfig.ICON_SIZE = QSize(18, 18)
+        AppConfig.projectPath = ""
         AppConfig.mainWindowSize = QSize(800, 600)
         AppConfig.docTreeViewSize = QSize(100, 100)
         AppConfig.docEditorSize = QSize(100, 100)
@@ -32,6 +33,7 @@ class AppConfig(BaseConfig):
         AppConfig.init()
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
+        sOut.writeQString(self.projectPath)
         sOut << AppConfig.mainWindowSize
         sOut << AppConfig.docTreeViewSize
         sOut << AppConfig.docEditorSize
@@ -40,6 +42,7 @@ class AppConfig(BaseConfig):
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
+        self.projectPath = sIn.readQString()
         sIn >> AppConfig.mainWindowSize
         sIn >> AppConfig.docTreeViewSize
         sIn >> AppConfig.docEditorSize

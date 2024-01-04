@@ -9,7 +9,6 @@ from PyQt6.QtGui import (
     QKeySequence,
 )
 
-from markupwriter.util import File
 from .base_config import BaseConfig
 
 class HotkeyConfig(BaseConfig):
@@ -19,7 +18,7 @@ class HotkeyConfig(BaseConfig):
     newItem: QKeySequence  = None
 
     def init():
-        HotkeyConfig.INI_PATH = File.path("./resources/configs/hotkey.ini")
+        HotkeyConfig.INI_PATH = "./resources/configs/hotkey.ini"
         HotkeyConfig.navUp = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Up)
         HotkeyConfig.navDown = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Down)
         HotkeyConfig.newItem = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_N)

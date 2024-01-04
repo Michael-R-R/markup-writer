@@ -26,22 +26,22 @@ class DocumentTreeView(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
-        self.docTreeBar = DocumentTreeBar(self)
-        self.docTree = DocumentTree(self)
+        self.treeBar = DocumentTreeBar(self)
+        self.tree = DocumentTree(self)
 
         vLayout = QVBoxLayout(self)
         vLayout.setContentsMargins(0, 0, 0, 0)
         vLayout.setSpacing(0)
-        vLayout.addWidget(self.docTreeBar)
-        vLayout.addWidget(self.docTree)
+        vLayout.addWidget(self.treeBar)
+        vLayout.addWidget(self.tree)
 
         self.setupConnections()
         self.setStyleSheet(Style.TREE_VIEW)
 
     def setupConnections(self):
-        self.docTreeBar.addItemAction.itemCreated.connect(lambda item: self.docTree.addItemWidget(item, True))
-        self.docTreeBar.navUpAction.triggered.connect(lambda: self.docTree.translateItem(-1))
-        self.docTreeBar.navDownAction.triggered.connect(lambda: self.docTree.translateItem(1))
+        self.treeBar.addItemAction.itemCreated.connect(lambda item: self.tree.addItemWidget(item, True))
+        self.treeBar.navUpAction.triggered.connect(lambda: self.tree.translateItem(-1))
+        self.treeBar.navDownAction.triggered.connect(lambda: self.tree.translateItem(1))
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docTreeViewSize = e.size()

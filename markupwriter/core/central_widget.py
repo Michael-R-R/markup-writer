@@ -37,16 +37,16 @@ class CentralWidget(QWidget):
         hSplitter = QSplitter(Qt.Orientation.Horizontal)
         vSplitter = QSplitter(Qt.Orientation.Vertical)
 
-        self.documentTreeView = DocumentTreeView(self)
-        self.documentEditor = DocumentEditor(self)
+        self.treeView = DocumentTreeView(self)
+        self.editor = DocumentEditor(self)
         self.terminal = Terminal(self)
-        self.documentPreview = DocumentPreview(self)
+        self.preview = DocumentPreview(self)
 
-        hSplitter.addWidget(self.documentTreeView)
+        hSplitter.addWidget(self.treeView)
         hSplitter.addWidget(vSplitter)
-        vSplitter.addWidget(self.documentEditor)
+        vSplitter.addWidget(self.editor)
         vSplitter.addWidget(self.terminal)
-        hSplitter.addWidget(self.documentPreview)
+        hSplitter.addWidget(self.preview)
 
         hSplitter.setSizes([AppConfig.docTreeViewSize.width(),
                             AppConfig.docEditorSize.width(),
@@ -55,6 +55,13 @@ class CentralWidget(QWidget):
                             AppConfig.terminalSize.height()])
 
         vLayout.addWidget(hSplitter)
+
+        self.setupConnections()
+
+    def setupConnections(self):
+        # Editor
+        self.treeView.tree.fileDoubleClicked.connect(self.editor.onFileDoubleClicked)
+        self.treeView.tree.fileRemoved.connect(self.editor.onFileRemoved)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return sOut

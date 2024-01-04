@@ -8,7 +8,6 @@ from PyQt6.QtGui import (
     QColor,
 )
 
-from markupwriter.util import File
 from .base_config import BaseConfig
 
 class HighlighterConfig(BaseConfig):
@@ -19,7 +18,7 @@ class HighlighterConfig(BaseConfig):
     keywordCol: QColor = None
 
     def init():
-        HighlighterConfig.INI_PATH = File.path("./resources/configs/highlighter.ini")
+        HighlighterConfig.INI_PATH = "./resources/configs/highlighter.ini"
         # Base-line: 70% lightness, 50% saturation
         HighlighterConfig.refTagCol = QColor(64, 191, 142)
         HighlighterConfig.aliasTagCol = QColor(224, 224, 133)
