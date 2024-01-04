@@ -13,10 +13,10 @@ from markupwriter.util import File
 from .base_config import BaseConfig
 
 class HotkeyConfig(BaseConfig):
-    INI_PATH = None
-    navUp = None
-    navDown = None
-    newItem = None
+    INI_PATH: str = None
+    navUp: QKeySequence = None
+    navDown: QKeySequence  = None
+    newItem: QKeySequence  = None
 
     def init():
         HotkeyConfig.INI_PATH = File.path("./resources/configs/hotkey.ini")

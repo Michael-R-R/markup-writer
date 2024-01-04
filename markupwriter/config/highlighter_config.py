@@ -12,11 +12,11 @@ from markupwriter.util import File
 from .base_config import BaseConfig
 
 class HighlighterConfig(BaseConfig):
-    INI_PATH = None
-    refTagCol = None
-    aliasTagCol = None
-    commentCol = None
-    keywordCol = None
+    INI_PATH: str = None
+    refTagCol: QColor = None
+    aliasTagCol: QColor = None
+    commentCol: QColor = None
+    keywordCol: QColor = None
 
     def init():
         HighlighterConfig.INI_PATH = File.path("./resources/configs/highlighter.ini")

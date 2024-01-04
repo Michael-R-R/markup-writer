@@ -9,14 +9,14 @@ from markupwriter.util import File
 from .base_config import BaseConfig
 
 class AppConfig(BaseConfig):
-    INI_PATH = None
-    APP_NAME = None
-    ICON_SIZE = None
-    mainWindowSize = None
-    docTreeViewSize = None
-    docEditorSize = None
-    docPreviewSize = None
-    terminalSize = None
+    INI_PATH: str = None
+    APP_NAME: str = None
+    ICON_SIZE: QSize = None
+    mainWindowSize: QSize  = None
+    docTreeViewSize: QSize  = None
+    docEditorSize: QSize  = None
+    docPreviewSize: QSize  = None
+    terminalSize: QSize  = None
 
     def init():
         AppConfig.INI_PATH = File.path("./resources/configs/app.ini")
