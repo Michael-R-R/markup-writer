@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
+    QObject,
     QPoint,
 )
 
@@ -8,8 +9,9 @@ from PyQt6.QtWidgets import (
     QMenu,
 )
 
-class BaseContextMenu(object):
-    def __init__(self) -> None:
+class BaseContextMenu(QObject):
+    def __init__(self, parent: QObject | None) -> None:
+        super().__init__(parent)
         self._menu = QMenu()
 
     def preprocess(self, args: list[object] | None):

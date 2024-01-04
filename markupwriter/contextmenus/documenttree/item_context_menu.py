@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    QObject,
+)
+
 from PyQt6.QtGui import (
     QAction,
 )
@@ -17,16 +21,18 @@ from markupwriter.contextmenus import (
 )
 
 class ItemContextMenu(BaseContextMenu):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, parent: QObject | None) -> None:
+        super().__init__(parent)
 
         self.addItemMenu = AddItemMenu(None)
         self._menu.addMenu(self.addItemMenu)
 
-        self.renameAction = QAction("Rename")
-        self.toTrashAction = QAction(Icon.TRASH_FOLDER, "Move to trash")
-        self.recoverAction = QAction(Icon.TRASH_FOLDER, "Recover")
+        self.toggleActiveAction = QAction("Toggle active", self)
+        self.renameAction = QAction("Rename", self)
+        self.toTrashAction = QAction(Icon.TRASH_FOLDER, "Move to trash", self)
+        self.recoverAction = QAction(Icon.TRASH_FOLDER, "Recover", self)
 
+        self._menu.addAction(self.toggleActiveAction)
         self._menu.addAction(self.renameAction)
         self._menu.addAction(self.toTrashAction)
         self._menu.addAction(self.recoverAction)

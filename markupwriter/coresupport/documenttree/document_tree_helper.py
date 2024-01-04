@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
+    QObject,
     QPoint,
 )
 
@@ -34,20 +35,22 @@ from .treeitem import (
 
 import markupwriter.coresupport.documenttree as dt
 
-class DocumentTreeHelper(object):
-    def __init__(self, tree: dt.DocumentTree):
-        self._tree = tree
+class DocumentTreeHelper(QObject):
+    def __init__(self, parent: dt.DocumentTree):
+        super().__init__(parent)
+        self._tree = parent
 
-        self._treeContextMenu = TreeContextMenu()
+        self._treeContextMenu = TreeContextMenu(self)
         self._treeContextMenu.addItemMenu.itemCreated.connect(self.onItemCreated)
 
-        self._itemContextMenu = ItemContextMenu()
+        self._itemContextMenu = ItemContextMenu(self)
         self._itemContextMenu.addItemMenu.itemCreated.connect(self.onItemCreated)
+        self._itemContextMenu.toggleActiveAction.triggered.connect(self.onToggleActive)
         self._itemContextMenu.renameAction.triggered.connect(self.onRename)
         self._itemContextMenu.toTrashAction.triggered.connect(self.onMoveToTrash)
         self._itemContextMenu.recoverAction.triggered.connect(self.onRecover)
 
-        self._trashContextMenu = TrashContextMenu()
+        self._trashContextMenu = TrashContextMenu(self)
         self._trashContextMenu.emptyAction.triggered.connect(self.onEmptyTrash)
 
 
@@ -107,6 +110,14 @@ class DocumentTreeHelper(object):
 
     def onItemCreated(self, item: BaseTreeItem):
         self._tree.addWidget(item)
+
+    def onToggleActive(self):
+        item = self._tree.currentItem()
+        if item is None:
+            return
+        
+        widget: BaseTreeItem = self._tree.itemWidget(item, 0)
+        widget.toggleActive()
 
     def onRename(self):
         item = self._tree.currentItem()
