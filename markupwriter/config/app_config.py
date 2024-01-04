@@ -33,7 +33,6 @@ class AppConfig(BaseConfig):
         AppConfig.init()
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        sOut.writeQString(self.projectPath)
         sOut << AppConfig.mainWindowSize
         sOut << AppConfig.docTreeViewSize
         sOut << AppConfig.docEditorSize
@@ -42,7 +41,6 @@ class AppConfig(BaseConfig):
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        self.projectPath = sIn.readQString()
         sIn >> AppConfig.mainWindowSize
         sIn >> AppConfig.docTreeViewSize
         sIn >> AppConfig.docEditorSize

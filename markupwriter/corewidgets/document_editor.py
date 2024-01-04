@@ -63,7 +63,6 @@ class DocumentEditor(QPlainTextEdit):
             pass
 
         self.currUUID = uuid
-        print(uuid)
         
         # TODO: read file and add contents to document
 

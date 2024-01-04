@@ -16,6 +16,10 @@ from markupwriter.config import (
     AppConfig,
 )
 
+from markupwriter.common.handler import (
+    ProjectHandler,
+)
+
 from markupwriter.corewidgets import (
     MainMenuBar,
     DocumentTreeView,
@@ -31,7 +35,7 @@ class CentralWidget(QWidget):
         self.setSizePolicy(QSizePolicy.Policy.Expanding,
                            QSizePolicy.Policy.Expanding)
         
-        self.mainMenuBar = MainMenuBar(self)
+        self.menuBar = MainMenuBar(self)
 
         vLayout = QVBoxLayout(self)
         hSplitter = QSplitter(Qt.Orientation.Horizontal)
@@ -59,7 +63,10 @@ class CentralWidget(QWidget):
         self.setupConnections()
 
     def setupConnections(self):
-        # Editor
+        # --- Menu bar --- #
+        self.menuBar.fileMenu.newAction.triggered.connect(ProjectHandler.onNewProjectClicked)
+
+        # --- Editor --- #
         self.treeView.tree.fileDoubleClicked.connect(self.editor.onFileDoubleClicked)
         self.treeView.tree.fileRemoved.connect(self.editor.onFileRemoved)
 

@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
 
         self._centralWidget = CentralWidget(self)
 
-        self.setMenuBar(self._centralWidget.mainMenuBar)
+        self.setMenuBar(self._centralWidget.menuBar)
         self.setCentralWidget(self._centralWidget)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
