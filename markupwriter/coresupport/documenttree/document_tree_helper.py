@@ -90,7 +90,7 @@ class DocumentTreeHelper(QObject):
     def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
         widget: BaseTreeItem = self._tree.itemWidget(item, col)
         if widget.hasFlag(ITEM_FLAG.file):
-            self._tree.fileDoubleClicked.emit(widget)
+            self._tree.fileDoubleClicked.emit(widget.UUID())
 
     def onContextMenuRequest(self, pos: QPoint):
         item = self._tree.itemAt(pos)
