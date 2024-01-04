@@ -15,8 +15,13 @@ from PyQt6.QtGui import (
     QMouseEvent,
 ) 
 
+from markupwriter.dialogs.modal import (
+    StrDialog,
+    YesNoDialog,
+)
+
 from markupwriter.contextmenus.documenttree import (
-    DefaultContextMenu,
+    TreeContextMenu,
     ItemContextMenu,
     TrashContextMenu,
 )
@@ -33,9 +38,18 @@ class DocumentTreeHelper(object):
     def __init__(self, tree: dt.DocumentTree):
         self._tree = tree
 
-        self._defaultContextMenu = DefaultContextMenu(self._tree)
-        self._itemContextMenu = ItemContextMenu(self._tree)
-        self._trashContextMenu = TrashContextMenu(self._tree)
+        self._treeContextMenu = TreeContextMenu()
+        self._treeContextMenu.addItemMenu.itemCreated.connect(self.onItemCreated)
+
+        self._itemContextMenu = ItemContextMenu()
+        self._itemContextMenu.addItemMenu.itemCreated.connect(self.onItemCreated)
+        self._itemContextMenu.renameAction.triggered.connect(self.onRename)
+        self._itemContextMenu.toTrashAction.triggered.connect(self.onMoveToTrash)
+        self._itemContextMenu.recoverAction.triggered.connect(self.onRecover)
+
+        self._trashContextMenu = TrashContextMenu()
+        self._trashContextMenu.emptyAction.triggered.connect(self.onEmptyTrash)
+
 
     def onDragEnterEvent(self, super: QTreeView, e: QDragEnterEvent):
         item = self._tree.currentItem()
@@ -77,11 +91,62 @@ class DocumentTreeHelper(object):
 
     def onContextMenuRequest(self, pos: QPoint):
         item = self._tree.itemAt(pos)
-        widget = self._tree.itemWidget(item, 0)
+        widget: BaseTreeItem = self._tree.itemWidget(item, 0)
         pos = self._tree.mapToGlobal(pos)
         if item is None:
-            self._defaultContextMenu.onShowMenu(pos)
+            self._treeContextMenu.onShowMenu(pos)
         elif isinstance(widget, TrashFolderItem):
-            self._trashContextMenu.onShowMenu(pos)
+            isEmpty = item.childCount() < 1
+            args = [isEmpty]
+            self._trashContextMenu.onShowMenu(pos, args)
         else:
-            self._itemContextMenu.onShowMenu(pos)
+            inTrash = self._tree.isItemInTrash(item)
+            isMutable = widget.hasFlag(ITEM_FLAG.mutable)
+            args = [inTrash, isMutable]
+            self._itemContextMenu.onShowMenu(pos, args)
+
+    def onItemCreated(self, item: BaseTreeItem):
+        self._tree.addWidget(item)
+
+    def onRename(self):
+        item = self._tree.currentItem()
+        if item is None:
+            return
+        
+        widget: BaseTreeItem = self._tree.itemWidget(item, 0)
+        text = StrDialog.run("Rename", widget.title, None)
+        if text is None:
+            return
+        
+        widget.title = text
+
+    def onMoveToTrash(self):
+        item = self._tree.currentItem()
+        if item is None:
+            return
+        
+        if not YesNoDialog.run("Move to trash?"):
+            return
+        
+        trash = self._tree.findTrashFolder()
+        if trash is None:
+            return
+        
+        self._tree.moveItemTo(item, trash)
+
+    def onRecover(self):
+        item = self._tree.currentItem()
+        if item is None:
+            return
+        self._tree.moveItemTo(item, None)
+
+    def onEmptyTrash(self):
+        item = self._tree.currentItem()
+        if item is None:
+            return
+        
+        if not YesNoDialog.run("Empty trash?"):
+            return
+        
+        for i in range(item.childCount()-1, -1, -1):
+            self._tree.removeItem(item.child(i), item)

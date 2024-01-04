@@ -169,6 +169,17 @@ class DocumentTree(QTreeWidget):
         for i in items:
             self.setItemWidget(i.item, 0, i)
 
+    def isItemInTrash(self, item: QTreeWidgetItem) -> bool:
+        trash = self.findTrashFolder()
+
+        prev = None
+        curr = item.parent()
+        while curr is not None:
+            prev = curr
+            curr = curr.parent()
+
+        return prev == trash
+
     def findTrashFolder(self) -> QTreeWidgetItem | None:
         for i in range(self.topLevelItemCount()-1, -1, -1):
             item = self.topLevelItem(i)

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-from .default_context_menu import (
-    DefaultContextMenu,
+from .tree_context_menu import (
+    TreeContextMenu,
 )
 
 from .item_context_menu import (

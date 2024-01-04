@@ -8,48 +8,24 @@ from markupwriter.common.provider import (
     Icon,
 )
 
-from markupwriter.dialogs.modal import (
-    YesNoDialog,
+from markupwriter.contextmenus import (
+    BaseContextMenu,
 )
 
-from markupwriter.coresupport.documenttree import (
-    DocumentTree,
-)
-
-from .tree_context_menu import (
-    TreeContextMenu,
-)
-
-class TrashContextMenu(TreeContextMenu):
-    def __init__(self, tree: DocumentTree) -> None:
-        super().__init__(tree)
+class TrashContextMenu(BaseContextMenu):
+    def __init__(self) -> None:
+        super().__init__()
 
         self.emptyAction = QAction(Icon.TRASH_FOLDER, "Empty trash")
 
         self._menu.addAction(self.emptyAction)
 
-        self.emptyAction.triggered.connect(self._onEmptyTrash)
+    def preprocess(self, args: list[object] | None):
+        isEmpty = args[0]
 
-    def preprocess(self):
-        item = self._tree.currentItem()
-        if item is None:
-            return
-        
-        isEmpty = item.childCount() < 1
         self.emptyAction.setDisabled(isEmpty)
 
-    def postprocess(self):
+    def postprocess(self, args: list[object] | None):
         actions = self._menu.actions()
         for a in actions:
-            a.setDisabled(False)
-
-    def _onEmptyTrash(self):
-        item = self._tree.currentItem()
-        if item is None:
-            return
-        
-        if not YesNoDialog.run("Empty trash?"):
-            return
-        
-        for i in range(item.childCount()-1, -1, -1):
-            self._tree.removeItem(item.child(i), item)
+            a.setEnabled(True)
