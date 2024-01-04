@@ -27,12 +27,14 @@ class PlainDocument(QTextDocument):
         self.setDocumentLayout(QPlainTextDocumentLayout(self))
         self._highlighter = Highlighter(self)
         self._refTagManager = RefTagManager()
-        self._passiveParser = PassiveParser(self._highlighter,
-                                            self._refTagManager)
+        self._passiveParser = PassiveParser(self)
 
     def highlighter(self) -> Highlighter:
         return self._highlighter
     
     def refTagManager(self) -> RefTagManager:
         return self._refTagManager
+    
+    def passiveParser(self) -> PassiveParser:
+        return self._passiveParser
         

@@ -31,11 +31,11 @@ class DocumentEditor(QPlainTextEdit):
         self.plainDocument = PlainDocument()
         
         self.setDocument(self.plainDocument)
+        self.setStyleSheet(Style.EDITOR)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setTabStopDistance(20.0)
         self.updateViewportMargins()
-        self.setStyleSheet(Style.EDITOR)
 
     def updateViewportMargins(self):
         mSize = QGuiApplication.primaryScreen().size()
