@@ -19,22 +19,15 @@ from .base_file_item import (
 
 class TitleFileItem(BaseFileItem):
     def __init__(self,
-                 title: str = None,
-                 content: str = None,
-                 item: QTreeWidgetItem = None,
-                 parent: QWidget = None):
-        super().__init__(title, content, item, parent)
-        self.applyChanges()
+                 title: str=None,
+                 item: QTreeWidgetItem=None,
+                 parent: QWidget=None):
+        super().__init__(title, item, parent)
 
-    def shallowcopy(self):
-        myCopy = TitleFileItem(self.title,
-                              self.content,
-                              self.item,
-                              self.parentWidget())
-        myCopy._docUUID = self._docUUID
-        myCopy._flags = self._flags
-        myCopy.applyIcon()
-        return myCopy
+    def shallowcopy(self, other = None):
+        other: TitleFileItem = super().shallowcopy(TitleFileItem())
+        other.applyChanges()
+        return other
     
     def applyIcon(self):
         self.icon = Icon.TITLE_FILE

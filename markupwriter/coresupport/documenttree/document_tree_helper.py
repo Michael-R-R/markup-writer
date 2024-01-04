@@ -109,7 +109,7 @@ class DocumentTreeHelper(QObject):
             self._itemContextMenu.onShowMenu(pos, args)
 
     def onItemCreated(self, item: BaseTreeItem):
-        self._tree.addWidget(item)
+        self._tree.addItemWidget(item)
 
     def onToggleActive(self):
         item = self._tree.currentItem()

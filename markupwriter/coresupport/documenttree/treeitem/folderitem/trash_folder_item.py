@@ -26,15 +26,13 @@ class TrashFolderItem(BaseFolderItem):
                  item: QTreeWidgetItem = None,
                  parent: QWidget = None):
         super().__init__(title, item, parent)
-        self.applyChanges()
+        self._flags -= ITEM_FLAG.draggable
+        self._flags -= ITEM_FLAG.mutable
 
-    def shallowcopy(self):
-        folder = TrashFolderItem(self.title,
-                                self.item,
-                                self.parentWidget())
-        folder._flags = self._flags
-        folder.applyIcon()
-        return folder
+    def shallowcopy(self, other = None):
+        other: TrashFolderItem = super().shallowcopy(TrashFolderItem())
+        other.applyChanges()
+        return other
     
     def applyIcon(self):
         self.icon = Icon.TRASH_FOLDER

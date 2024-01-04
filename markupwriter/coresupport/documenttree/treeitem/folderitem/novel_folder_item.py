@@ -26,21 +26,18 @@ class NovelFolderItem(BaseFolderItem):
                  item: QTreeWidgetItem = None,
                  parent: QWidget = None):
         super().__init__(title, item, parent)
-        self._flags += ITEM_FLAG.mutable
-        self.applyChanges()
+
+        self._flags -= ITEM_FLAG.draggable
 
         label: QWidget = self.children()[self.TITLE]
         font = label.font()
         font.setUnderline(True)
         label.setFont(font)
 
-    def shallowcopy(self):
-        folder = NovelFolderItem(self.title,
-                                 self.item,
-                                 self.parentWidget())
-        folder._flags = self._flags
-        folder.applyIcon()
-        return folder
+    def shallowcopy(self, other = None):
+        other: NovelFolderItem = super().shallowcopy(NovelFolderItem())
+        other.applyChanges()
+        return other
     
     def applyIcon(self):
         self.icon = Icon.NOVEL_FOLDER

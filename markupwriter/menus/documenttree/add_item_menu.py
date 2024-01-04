@@ -42,7 +42,7 @@ class AddItemMenu(QMenu):
 
         self._folderMenu = QMenu("Folder", self)
         self.setupFolderAction(QAction(Icon.NOVEL_FOLDER, "Novel", self._folderMenu), NovelFolderItem)
-        self.setupFolderAction(QAction(Icon.MISC_FOLDER, "Miscellaneous", self._folderMenu), MiscFolderItem)
+        self.setupFolderAction(QAction(Icon.MISC_FOLDER, "Misc.", self._folderMenu), MiscFolderItem)
         self.addMenu(self._folderMenu)
 
         self._fileMenu = QMenu("File", self)
@@ -50,7 +50,7 @@ class AddItemMenu(QMenu):
         self.setupFileAction(QAction(Icon.CHAPTER_FILE, "Chapter", self._fileMenu), ChapterFileItem)
         self.setupFileAction(QAction(Icon.SCENE_FILE, "Scene", self._fileMenu), SceneFileItem)
         self.setupFileAction(QAction(Icon.SECTION_FILE, "Section", self._fileMenu), SectionFileItem)
-        self.setupFileAction(QAction(Icon.MISC_FILE, "Miscellaneous", self._fileMenu), MiscFileItem)
+        self.setupFileAction(QAction(Icon.MISC_FILE, "Misc.", self._fileMenu), MiscFileItem)
         self.addMenu(self._fileMenu)
 
     def setupFolderAction(self, action: QAction, folderClass):
@@ -74,5 +74,5 @@ class AddItemMenu(QMenu):
         if text is None:
             return
         
-        file = fileClass(text, "", QTreeWidgetItem())
+        file = fileClass(text, QTreeWidgetItem())
         self.itemCreated.emit(file)

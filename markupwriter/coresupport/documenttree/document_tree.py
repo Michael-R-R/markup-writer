@@ -22,7 +22,6 @@ from PyQt6.QtWidgets import (
 from .treeitem import (
     ITEM_FLAG,
     BaseTreeItem,
-    BaseFileItem,
     PlotFolderItem,
     TimelineFolderItem,
     CharsFolderItem,
@@ -34,9 +33,9 @@ from .treeitem import (
 import markupwriter.coresupport.documenttree as dt
 
 class DocumentTree(QTreeWidget):
-    fileAdded = pyqtSignal(BaseFileItem)
-    fileRemoved = pyqtSignal(BaseFileItem)
-    fileDoubleClicked = pyqtSignal(BaseFileItem)
+    fileAdded = pyqtSignal(str)
+    fileRemoved = pyqtSignal(str)
+    fileDoubleClicked = pyqtSignal(str)
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -54,31 +53,31 @@ class DocumentTree(QTreeWidget):
         self.helper = dt.DocumentTreeHelper(self)
         self.draggedItem = None
 
-        self.addWidget(PlotFolderItem("Plot", QTreeWidgetItem(), self), False)
-        self.addWidget(TimelineFolderItem("Timeline", QTreeWidgetItem(), self), False)
-        self.addWidget(CharsFolderItem("Characters", QTreeWidgetItem(), self), False)
-        self.addWidget(LocFolderItem("Locations", QTreeWidgetItem(), self), False)
-        self.addWidget(ObjFolderItem("Objects", QTreeWidgetItem(), self), False)
-        self.addWidget(TrashFolderItem("Trash", QTreeWidgetItem(), self), False)
+        self.addItemWidget(PlotFolderItem("Plot", QTreeWidgetItem(), self), False)
+        self.addItemWidget(TimelineFolderItem("Timeline", QTreeWidgetItem(), self), False)
+        self.addItemWidget(CharsFolderItem("Characters", QTreeWidgetItem(), self), False)
+        self.addItemWidget(LocFolderItem("Locations", QTreeWidgetItem(), self), False)
+        self.addItemWidget(ObjFolderItem("Objects", QTreeWidgetItem(), self), False)
+        self.addItemWidget(TrashFolderItem("Trash", QTreeWidgetItem(), self), False)
 
         self.itemDoubleClicked.connect(self.helper.onItemDoubleClick)
         self.customContextMenuRequested.connect(self.helper.onContextMenuRequest)
 
-    def addWidget(self, widget: BaseTreeItem, isActive: bool = True):
+    def addItemWidget(self, item: BaseTreeItem, isActive: bool = True):
         parent = self.currentItem()
         if parent is None:
-            self.addTopLevelItem(widget.item)
-        elif not widget.hasFlag(ITEM_FLAG.draggable):
-            self.addTopLevelItem(widget.item)
+            self.addTopLevelItem(item.item)
+        elif not item.hasFlag(ITEM_FLAG.draggable):
+            self.addTopLevelItem(item.item)
         else:
-            parent.addChild(widget.item)
+            parent.addChild(item.item)
                 
-        self.setItemWidget(widget.item, 0, widget)
+        self.setItemWidget(item.item, 0, item)
         if isActive:
-            self.setCurrentItem(widget.item)
+            self.setCurrentItem(item.item)
 
-        if widget.hasFlag(ITEM_FLAG.file):
-            self.fileAdded.emit(widget.shallowcopy())
+        if item.hasFlag(ITEM_FLAG.file):
+            self.fileAdded.emit(item.UUID())
 
     def removeItem(self, item: QTreeWidgetItem, parent: QTreeWidgetItem | None):
         for i in range(item.childCount()-1, -1, -1):
@@ -87,7 +86,7 @@ class DocumentTree(QTreeWidget):
         
         widget: BaseTreeItem = self.itemWidget(item, 0)
         if widget.hasFlag(ITEM_FLAG.file):
-            self.fileRemoved.emit(widget.shallowcopy())
+            self.fileRemoved.emit(widget.UUID())
 
         if parent is None:
             index = self.indexOfTopLevelItem(item)
@@ -124,7 +123,7 @@ class DocumentTree(QTreeWidget):
             target.addChild(item)
 
         self.setItemWidgetList(widgetList)
-        self.setCurrentItem(item) 
+        self.setCurrentItem(item)
 
     def insertItemAt(self,
                      item: QTreeWidgetItem,

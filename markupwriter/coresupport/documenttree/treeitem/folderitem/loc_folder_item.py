@@ -22,19 +22,18 @@ from .base_folder_item import (
 
 class LocFolderItem(BaseFolderItem):
     def __init__(self,
-                 title: str = None,
-                 item: QTreeWidgetItem = None,
-                 parent: QWidget = None):
+                 title: str=None,
+                 item: QTreeWidgetItem=None,
+                 parent: QWidget=None):
         super().__init__(title, item, parent)
-        self.applyChanges()
 
-    def shallowcopy(self):
-        folder = LocFolderItem(self.title,
-                                self.item,
-                                self.parentWidget())
-        folder._flags = self._flags
-        folder.applyIcon()
-        return folder
+        self._flags -= ITEM_FLAG.draggable
+        self._flags -= ITEM_FLAG.mutable
+
+    def shallowcopy(self, other = None):
+        other: LocFolderItem = super().shallowcopy(LocFolderItem())
+        other.applyChanges()
+        return other
     
     def applyIcon(self):
         self.icon = Icon.LOCATIONS_FOLDER

@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import uuid
+
 from enum import IntEnum
 
 from PyQt6.QtCore import (
@@ -44,21 +46,19 @@ class BaseTreeItem(QWidget):
     PRIORITY = 6
 
     def __init__(self,
-                 title: str,
-                 item: QTreeWidgetItem, 
-                 parent: QWidget):
+                 title: str=None,
+                 item: QTreeWidgetItem=None, 
+                 parent: QWidget=None):
         super().__init__(parent)
-
-        flags = ITEM_FLAG.draggable
-        flags += ITEM_FLAG.mutable
-
+        
+        self._uuid = str(uuid.uuid1())
         self._item = item
         self._title = title
         self._wordCount = "0"
         self._isActive = False
         self._groupStatus = QColor(64, 64, 64)
         self._priorityStatus = QColor(64, 64, 64)
-        self._flags = flags
+        self._flags = ITEM_FLAG.none
 
         hLayout = QHBoxLayout(self)
         hLayout.setContentsMargins(1, 2, 1, 2)
@@ -70,8 +70,18 @@ class BaseTreeItem(QWidget):
         hLayout.addWidget(QLabel("group", self))
         hLayout.addWidget(QLabel("priority", self))
 
-    def shallowcopy(self):
-        raise NotImplementedError()
+        self.applyChanges()
+
+    def shallowcopy(self, other = None):
+        other._uuid = self._uuid
+        other._item = self._item
+        other._title = self._title
+        other._wordCount = self._wordCount
+        other._isActive = self._isActive
+        other._groupStatus = self._groupStatus
+        other._priorityStatus = self._priorityStatus
+        other._flags = self._flags
+        return other
 
     def applyIcon(self):
         raise NotImplementedError()
@@ -83,6 +93,9 @@ class BaseTreeItem(QWidget):
         self.isActive = self._isActive
         self.groupStatus = self._groupStatus
         self.priorityStatus= self._priorityStatus
+
+    def UUID(self) -> str:
+        return self._uuid
 
     def hasFlag(self, flag: int) -> bool:
         return (self._flags & flag) == flag
@@ -143,6 +156,7 @@ class BaseTreeItem(QWidget):
         self.isActive = not self.isActive
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
+        sOut.writeQString(self._uuid)
         sOut.writeQString(self._title)
         sOut.writeQString(self._wordCount)
         sOut.writeBool(self._isActive)
@@ -152,6 +166,7 @@ class BaseTreeItem(QWidget):
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
+        self._uuid = sIn.readQString()
         self._title = sIn.readQString()
         self._wordCount = sIn.readQString()
         self._isActive = sIn.readBool()
