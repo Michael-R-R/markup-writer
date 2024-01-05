@@ -67,13 +67,9 @@ class CentralWidget(QWidget):
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << self.treeView
         sOut << self.editor
-        sOut << self.terminal
-        sOut << self.preview
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         sIn >> self.treeView
         sIn >> self.editor
-        sIn >> self.terminal
-        sIn >> self.preview
         return sIn

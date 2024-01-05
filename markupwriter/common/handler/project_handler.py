@@ -17,33 +17,42 @@ from markupwriter.config import (
     AppConfig,
 )
 
-from markupwriter.util import (
-    Serialize,
+from markupwriter.dialogs.modal import (
+    StrDialog,
 )
 
 class ProjectHandler(object):
 
     T = TypeVar("T")
 
-    def onNewClicked():
-        projectPath = QFileDialog.getExistingDirectory(None,
+    def onNewClicked() -> bool:
+        projectName = StrDialog.run("Project name?",
+                                    "Default",
+                                    None)
+        if projectName is None:
+            return False
+
+        projectDir = QFileDialog.getExistingDirectory(None,
                                                        "New Project",
                                                        "/home",
                                                        QFileDialog.Option.ShowDirsOnly |
                                                        QFileDialog.Option.DontResolveSymlinks)
-        if projectPath == "":
-            return
+        if projectDir == "":
+            return False
 
         dir = QDir()
-        if not dir.mkpath(projectPath + "/data/content/"):
-            return
+        if not dir.mkpath(projectDir + "/data/content/"):
+            return False
 
-        AppConfig.projectPath = projectPath
+        AppConfig.projectName = projectName
+        AppConfig.projectDir = projectDir
 
-    def onOpenClicked(type: Type[T]) -> T | None:
-        # TODO implement properly
-        return Serialize.read(type, "./resources/.tests/sample.mwf")
+        return True
 
-    def onSaveClicked(data):
-        # TODO implmement properly
-        Serialize.write("./resources/.tests/sample.mwf", data)
+    def onOpenClicked() -> str | None:
+        projectFilePath = QFileDialog.getOpenFileName(None,
+                                                      "Open Project",
+                                                      "/home",
+                                                      "Markup Writer Files (*.mwf)")
+        # TODO implement
+        

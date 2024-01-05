@@ -15,5 +15,7 @@ class StrDialog(object):
                                       label)
         if not result[1]:
             return None
+        if result[0] == "":
+            return None
         
         return result[0]

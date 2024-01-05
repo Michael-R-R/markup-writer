@@ -53,11 +53,9 @@ class DocumentTreeView(QWidget):
         return super().resizeEvent(e)
     
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        sOut << self.treeBar
         sOut << self.tree
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        sIn >> self.treeBar
         sIn >> self.tree
         return sIn

@@ -12,6 +12,10 @@ from markupwriter.config import (
     AppConfig,
 )
 
+from markupwriter.util import (
+    Serialize,
+)
+
 from markupwriter.common.handler import (
     ProjectHandler,
 )
@@ -39,13 +43,17 @@ class MainWindow(QMainWindow):
         fileMenu = menuBar.fileMenu
         fileMenu.newAction.triggered.connect(self._onNewClicked)
         fileMenu.openAction.triggered.connect(self._onOpenClicked)
-        fileMenu.saveAction.triggered.connect(self._onSaveClicked)
+        fileMenu.saveAction.triggered.connect(self._onSerialize)
 
     def _onNewClicked(self):
-        ProjectHandler.onNewClicked()
+        if not ProjectHandler.onNewClicked():
+            return
+        self._onSerialize()
+        self.setWindowTitle("{} - {}".format(AppConfig.APP_NAME,
+                                             AppConfig.projectName))
 
     def _onOpenClicked(self):
-        widget: CentralWidget = ProjectHandler.onOpenClicked(CentralWidget)
+        widget: CentralWidget = ProjectHandler.onOpenClicked()
         if widget is None:
             raise RuntimeError()
         self.mainWidget = widget
@@ -53,8 +61,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.mainWidget)
         self.setupConnections()
 
-    def _onSaveClicked(self):
-        ProjectHandler.onSaveClicked(self.mainWidget)
+    def _onSerialize(self):
+        path = AppConfig.projectFilePath()
+        if path == "":
+            return
+        Serialize.write(path, self.mainWidget)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         AppConfig.mainWindowSize = a0.size()

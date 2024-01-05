@@ -11,7 +11,8 @@ class AppConfig(BaseConfig):
     INI_PATH: str = None
     APP_NAME: str = None
     ICON_SIZE: QSize = None
-    projectPath: str = None
+    projectName: str = None
+    projectDir: str = None
     mainWindowSize: QSize  = None
     docTreeViewSize: QSize  = None
     docEditorSize: QSize  = None
@@ -22,7 +23,6 @@ class AppConfig(BaseConfig):
         AppConfig.INI_PATH = "./resources/configs/app.ini"
         AppConfig.APP_NAME = "Markup Writer"
         AppConfig.ICON_SIZE = QSize(18, 18)
-        AppConfig.projectPath = ""
         AppConfig.mainWindowSize = QSize(800, 600)
         AppConfig.docTreeViewSize = QSize(100, 100)
         AppConfig.docEditorSize = QSize(100, 100)
@@ -31,6 +31,9 @@ class AppConfig(BaseConfig):
 
     def reset():
         AppConfig.init()
+
+    def projectFilePath() -> str:
+        return "{}/{}.mwf".format(AppConfig.projectDir, AppConfig.projectName)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << AppConfig.mainWindowSize
