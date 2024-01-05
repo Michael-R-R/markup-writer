@@ -173,4 +173,5 @@ class BaseTreeItem(QWidget):
         sIn >> self._groupStatus
         sIn >> self._priorityStatus
         self._flags = sIn.readInt()
+        self.applyChanges()
         return sIn

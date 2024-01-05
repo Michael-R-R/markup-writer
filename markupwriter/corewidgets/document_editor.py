@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    QDataStream,
+)
+
 from PyQt6.QtGui import (
     QResizeEvent,
     QGuiApplication,
@@ -77,3 +81,11 @@ class DocumentEditor(QPlainTextEdit):
         AppConfig.docEditorSize = e.size()
         self.updateViewportMargins()
         super().resizeEvent(e)
+
+    def __rlshift__(self, sOut: QDataStream) -> QDataStream:
+        sOut.writeQString(self.currUUID)
+        return sOut
+    
+    def __rrshift__(self, sIn: QDataStream) -> QDataStream:
+        self.currUUID = sIn.readQString()
+        return sIn

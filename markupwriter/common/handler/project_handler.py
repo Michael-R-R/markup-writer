@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
+from typing import (
+    TypeVar,
+    Type,
+)
+
 from PyQt6.QtCore import (
     QDir,
 )
@@ -12,24 +17,33 @@ from markupwriter.config import (
     AppConfig,
 )
 
+from markupwriter.util import (
+    Serialize,
+)
+
 class ProjectHandler(object):
 
-    def onNewProjectClicked(self):
-        # Open file dialog and get working folder path
+    T = TypeVar("T")
+
+    def onNewClicked():
         projectPath = QFileDialog.getExistingDirectory(None,
                                                        "New Project",
-                                                       None,
+                                                       "/home",
                                                        QFileDialog.Option.ShowDirsOnly |
                                                        QFileDialog.Option.DontResolveSymlinks)
         if projectPath == "":
             return
-        
-        print(projectPath)
 
-        # Create 'data>documents' folder inside working folder
         dir = QDir()
         if not dir.mkpath(projectPath + "/data/content/"):
             return
 
-        # Set AppConfig project path
         AppConfig.projectPath = projectPath
+
+    def onOpenClicked(type: Type[T]) -> T | None:
+        # TODO implement properly
+        return Serialize.read(type, "./resources/.tests/sample.mwf")
+
+    def onSaveClicked(data):
+        # TODO implmement properly
+        Serialize.write("./resources/.tests/sample.mwf", data)

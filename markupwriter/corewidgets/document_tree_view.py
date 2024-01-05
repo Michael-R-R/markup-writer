@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    QDataStream,
+)
+
 from PyQt6.QtGui import (
     QResizeEvent,
 )
@@ -39,6 +43,7 @@ class DocumentTreeView(QWidget):
         self.setStyleSheet(Style.TREE_VIEW)
 
     def setupConnections(self):
+        # --- Tree --- #
         self.treeBar.addItemAction.itemCreated.connect(lambda item: self.tree.addItemWidget(item, True))
         self.treeBar.navUpAction.triggered.connect(lambda: self.tree.translateItem(-1))
         self.treeBar.navDownAction.triggered.connect(lambda: self.tree.translateItem(1))
@@ -47,3 +52,12 @@ class DocumentTreeView(QWidget):
         AppConfig.docTreeViewSize = e.size()
         return super().resizeEvent(e)
     
+    def __rlshift__(self, sOut: QDataStream) -> QDataStream:
+        sOut << self.treeBar
+        sOut << self.tree
+        return sOut
+    
+    def __rrshift__(self, sIn: QDataStream) -> QDataStream:
+        sIn >> self.treeBar
+        sIn >> self.tree
+        return sIn

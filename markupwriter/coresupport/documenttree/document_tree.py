@@ -22,12 +22,14 @@ from PyQt6.QtWidgets import (
 from .treeitem import (
     ITEM_FLAG,
     BaseTreeItem,
+    NovelFolderItem,
     PlotFolderItem,
     TimelineFolderItem,
     CharsFolderItem,
     LocFolderItem,
     ObjFolderItem,
     TrashFolderItem,
+    MiscFolderItem,
 )
 
 import markupwriter.coresupport.documenttree as dt
@@ -39,16 +41,6 @@ class DocumentTree(QTreeWidget):
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setDragEnabled(True)
-        self.setExpandsOnDoubleClick(False)
-        self.setUniformRowHeights(True)
-        self.setAllColumnsShowFocus(True)
-        self.setDragDropMode(self.DragDropMode.InternalMove)
-        self.setSelectionMode(self.SelectionMode.SingleSelection)
-        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.setFrameStyle(QFrame.Shape.NoFrame)
-        self.setHeaderHidden(True)
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.helper = dt.DocumentTreeHelper(self)
         self.draggedItem = None
@@ -59,6 +51,17 @@ class DocumentTree(QTreeWidget):
         self.addItemWidget(LocFolderItem("Locations", QTreeWidgetItem(), self), False)
         self.addItemWidget(ObjFolderItem("Objects", QTreeWidgetItem(), self), False)
         self.addItemWidget(TrashFolderItem("Trash", QTreeWidgetItem(), self), False)
+
+        self.setDragEnabled(True)
+        self.setExpandsOnDoubleClick(False)
+        self.setUniformRowHeights(True)
+        self.setAllColumnsShowFocus(True)
+        self.setDragDropMode(self.DragDropMode.InternalMove)
+        self.setSelectionMode(self.SelectionMode.SingleSelection)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setFrameStyle(QFrame.Shape.NoFrame)
+        self.setHeaderHidden(True)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.itemDoubleClicked.connect(self.helper.onItemDoubleClick)
         self.customContextMenuRequested.connect(self.helper.onContextMenuRequest)
@@ -196,9 +199,90 @@ class DocumentTree(QTreeWidget):
     def mousePressEvent(self, e: QMouseEvent) -> None:
         self.helper.onMousePressEvent(super(), e)
 
+    def _writeHelper(self,
+                     sOut: QDataStream,
+                     iParent: QTreeWidgetItem):
+        cCount = iParent.childCount()
+        sOut.writeInt(cCount)
+
+        for i in range(cCount):
+            iChild = iParent.child(i)
+            self._writeHelper(sOut, iChild)
+            wChild: BaseTreeItem = self.itemWidget(iChild, 0)
+            sOut.writeQString(wChild.__class__.__name__)
+            sOut << wChild
+
+    def _readHelper(self,
+                    sIn: QDataStream,
+                    iParent: QTreeWidgetItem):
+        cCount = sIn.readInt()
+
+        for i in range(cCount):
+            iChild = QTreeWidgetItem()
+            self._readHelper(sIn, iChild)
+            type = sIn.readQString()
+            wChild = self._factoryCreate(type)
+            sIn >> wChild
+            wChild.item = iChild
+            
+            iParent.addChild(iChild)
+            self.setItemWidget(iChild, 0, wChild)
+
+    def _factoryCreate(self, type: str) -> BaseTreeItem | None:
+        match type:
+            case NovelFolderItem.__name__:
+                return NovelFolderItem()
+            case CharsFolderItem.__name__:
+                return CharsFolderItem()
+            case LocFolderItem.__name__:
+                return LocFolderItem()
+            case MiscFolderItem.__name__:
+                return MiscFolderItem()
+            case ObjFolderItem.__name__:
+                return ObjFolderItem()
+            case PlotFolderItem.__name__:
+                return PlotFolderItem()
+            case TimelineFolderItem.__name__:
+                return TimelineFolderItem()
+            case TrashFolderItem.__name__:
+                return TrashFolderItem()
+            case _:
+                return None
+
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        raise NotImplementedError()
+        iCount = self.topLevelItemCount()
+        sOut.writeInt(iCount)
+
+        # Top level items
+        for i in range(iCount):
+            iParent = self.topLevelItem(i)
+            wParent: BaseTreeItem = self.itemWidget(iParent, 0)
+            sOut.writeQString(wParent.__class__.__name__)
+            sOut << wParent
+
+            # Child level items
+            self._writeHelper(sOut, iParent)
+
+        return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        raise NotImplementedError()
+        self.clear()
+
+        iCount = sIn.readInt()
+
+        # Top level items
+        for i in range(iCount):
+            iParent = QTreeWidgetItem()
+            type = sIn.readQString()
+            wParent = self._factoryCreate(type)
+            sIn >> wParent
+            wParent.item = iParent
+
+            # Child level items
+            self._readHelper(sIn, iParent)
+
+            self.addTopLevelItem(iParent)
+            self.setItemWidget(iParent, 0, wParent)
+
+        return sIn
     

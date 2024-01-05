@@ -15,13 +15,11 @@ class FileMainMenu(QMenu):
 
         self.newAction = QAction("New", self)
         self.openAction = QAction("Open", self)
-        self.openRecentAction = QAction("Open recent", self)
         self.saveAction = QAction("Save", self)
         self.saveAsAction = QAction("Save as", self)
 
         self.addAction(self.newAction)
         self.addSeparator()
         self.addAction(self.openAction)
-        self.addAction(self.openRecentAction)
         self.addAction(self.saveAction)
         self.addAction(self.saveAsAction)

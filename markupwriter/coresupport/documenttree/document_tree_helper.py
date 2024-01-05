@@ -38,6 +38,7 @@ import markupwriter.coresupport.documenttree as dt
 class DocumentTreeHelper(QObject):
     def __init__(self, parent: dt.DocumentTree):
         super().__init__(parent)
+
         self._tree = parent
 
         self._treeContextMenu = TreeContextMenu(self)
@@ -52,7 +53,6 @@ class DocumentTreeHelper(QObject):
 
         self._trashContextMenu = TrashContextMenu(self)
         self._trashContextMenu.emptyAction.triggered.connect(self.onEmptyTrash)
-
 
     def onDragEnterEvent(self, super: QTreeView, e: QDragEnterEvent):
         item = self._tree.currentItem()

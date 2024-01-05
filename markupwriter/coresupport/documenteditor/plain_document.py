@@ -24,10 +24,11 @@ class PlainDocument(QTextDocument):
     def __init__(self):
         super().__init__()
         
-        self.setDocumentLayout(QPlainTextDocumentLayout(self))
         self._highlighter = Highlighter(self)
         self._refTagManager = RefTagManager()
         self._passiveParser = PassiveParser(self)
+        
+        self.setDocumentLayout(QPlainTextDocumentLayout(self))
 
     def highlighter(self) -> Highlighter:
         return self._highlighter

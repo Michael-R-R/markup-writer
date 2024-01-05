@@ -16,10 +16,6 @@ from markupwriter.config import (
     AppConfig,
 )
 
-from markupwriter.common.handler import (
-    ProjectHandler,
-)
-
 from markupwriter.corewidgets import (
     MainMenuBar,
     DocumentTreeView,
@@ -29,11 +25,8 @@ from markupwriter.corewidgets import (
 )
 
 class CentralWidget(QWidget):
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: QWidget=None):
         super().__init__(parent)
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding,
-                           QSizePolicy.Policy.Expanding)
         
         self.menuBar = MainMenuBar(self)
 
@@ -60,18 +53,27 @@ class CentralWidget(QWidget):
 
         vLayout.addWidget(hSplitter)
 
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding,
+                           QSizePolicy.Policy.Expanding)
+
         self.setupConnections()
 
     def setupConnections(self):
-        # --- Menu bar --- #
-        self.menuBar.fileMenu.newAction.triggered.connect(ProjectHandler.onNewProjectClicked)
-
         # --- Editor --- #
         self.treeView.tree.fileDoubleClicked.connect(self.editor.onFileDoubleClicked)
         self.treeView.tree.fileRemoved.connect(self.editor.onFileRemoved)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
+        sOut << self.treeView
+        sOut << self.editor
+        sOut << self.terminal
+        sOut << self.preview
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
+        sIn >> self.treeView
+        sIn >> self.editor
+        sIn >> self.terminal
+        sIn >> self.preview
         return sIn

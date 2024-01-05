@@ -1,18 +1,18 @@
 #!/usr/bin/python
 
+from typing import (
+    TypeVar,
+    Type,
+)
+
 from PyQt6.QtCore import (
     QDataStream, 
     QFile, 
     QIODevice,
 )
 
-from typing import (
-    TypeVar,
-    Type,
-)
-
 class Serialize(object):
-    T = TypeVar('T')
+    T = TypeVar("T")
 
     _qtVersion = QDataStream.Version.Qt_6_6
     _masterFormat = 0x00000001

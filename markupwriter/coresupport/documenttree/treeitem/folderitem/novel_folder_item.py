@@ -22,9 +22,9 @@ from .base_folder_item import (
 
 class NovelFolderItem(BaseFolderItem):
     def __init__(self,
-                 title: str = None,
-                 item: QTreeWidgetItem = None,
-                 parent: QWidget = None):
+                 title: str=None,
+                 item: QTreeWidgetItem=None,
+                 parent: QWidget=None):
         super().__init__(title, item, parent)
 
         self._flags -= ITEM_FLAG.draggable
