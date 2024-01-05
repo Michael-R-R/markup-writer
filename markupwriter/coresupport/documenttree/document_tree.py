@@ -19,17 +19,14 @@ from PyQt6.QtWidgets import (
     QFrame,
 )
 
+from markupwriter.common.factory import (
+    TreeItemFactory,
+)
+
 from .treeitem import (
     ITEM_FLAG,
     BaseTreeItem,
-    NovelFolderItem,
-    PlotFolderItem,
-    TimelineFolderItem,
-    CharsFolderItem,
-    LocFolderItem,
-    ObjFolderItem,
     TrashFolderItem,
-    MiscFolderItem,
 )
 
 import markupwriter.coresupport.documenttree as dt
@@ -44,13 +41,6 @@ class DocumentTree(QTreeWidget):
 
         self.helper = dt.DocumentTreeHelper(self)
         self.draggedItem = None
-
-        self.addItemWidget(PlotFolderItem("Plot", QTreeWidgetItem(), self), False)
-        self.addItemWidget(TimelineFolderItem("Timeline", QTreeWidgetItem(), self), False)
-        self.addItemWidget(CharsFolderItem("Characters", QTreeWidgetItem(), self), False)
-        self.addItemWidget(LocFolderItem("Locations", QTreeWidgetItem(), self), False)
-        self.addItemWidget(ObjFolderItem("Objects", QTreeWidgetItem(), self), False)
-        self.addItemWidget(TrashFolderItem("Trash", QTreeWidgetItem(), self), False)
 
         self.setDragEnabled(True)
         self.setExpandsOnDoubleClick(False)
@@ -221,33 +211,12 @@ class DocumentTree(QTreeWidget):
             iChild = QTreeWidgetItem()
             self._readHelper(sIn, iChild)
             type = sIn.readQString()
-            wChild = self._factoryCreate(type)
+            wChild: BaseTreeItem = TreeItemFactory.make(type)
             sIn >> wChild
             wChild.item = iChild
             
             iParent.addChild(iChild)
             self.setItemWidget(iChild, 0, wChild)
-
-    def _factoryCreate(self, type: str) -> BaseTreeItem | None:
-        match type:
-            case NovelFolderItem.__name__:
-                return NovelFolderItem()
-            case CharsFolderItem.__name__:
-                return CharsFolderItem()
-            case LocFolderItem.__name__:
-                return LocFolderItem()
-            case MiscFolderItem.__name__:
-                return MiscFolderItem()
-            case ObjFolderItem.__name__:
-                return ObjFolderItem()
-            case PlotFolderItem.__name__:
-                return PlotFolderItem()
-            case TimelineFolderItem.__name__:
-                return TimelineFolderItem()
-            case TrashFolderItem.__name__:
-                return TrashFolderItem()
-            case _:
-                return None
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         iCount = self.topLevelItemCount()
@@ -266,15 +235,13 @@ class DocumentTree(QTreeWidget):
         return sOut
     
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        self.clear()
-
         iCount = sIn.readInt()
 
         # Top level items
         for i in range(iCount):
             iParent = QTreeWidgetItem()
             type = sIn.readQString()
-            wParent = self._factoryCreate(type)
+            wParent: BaseTreeItem = TreeItemFactory.make(type)
             sIn >> wParent
             wParent.item = iParent
 
