@@ -26,33 +26,37 @@ class ProjectHandler(object):
     T = TypeVar("T")
 
     def onNewClicked() -> bool:
-        projectName = StrDialog.run("Project name?",
-                                    "Default",
-                                    None)
-        if projectName is None:
+        projName = StrDialog.run("Project name?",
+                                "Default",
+                                None)
+        if projName is None:
             return False
 
-        projectDir = QFileDialog.getExistingDirectory(None,
-                                                       "New Project",
-                                                       "/home",
-                                                       QFileDialog.Option.ShowDirsOnly |
-                                                       QFileDialog.Option.DontResolveSymlinks)
-        if projectDir == "":
+        dirPath = QFileDialog.getExistingDirectory(None,
+                                                   "New Project",
+                                                   "/home",
+                                                    QFileDialog.Option.ShowDirsOnly |
+                                                    QFileDialog.Option.DontResolveSymlinks)
+        if dirPath == "":
             return False
 
         dir = QDir()
-        if not dir.mkpath(projectDir + "/data/content/"):
+        if not dir.mkpath(dir + "/data/content/"):
             return False
 
-        AppConfig.projectName = projectName
-        AppConfig.projectDir = projectDir
+        AppConfig.projectName = projName
+        AppConfig.projectDir = dirPath
 
         return True
 
     def onOpenClicked() -> str | None:
-        projectFilePath = QFileDialog.getOpenFileName(None,
-                                                      "Open Project",
-                                                      "/home",
-                                                      "Markup Writer Files (*.mwf)")
-        # TODO implement
+        filePath = QFileDialog.getOpenFileName(None,
+                                               "Open Project",
+                                               "/home",
+                                               "Markup Writer Files (*.mwf)")
+        if filePath[0] == "":
+            return None
+        
+        return filePath[0]
+        
         

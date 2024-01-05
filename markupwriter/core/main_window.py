@@ -43,25 +43,30 @@ class MainWindow(QMainWindow):
         fileMenu = menuBar.fileMenu
         fileMenu.newAction.triggered.connect(self._onNewClicked)
         fileMenu.openAction.triggered.connect(self._onOpenClicked)
-        fileMenu.saveAction.triggered.connect(self._onSerialize)
+        fileMenu.saveAction.triggered.connect(self._onSave)
 
     def _onNewClicked(self):
         if not ProjectHandler.onNewClicked():
             return
-        self._onSerialize()
+        self._onSave()
         self.setWindowTitle("{} - {}".format(AppConfig.APP_NAME,
                                              AppConfig.projectName))
 
     def _onOpenClicked(self):
-        widget: CentralWidget = ProjectHandler.onOpenClicked()
-        if widget is None:
-            raise RuntimeError()
+        # TODO ask to save current project
+
+        filePath = ProjectHandler.onOpenClicked()
+        if filePath is None:
+            return
+        widget: CentralWidget = Serialize.read(CentralWidget, filePath)
         self.mainWidget = widget
         self.setMenuBar(self.mainWidget.menuBar)
         self.setCentralWidget(self.mainWidget)
         self.setupConnections()
 
-    def _onSerialize(self):
+        # TODO setup all required config paths
+
+    def _onSave(self):
         path = AppConfig.projectFilePath()
         if path == "":
             return
