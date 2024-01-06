@@ -32,9 +32,6 @@ class AppConfig(BaseConfig):
     def reset():
         AppConfig.init()
 
-    def projectFilePath() -> str:
-        return "{}/{}.mwf".format(AppConfig.projectDir, AppConfig.projectName)
-
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << AppConfig.mainWindowSize
         sOut << AppConfig.docTreeViewSize
