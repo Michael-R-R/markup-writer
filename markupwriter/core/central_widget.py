@@ -22,22 +22,25 @@ from markupwriter.corewidgets import (
     DocumentEditor,
     DocumentPreview,
     Terminal,
+    MainStatusBar,
 )
 
-class CentralWidget(QWidget):
-    def __init__(self, parent: QWidget=None):
-        super().__init__(parent)
-        
-        self.menuBar = MainMenuBar(self)
 
-        vLayout = QVBoxLayout(self)
-        hSplitter = QSplitter(Qt.Orientation.Horizontal)
-        vSplitter = QSplitter(Qt.Orientation.Vertical)
+class CentralWidget(QWidget):
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+
+        self.menuBar = MainMenuBar(self)
+        self.statusBar = MainStatusBar(self)
 
         self.treeView = DocumentTreeView(self)
         self.editor = DocumentEditor(self)
         self.terminal = Terminal(self)
         self.preview = DocumentPreview(self)
+
+        vLayout = QVBoxLayout(self)
+        hSplitter = QSplitter(Qt.Orientation.Horizontal)
+        vSplitter = QSplitter(Qt.Orientation.Vertical)
 
         hSplitter.addWidget(self.treeView)
         hSplitter.addWidget(vSplitter)
@@ -45,17 +48,21 @@ class CentralWidget(QWidget):
         vSplitter.addWidget(self.terminal)
         hSplitter.addWidget(self.preview)
 
-        hSplitter.setSizes([AppConfig.docTreeViewSize.width(),
-                            AppConfig.docEditorSize.width(),
-                            AppConfig.docPreviewSize.width()])
-        vSplitter.setSizes([AppConfig.docEditorSize.height(),
-                            AppConfig.terminalSize.height()])
+        hSplitter.setSizes(
+            [
+                AppConfig.docTreeViewSize.width(),
+                AppConfig.docEditorSize.width(),
+                AppConfig.docPreviewSize.width(),
+            ]
+        )
+        vSplitter.setSizes(
+            [AppConfig.docEditorSize.height(), AppConfig.terminalSize.height()]
+        )
 
         vLayout.addWidget(hSplitter)
 
         self.setContentsMargins(0, 0, 0, 0)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding,
-                           QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         self.setupConnections()
 
@@ -68,7 +75,7 @@ class CentralWidget(QWidget):
         sOut << self.treeView
         sOut << self.editor
         return sOut
-    
+
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         sIn >> self.treeView
         sIn >> self.editor

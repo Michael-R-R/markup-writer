@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import re
+
 from PyQt6.QtCore import (
     QDir,
     QFileInfo,
@@ -22,6 +24,7 @@ from markupwriter.config import (
 
 from markupwriter.dialogs.modal import (
     YesNoDialog,
+    StrDialog,
 )
 
 from markupwriter.util import (
@@ -38,6 +41,7 @@ class MainWindow(QMainWindow):
         self.mainWidget = CentralWidget(self)
         self.setMenuBar(self.mainWidget.menuBar)
         self.setCentralWidget(self.mainWidget)
+        self.setStatusBar(self.mainWidget.statusBar)
         self.setupConnections()
 
         self.setWindowTitle(AppConfig.APP_NAME)
@@ -51,6 +55,7 @@ class MainWindow(QMainWindow):
         fileMenu.newAction.triggered.connect(self._onNewClicked)
         fileMenu.openAction.triggered.connect(self._onOpenClicked)
         fileMenu.saveAction.triggered.connect(self._onSaveClicked)
+        fileMenu.saveAsAction.triggered.connect(self._onSaveAsClicked)
         fileMenu.closeAction.triggered.connect(self._onCloseClicked)
         fileMenu.exitAction.triggered.connect(self._onExitClicked)
 
@@ -58,6 +63,7 @@ class MainWindow(QMainWindow):
         self.mainWidget = CentralWidget(self)
         self.setMenuBar(self.mainWidget.menuBar)
         self.setCentralWidget(self.mainWidget)
+        self.setStatusBar(self.mainWidget.statusBar)
         self.setupConnections()
         self.setWindowTitle(AppConfig.APP_NAME)
         self.resize(AppConfig.mainWindowSize)
@@ -65,30 +71,29 @@ class MainWindow(QMainWindow):
         AppConfig.projectDir = None
 
     def _onNewClicked(self):
-        if not self._askToSave():
+        if not self._shouldClose():
             return
 
-        path = QFileDialog.getSaveFileName(
-            None, "New Project", "/home", "Markup Writer Files (*.mwf)"
-        )
-        if path[0] == "":
+        name: str = self._getProjectName()
+        if name is None:
             return
 
-        info = QFileInfo(path[0])
-
-        dir = QDir()
-        if not dir.mkpath("{}/data/content/".format(info.canonicalPath())):
+        path = self._getProjectDir("New Project")
+        if path is None:
             return
 
-        AppConfig.projectName = info.fileName()
-        AppConfig.projectDir = info.canonicalPath()
+        if not self._createAddedDirs(path):
+            return
+
+        AppConfig.projectName = name
+        AppConfig.projectDir = path
 
         Serialize.write(self._fullProjectPath(), self.mainWidget)
 
         self.setWindowTitle("{} - {}".format(AppConfig.APP_NAME, AppConfig.projectName))
 
     def _onOpenClicked(self):
-        if not self._askToSave():
+        if not self._shouldClose():
             return
 
         filePath = QFileDialog.getOpenFileName(
@@ -112,20 +117,74 @@ class MainWindow(QMainWindow):
 
     def _onSaveClicked(self):
         if not self._hasOpenProject():
+            self._onSaveAsClicked()
+        else:
+            Serialize.write(self._fullProjectPath(), self.mainWidget)
+            self.statusBar().showMessage("Project saved", 2000)
+
+    def _onSaveAsClicked(self):
+        if not self._shouldClose(False):
             return
+
+        name: str = self._getProjectName()
+        if name is None:
+            return
+
+        path = self._getProjectDir("Save As Project")
+        if path is None:
+            return
+
+        if not self._createAddedDirs(path):
+            return
+
+        AppConfig.projectName = name
+        AppConfig.projectDir = path
+
         Serialize.write(self._fullProjectPath(), self.mainWidget)
 
+        self.setWindowTitle("{} - {}".format(AppConfig.APP_NAME, AppConfig.projectName))
+
     def _onCloseClicked(self):
-        self._askToSave()
+        self._shouldClose()
 
     def _onExitClicked(self):
         QApplication.quit()
 
-    def _askToSave(self) -> bool:
+    def _getProjectName(self) -> str | None:
+        name: str = StrDialog.run("Project name?", "Default", None)
+        if name is None:
+            return None
+        
+        name = name.strip()
+        found = re.search(r"^[a-zA-Z0-9_\-\s]+$", name)
+        if found is None:
+            return None
+        name += AppConfig.APP_EXTENSION
+        
+        return name
+
+    def _getProjectDir(self, title: str) -> str | None:
+        path = QFileDialog.getExistingDirectory(
+            None,
+            title,
+            "/home",
+            QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontResolveSymlinks,
+        )
+        if path == "":
+            return None
+        
+        return path
+
+    def _createAddedDirs(self, path: str) -> bool:
+        dir = QDir()
+        return dir.mkpath("{}/data/content/".format(path))
+
+    def _shouldClose(self, doReset: bool = True) -> bool:
         if self._hasOpenProject():
             if YesNoDialog.run("Save and close current project?"):
                 Serialize.write(self._fullProjectPath(), self.mainWidget)
-                self.reset()
+                if doReset:
+                    self.reset()
             else:
                 return False
         return True
@@ -146,5 +205,5 @@ class MainWindow(QMainWindow):
     def closeEvent(self, e: QCloseEvent | None) -> None:
         if self._hasOpenProject():
             Serialize.write(self._fullProjectPath(), self.mainWidget)
-        
+
         super().closeEvent(e)

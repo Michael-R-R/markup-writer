@@ -10,6 +10,7 @@ from .base_config import BaseConfig
 class AppConfig(BaseConfig):
     INI_PATH: str = None
     APP_NAME: str = None
+    APP_EXTENSION: str = None
     ICON_SIZE: QSize = None
     projectName: str = None
     projectDir: str = None
@@ -22,6 +23,7 @@ class AppConfig(BaseConfig):
     def init():
         AppConfig.INI_PATH = "./resources/configs/app.ini"
         AppConfig.APP_NAME = "Markup Writer"
+        AppConfig.APP_EXTENSION = ".mwf"
         AppConfig.ICON_SIZE = QSize(18, 18)
         AppConfig.mainWindowSize = QSize(800, 600)
         AppConfig.docTreeViewSize = QSize(100, 100)
