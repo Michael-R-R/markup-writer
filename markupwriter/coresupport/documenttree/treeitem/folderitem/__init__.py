@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
-from .base_folder_item import (
-    BaseFolderItem
-)
+from .base_folder_item import BaseFolderItem
 
 from .novel_folder_item import (
     NovelFolderItem,

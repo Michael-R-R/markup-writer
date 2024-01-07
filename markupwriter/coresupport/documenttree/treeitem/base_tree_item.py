@@ -29,12 +29,14 @@ from markupwriter.common.provider import (
     Icon,
 )
 
+
 class ITEM_FLAG(IntEnum):
     none = 0
     file = 1
     folder = 2
     draggable = 4
     mutable = 8
+
 
 class BaseTreeItem(QWidget):
     # Widget indices
@@ -45,14 +47,11 @@ class BaseTreeItem(QWidget):
     GROUP = 5
     PRIORITY = 6
 
-    def __init__(self,
-                 title: str=None,
-                 item: QTreeWidgetItem=None, 
-                 parent: QWidget=None):
+    def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(parent)
-        
+
         self._uuid = str(uuid.uuid1())
-        self._item = item
+        self._item = QTreeWidgetItem()
         self._title = title
         self._wordCount = "0"
         self._isActive = False
@@ -72,7 +71,7 @@ class BaseTreeItem(QWidget):
 
         self.applyChanges()
 
-    def shallowcopy(self, other = None):
+    def shallowcopy(self, other=None):
         other._uuid = self._uuid
         other._item = self._item
         other._title = self._title
@@ -92,7 +91,7 @@ class BaseTreeItem(QWidget):
         self.wordCount = self._wordCount
         self.isActive = self._isActive
         self.groupStatus = self._groupStatus
-        self.priorityStatus= self._priorityStatus
+        self.priorityStatus = self._priorityStatus
 
     def UUID(self) -> str:
         return self._uuid
@@ -102,15 +101,18 @@ class BaseTreeItem(QWidget):
 
     def flags(self, flags: int) -> int:
         self._flags = flags
+
     flags = property(lambda self: self._flags, flags)
 
     def item(self, val: QTreeWidgetItem):
         self._item = val
+
     item = property(lambda self: self._item, item)
 
     def icon(self, icon: QIcon):
         label: QLabel = self.children()[self.ICON]
         label.setPixmap(icon.pixmap(AppConfig.ICON_SIZE))
+
     icon = property(None, icon)
 
     def title(self, text: str):
@@ -119,6 +121,7 @@ class BaseTreeItem(QWidget):
         self._title = text
         label: QLabel = self.children()[self.TITLE]
         label.setText(text)
+
     title = property(lambda x: x._title, title)
 
     def wordCount(self, text: str):
@@ -127,6 +130,7 @@ class BaseTreeItem(QWidget):
         self._wordCount = text
         label: QLabel = self.children()[self.WORD_COUNT]
         label.setText(text)
+
     wordCount = property(lambda self: self._wordCount, wordCount)
 
     def isActive(self, status: bool):
@@ -136,6 +140,7 @@ class BaseTreeItem(QWidget):
             label.setPixmap(Icon.CHECK.pixmap(AppConfig.ICON_SIZE))
         else:
             label.setPixmap(Icon.UNCHECK.pixmap(AppConfig.ICON_SIZE))
+
     isActive = property(lambda self: self._isActive, isActive)
 
     def groupStatus(self, color: QColor):
@@ -143,6 +148,7 @@ class BaseTreeItem(QWidget):
         pix.fill(color)
         label: QLabel = self.children()[self.GROUP]
         label.setPixmap(pix)
+
     groupStatus = property(lambda self: self._groupStatus, groupStatus)
 
     def priorityStatus(self, color: QColor):
@@ -150,6 +156,7 @@ class BaseTreeItem(QWidget):
         pix.fill(color)
         label: QLabel = self.children()[self.PRIORITY]
         label.setPixmap(pix)
+
     priorityStatus = property(lambda self: self._priorityStatus, priorityStatus)
 
     def toggleActive(self):
@@ -164,7 +171,7 @@ class BaseTreeItem(QWidget):
         sOut << self._priorityStatus
         sOut.writeInt(self._flags)
         return sOut
-    
+
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         self._uuid = sIn.readQString()
         self._title = sIn.readQString()

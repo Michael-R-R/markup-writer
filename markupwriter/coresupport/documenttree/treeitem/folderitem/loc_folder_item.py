@@ -6,12 +6,9 @@ from PyQt6.QtCore import (
     QDataStream,
 )
 
-from PyQt6.QtWidgets import (
-    QTreeWidgetItem,
-    QWidget
-)
+from PyQt6.QtWidgets import QWidget
 
-from markupwriter.common.provider import(
+from markupwriter.common.provider import (
     Icon,
 )
 
@@ -20,21 +17,19 @@ from .base_folder_item import (
     BaseFolderItem,
 )
 
+
 class LocFolderItem(BaseFolderItem):
-    def __init__(self,
-                 title: str=None,
-                 item: QTreeWidgetItem=None,
-                 parent: QWidget=None):
-        super().__init__(title, item, parent)
+    def __init__(self, parent: QWidget = None):
+        super().__init__("Locations", parent)
 
         self._flags -= ITEM_FLAG.draggable
         self._flags -= ITEM_FLAG.mutable
 
-    def shallowcopy(self, other = None):
+    def shallowcopy(self, other=None):
         other: LocFolderItem = super().shallowcopy(LocFolderItem())
         other.applyChanges()
         return other
-    
+
     def applyIcon(self):
         self.icon = Icon.LOCATIONS_FOLDER
 
@@ -42,4 +37,4 @@ class LocFolderItem(BaseFolderItem):
         return super().__rlshift__(sOut)
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        return super().__rrshift__(sIn) 
+        return super().__rrshift__(sIn)

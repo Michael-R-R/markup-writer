@@ -7,7 +7,6 @@ from PyQt6.QtCore import (
 )
 
 from PyQt6.QtWidgets import (
-    QTreeWidgetItem, 
     QWidget,
 )
 
@@ -16,18 +15,16 @@ from markupwriter.coresupport.documenttree.treeitem import (
     BaseTreeItem,
 )
 
+
 class BaseFileItem(BaseTreeItem):
-    def __init__(self,
-                 title: str=None,
-                 item: QTreeWidgetItem=None,
-                 parent: QWidget=None):
-        super().__init__(title, item, parent)
+    def __init__(self, title: str = None, parent: QWidget = None):
+        super().__init__(title, parent)
 
         self._flags += ITEM_FLAG.file
         self._flags += ITEM_FLAG.draggable
         self._flags += ITEM_FLAG.mutable
 
-    def shallowcopy(self, other = None):
+    def shallowcopy(self, other=None):
         other: BaseFileItem = super().shallowcopy(other)
         return other
 

@@ -26,10 +26,16 @@ from markupwriter.common.factory import (
 from .treeitem import (
     ITEM_FLAG,
     BaseTreeItem,
+    PlotFolderItem,
+    TimelineFolderItem,
+    CharsFolderItem,
+    LocFolderItem,
+    ObjFolderItem,
     TrashFolderItem,
 )
 
 import markupwriter.coresupport.documenttree as dt
+
 
 class DocumentTree(QTreeWidget):
     fileAdded = pyqtSignal(str)
@@ -53,30 +59,37 @@ class DocumentTree(QTreeWidget):
         self.setHeaderHidden(True)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
+        self.add(PlotFolderItem(), False)
+        self.add(TimelineFolderItem(), False)
+        self.add(CharsFolderItem(), False)
+        self.add(LocFolderItem(), False)
+        self.add(ObjFolderItem(), False)
+        self.add(TrashFolderItem(), False)
+
         self.itemDoubleClicked.connect(self.helper.onItemDoubleClick)
         self.customContextMenuRequested.connect(self.helper.onContextMenuRequest)
 
-    def addItemWidget(self, item: BaseTreeItem, isActive: bool = True):
+    def add(self, widget: BaseTreeItem, isActive: bool = True):
         parent = self.currentItem()
         if parent is None:
-            self.addTopLevelItem(item.item)
-        elif not item.hasFlag(ITEM_FLAG.draggable):
-            self.addTopLevelItem(item.item)
+            self.addTopLevelItem(widget.item)
+        elif not widget.hasFlag(ITEM_FLAG.draggable):
+            self.addTopLevelItem(widget.item)
         else:
-            parent.addChild(item.item)
-                
-        self.setItemWidget(item.item, 0, item)
+            parent.addChild(widget.item)
+
+        self.setItemWidget(widget.item, 0, widget)
         if isActive:
-            self.setCurrentItem(item.item)
+            self.setCurrentItem(widget.item)
 
-        if item.hasFlag(ITEM_FLAG.file):
-            self.fileAdded.emit(item.UUID())
+        if widget.hasFlag(ITEM_FLAG.file):
+            self.fileAdded.emit(widget.UUID())
 
-    def removeItem(self, item: QTreeWidgetItem, parent: QTreeWidgetItem | None):
-        for i in range(item.childCount()-1, -1, -1):
+    def remove(self, item: QTreeWidgetItem, parent: QTreeWidgetItem | None):
+        for i in range(item.childCount() - 1, -1, -1):
             child = item.child(i)
-            self.removeItem(child, item)
-        
+            self.remove(child, item)
+
         widget: BaseTreeItem = self.itemWidget(item, 0)
         if widget.hasFlag(ITEM_FLAG.file):
             self.fileRemoved.emit(widget.UUID())
@@ -86,83 +99,80 @@ class DocumentTree(QTreeWidget):
             self.takeTopLevelItem(index)
         else:
             parent.removeChild(item)
-        
+
         self.removeItemWidget(item, 0)
         self.clearSelection()
         self.setCurrentItem(None)
 
-    def translateItem(self, direction: int):
+    def translate(self, direction: int):
         item = self.currentItem()
         if item is None:
             return
-        
+
         parent = item.parent()
-        if parent is None: # root index
+        if parent is None:  # root index
             size = self.topLevelItemCount()
             index = self.indexFromItem(item, 0).row()
-            self.insertItemAt(item, parent, (index + direction) % size)
-        else: # child index
+            self.insertAt(item, parent, (index + direction) % size)
+        else:  # child index
             size = parent.childCount()
             index = parent.indexOfChild(item)
-            self.insertItemAt(item, parent, (index + direction) % size)
+            self.insertAt(item, parent, (index + direction) % size)
 
-    def moveItemTo(self,
-                   item: QTreeWidgetItem,
-                   target: QTreeWidgetItem | None):
-        widgetList = self.takeItemOut(item)
-        if target is None: # add to root
+    def moveTo(self, item: QTreeWidgetItem, target: QTreeWidgetItem | None):
+        widgetList = self.takeOut(item)
+        if target is None:  # add to root
             self.addTopLevelItem(item)
-        else: # add to target
+        else:  # add to target
             target.addChild(item)
 
-        self.setItemWidgetList(widgetList)
+        self.setWidgetList(widgetList)
         self.setCurrentItem(item)
 
-    def insertItemAt(self,
-                     item: QTreeWidgetItem,
-                     target: QTreeWidgetItem | None,
-                     targetIndex: int):
-        widgetList = self.takeItemOut(item)
-        if target is None: # insert to root
+    def insertAt(
+        self, item: QTreeWidgetItem, target: QTreeWidgetItem | None, targetIndex: int
+    ):
+        widgetList = self.takeOut(item)
+        if target is None:  # insert to root
             self.insertTopLevelItem(targetIndex, item)
-        else: # insert to target
+        else:  # insert to target
             target.insertChild(targetIndex, item)
 
-        self.setItemWidgetList(widgetList)
+        self.setWidgetList(widgetList)
         self.setCurrentItem(item)
 
-    def takeItemOut(self, item: QTreeWidgetItem) -> list[BaseTreeItem]:
+    def takeOut(self, item: QTreeWidgetItem) -> list[BaseTreeItem]:
         widgetList = self.copyWidgets(item, list())
         parent = item.parent()
-        if parent is None: # is root item
+        if parent is None:  # is root item
             index = self.indexFromItem(item, 0).row()
             item = self.takeTopLevelItem(index)
-        else: # is child item
+        else:  # is child item
             index = parent.indexOfChild(item)
             item = parent.takeChild(index)
 
         return widgetList
-    
-    def copyWidgets(self,
-                    parent: QTreeWidgetItem,
-                    itemList: list[BaseTreeItem]) -> list[BaseTreeItem]:
+
+    def copyWidgets(
+        self, pItem: QTreeWidgetItem, itemList: list[BaseTreeItem]
+    ) -> list[BaseTreeItem]:
         result = itemList
 
-        for i in range(parent.childCount()):
-            child = parent.child(i)
-            result = self.copyWidgets(child, result)
+        for i in range(pItem.childCount()):
+            cItem = pItem.child(i)
+            result = self.copyWidgets(cItem, result)
 
-        widget: BaseTreeItem = self.itemWidget(parent, 0)
+        widget: BaseTreeItem = self.itemWidget(pItem, 0)
         result.append(widget.shallowcopy())
 
         return result
-    
-    def setItemWidgetList(self, items: list[BaseTreeItem]):
+
+    def setWidgetList(self, items: list[BaseTreeItem]):
         for i in items:
             self.setItemWidget(i.item, 0, i)
 
-    def isItemInTrash(self, item: QTreeWidgetItem) -> bool:
-        trash = self.findTrashFolder()
+    def isInTrash(self, item: QTreeWidgetItem) -> bool:
+        trash = self.findTrash()
 
         prev = None
         curr = item.parent()
@@ -172,8 +182,8 @@ class DocumentTree(QTreeWidget):
 
         return prev == trash
 
-    def findTrashFolder(self) -> QTreeWidgetItem | None:
-        for i in range(self.topLevelItemCount()-1, -1, -1):
+    def findTrash(self) -> QTreeWidgetItem | None:
+        for i in range(self.topLevelItemCount() - 1, -1, -1):
             item = self.topLevelItem(i)
             widget = self.itemWidget(item, 0)
             if isinstance(widget, TrashFolderItem):
@@ -182,41 +192,35 @@ class DocumentTree(QTreeWidget):
 
     def dragEnterEvent(self, e: QDragEnterEvent) -> None:
         self.helper.onDragEnterEvent(super(), e)
-    
+
     def dropEvent(self, e: QDropEvent) -> None:
         self.helper.onDropEvent(super(), e)
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         self.helper.onMousePressEvent(super(), e)
 
-    def _writeHelper(self,
-                     sOut: QDataStream,
-                     iParent: QTreeWidgetItem):
+    def _writeHelper(self, sOut: QDataStream, iParent: QTreeWidgetItem):
         cCount = iParent.childCount()
         sOut.writeInt(cCount)
 
         for i in range(cCount):
             iChild = iParent.child(i)
-            self._writeHelper(sOut, iChild)
             wChild: BaseTreeItem = self.itemWidget(iChild, 0)
             sOut.writeQString(wChild.__class__.__name__)
+            self._writeHelper(sOut, iChild)
             sOut << wChild
 
-    def _readHelper(self,
-                    sIn: QDataStream,
-                    iParent: QTreeWidgetItem):
+    def _readHelper(self, sIn: QDataStream, iParent: QTreeWidgetItem):
         cCount = sIn.readInt()
 
         for i in range(cCount):
-            iChild = QTreeWidgetItem()
-            self._readHelper(sIn, iChild)
             type = sIn.readQString()
             wChild: BaseTreeItem = TreeItemFactory.make(type)
+            self._readHelper(sIn, wChild.item)
             sIn >> wChild
-            wChild.item = iChild
-            
-            iParent.addChild(iChild)
-            self.setItemWidget(iChild, 0, wChild)
+
+            iParent.addChild(wChild.item)
+            self.setItemWidget(wChild.item, 0, wChild)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         iCount = self.topLevelItemCount()
@@ -233,23 +237,22 @@ class DocumentTree(QTreeWidget):
             self._writeHelper(sOut, iParent)
 
         return sOut
-    
+
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
+        self.clear()
+
         iCount = sIn.readInt()
 
         # Top level items
         for i in range(iCount):
-            iParent = QTreeWidgetItem()
             type = sIn.readQString()
             wParent: BaseTreeItem = TreeItemFactory.make(type)
             sIn >> wParent
-            wParent.item = iParent
 
             # Child level items
-            self._readHelper(sIn, iParent)
+            self._readHelper(sIn, wParent.item)
 
-            self.addTopLevelItem(iParent)
-            self.setItemWidget(iParent, 0, wParent)
+            self.addTopLevelItem(wParent.item)
+            self.setItemWidget(wParent.item, 0, wParent)
 
         return sIn
-    

@@ -74,7 +74,7 @@ class DocumentTreeHelper(QObject):
         
         itemList = self._tree.copyWidgets(item, list())
         super.dropEvent(e)
-        self._tree.setItemWidgetList(itemList)
+        self._tree.setWidgetList(itemList)
         self._tree.setCurrentItem(item)
         self._tree.expandItem(item)
 
@@ -103,13 +103,13 @@ class DocumentTreeHelper(QObject):
             args = [isEmpty]
             self._trashContextMenu.onShowMenu(pos, args)
         else:
-            inTrash = self._tree.isItemInTrash(item)
+            inTrash = self._tree.isInTrash(item)
             isMutable = widget.hasFlag(ITEM_FLAG.mutable)
             args = [inTrash, isMutable]
             self._itemContextMenu.onShowMenu(pos, args)
 
     def onItemCreated(self, item: BaseTreeItem):
-        self._tree.addItemWidget(item)
+        self._tree.add(item)
 
     def onToggleActive(self):
         item = self._tree.currentItem()
@@ -139,17 +139,17 @@ class DocumentTreeHelper(QObject):
         if not YesNoDialog.run("Move to trash?"):
             return
         
-        trash = self._tree.findTrashFolder()
+        trash = self._tree.findTrash()
         if trash is None:
             return
         
-        self._tree.moveItemTo(item, trash)
+        self._tree.moveTo(item, trash)
 
     def onRecover(self):
         item = self._tree.currentItem()
         if item is None:
             return
-        self._tree.moveItemTo(item, None)
+        self._tree.moveTo(item, None)
 
     def onEmptyTrash(self):
         item = self._tree.currentItem()
@@ -160,4 +160,4 @@ class DocumentTreeHelper(QObject):
             return
         
         for i in range(item.childCount()-1, -1, -1):
-            self._tree.removeItem(item.child(i), item)
+            self._tree.remove(item.child(i), item)

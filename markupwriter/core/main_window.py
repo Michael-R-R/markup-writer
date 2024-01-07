@@ -71,26 +71,7 @@ class MainWindow(QMainWindow):
         AppConfig.projectDir = None
 
     def _onNewClicked(self):
-        if not self._shouldClose():
-            return
-
-        name: str = self._getProjectName()
-        if name is None:
-            return
-
-        path = self._getProjectDir("New Project")
-        if path is None:
-            return
-
-        if not self._createAddedDirs(path):
-            return
-
-        AppConfig.projectName = name
-        AppConfig.projectDir = path
-
-        Serialize.write(self._fullProjectPath(), self.mainWidget)
-
-        self.setWindowTitle("{} - {}".format(AppConfig.APP_NAME, AppConfig.projectName))
+        self._createProject("New Project", True)
 
     def _onOpenClicked(self):
         if not self._shouldClose():
@@ -123,14 +104,23 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Project saved", 2000)
 
     def _onSaveAsClicked(self):
-        if not self._shouldClose(False):
+        self._createProject("Save As Project", False)
+
+    def _onCloseClicked(self):
+        self._shouldClose()
+
+    def _onExitClicked(self):
+        QApplication.quit()
+
+    def _createProject(self, title: str, doReset: bool):
+        if not self._shouldClose(doReset):
             return
 
         name: str = self._getProjectName()
         if name is None:
             return
 
-        path = self._getProjectDir("Save As Project")
+        path = self._getProjectDir(title)
         if path is None:
             return
 
@@ -143,12 +133,6 @@ class MainWindow(QMainWindow):
         Serialize.write(self._fullProjectPath(), self.mainWidget)
 
         self.setWindowTitle("{} - {}".format(AppConfig.APP_NAME, AppConfig.projectName))
-
-    def _onCloseClicked(self):
-        self._shouldClose()
-
-    def _onExitClicked(self):
-        QApplication.quit()
 
     def _getProjectName(self) -> str | None:
         name: str = StrDialog.run("Project name?", "Default", None)
