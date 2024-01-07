@@ -111,6 +111,9 @@ class MainWindow(QMainWindow):
         self._shouldClose()
 
     def _onExitClicked(self):
+        if not YesNoDialog.run("Quit application?"):
+            return
+        
         QApplication.quit()
 
     def _createProject(self, title: str, doReset: bool):

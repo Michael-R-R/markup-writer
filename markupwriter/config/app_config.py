@@ -5,10 +5,6 @@ from PyQt6.QtCore import (
     QSize,
 )
 
-from markupwriter.util import (
-    File,
-)
-
 from .base_config import BaseConfig
 
 
