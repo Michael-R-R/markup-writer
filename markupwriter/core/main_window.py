@@ -44,7 +44,7 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.mainWidget.statusBar)
         self.setupConnections()
 
-        self.setWindowTitle(AppConfig.APP_NAME)
+        self.setWindowTitle(AppConfig.fullWindowTitle())
         self.resize(AppConfig.mainWindowSize)
         self.setContentsMargins(0, 0, 0, 0)
 
@@ -60,15 +60,16 @@ class MainWindow(QMainWindow):
         fileMenu.exitAction.triggered.connect(self._onExitClicked)
 
     def reset(self):
+        AppConfig.projectName = None
+        AppConfig.projectDir = None
+
         self.mainWidget = CentralWidget(self)
         self.setMenuBar(self.mainWidget.menuBar)
         self.setCentralWidget(self.mainWidget)
         self.setStatusBar(self.mainWidget.statusBar)
         self.setupConnections()
-        self.setWindowTitle(AppConfig.APP_NAME)
+        self.setWindowTitle(AppConfig.fullWindowTitle())
         self.resize(AppConfig.mainWindowSize)
-        AppConfig.projectName = None
-        AppConfig.projectDir = None
 
     def _onNewClicked(self):
         self._createProject("New Project", True)
@@ -87,20 +88,20 @@ class MainWindow(QMainWindow):
         self.mainWidget = widget
         self.setMenuBar(self.mainWidget.menuBar)
         self.setCentralWidget(self.mainWidget)
+        self.setStatusBar(self.mainWidget.statusBar)
         self.setupConnections()
-        self.resize(AppConfig.mainWindowSize)
 
         info = QFileInfo(filePath[0])
         AppConfig.projectName = info.fileName()
         AppConfig.projectDir = info.canonicalPath()
 
-        self.setWindowTitle("{} - {}".format(AppConfig.APP_NAME, AppConfig.projectName))
+        self.setWindowTitle(AppConfig.fullWindowTitle())
 
     def _onSaveClicked(self):
-        if not self._hasOpenProject():
+        if not AppConfig.hasActiveProject():
             self._onSaveAsClicked()
         else:
-            Serialize.write(self._fullProjectPath(), self.mainWidget)
+            Serialize.write(AppConfig.projectFilePath(), self.mainWidget)
             self.statusBar().showMessage("Project saved", 2000)
 
     def _onSaveAsClicked(self):
@@ -116,38 +117,39 @@ class MainWindow(QMainWindow):
         if not self._shouldClose(doReset):
             return
 
-        name: str = self._getProjectName()
+        name: str = self._selectProjectName()
         if name is None:
             return
 
-        path = self._getProjectDir(title)
+        path = self._selectProjectDir(title)
         if path is None:
             return
 
-        if not self._createAddedDirs(path):
+        dir = QDir()
+        if not dir.mkpath("{}/data/content/".format(path)):
             return
 
         AppConfig.projectName = name
         AppConfig.projectDir = path
 
-        Serialize.write(self._fullProjectPath(), self.mainWidget)
+        Serialize.write(AppConfig.projectFilePath(), self.mainWidget)
 
-        self.setWindowTitle("{} - {}".format(AppConfig.APP_NAME, AppConfig.projectName))
+        self.setWindowTitle(AppConfig.fullWindowTitle())
 
-    def _getProjectName(self) -> str | None:
+    def _selectProjectName(self) -> str | None:
         name: str = StrDialog.run("Project name?", "Default", None)
         if name is None:
             return None
-        
+
         name = name.strip()
         found = re.search(r"^[a-zA-Z0-9_\-\s]+$", name)
         if found is None:
             return None
         name += AppConfig.APP_EXTENSION
-        
+
         return name
 
-    def _getProjectDir(self, title: str) -> str | None:
+    def _selectProjectDir(self, title: str) -> str | None:
         path = QFileDialog.getExistingDirectory(
             None,
             title,
@@ -156,38 +158,25 @@ class MainWindow(QMainWindow):
         )
         if path == "":
             return None
-        
+
         return path
 
-    def _createAddedDirs(self, path: str) -> bool:
-        dir = QDir()
-        return dir.mkpath("{}/data/content/".format(path))
-
     def _shouldClose(self, doReset: bool = True) -> bool:
-        if self._hasOpenProject():
+        if AppConfig.hasActiveProject():
             if YesNoDialog.run("Save and close current project?"):
-                Serialize.write(self._fullProjectPath(), self.mainWidget)
+                Serialize.write(AppConfig.projectFilePath(), self.mainWidget)
                 if doReset:
                     self.reset()
             else:
                 return False
         return True
 
-    def _fullProjectPath(self) -> str | None:
-        if not self._hasOpenProject():
-            return None
-
-        return "{}/{}".format(AppConfig.projectDir, AppConfig.projectName)
-
-    def _hasOpenProject(self) -> bool:
-        return AppConfig.projectDir != None
-
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.mainWindowSize = e.size()
         super().resizeEvent(e)
 
     def closeEvent(self, e: QCloseEvent | None) -> None:
-        if self._hasOpenProject():
-            Serialize.write(self._fullProjectPath(), self.mainWidget)
+        if AppConfig.hasActiveProject():
+            Serialize.write(AppConfig.projectFilePath(), self.mainWidget)
 
         super().closeEvent(e)

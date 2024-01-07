@@ -5,7 +5,12 @@ from PyQt6.QtCore import (
     QSize,
 )
 
+from markupwriter.util import (
+    File,
+)
+
 from .base_config import BaseConfig
+
 
 class AppConfig(BaseConfig):
     INI_PATH: str = None
@@ -14,11 +19,11 @@ class AppConfig(BaseConfig):
     ICON_SIZE: QSize = None
     projectName: str = None
     projectDir: str = None
-    mainWindowSize: QSize  = None
-    docTreeViewSize: QSize  = None
-    docEditorSize: QSize  = None
-    docPreviewSize: QSize  = None
-    terminalSize: QSize  = None
+    mainWindowSize: QSize = None
+    docTreeViewSize: QSize = None
+    docEditorSize: QSize = None
+    docPreviewSize: QSize = None
+    terminalSize: QSize = None
 
     def init():
         AppConfig.INI_PATH = "./resources/configs/app.ini"
@@ -33,6 +38,22 @@ class AppConfig(BaseConfig):
 
     def reset():
         AppConfig.init()
+
+    def hasActiveProject() -> bool:
+        return AppConfig.projectDir is not None
+
+    def fullWindowTitle() -> str:
+        return "{} - {}".format(AppConfig.APP_NAME, AppConfig.projectName)
+
+    def projectFilePath() -> str | None:
+        if AppConfig.projectDir is None:
+            return None
+        return "{}/{}".format(AppConfig.projectDir, AppConfig.projectName)
+
+    def projectContentPath() -> str | None:
+        if AppConfig.projectDir is None:
+            return None
+        return "{}/data/content/".format(AppConfig.projectDir)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << AppConfig.mainWindowSize

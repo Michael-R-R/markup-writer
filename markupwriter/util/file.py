@@ -2,7 +2,6 @@
 
 from PyQt6.QtCore import (
     QFile,
-    QFileInfo,
     QIODevice,
     QTextStream,
 )
@@ -28,10 +27,3 @@ class File(object):
     def exists(path: str) -> bool:
         info = QFile(path)
         return info.exists()
-    
-    def path(path: str) -> str:
-        info = QFileInfo(path)
-        if info.isDir():
-            return info.canonicalPath()
-        else:
-            return info.canonicalFilePath()
