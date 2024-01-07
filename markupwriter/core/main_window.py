@@ -32,23 +32,12 @@ from .central_widget import CentralWidget
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        
-        self.mainWidget = None
 
-        self.setup(CentralWidget(self))
-        
-        ProjectHandler.setActionStates(self.mainWidget, False)
+        widget = CentralWidget(self)
 
-    def setupConnections(self):
-        # --- File menu --- #
-        menuBar = self.mainWidget.menuBar
-        fileMenu = menuBar.fileMenu
-        fileMenu.newAction.triggered.connect(self._onNewClicked)
-        fileMenu.openAction.triggered.connect(self._onOpenClicked)
-        fileMenu.saveAction.triggered.connect(self._onSaveClicked)
-        fileMenu.saveAsAction.triggered.connect(self._onSaveAsClicked)
-        fileMenu.closeAction.triggered.connect(self._askToClose)
-        fileMenu.exitAction.triggered.connect(self._onExitClicked)
+        ProjectHandler.setActionStates(widget, False)
+
+        self.setup(widget)
 
     def setup(self, widget: CentralWidget):
         self.mainWidget = widget
@@ -62,48 +51,69 @@ class MainWindow(QMainWindow):
         self.setContentsMargins(0, 0, 0, 0)
         self.resize(AppConfig.mainWindowSize)
 
-    def _onNewClicked(self):
-        if not self._askToClose():
+    def setupConnections(self):
+        # --- File menu --- #
+        menuBar = self.mainWidget.menuBar
+        fileMenu = menuBar.fileMenu
+        fileMenu.newAction.triggered.connect(self._onNewProject)
+        fileMenu.openAction.triggered.connect(self._onOpenProject)
+        fileMenu.saveAction.triggered.connect(self._onSaveProject)
+        fileMenu.saveAsAction.triggered.connect(self._onSaveAsProject)
+        fileMenu.closeAction.triggered.connect(self._onCloseProject)
+        fileMenu.exitAction.triggered.connect(self._onExit)
+
+    def _onNewProject(self):
+        if not self._onCloseProject():
             return
-        
-        widget: CentralWidget = ProjectHandler.createNewProject(self)
+
+        widget: CentralWidget = ProjectHandler.createProject(self)
         if widget is None:
             return
-        
+
+        ProjectHandler.setActionStates(widget, True)
+        ProjectHandler.createDefaultFolders(widget)
+
         self.setup(widget)
 
-    def _onOpenClicked(self):
-        if not self._askToClose():
+    def _onOpenProject(self):
+        if not self._onCloseProject():
             return
 
-        widget: CentralWidget = ProjectHandler.openNewProject(self)
+        widget: CentralWidget = ProjectHandler.openProject(self)
         if widget is None:
             return
-        
+
+        ProjectHandler.setActionStates(widget, True)
+
         self.setup(widget)
 
-    def _onSaveClicked(self):
+    def _onSaveProject(self):
         if Serialize.write(AppConfig.projectFilePath(), self.mainWidget):
             self.statusBar().showMessage("Project saved", 2000)
 
-    def _onSaveAsClicked(self):
+    def _onSaveAsProject(self):
         raise NotImplementedError()
 
-    def _onExitClicked(self):
+    def _onCloseProject(self) -> bool:
+        if not AppConfig.hasActiveProject():
+            return True
+
+        if YesNoDialog.run("Save and close current project?"):
+            Serialize.write(AppConfig.projectFilePath(), self.mainWidget)
+
+            widget: CentralWidget = ProjectHandler.closeProject(self)
+            ProjectHandler.setActionStates(widget, False)
+            self.setup(widget)
+
+            return True
+
+        return False
+
+    def _onExit(self):
         if not YesNoDialog.run("Quit application?"):
             return
 
         QApplication.quit()
-
-    def _askToClose(self) -> bool:
-        if AppConfig.hasActiveProject():
-            if YesNoDialog.run("Save and close current project?"):
-                Serialize.write(AppConfig.projectFilePath(), self.mainWidget)
-                self.setup(CentralWidget(self))
-            else:
-                return False
-
-        return True
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.mainWindowSize = e.size()

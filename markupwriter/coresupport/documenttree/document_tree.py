@@ -227,8 +227,6 @@ class DocumentTree(QTreeWidget):
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        self.clear()
-
         iCount = sIn.readInt()
 
         # Top level items

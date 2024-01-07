@@ -54,7 +54,7 @@ class ProjectHandler(object):
         tree = widget.treeView.tree
         tree.helper.treeContextMenu.addItemMenu.setEnabled(isEnabled)
 
-    def createNewProject(parent: QWidget) -> cw.CentralWidget | None:
+    def createProject(parent: QWidget) -> cw.CentralWidget | None:
         name: str = StrDialog.run("Project name?", "Default", None)
         if name is None:
             return None
@@ -77,18 +77,16 @@ class ProjectHandler(object):
         if not dir.mkpath("{}/data/content/".format(path)):
             return None
 
+        widget = cw.CentralWidget(parent)
+
         AppConfig.projectName = name
         AppConfig.projectDir = path
-
-        widget = cw.CentralWidget(parent)
-        ProjectHandler.setActionStates(widget, True)
-        ProjectHandler.createDefaultFolders(widget)
 
         Serialize.write(AppConfig.projectFilePath(), widget)
 
         return widget
 
-    def openNewProject(parent: QWidget) -> cw.CentralWidget | None:
+    def openProject(parent: QWidget) -> cw.CentralWidget | None:
         path = QFileDialog.getOpenFileName(
             None, "Open Project", "/home", "Markup Writer Files (*.mwf)"
         )
@@ -96,7 +94,8 @@ class ProjectHandler(object):
             return None
 
         widget: cw.CentralWidget = Serialize.read(cw.CentralWidget, path[0])
-        ProjectHandler.setActionStates(widget, True)
+        if widget is None:
+            return None
 
         info = QFileInfo(path[0])
         AppConfig.projectName = info.fileName()
@@ -104,10 +103,11 @@ class ProjectHandler(object):
 
         return widget
 
-    def closeProject():
+    def closeProject(parent: QWidget):
         AppConfig.projectName = None
         AppConfig.projectDir = None
-        # TODO implement
+
+        return cw.CentralWidget(parent)
 
     def createDefaultFolders(widget: cw.CentralWidget):
         tree = widget.treeView.tree
