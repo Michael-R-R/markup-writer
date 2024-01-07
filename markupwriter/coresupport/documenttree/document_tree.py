@@ -26,11 +26,6 @@ from markupwriter.common.factory import (
 from .treeitem import (
     ITEM_FLAG,
     BaseTreeItem,
-    PlotFolderItem,
-    TimelineFolderItem,
-    CharsFolderItem,
-    LocFolderItem,
-    ObjFolderItem,
     TrashFolderItem,
 )
 
@@ -58,13 +53,6 @@ class DocumentTree(QTreeWidget):
         self.setFrameStyle(QFrame.Shape.NoFrame)
         self.setHeaderHidden(True)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-        self.add(PlotFolderItem(), False)
-        self.add(TimelineFolderItem(), False)
-        self.add(CharsFolderItem(), False)
-        self.add(LocFolderItem(), False)
-        self.add(ObjFolderItem(), False)
-        self.add(TrashFolderItem(), False)
 
         self.itemDoubleClicked.connect(self.helper.onItemDoubleClick)
         self.customContextMenuRequested.connect(self.helper.onContextMenuRequest)
