@@ -19,7 +19,7 @@ from markupwriter.config import (
 from markupwriter.corewidgets import (
     MainMenuBar,
     DocumentTreeView,
-    DocumentEditor,
+    DocumentEditorView,
     DocumentPreview,
     Terminal,
     MainStatusBar,
@@ -34,7 +34,7 @@ class CentralWidget(QWidget):
         self.statusBar = MainStatusBar(self)
 
         self.treeView = DocumentTreeView(self)
-        self.editor = DocumentEditor(self)
+        self.editorView = DocumentEditorView(self)
         self.terminal = Terminal(self)
         self.preview = DocumentPreview(self)
 
@@ -44,19 +44,19 @@ class CentralWidget(QWidget):
 
         hSplitter.addWidget(self.treeView)
         hSplitter.addWidget(vSplitter)
-        vSplitter.addWidget(self.editor)
+        vSplitter.addWidget(self.editorView)
         vSplitter.addWidget(self.terminal)
         hSplitter.addWidget(self.preview)
 
         hSplitter.setSizes(
             [
                 AppConfig.docTreeViewSize.width(),
-                AppConfig.docEditorSize.width(),
+                AppConfig.docEditorViewSize.width(),
                 AppConfig.docPreviewSize.width(),
             ]
         )
         vSplitter.setSizes(
-            [AppConfig.docEditorSize.height(), AppConfig.terminalSize.height()]
+            [AppConfig.docEditorViewSize.height(), AppConfig.terminalSize.height()]
         )
 
         vLayout.addWidget(hSplitter)
@@ -69,15 +69,15 @@ class CentralWidget(QWidget):
     def setupConnections(self):
         # --- Tree --- #
         tree = self.treeView.tree
-        tree.fileDoubleClicked.connect(self.editor.onFileDoubleClicked)
-        tree.fileRemoved.connect(self.editor.onFileRemoved)
+        tree.fileDoubleClicked.connect(self.editorView.onFileDoubleClicked)
+        tree.fileRemoved.connect(self.editorView.onFileRemoved)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << self.treeView
-        sOut << self.editor
+        sOut << self.editorView
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         sIn >> self.treeView
-        sIn >> self.editor
+        sIn >> self.editorView
         return sIn

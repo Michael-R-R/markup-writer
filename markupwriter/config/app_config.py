@@ -17,7 +17,7 @@ class AppConfig(BaseConfig):
     projectDir: str = None
     mainWindowSize: QSize = None
     docTreeViewSize: QSize = None
-    docEditorSize: QSize = None
+    docEditorViewSize: QSize = None
     docPreviewSize: QSize = None
     terminalSize: QSize = None
 
@@ -28,7 +28,7 @@ class AppConfig(BaseConfig):
         AppConfig.ICON_SIZE = QSize(18, 18)
         AppConfig.mainWindowSize = QSize(800, 600)
         AppConfig.docTreeViewSize = QSize(100, 100)
-        AppConfig.docEditorSize = QSize(100, 100)
+        AppConfig.docEditorViewSize = QSize(100, 100)
         AppConfig.docPreviewSize = QSize(100, 100)
         AppConfig.terminalSize = QSize(100, 100)
 
@@ -54,7 +54,7 @@ class AppConfig(BaseConfig):
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << AppConfig.mainWindowSize
         sOut << AppConfig.docTreeViewSize
-        sOut << AppConfig.docEditorSize
+        sOut << AppConfig.docEditorViewSize
         sOut << AppConfig.docPreviewSize
         sOut << AppConfig.terminalSize
         return sOut
@@ -62,7 +62,7 @@ class AppConfig(BaseConfig):
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         sIn >> AppConfig.mainWindowSize
         sIn >> AppConfig.docTreeViewSize
-        sIn >> AppConfig.docEditorSize
+        sIn >> AppConfig.docEditorViewSize
         sIn >> AppConfig.docPreviewSize
         sIn >> AppConfig.terminalSize
         return sIn

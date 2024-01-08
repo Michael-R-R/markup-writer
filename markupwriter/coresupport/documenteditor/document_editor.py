@@ -29,9 +29,7 @@ from markupwriter.common.provider import (
     Style,
 )
 
-from markupwriter.coresupport.documenteditor import (
-    PlainDocument,
-)
+from .plain_document import PlainDocument
 
 
 class DocumentEditor(QPlainTextEdit):
@@ -99,7 +97,6 @@ class DocumentEditor(QPlainTextEdit):
         self.setPlainText(content)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
-        AppConfig.docEditorSize = e.size()
         self.updateViewportMargins()
         super().resizeEvent(e)
 
