@@ -24,6 +24,9 @@ class File(object):
 
         return True
     
+    def remove(path: str) -> bool:
+        return QFile.remove(path)
+    
     def exists(path: str) -> bool:
         info = QFile(path)
         return info.exists()

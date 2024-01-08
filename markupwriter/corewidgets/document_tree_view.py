@@ -60,14 +60,18 @@ class DocumentTreeView(QWidget):
         self.tree.fileRemoved.connect(self._onFileRemoved)
 
     def _onFileAdded(self, uuid: str):
-        contentPath = AppConfig.projectContentPath()
-        if contentPath is None:
+        path = AppConfig.projectContentPath()
+        if path is None:
             return
-        contentPath += uuid
-        File.write(contentPath, "")
+        path += uuid
+        File.write(path, "")
 
     def _onFileRemoved(self, uuid: str):
-        pass
+        path = AppConfig.projectContentPath()
+        if path is None:
+            return
+        path += uuid
+        File.remove(path)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docTreeViewSize = e.size()
