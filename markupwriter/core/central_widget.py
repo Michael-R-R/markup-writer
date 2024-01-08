@@ -67,9 +67,10 @@ class CentralWidget(QWidget):
         self.setupConnections()
 
     def setupConnections(self):
-        # --- Tree view --- #
-        self.treeView.tree.fileDoubleClicked.connect(self.editor.onFileDoubleClicked)
-        self.treeView.tree.fileRemoved.connect(self.editor.onFileRemoved)
+        # --- Tree --- #
+        tree = self.treeView.tree
+        tree.fileDoubleClicked.connect(self.editor.onFileDoubleClicked)
+        tree.fileRemoved.connect(self.editor.onFileRemoved)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << self.treeView

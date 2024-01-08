@@ -87,6 +87,7 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Project saved", 2000)
 
     def _onSaveAsProject(self):
+        # TODO implement
         raise NotImplementedError()
 
     def _onCloseProject(self) -> bool:

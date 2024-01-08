@@ -5,6 +5,7 @@ from PyQt6.QtCore import (
 )
 
 from PyQt6.QtGui import (
+    QCloseEvent,
     QResizeEvent,
     QGuiApplication,
     QTextOption,
@@ -20,6 +21,10 @@ from markupwriter.config import (
     AppConfig,
 )
 
+from markupwriter.util import (
+    File,
+)
+
 from markupwriter.common.provider import (
     Style,
 )
@@ -28,13 +33,14 @@ from markupwriter.coresupport.documenteditor import (
     PlainDocument,
 )
 
+
 class DocumentEditor(QPlainTextEdit):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
         self.currUUID = ""
         self.plainDocument = PlainDocument()
-        
+
         self.setDocument(self.plainDocument)
         self.setStyleSheet(Style.EDITOR)
         self.setFrameShape(QFrame.Shape.NoFrame)
@@ -53,7 +59,7 @@ class DocumentEditor(QPlainTextEdit):
             wW = int(wW * 0.2)
         else:
             wW = int(wW * 0.1)
-            
+
         wH = int(self.height() * 0.1)
 
         self.setViewportMargins(wW, wH, wW, wH)
@@ -62,30 +68,48 @@ class DocumentEditor(QPlainTextEdit):
         if self.currUUID == uuid:
             return
 
-        if self.currUUID != "":
-            # TODO: save the contents of the current document
-            pass
-
+        self._writeCurrentDoc() # write old file
         self.currUUID = uuid
-        
-        # TODO: read file and add contents to document
+        self._readCurrentDoc() # read new file
 
     def onFileRemoved(self, uuid: str):
         if self.currUUID != uuid:
             return
-        
+
         self.currUUID = ""
         self.plainDocument.clear()
+        
+    def _writeCurrentDoc(self):
+        if self.currUUID == "":
+            return
+        path = AppConfig.projectContentPath()
+        if path is None:
+            return
+        path += self.currUUID
+        File.write(path, self.toPlainText())
+        
+    def _readCurrentDoc(self):
+        if self.currUUID == "":
+            return
+        path = AppConfig.projectContentPath()
+        if path is None:
+            return
+        path += self.currUUID
+        content = File.read(path)
+        self.setPlainText(content)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorSize = e.size()
         self.updateViewportMargins()
         super().resizeEvent(e)
 
+    def closeEvent(self, e: QCloseEvent | None) -> None:
+        self._writeCurrentDoc()
+
+        super().closeEvent(e)
+
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        sOut.writeQString(self.currUUID)
         return sOut
-    
+
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        self.currUUID = sIn.readQString()
         return sIn
