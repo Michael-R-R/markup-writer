@@ -17,12 +17,12 @@ from markupwriter.config import (
     AppConfig,
 )
 
-from markupwriter.common.provider import (
-    Style,
-)
-
 from markupwriter.util import (
     File,
+)
+
+from markupwriter.common.provider import (
+    Style,
 )
 
 from markupwriter.coresupport.documenttree import (
@@ -37,6 +37,7 @@ class DocumentTreeView(QWidget):
 
         self.treeBar = DocumentTreeBar(self)
         self.tree = DocumentTree(self)
+        self.setupConnections()
 
         vLayout = QVBoxLayout(self)
         vLayout.setContentsMargins(0, 0, 0, 0)
@@ -44,7 +45,6 @@ class DocumentTreeView(QWidget):
         vLayout.addWidget(self.treeBar)
         vLayout.addWidget(self.tree)
 
-        self.setupConnections()
         self.setStyleSheet(Style.TREE_VIEW)
 
     def setupConnections(self):
