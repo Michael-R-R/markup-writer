@@ -70,9 +70,6 @@ class CentralWidget(QWidget):
         # --- Tree view --- #
         self.treeView.tree.fileDoubleClicked.connect(self.editor.onFileDoubleClicked)
         self.treeView.tree.fileRemoved.connect(self.editor.onFileRemoved)
-        
-    def onNewProject(self):
-        raise NotImplementedError()
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << self.treeView

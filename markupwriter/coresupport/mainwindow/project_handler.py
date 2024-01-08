@@ -78,6 +78,8 @@ class ProjectHandler(object):
             return None
 
         widget = cw.CentralWidget(parent)
+        ProjectHandler.setActionStates(widget, True)
+        ProjectHandler.createRootFolders(widget)
 
         AppConfig.projectName = name
         AppConfig.projectDir = path
@@ -96,6 +98,8 @@ class ProjectHandler(object):
         widget: cw.CentralWidget = Serialize.read(cw.CentralWidget, path[0])
         if widget is None:
             return None
+        
+        ProjectHandler.setActionStates(widget, True)
 
         info = QFileInfo(path[0])
         AppConfig.projectName = info.fileName()
@@ -106,10 +110,13 @@ class ProjectHandler(object):
     def closeProject(parent: QWidget):
         AppConfig.projectName = None
         AppConfig.projectDir = None
+        
+        widget = cw.CentralWidget(parent)
+        ProjectHandler.setActionStates(widget, False)
 
-        return cw.CentralWidget(parent)
+        return widget
 
-    def createDefaultFolders(widget: cw.CentralWidget):
+    def createRootFolders(widget: cw.CentralWidget):
         tree = widget.treeView.tree
         tree.add(PlotFolderItem(), False)
         tree.add(TimelineFolderItem(), False)

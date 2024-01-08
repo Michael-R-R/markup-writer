@@ -22,7 +22,7 @@ from markupwriter.util import (
     Serialize,
 )
 
-from markupwriter.common.handler import (
+from markupwriter.coresupport.mainwindow import (
     ProjectHandler,
 )
 
@@ -70,9 +70,6 @@ class MainWindow(QMainWindow):
         if widget is None:
             return
 
-        ProjectHandler.setActionStates(widget, True)
-        ProjectHandler.createDefaultFolders(widget)
-
         self.setup(widget)
 
     def _onOpenProject(self):
@@ -82,8 +79,6 @@ class MainWindow(QMainWindow):
         widget: CentralWidget = ProjectHandler.openProject(self)
         if widget is None:
             return
-
-        ProjectHandler.setActionStates(widget, True)
 
         self.setup(widget)
 
@@ -102,7 +97,7 @@ class MainWindow(QMainWindow):
             Serialize.write(AppConfig.projectFilePath(), self.mainWidget)
 
             widget: CentralWidget = ProjectHandler.closeProject(self)
-            ProjectHandler.setActionStates(widget, False)
+
             self.setup(widget)
 
             return True
