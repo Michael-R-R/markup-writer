@@ -35,7 +35,7 @@ import markupwriter.coresupport.documenttree as dt
 class DocumentTree(QTreeWidget):
     fileAdded = pyqtSignal(str)
     fileRemoved = pyqtSignal(str)
-    fileDoubleClicked = pyqtSignal(str)
+    fileDoubleClicked = pyqtSignal(str, list)
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)

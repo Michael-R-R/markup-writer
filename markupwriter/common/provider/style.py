@@ -11,5 +11,5 @@ from markupwriter.util import (
 class Style(object):
     QDir.addSearchPath("styles", "./resources/styles/")  
 
-    EDITOR = File.read("styles:editor.qss")
-    TREE_VIEW = File.read("styles:tree_view.qss")
+    EDITOR_VIEW: str = File.read("styles:editor_view.qss")
+    TREE_VIEW: str = File.read("styles:tree_view.qss")

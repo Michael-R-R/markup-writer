@@ -89,9 +89,16 @@ class DocumentTreeHelper(QObject):
             self._tree.setCurrentItem(None)
 
     def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
+        paths: list[str] = list()
+        iTemp = item
+        while iTemp is not None:
+            wTemp: BaseTreeItem = self._tree.itemWidget(iTemp, 0)
+            paths.insert(0, wTemp.title)
+            iTemp = iTemp.parent()
+        
         widget: BaseTreeItem = self._tree.itemWidget(item, col)
         if widget.hasFlag(ITEM_FLAG.file):
-            self._tree.fileDoubleClicked.emit(widget.UUID())
+            self._tree.fileDoubleClicked.emit(widget.UUID(), paths)
 
     def onContextMenuRequest(self, pos: QPoint):
         item = self._tree.itemAt(pos)

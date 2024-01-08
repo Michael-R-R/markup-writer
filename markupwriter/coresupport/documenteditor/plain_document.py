@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    QObject,
+)
+
 from PyQt6.QtGui import (
     QTextDocument,
 )
@@ -21,8 +25,8 @@ from .passive_parser import (
 )
 
 class PlainDocument(QTextDocument):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent: QObject):
+        super().__init__(parent)
         
         self._highlighter = Highlighter(self)
         self._refTagManager = RefTagManager()

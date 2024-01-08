@@ -17,7 +17,12 @@ from markupwriter.config import (
     AppConfig,
 )
 
+from markupwriter.common.provider import (
+    Style,
+)
+
 from markupwriter.coresupport.documenteditor import (
+    DocumentEditorBar,
     DocumentEditor,
 )
 
@@ -26,14 +31,19 @@ class DocumentEditorView(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
+        self.editorBar = DocumentEditorBar(self)
         self.editor = DocumentEditor(self)
 
         vLayout = QVBoxLayout(self)
         vLayout.setContentsMargins(0, 0, 0, 0)
         vLayout.setSpacing(0)
+        vLayout.addWidget(self.editorBar)
         vLayout.addWidget(self.editor)
+        
+        self.setStyleSheet(Style.EDITOR_VIEW)
 
-    def onFileDoubleClicked(self, uuid: str):
+    def onFileDoubleClicked(self, uuid: str, paths: list[str]):
+        self.editorBar.onFileDoubleClicked(paths)
         self.editor.onFileDoubleClicked(uuid)
 
     def onFileRemoved(self, uuid: str):

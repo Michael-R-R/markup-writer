@@ -25,10 +25,6 @@ from markupwriter.util import (
     File,
 )
 
-from markupwriter.common.provider import (
-    Style,
-)
-
 from .plain_document import PlainDocument
 
 
@@ -37,15 +33,29 @@ class DocumentEditor(QPlainTextEdit):
         super().__init__(parent)
 
         self.currUUID = ""
-        self.plainDocument = PlainDocument()
+        self.plainDocument = PlainDocument(self)
 
         self.setDocument(self.plainDocument)
-        self.setStyleSheet(Style.EDITOR)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setTabStopDistance(20.0)
         self.updateViewportMargins()
 
+    def onFileDoubleClicked(self, uuid: str):
+        if self.currUUID == uuid:
+            return
+
+        self._writeCurrentDoc()  # write old file
+        self.currUUID = uuid
+        self._readCurrentDoc()  # read new file
+
+    def onFileRemoved(self, uuid: str):
+        if self.currUUID != uuid:
+            return
+
+        self.currUUID = ""
+        self.plainDocument.clear()
+        
     def updateViewportMargins(self):
         mSize = QGuiApplication.primaryScreen().size()
         mW = mSize.width()
@@ -62,21 +72,6 @@ class DocumentEditor(QPlainTextEdit):
 
         self.setViewportMargins(wW, wH, wW, wH)
 
-    def onFileDoubleClicked(self, uuid: str):
-        if self.currUUID == uuid:
-            return
-
-        self._writeCurrentDoc() # write old file
-        self.currUUID = uuid
-        self._readCurrentDoc() # read new file
-
-    def onFileRemoved(self, uuid: str):
-        if self.currUUID != uuid:
-            return
-
-        self.currUUID = ""
-        self.plainDocument.clear()
-        
     def _writeCurrentDoc(self):
         if self.currUUID == "":
             return
@@ -85,7 +80,7 @@ class DocumentEditor(QPlainTextEdit):
             return
         path += self.currUUID
         File.write(path, self.toPlainText())
-        
+
     def _readCurrentDoc(self):
         if self.currUUID == "":
             return
