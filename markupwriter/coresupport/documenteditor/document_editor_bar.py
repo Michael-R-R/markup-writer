@@ -19,14 +19,17 @@ class DocumentEditorBar(QWidget):
         hLayout.addWidget(self.docPathLabel)
         hLayout.addStretch()
         
-    def onFileDoubleClicked(self, paths: list[str]):
+    def clearDocPathLabel(self):
+        self.docPathLabel.clear()
+    
+    def onNameListReceived(self, nameList: list[str]):
         self.docPathLabel.clear()
         
         text = ""
-        count = len(paths)
+        count = len(nameList)
         for i in range(count-1):
-            text += "{} \u203a ".format(paths[i])
+            text += "{} \u203a ".format(nameList[i])
         
-        text += "{}".format(paths[count-1])
+        text += "{}".format(nameList[count-1])
             
         self.docPathLabel.setText(text)

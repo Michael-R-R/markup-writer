@@ -81,6 +81,11 @@ class DocumentTreeHelper(QObject):
         self._tree.expandItem(item)
 
         self._tree.draggedItem = None
+        
+        widget: BaseTreeItem = self._tree.itemWidget(item, 0)
+        if widget.hasFlag(ITEM_FLAG.file):
+            nameList = self._tree.getParentNameList(item)
+            self._tree.fileMoved.emit(widget.UUID(), nameList)
 
     def onMousePressEvent(self, super: QTreeView, e: QMouseEvent):
         index = self._tree.indexAt(e.pos())
@@ -90,17 +95,11 @@ class DocumentTreeHelper(QObject):
             self._tree.setCurrentItem(None)
 
     @pyqtSlot(QTreeWidgetItem, int)
-    def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
-        paths: list[str] = list()
-        iTemp = item
-        while iTemp is not None:
-            wTemp: BaseTreeItem = self._tree.itemWidget(iTemp, 0)
-            paths.insert(0, wTemp.title)
-            iTemp = iTemp.parent()
-        
+    def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):   
         widget: BaseTreeItem = self._tree.itemWidget(item, col)
         if widget.hasFlag(ITEM_FLAG.file):
-            self._tree.fileDoubleClicked.emit(widget.UUID(), paths)
+            nameList = self._tree.getParentNameList(item)
+            self._tree.fileDoubleClicked.emit(widget.UUID(), nameList)
 
     @pyqtSlot(QPoint)
     def onContextMenuRequest(self, pos: QPoint):

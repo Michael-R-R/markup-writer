@@ -44,13 +44,24 @@ class DocumentEditorView(QWidget):
         self.setStyleSheet(Style.EDITOR_VIEW)
 
     @pyqtSlot(str, list)
-    def onFileDoubleClicked(self, uuid: str, paths: list[str]):
-        self.editorBar.onFileDoubleClicked(paths)
-        self.editor.onFileDoubleClicked(uuid)
+    def onFileAdded(self, uuid: str, nameList: list[str]):
+        if self.editor.onFileIdReceived(uuid):
+            self.editorBar.onNameListReceived(nameList)
 
     @pyqtSlot(str)
     def onFileRemoved(self, uuid: str):
-        self.editor.onFileRemoved(uuid)
+        if self.editor.onFileRemoved(uuid):
+            self.editorBar.clearDocPathLabel()
+            
+    @pyqtSlot(str, list)
+    def onFileMoved(self, uuid: str, nameList: list[str]):
+        if uuid == self.editor.fileUUID:
+            self.editorBar.onNameListReceived(nameList)
+        
+    @pyqtSlot(str, list)
+    def onFileDoubleClicked(self, uuid: str, nameList: list[str]):
+        if self.editor.onFileIdReceived(uuid):
+            self.editorBar.onNameListReceived(nameList)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorViewSize = e.size()

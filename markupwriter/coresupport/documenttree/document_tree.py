@@ -33,8 +33,9 @@ import markupwriter.coresupport.documenttree as dt
 
 
 class DocumentTree(QTreeWidget):
-    fileAdded = pyqtSignal(str)
+    fileAdded = pyqtSignal(str, list)
     fileRemoved = pyqtSignal(str)
+    fileMoved = pyqtSignal(str, list)
     fileDoubleClicked = pyqtSignal(str, list)
 
     def __init__(self, parent: QWidget):
@@ -71,7 +72,8 @@ class DocumentTree(QTreeWidget):
             self.setCurrentItem(widget.item)
 
         if widget.hasFlag(ITEM_FLAG.file):
-            self.fileAdded.emit(widget.UUID())
+            nameList = self.getParentNameList(widget.item)
+            self.fileAdded.emit(widget.UUID(), nameList)
 
     def remove(self, item: QTreeWidgetItem, parent: QTreeWidgetItem | None):
         for i in range(item.childCount() - 1, -1, -1):
@@ -116,6 +118,11 @@ class DocumentTree(QTreeWidget):
 
         self.setWidgetList(widgetList)
         self.setCurrentItem(item)
+        
+        widget: BaseTreeItem = self.itemWidget(item, 0)
+        if widget.hasFlag(ITEM_FLAG.file):
+            nameList = self.getParentNameList(item)
+            self.fileMoved.emit(widget.UUID(), nameList)
 
     def insertAt(
         self, item: QTreeWidgetItem, target: QTreeWidgetItem | None, targetIndex: int
@@ -177,6 +184,15 @@ class DocumentTree(QTreeWidget):
             if isinstance(widget, TrashFolderItem):
                 return item
         return None
+    
+    def getParentNameList(self, item: QTreeWidgetItem) -> list[str]:
+        nameList: list[str] = list()
+        iTemp = item
+        while iTemp is not None:
+            wTemp: BaseTreeItem = self.itemWidget(iTemp, 0)
+            nameList.insert(0, wTemp.title)
+            iTemp = iTemp.parent()
+        return nameList
 
     def dragEnterEvent(self, e: QDragEnterEvent) -> None:
         self.helper.onDragEnterEvent(super(), e)

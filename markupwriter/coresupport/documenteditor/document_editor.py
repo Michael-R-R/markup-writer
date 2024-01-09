@@ -32,7 +32,7 @@ class DocumentEditor(QPlainTextEdit):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
-        self.currUUID = ""
+        self.fileUUID = ""
         self.plainDocument = PlainDocument(self)
 
         self.setDocument(self.plainDocument)
@@ -41,20 +41,24 @@ class DocumentEditor(QPlainTextEdit):
         self.setTabStopDistance(20.0)
         self.updateViewportMargins()
 
-    def onFileDoubleClicked(self, uuid: str):
-        if self.currUUID == uuid:
-            return
+    def onFileIdReceived(self, uuid: str) -> bool:
+        if self.fileUUID == uuid:
+            return False
 
-        self._writeCurrentDoc()  # write old file
-        self.currUUID = uuid
-        self._readCurrentDoc()  # read new file
+        self._writeCurrentFile()  # write old file
+        self.fileUUID = uuid
+        self._readCurrentFile()  # read new file
+        
+        return True
 
-    def onFileRemoved(self, uuid: str):
-        if self.currUUID != uuid:
-            return
+    def onFileRemoved(self, uuid: str) -> bool:
+        if self.fileUUID != uuid:
+            return False
 
-        self.currUUID = ""
+        self.fileUUID = ""
         self.plainDocument.clear()
+        
+        return True
         
     def updateViewportMargins(self):
         mSize = QGuiApplication.primaryScreen().size()
@@ -72,22 +76,22 @@ class DocumentEditor(QPlainTextEdit):
 
         self.setViewportMargins(wW, wH, wW, wH)
 
-    def _writeCurrentDoc(self):
-        if self.currUUID == "":
+    def _writeCurrentFile(self):
+        if self.fileUUID == "":
             return
         path = AppConfig.projectContentPath()
         if path is None:
             return
-        path += self.currUUID
+        path += self.fileUUID
         File.write(path, self.toPlainText())
 
-    def _readCurrentDoc(self):
-        if self.currUUID == "":
+    def _readCurrentFile(self):
+        if self.fileUUID == "":
             return
         path = AppConfig.projectContentPath()
         if path is None:
             return
-        path += self.currUUID
+        path += self.fileUUID
         content = File.read(path)
         self.setPlainText(content)
 
@@ -96,7 +100,7 @@ class DocumentEditor(QPlainTextEdit):
         super().resizeEvent(e)
 
     def closeEvent(self, e: QCloseEvent | None) -> None:
-        self._writeCurrentDoc()
+        self._writeCurrentFile()
 
         super().closeEvent(e)
 

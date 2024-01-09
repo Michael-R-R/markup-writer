@@ -42,5 +42,7 @@ class SignalManager(object):
         # --- Tree --- #
         treeView = window.mainWidget.treeView
         tree = treeView.tree
-        tree.fileDoubleClicked.connect(editorview.onFileDoubleClicked)
+        tree.fileAdded.connect(editorview.onFileAdded)
         tree.fileRemoved.connect(editorview.onFileRemoved)
+        tree.fileMoved.connect(editorview.onFileMoved)
+        tree.fileDoubleClicked.connect(editorview.onFileDoubleClicked)
