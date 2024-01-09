@@ -64,14 +64,6 @@ class CentralWidget(QWidget):
         self.setContentsMargins(0, 0, 0, 0)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
-        self.setupConnections()
-
-    def setupConnections(self):
-        # --- Tree --- #
-        tree = self.treeView.tree
-        tree.fileDoubleClicked.connect(self.editorView.onFileDoubleClicked)
-        tree.fileRemoved.connect(self.editorView.onFileRemoved)
-
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << self.treeView
         sOut << self.editorView

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
+    pyqtSlot,
     QDataStream,
 )
 
@@ -42,10 +43,12 @@ class DocumentEditorView(QWidget):
         
         self.setStyleSheet(Style.EDITOR_VIEW)
 
+    @pyqtSlot(str, list)
     def onFileDoubleClicked(self, uuid: str, paths: list[str]):
         self.editorBar.onFileDoubleClicked(paths)
         self.editor.onFileDoubleClicked(uuid)
 
+    @pyqtSlot(str)
     def onFileRemoved(self, uuid: str):
         self.editor.onFileRemoved(uuid)
 

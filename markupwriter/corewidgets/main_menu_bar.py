@@ -10,6 +10,7 @@ from markupwriter.menus.mainmenubar import (
     EditMainMenu,
 )
 
+
 class MainMenuBar(QMenuBar):
     def __init__(self, parent: QWidget):
         super().__init__(parent)

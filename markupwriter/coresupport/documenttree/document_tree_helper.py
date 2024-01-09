@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
+    pyqtSlot,
     QObject,
     QPoint,
 )
@@ -88,6 +89,7 @@ class DocumentTreeHelper(QObject):
             self._tree.clearSelection()
             self._tree.setCurrentItem(None)
 
+    @pyqtSlot(QTreeWidgetItem, int)
     def onItemDoubleClick(self, item: QTreeWidgetItem, col: int):
         paths: list[str] = list()
         iTemp = item
@@ -100,6 +102,7 @@ class DocumentTreeHelper(QObject):
         if widget.hasFlag(ITEM_FLAG.file):
             self._tree.fileDoubleClicked.emit(widget.UUID(), paths)
 
+    @pyqtSlot(QPoint)
     def onContextMenuRequest(self, pos: QPoint):
         item = self._tree.itemAt(pos)
         widget: BaseTreeItem = self._tree.itemWidget(item, 0)
@@ -116,9 +119,11 @@ class DocumentTreeHelper(QObject):
             args = [inTrash, isMutable]
             self.itemContextMenu.onShowMenu(pos, args)
 
+    @pyqtSlot(BaseTreeItem)
     def onItemCreated(self, item: BaseTreeItem):
         self._tree.add(item)
 
+    @pyqtSlot()
     def onToggleActive(self):
         item = self._tree.currentItem()
         if item is None:
@@ -127,6 +132,7 @@ class DocumentTreeHelper(QObject):
         widget: BaseTreeItem = self._tree.itemWidget(item, 0)
         widget.toggleActive()
 
+    @pyqtSlot()
     def onRename(self):
         item = self._tree.currentItem()
         if item is None:
@@ -139,6 +145,7 @@ class DocumentTreeHelper(QObject):
 
         widget.title = text
 
+    @pyqtSlot()
     def onMoveToTrash(self):
         item = self._tree.currentItem()
         if item is None:
@@ -153,12 +160,14 @@ class DocumentTreeHelper(QObject):
 
         self._tree.moveTo(item, trash)
 
+    @pyqtSlot()
     def onRecover(self):
         item = self._tree.currentItem()
         if item is None:
             return
         self._tree.moveTo(item, None)
 
+    @pyqtSlot()
     def onEmptyTrash(self):
         item = self._tree.currentItem()
         if item is None:

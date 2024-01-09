@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
+    pyqtSlot,
     QDataStream,
 )
 
@@ -30,6 +31,10 @@ from markupwriter.coresupport.documenttree import (
     DocumentTree,
 )
 
+from markupwriter.coresupport.documenttree.treeitem import (
+    BaseTreeItem,
+)
+
 
 class DocumentTreeView(QWidget):
     def __init__(self, parent: QWidget):
@@ -37,7 +42,6 @@ class DocumentTreeView(QWidget):
 
         self.treeBar = DocumentTreeBar(self)
         self.tree = DocumentTree(self)
-        self.setupConnections()
 
         vLayout = QVBoxLayout(self)
         vLayout.setContentsMargins(0, 0, 0, 0)
@@ -46,27 +50,29 @@ class DocumentTreeView(QWidget):
         vLayout.addWidget(self.tree)
 
         self.setStyleSheet(Style.TREE_VIEW)
+        
+    @pyqtSlot(BaseTreeItem)
+    def onItemCreated(self, item: BaseTreeItem):
+        self.tree.add(item)
+        
+    @pyqtSlot()
+    def onNavUpClicked(self):
+        self.tree.translate(-1)
+    
+    @pyqtSlot()
+    def onNavDownClicked(self):
+        self.tree.translate(1)
 
-    def setupConnections(self):
-        # --- Tree bar --- #
-        self.treeBar.addItemAction.itemCreated.connect(
-            lambda item: self.tree.add(item, True)
-        )
-        self.treeBar.navUpAction.triggered.connect(lambda: self.tree.translate(-1))
-        self.treeBar.navDownAction.triggered.connect(lambda: self.tree.translate(1))
-
-        # --- Tree --- #
-        self.tree.fileAdded.connect(self._onFileAdded)
-        self.tree.fileRemoved.connect(self._onFileRemoved)
-
-    def _onFileAdded(self, uuid: str):
+    @pyqtSlot(str)
+    def onFileAdded(self, uuid: str):
         path = AppConfig.projectContentPath()
         if path is None:
             return
         path += uuid
         File.write(path, "")
 
-    def _onFileRemoved(self, uuid: str):
+    @pyqtSlot(str)
+    def onFileRemoved(self, uuid: str):
         path = AppConfig.projectContentPath()
         if path is None:
             return

@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    pyqtSignal,
+    pyqtSlot,
+)
+
 from PyQt6.QtGui import (
     QCloseEvent,
     QResizeEvent,
@@ -30,12 +35,16 @@ from .central_widget import CentralWidget
 
 
 class MainWindow(QMainWindow):
+    setupTriggered = pyqtSignal()
+    
     def __init__(self) -> None:
         super().__init__()
 
-        widget = CentralWidget(self)
-
-        ProjectHandler.setActionStates(widget, False)
+        # TODO read in file for testing purposes
+        widget: CentralWidget = Serialize.read(CentralWidget, "/home/michael/ssd1/writing/markup_writer/demo/demo.mwf")
+        ProjectHandler.setActionStates(widget, True)
+        AppConfig.projectDir = "/home/michael/ssd1/writing/markup_writer/demo/"
+        AppConfig.projectName = "demo.mwf"
 
         self.setup(widget)
 
@@ -45,25 +54,16 @@ class MainWindow(QMainWindow):
         self.setMenuBar(widget.menuBar)
         self.setCentralWidget(widget)
         self.setStatusBar(widget.statusBar)
-        self.setupConnections()
 
         self.setWindowTitle(AppConfig.fullWindowTitle())
         self.setContentsMargins(0, 0, 0, 0)
         self.resize(AppConfig.mainWindowSize)
+        
+        self.setupTriggered.emit()
 
-    def setupConnections(self):
-        # --- File menu --- #
-        menuBar = self.mainWidget.menuBar
-        fileMenu = menuBar.fileMenu
-        fileMenu.newAction.triggered.connect(self._onNewProject)
-        fileMenu.openAction.triggered.connect(self._onOpenProject)
-        fileMenu.saveAction.triggered.connect(self._onSaveProject)
-        fileMenu.saveAsAction.triggered.connect(self._onSaveAsProject)
-        fileMenu.closeAction.triggered.connect(self._onCloseProject)
-        fileMenu.exitAction.triggered.connect(self._onExit)
-
-    def _onNewProject(self):
-        if not self._onCloseProject():
+    @pyqtSlot()
+    def onNewProject(self):
+        if not self.onCloseProject():
             return
 
         widget: CentralWidget = ProjectHandler.createProject(self)
@@ -72,8 +72,9 @@ class MainWindow(QMainWindow):
 
         self.setup(widget)
 
-    def _onOpenProject(self):
-        if not self._onCloseProject():
+    @pyqtSlot()
+    def onOpenProject(self):
+        if not self.onCloseProject():
             return
 
         widget: CentralWidget = ProjectHandler.openProject(self)
@@ -82,15 +83,18 @@ class MainWindow(QMainWindow):
 
         self.setup(widget)
 
-    def _onSaveProject(self):
+    @pyqtSlot()
+    def onSaveProject(self):
         if Serialize.write(AppConfig.projectFilePath(), self.mainWidget):
             self.statusBar().showMessage("Project saved", 2000)
 
-    def _onSaveAsProject(self):
+    @pyqtSlot()
+    def onSaveAsProject(self):
         # TODO implement
         raise NotImplementedError()
 
-    def _onCloseProject(self) -> bool:
+    @pyqtSlot()
+    def onCloseProject(self) -> bool:
         if not AppConfig.hasActiveProject():
             return True
 
@@ -105,7 +109,8 @@ class MainWindow(QMainWindow):
 
         return False
 
-    def _onExit(self):
+    @pyqtSlot()
+    def onExit(self):
         if not YesNoDialog.run("Quit application?"):
             return
 
