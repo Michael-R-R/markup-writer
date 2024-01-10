@@ -1,30 +1,24 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    pyqtSlot,
-)
-
 from PyQt6.QtWidgets import (
     QApplication,
 )
 
-from markupwriter.config import (
+from markupwriter.common.config import (
     AppConfig,
     HighlighterConfig,
     HotkeyConfig,
     SerializeConfig,
 )
 
-from markupwriter.coresupport.application import (
-    SignalManager,
+from markupwriter.controller.core import (
+    MainWindowController,
 )
-
-from .main_window import MainWindow
 
 
 class Application(object):
     status = -1
-    window: MainWindow = None
+    controller: MainWindowController = None
 
     def start():
         AppConfig.init()
@@ -36,16 +30,11 @@ class Application(object):
         app = QApplication(argv)
         app.setApplicationName(AppConfig.APP_NAME)
 
-        Application.window = MainWindow()
-        Application.window.show()
-        Application._onSetupTriggered()
-        Application.window.setupTriggered.connect(Application._onSetupTriggered)
+        Application.controller = MainWindowController(None)
+        Application.controller.setup()
+        Application.controller.show()
 
         Application.status = app.exec()
 
     def close():
         SerializeConfig.write()
-
-    @pyqtSlot()
-    def _onSetupTriggered():
-        SignalManager.setup(Application.window)

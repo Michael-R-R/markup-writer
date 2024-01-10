@@ -4,7 +4,7 @@ from PyQt6.QtCore import (
     QDir,
 )
 
-from markupwriter.util import (
+from markupwriter.common.util import (
     File,
 )
 

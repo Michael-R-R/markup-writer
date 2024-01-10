@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from markupwriter.coresupport.documenttree.treeitem import (
+from markupwriter.support.doctree.item import (
     BaseTreeItem,
 
     ChapterFileItem,
