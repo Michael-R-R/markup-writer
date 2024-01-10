@@ -10,6 +10,7 @@ from PyQt6.QtGui import (
 
 from .base_config import BaseConfig
 
+
 class HighlighterConfig(BaseConfig):
     INI_PATH: str = None
     refTagCol: QColor = None
@@ -34,7 +35,7 @@ class HighlighterConfig(BaseConfig):
         sOut << HighlighterConfig.commentCol
         sOut << HighlighterConfig.keywordCol
         return sOut
-    
+
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         sIn >> HighlighterConfig.refTagCol
         sIn >> HighlighterConfig.aliasTagCol

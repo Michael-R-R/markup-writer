@@ -1,5 +1,1 @@
-#!/usr/bin/python
-
-from .add_item_menu import (
-    AddItemMenu,
-)
+from .add_item_menu import AddItemMenu

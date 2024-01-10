@@ -16,10 +16,11 @@ from PyQt6.QtWidgets import (
 
 import markupwriter.gui.actions.doctree as dt
 
+
 class DocumentTreeView(QWidget):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
-        
+
         toolbar = QToolBar(self)
         self.navUpAction = dt.ItemNavUpAction(toolbar)
         self.navDownAction = dt.ItemNavDownAction(toolbar)
@@ -41,12 +42,12 @@ class DocumentTreeView(QWidget):
         treewidget.setHeaderHidden(True)
         treewidget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.treewidget = treewidget
-        
+
         hLayout = QHBoxLayout()
         hLayout.addWidget(QLabel("<b>Project Content<b>", self))
         hLayout.addStretch()
         hLayout.addWidget(self.toolbar)
-        
+
         vLayout = QVBoxLayout(self)
         vLayout.addLayout(hLayout)
         vLayout.addWidget(self.treewidget)

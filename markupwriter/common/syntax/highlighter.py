@@ -14,7 +14,7 @@ from PyQt6.QtGui import (
     QFont,
 )
 
-from markupwriter.common.config import (
+from markupwriter.config import (
     HighlighterConfig,
 )
 

@@ -12,13 +12,14 @@ from markupwriter.view.core import (
     MainMenuBarView,
 )
 
+
 class MainMenuBarController(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
-        
+
         self.model = MainMenuBar(self)
         self.view = MainMenuBarView(None)
-        
+
     def setup(self):
         self.view.addMenu(self.model.filemenu)
         self.view.addMenu(self.model.editmenu)

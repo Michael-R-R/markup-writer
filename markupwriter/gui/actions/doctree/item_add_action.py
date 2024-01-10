@@ -22,6 +22,7 @@ from markupwriter.gui.menus.doctree import (
     AddItemMenu,
 )
 
+
 class ItemAddAction(QAction):
     itemCreated = pyqtSignal(BaseTreeItem)
 

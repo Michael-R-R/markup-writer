@@ -8,7 +8,7 @@ from PyQt6.QtCore import (
 class DocumentEditor(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
-        
+
         self.currDocPath = ""
         self.currDocUUID = ""
         self.document = None

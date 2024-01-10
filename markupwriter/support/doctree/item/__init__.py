@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 from .base_tree_item import (
     ITEM_FLAG,
     BaseTreeItem,

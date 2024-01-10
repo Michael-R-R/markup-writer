@@ -5,9 +5,6 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from PyQt6.QtGui import (
-    QAction,
-)
 
 class EditMainMenu(QMenu):
     def __init__(self, parent: QWidget | None):

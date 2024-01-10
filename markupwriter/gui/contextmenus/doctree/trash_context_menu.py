@@ -12,9 +12,10 @@ from markupwriter.common.provider import (
     Icon,
 )
 
-from markupwriter.contextmenus import (
+from markupwriter.gui.contextmenus import (
     BaseContextMenu,
 )
+
 
 class TrashContextMenu(BaseContextMenu):
     def __init__(self, parent: QObject | None) -> None:

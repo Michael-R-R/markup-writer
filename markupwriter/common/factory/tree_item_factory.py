@@ -2,13 +2,11 @@
 
 from markupwriter.support.doctree.item import (
     BaseTreeItem,
-
     ChapterFileItem,
     MiscFileItem,
     SceneFileItem,
     SectionFileItem,
     TitleFileItem,
-
     CharsFolderItem,
     LocFolderItem,
     MiscFolderItem,
@@ -18,6 +16,7 @@ from markupwriter.support.doctree.item import (
     TimelineFolderItem,
     TrashFolderItem,
 )
+
 
 class TreeItemFactory(object):
     def make(type: str) -> BaseTreeItem:

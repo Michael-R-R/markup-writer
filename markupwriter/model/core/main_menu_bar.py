@@ -9,9 +9,10 @@ from markupwriter.gui.menus.mainmenubar import (
     EditMainMenu,
 )
 
+
 class MainMenuBar(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
-        
+
         self.filemenu = FileMainMenu(None)
         self.editmenu = EditMainMenu(None)

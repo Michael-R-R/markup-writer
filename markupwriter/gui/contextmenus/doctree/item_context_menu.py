@@ -12,13 +12,14 @@ from markupwriter.common.provider import (
     Icon,
 )
 
-from markupwriter.menus.documenttree import (
+from markupwriter.gui.menus.doctree import (
     AddItemMenu,
 )
 
-from markupwriter.contextmenus import (
+from markupwriter.gui.contextmenus import (
     BaseContextMenu,
 )
+
 
 class ItemContextMenu(BaseContextMenu):
     def __init__(self, parent: QObject | None) -> None:
@@ -40,7 +41,7 @@ class ItemContextMenu(BaseContextMenu):
     def preprocess(self, args: list[object] | None):
         inTrash: bool = args[0]
         isMutable: bool = args[1]
-        
+
         self.recoverAction.setEnabled(inTrash)
         self.renameAction.setEnabled(isMutable)
         self.toTrashAction.setEnabled((not inTrash) and isMutable)

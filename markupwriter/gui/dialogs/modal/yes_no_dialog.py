@@ -4,12 +4,14 @@ from PyQt6.QtWidgets import (
     QMessageBox,
 )
 
+
 class YesNoDialog(object):
     def run(text: str) -> bool:
         box = QMessageBox()
         box.setText(text)
-        box.setStandardButtons(QMessageBox.StandardButton.No | 
-                               QMessageBox.StandardButton.Yes)
+        box.setStandardButtons(
+            QMessageBox.StandardButton.No | QMessageBox.StandardButton.Yes
+        )
         box.setDefaultButton(QMessageBox.StandardButton.No)
         match box.exec():
             case QMessageBox.StandardButton.No:

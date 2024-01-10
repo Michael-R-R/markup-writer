@@ -9,7 +9,7 @@ from PyQt6.QtGui import (
     QAction,
 )
 
-from markupwriter.common.config import (
+from markupwriter.config import (
     HotkeyConfig,
 )
 
@@ -35,7 +35,7 @@ class FileMainMenu(QMenu):
         self.addAction(self.closeAction)
         self.addSeparator()
         self.addAction(self.exitAction)
-        
+
         self.openAction.setShortcut(HotkeyConfig.openProject)
         self.saveAction.setShortcut(HotkeyConfig.saveProject)
         self.saveAsAction.setShortcut(HotkeyConfig.saveAsProject)

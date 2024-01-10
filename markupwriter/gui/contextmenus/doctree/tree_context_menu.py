@@ -4,13 +4,14 @@ from PyQt6.QtCore import (
     QObject,
 )
 
-from markupwriter.menus.documenttree import (
+from markupwriter.gui.menus.doctree import (
     AddItemMenu,
 )
 
-from markupwriter.contextmenus import (
+from markupwriter.gui.contextmenus import (
     BaseContextMenu,
 )
+
 
 class TreeContextMenu(BaseContextMenu):
     def __init__(self, parent: QObject | None):

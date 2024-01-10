@@ -11,10 +11,11 @@ from markupwriter.controller.corewidgets import (
     DocumentPreviewController,
 )
 
+
 class CentralWidget(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
-        
+
         self.docTreeController = DocumentTreeController(self)
         self.docEditorController = DocumentEditorController(self)
         self.consoleController = ConsoleController(self)

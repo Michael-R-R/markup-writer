@@ -5,6 +5,7 @@ from .app_config import AppConfig
 from .highlighter_config import HighlighterConfig
 from .hotkey_config import HotkeyConfig
 
+
 class SerializeConfig(object):
     def read():
         Serialize.read(AppConfig, AppConfig.INI_PATH)

@@ -6,10 +6,11 @@ from typing import (
 )
 
 from PyQt6.QtCore import (
-    QDataStream, 
-    QFile, 
+    QDataStream,
+    QFile,
     QIODevice,
 )
+
 
 class Serialize(object):
     T = TypeVar("T")
@@ -22,19 +23,19 @@ class Serialize(object):
         inFile = QFile(path)
         if not inFile.open(QIODevice.OpenModeFlag.ReadOnly):
             return None
-        
+
         inStream = QDataStream(inFile)
 
         # Check if the format is supported
         format = inStream.readInt()
         if format != Serialize._masterFormat:
             return None
-        
+
         # Check if the version is supported
         version = inStream.readInt()
         if version != Serialize._masterVersion:
             return None
-        
+
         inStream.setVersion(Serialize._qtVersion)
 
         obj = type()
@@ -48,7 +49,7 @@ class Serialize(object):
         outFile = QFile(path)
         if not outFile.open(QIODevice.OpenModeFlag.WriteOnly):
             return False
-        
+
         outStream = QDataStream(outFile)
         outStream.writeInt(Serialize._masterFormat)
         outStream.writeInt(Serialize._masterVersion)

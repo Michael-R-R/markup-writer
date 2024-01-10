@@ -6,16 +6,15 @@ from PyQt6.QtWidgets import (
     QLineEdit,
 )
 
+
 class StrDialog(object):
     def run(title: str, label: str, parent: QWidget | None) -> str | None:
-        result = QInputDialog.getText(parent,
-                                      title,
-                                      "Text",
-                                      QLineEdit.EchoMode.Normal,
-                                      label)
+        result = QInputDialog.getText(
+            parent, title, "Text", QLineEdit.EchoMode.Normal, label
+        )
         if not result[1]:
             return None
         if result[0] == "":
             return None
-        
+
         return result[0]

@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QApplication,
 )
 
-from markupwriter.common.config import (
+from markupwriter.config import (
     AppConfig,
     HighlighterConfig,
     HotkeyConfig,

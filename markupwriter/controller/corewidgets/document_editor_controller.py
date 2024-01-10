@@ -16,6 +16,6 @@ from markupwriter.view.corewidgets import (
 class DocumentEditorController(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
-        
+
         self.model = DocumentEditor(self)
         self.view = DocumentEditorView(None)

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+
 class Hash(object):
     # https://en.wikipedia.org/wiki/Jenkins_hash_function
     def compute(text: str) -> int:

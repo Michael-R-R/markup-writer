@@ -21,7 +21,7 @@ from PyQt6.QtWidgets import (
     QLabel,
 )
 
-from markupwriter.common.config import (
+from markupwriter.config import (
     AppConfig,
 )
 

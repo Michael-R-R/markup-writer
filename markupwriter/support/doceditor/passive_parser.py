@@ -7,6 +7,7 @@ from PyQt6.QtCore import (
     pyqtSignal,
 )
 
+
 class PassiveParser(QObject):
     tokenAdded = pyqtSignal(str, str)
     tokenRemoved = pyqtSignal(str, str)
@@ -21,8 +22,8 @@ class PassiveParser(QObject):
         index = 0
         while index > -1:
             index = text.find("\n")
-            line = text[:index+1].strip()
-            text = text[index+1:]
+            line = text[: index + 1].strip()
+            text = text[index + 1 :]
             if line == "":
                 continue
 
