@@ -18,3 +18,6 @@ class MainStatusBarController(QObject):
         
         self.model = MainStatusBar(self)
         self.view = MainStatusBarView(None)
+
+    def setup(self):
+        pass

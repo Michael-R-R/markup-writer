@@ -23,5 +23,5 @@ class CentralWidgetView(QWidget):
         self.hSplitter = QSplitter(Qt.Orientation.Horizontal)
         self.vSplitter = QSplitter(Qt.Orientation.Vertical)
 
-        self.hSplitter.addWidget(self.vSplitter)
-        self.vLayout.addWidget(self.hSplitter)
+        self.vSplitter.addWidget(self.hSplitter)
+        self.vLayout.addWidget(self.vSplitter)

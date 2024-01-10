@@ -20,6 +20,10 @@ class MainWindowController(QObject):
         self.view = MainWindowView(None)
         
     def setup(self):
+        self.model.menuBarController.setup()
+        self.model.centralController.setup()
+        self.model.statusBarController.setup()
+        
         self.view.setMenuBar(self.model.menuBarController.view)
         self.view.setCentralWidget(self.model.centralController.view)
         self.view.setStatusBar(self.model.statusBarController.view)

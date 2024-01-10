@@ -22,7 +22,7 @@ class CentralWidgetController(QObject):
 
     def setup(self):
         self.view.hSplitter.insertWidget(0, self.model.docTreeController.view)
-        self.view.vSplitter.addWidget(self.model.docEditorController.view)
-        self.view.vSplitter.addWidget(self.model.consoleController.view)
+        self.view.hSplitter.addWidget(self.model.docEditorController.view)
         self.view.hSplitter.addWidget(self.model.docPreviewController.view)
+        self.view.vSplitter.addWidget(self.model.consoleController.view)
         
