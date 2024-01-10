@@ -4,11 +4,11 @@ from PyQt6.QtCore import (
     QObject,
 )
 
-from markupwriter.model.core import (
+from markupwriter.mvc.model.core import (
     CentralWidget,
 )
 
-from markupwriter.view.core import (
+from markupwriter.mvc.view.core import (
     CentralWidgetView,
 )
 

@@ -4,7 +4,7 @@ from PyQt6.QtCore import (
     QObject,
 )
 
-import markupwriter.controller.core as core
+import markupwriter.mvc.controller.core as core
 
 
 class MainWindow(QObject):

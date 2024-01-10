@@ -11,7 +11,7 @@ from markupwriter.config import (
     SerializeConfig,
 )
 
-from markupwriter.controller.core import (
+from markupwriter.mvc.controller.core import (
     MainWindowController,
 )
 

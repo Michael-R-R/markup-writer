@@ -4,7 +4,7 @@ from PyQt6.QtCore import (
     QObject,
 )
 
-from markupwriter.controller.corewidgets import (
+from markupwriter.mvc.controller.corewidgets import (
     DocumentTreeController,
     DocumentEditorController,
     ConsoleController,
