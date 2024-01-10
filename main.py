@@ -10,7 +10,7 @@ except Exception:
     print("ERROR::main::cannot import PyQt6 dependecies")
     sys.exit(1)
 
-from markupwriter.core import (
+from markupwriter.application import (
     Application,
 )
 
