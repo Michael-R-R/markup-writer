@@ -6,19 +6,18 @@ from PyQt6.QtGui import (
 
 from PyQt6.QtWidgets import (
     QWidget,
-    QTextBrowser,
     QVBoxLayout,
 )
 
 from markupwriter.config import AppConfig
+import markupwriter.widgets as mw
 
 
 class DocumentPreviewView(QWidget):
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
         
-        textbrowser = QTextBrowser(self)
-        self.textbrowser = textbrowser
+        self.textbrowser = mw.DocumentPreviewBrowser(self)
         
         vLayout = QVBoxLayout(self)
         vLayout.addWidget(self.textbrowser)

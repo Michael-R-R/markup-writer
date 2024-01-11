@@ -10,15 +10,15 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
-import markupwriter.widgets as w
+import markupwriter.widgets as mw
 
 
 class DocumentTreeView(QWidget):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
-        self.treebar = w.DocumentTreeBarWidget(self)
-        self.treewidget = w.DocumentTreeWidget(self)
+        self.treebar = mw.DocumentTreeBarWidget(self)
+        self.treewidget = mw.DocumentTreeWidget(self)
 
         vLayout = QVBoxLayout(self)
         vLayout.addWidget(self.treebar)

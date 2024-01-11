@@ -28,38 +28,38 @@ class DocumentTreeController(QObject):
 
         self.model = DocumentTree(self)
         self.view = DocumentTreeView(None)
-        
+
     def setup(self):
         treebar = self.view.treebar
         treebar.addItemAction.itemCreated.connect(self._onItemCreated)
         treebar.navUpAction.triggered.connect(self._onItemNavUp)
         treebar.navDownAction.triggered.connect(self._onItemNavDown)
-        
+
         tcm = self.view.treewidget.treeContextMenu
         tcm.addItemMenu.itemCreated.connect(self._onItemCreated)
-        
+
         icm = self.view.treewidget.itemContextMenu
         icm.addItemMenu.itemCreated.connect(self._onItemCreated)
         icm.toggleActiveAction.triggered.connect(self._onItemToggleActive)
         icm.renameAction.triggered.connect(self._onItemRename)
         icm.toTrashAction.triggered.connect(self._onItemMoveToTrash)
         icm.recoverAction.triggered.connect(self._onItemRecover)
-        
+
         trcm = self.view.treewidget.trashContextMenu
         trcm.emptyAction.triggered.connect(self._onEmptyTrash)
-        
+
     @pyqtSlot()
     def _onItemNavUp(self):
         self.view.treewidget.translate(-1)
-    
+
     @pyqtSlot()
     def _onItemNavDown(self):
         self.view.treewidget.translate(1)
-        
+
     @pyqtSlot(dti.BaseTreeItem)
     def _onItemCreated(self, item: dti.BaseTreeItem):
         self.view.treewidget.add(item)
-        
+
     @pyqtSlot()
     def _onItemToggleActive(self):
         tree = self.view.treewidget
@@ -69,7 +69,7 @@ class DocumentTreeController(QObject):
 
         widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
         widget.toggleActive()
-        
+
     @pyqtSlot()
     def _onItemRename(self):
         tree = self.view.treewidget
@@ -83,7 +83,7 @@ class DocumentTreeController(QObject):
             return
 
         widget.title = text
-        
+
     @pyqtSlot()
     def _onItemMoveToTrash(self):
         tree = self.view.treewidget
@@ -99,16 +99,16 @@ class DocumentTreeController(QObject):
             return
 
         tree.moveTo(item, trash)
-        
+
     @pyqtSlot()
     def _onItemRecover(self):
         tree = self.view.treewidget
         item = tree.currentItem()
         if item is None:
             return
-        
+
         tree.moveTo(item, None)
-        
+
     @pyqtSlot()
     def _onEmptyTrash(self):
         tree = self.view.treewidget
@@ -121,9 +121,9 @@ class DocumentTreeController(QObject):
 
         for i in range(item.childCount() - 1, -1, -1):
             tree.remove(item.child(i), item)
-        
+
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         return sout
-    
+
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
         return sin

@@ -2,36 +2,28 @@
 
 from PyQt6.QtGui import (
     QResizeEvent,
-    QTextOption,
 )
 
 from PyQt6.QtWidgets import (
     QWidget,
     QHBoxLayout,
     QVBoxLayout,
-    QLabel,
-    QPlainTextEdit,
-    QFrame,
 )
 
 from markupwriter.config import AppConfig
+import markupwriter.widgets as mw
 
 
 class DocumentEditorView(QWidget):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
-        self.docPathLabel = QLabel("", self)
-        
-        textEdit = QPlainTextEdit(self)
-        textEdit.setFrameShape(QFrame.Shape.NoFrame)
-        textEdit.setWordWrapMode(QTextOption.WrapMode.WordWrap)
-        textEdit.setTabStopDistance(20.0)
-        self.textEdit = textEdit
+        self.editorBar = mw.DocumentEditorBar(self)
+        self.textEdit = mw.DocumentTextEdit(self)
         
         hLayout = QHBoxLayout()
         hLayout.addStretch()
-        hLayout.addWidget(self.docPathLabel)
+        hLayout.addWidget(self.editorBar)
         hLayout.addStretch()
         self.hLayout = hLayout
         
