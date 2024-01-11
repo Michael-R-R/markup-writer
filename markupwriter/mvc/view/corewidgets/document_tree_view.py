@@ -1,19 +1,12 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    Qt,
-)
-
 from PyQt6.QtGui import (
     QResizeEvent,
 )
 
 from PyQt6.QtWidgets import (
     QWidget,
-    QHBoxLayout,
     QVBoxLayout,
-    QToolBar,
-    QLabel,
 )
 
 from markupwriter.config import AppConfig
