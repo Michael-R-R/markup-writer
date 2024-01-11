@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     QObject,
+    QDataStream,
 )
 
 from markupwriter.mvc.model.corewidgets import (
@@ -19,3 +20,9 @@ class DocumentEditorController(QObject):
 
         self.model = DocumentEditor(self)
         self.view = DocumentEditorView(None)
+        
+    def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        return sout
+    
+    def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        return sin

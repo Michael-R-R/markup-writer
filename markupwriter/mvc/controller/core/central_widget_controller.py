@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     QObject,
+    QDataStream,
 )
 
 from markupwriter.mvc.model.core import (
@@ -48,3 +49,17 @@ class CentralWidgetController(QObject):
                 AppConfig.consoleSize.height(),
             ]
         )
+        
+    def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        sout << self.model.docTreeController
+        sout << self.model.docEditorController
+        sout << self.model.docPreviewController
+        sout << self.model.consoleController
+        return sout
+    
+    def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        sin >> self.model.docTreeController
+        sin >> self.model.docEditorController
+        sin >> self.model.docPreviewController
+        sin >> self.model.consoleController
+        return sin
