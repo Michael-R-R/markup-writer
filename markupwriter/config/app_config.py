@@ -16,10 +16,10 @@ class AppConfig(BaseConfig):
     projectName: str = None
     projectDir: str = None
     mainWindowSize: QSize = None
-    docTreeViewSize: QSize = None
-    docEditorViewSize: QSize = None
+    docTreeSize: QSize = None
+    docEditorSize: QSize = None
     docPreviewSize: QSize = None
-    terminalSize: QSize = None
+    consoleSize: QSize = None
 
     def init():
         AppConfig.INI_PATH = "./resources/configs/app.ini"
@@ -27,10 +27,10 @@ class AppConfig(BaseConfig):
         AppConfig.APP_EXTENSION = ".mwf"
         AppConfig.ICON_SIZE = QSize(18, 18)
         AppConfig.mainWindowSize = QSize(800, 600)
-        AppConfig.docTreeViewSize = QSize(100, 100)
-        AppConfig.docEditorViewSize = QSize(100, 100)
+        AppConfig.docTreeSize = QSize(100, 100)
+        AppConfig.docEditorSize = QSize(100, 100)
         AppConfig.docPreviewSize = QSize(100, 100)
-        AppConfig.terminalSize = QSize(100, 100)
+        AppConfig.consoleSize = QSize(100, 100)
 
     def reset():
         AppConfig.init()
@@ -53,16 +53,16 @@ class AppConfig(BaseConfig):
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << AppConfig.mainWindowSize
-        sOut << AppConfig.docTreeViewSize
-        sOut << AppConfig.docEditorViewSize
+        sOut << AppConfig.docTreeSize
+        sOut << AppConfig.docEditorSize
         sOut << AppConfig.docPreviewSize
-        sOut << AppConfig.terminalSize
+        sOut << AppConfig.consoleSize
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         sIn >> AppConfig.mainWindowSize
-        sIn >> AppConfig.docTreeViewSize
-        sIn >> AppConfig.docEditorViewSize
+        sIn >> AppConfig.docTreeSize
+        sIn >> AppConfig.docEditorSize
         sIn >> AppConfig.docPreviewSize
-        sIn >> AppConfig.terminalSize
+        sIn >> AppConfig.consoleSize
         return sIn

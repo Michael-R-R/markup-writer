@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from PyQt6.QtGui import (
+    QResizeEvent,
     QTextOption,
 )
 
@@ -12,6 +13,8 @@ from PyQt6.QtWidgets import (
     QPlainTextEdit,
     QFrame,
 )
+
+from markupwriter.config import AppConfig
 
 
 class DocumentEditorView(QWidget):
@@ -32,6 +35,11 @@ class DocumentEditorView(QWidget):
         hLayout.addStretch()
         self.hLayout = hLayout
         
-        self.vLayout = QVBoxLayout(self)
-        self.vLayout.addLayout(self.hLayout)
-        self.vLayout.addWidget(self.textEdit)
+        vLayout = QVBoxLayout(self)
+        vLayout.addLayout(self.hLayout)
+        vLayout.addWidget(self.textEdit)
+        self.vLayout = vLayout
+        
+    def resizeEvent(self, e: QResizeEvent | None) -> None:
+        AppConfig.docEditorSize = e.size()
+        return super().resizeEvent(e)

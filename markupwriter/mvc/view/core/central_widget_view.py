@@ -11,7 +11,6 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
 )
 
-
 class CentralWidgetView(QWidget):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
@@ -20,8 +19,10 @@ class CentralWidgetView(QWidget):
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         self.vLayout = QVBoxLayout(self)
-        self.hSplitter = QSplitter(Qt.Orientation.Horizontal)
-        self.vSplitter = QSplitter(Qt.Orientation.Vertical)
+        self.lhSplitter = QSplitter(Qt.Orientation.Horizontal)
+        self.rhSplitter = QSplitter(Qt.Orientation.Horizontal)
+        self.rvSplitter = QSplitter(Qt.Orientation.Vertical)
 
-        self.vSplitter.addWidget(self.hSplitter)
-        self.vLayout.addWidget(self.vSplitter)
+        self.lhSplitter.addWidget(self.rvSplitter)
+        self.rvSplitter.addWidget(self.rhSplitter)
+        self.vLayout.addWidget(self.lhSplitter)
