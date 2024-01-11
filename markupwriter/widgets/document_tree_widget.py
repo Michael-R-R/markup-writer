@@ -92,11 +92,11 @@ class DocumentTreeWidget(QTreeWidget):
         if parent is None:  # root index
             size = self.topLevelItemCount()
             index = self.indexFromItem(selected, 0).row()
-            self.insertAt(selected, parent, (index + direction) % size)
+            self.insertAt((index + direction) % size, selected, parent)
         else:  # child index
             size = parent.childCount()
             index = parent.indexOfChild(selected)
-            self.insertAt(selected, parent, (index + direction) % size)
+            self.insertAt((index + direction) % size, selected, parent)
 
     def moveTo(self, item: QTreeWidgetItem, target: QTreeWidgetItem | None):
         widgetList = self.takeOut(item)

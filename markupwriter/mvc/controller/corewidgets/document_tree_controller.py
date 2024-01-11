@@ -30,6 +30,11 @@ class DocumentTreeController(QObject):
         self.view = DocumentTreeView(None)
         
     def setup(self):
+        treebar = self.view.treebar
+        treebar.addItemAction.itemCreated.connect(self._onItemCreated)
+        treebar.navUpAction.triggered.connect(self._onItemNavUp)
+        treebar.navDownAction.triggered.connect(self._onItemNavDown)
+        
         tcm = self.view.treewidget.treeContextMenu
         tcm.addItemMenu.itemCreated.connect(self._onItemCreated)
         
@@ -42,6 +47,14 @@ class DocumentTreeController(QObject):
         
         trcm = self.view.treewidget.trashContextMenu
         trcm.emptyAction.triggered.connect(self._onEmptyTrash)
+        
+    @pyqtSlot()
+    def _onItemNavUp(self):
+        self.view.treewidget.translate(-1)
+    
+    @pyqtSlot()
+    def _onItemNavDown(self):
+        self.view.treewidget.translate(1)
         
     @pyqtSlot(dti.BaseTreeItem)
     def _onItemCreated(self, item: dti.BaseTreeItem):
