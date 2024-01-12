@@ -21,5 +21,4 @@ class MainMenuBarController(QObject):
         self.view = MainMenuBarView(None)
 
     def setup(self):
-        self.view.addMenu(self.model.filemenu)
-        self.view.addMenu(self.model.editmenu)
+        pass

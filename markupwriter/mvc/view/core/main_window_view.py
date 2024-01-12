@@ -12,6 +12,7 @@ from markupwriter.config import AppConfig
 class MainWindowView(QMainWindow):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
+        
         self.resize(AppConfig.mainWindowSize)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:

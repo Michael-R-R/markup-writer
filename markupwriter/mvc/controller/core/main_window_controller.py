@@ -12,6 +12,8 @@ from markupwriter.mvc.view.core import (
     MainWindowView,
 )
 
+from markupwriter.config import AppConfig
+
 
 class MainWindowController(QObject):
     def __init__(self, parent: QObject | None) -> None:
