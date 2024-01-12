@@ -125,3 +125,5 @@ class ProjectHandler(object):
         tree.add(LocFolderItem())
         tree.add(ObjFolderItem())
         tree.add(TrashFolderItem())
+        
+    # TODO complete class overhaul
