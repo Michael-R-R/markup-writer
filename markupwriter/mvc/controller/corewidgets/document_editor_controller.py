@@ -58,6 +58,13 @@ class DocumentEditorController(QObject):
     @pyqtSlot(str, list)
     def onFileDoubleClicked(self, uuid: str, path: list[str]):
         self.onFileAdded(uuid, path)
+        
+    @pyqtSlot(str, str, str)
+    def onFileRenamed(self, uuid: str, old: str, new: str):
+        if not self._isIdMatching(uuid):
+            return
+        self.model.currDocPath = self.model.currDocPath.replace(old, new)
+        self.view.setPathLabel(self.model.currDocPath)
     
     def _isIdMatching(self, uuid: str) -> bool:
         return self.model.currDocUUID == uuid

@@ -55,11 +55,13 @@ class CentralWidgetController(QObject):
         
         # --- Editor slots --- #
         editorController = self.model.docEditorController
-        tree = self.model.docTreeController.view.treewidget
+        treeController = self.model.docTreeController
+        tree = treeController.view.treewidget
         tree.fileAdded.connect(editorController.onFileAdded)
         tree.fileRemoved.connect(editorController.onFileRemoved)
         tree.fileMoved.connect(editorController.onFileMoved)
         tree.fileDoubleClicked.connect(editorController.onFileDoubleClicked)
+        treeController.fileRenamed.connect(editorController.onFileRenamed)
         
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController

@@ -4,6 +4,7 @@ from PyQt6.QtCore import (
     QObject,
     QDataStream,
     pyqtSlot,
+    pyqtSignal,
 )
 
 from PyQt6.QtWidgets import (
@@ -40,6 +41,8 @@ import markupwriter.support.doctree.item as dti
 
 
 class DocumentTreeController(QObject):
+    fileRenamed = pyqtSignal(str, str, str)
+    
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
 
@@ -146,7 +149,12 @@ class DocumentTreeController(QObject):
         if text is None:
             return
 
+        oldTitle = widget.title
+        
         widget.title = text
+        
+        if widget.hasFlag(dti.ITEM_FLAG.file):
+            self.fileRenamed.emit(widget.UUID(), oldTitle, text)
 
     @pyqtSlot()
     def _onItemMoveToTrash(self):
