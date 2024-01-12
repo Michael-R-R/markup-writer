@@ -12,11 +12,16 @@ from PyQt6.QtWidgets import (
     QFrame,
 )
 
+import markupwriter.support.doceditor as de
+
 
 class DocumentTextEdit(QPlainTextEdit):
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
+        
+        self.plainDocument = de.PlainDocument(self)
 
+        self.setDocument(self.plainDocument)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setTabStopDistance(20.0)

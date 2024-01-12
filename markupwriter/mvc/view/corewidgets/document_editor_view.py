@@ -32,6 +32,13 @@ class DocumentEditorView(QWidget):
         vLayout.addWidget(self.textEdit)
         self.vLayout = vLayout
         
+    def clearAll(self):
+        self.editorBar.pathLabel.clear()
+        self.textEdit.clear()
+        
+    def setPathLabel(self, path: str):
+        self.editorBar.pathLabel.setText(path)
+        
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorSize = e.size()
         return super().resizeEvent(e)

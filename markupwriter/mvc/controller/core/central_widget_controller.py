@@ -25,6 +25,7 @@ class CentralWidgetController(QObject):
 
     def setup(self):
         self.model.docTreeController.setup()
+        self.model.docEditorController.setup()
         
         self.view.lhSplitter.insertWidget(0, self.model.docTreeController.view)
         self.view.rhSplitter.insertWidget(0, self.model.docEditorController.view)
