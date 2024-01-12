@@ -1,6 +1,14 @@
 #!/usr/bin/python
 
-from PyQt6.QtGui import QResizeEvent
+from PyQt6.QtCore import (
+    pyqtSignal,
+)
+
+from PyQt6.QtGui import (
+    QCloseEvent,
+    QResizeEvent,
+)
+
 from PyQt6.QtWidgets import (
     QMainWindow,
     QWidget,
@@ -10,6 +18,8 @@ from markupwriter.config import AppConfig
 
 
 class MainWindowView(QMainWindow):
+    closing = pyqtSignal()
+    
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
@@ -24,3 +34,7 @@ class MainWindowView(QMainWindow):
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.mainWindowSize = e.size()
         return super().resizeEvent(e)
+    
+    def closeEvent(self, e: QCloseEvent | None) -> None:
+        self.closing.emit()
+        super().closeEvent(e)

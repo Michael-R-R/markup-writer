@@ -6,6 +6,11 @@ from PyQt6.QtCore import (
     pyqtSlot,
 )
 
+from PyQt6.QtWidgets import (
+    QTreeWidget,
+    QTreeWidgetItem,
+)
+
 from markupwriter.mvc.model.corewidgets import (
     DocumentTree,
 )
@@ -17,6 +22,18 @@ from markupwriter.mvc.view.corewidgets import (
 from markupwriter.gui.dialogs.modal import (
     StrDialog,
     YesNoDialog,
+)
+
+from markupwriter.common.factory import (
+    TreeItemFactory,
+)
+
+from markupwriter.config import (
+    AppConfig,
+)
+
+from markupwriter.common.util import (
+    File,
 )
 
 import markupwriter.support.doctree.item as dti
@@ -37,6 +54,11 @@ class DocumentTreeController(QObject):
         treebar.addItemAction.itemCreated.connect(self._onItemCreated)
         treebar.navUpAction.triggered.connect(self._onItemNavUp)
         treebar.navDownAction.triggered.connect(self._onItemNavDown)
+        
+        # --- Tree signals --- #
+        tree = self.view.treewidget
+        tree.fileAdded.connect(self._onFileAdded)
+        tree.fileRemoved.connect(self._onFileRemoved)
 
         # --- Tree context menu signals --- #
         tcm = self.view.treewidget.treeContextMenu
@@ -73,6 +95,22 @@ class DocumentTreeController(QObject):
         tree.add(dti.LocFolderItem())
         tree.add(dti.ObjFolderItem())
         tree.add(dti.TrashFolderItem()) 
+        
+    @pyqtSlot(str, list)
+    def _onFileAdded(self, uuid: str, paths: list[str]):
+        path = AppConfig.projectContentPath()
+        if path is None:
+            return
+        path += uuid
+        File.write(path, "")
+    
+    @pyqtSlot(str)
+    def _onFileRemoved(self, uuid: str):
+        path = AppConfig.projectContentPath()
+        if path is None:
+            return
+        path += uuid
+        File.remove(path)
 
     @pyqtSlot()
     def _onItemNavUp(self):
@@ -146,10 +184,64 @@ class DocumentTreeController(QObject):
             return
 
         for i in range(item.childCount() - 1, -1, -1):
-            tree.remove(item.child(i), item)
+            tree.remove(item.child(i))
+            
+    def _writeHelper(self, sOut: QDataStream, tree: QTreeWidget, iParent: QTreeWidgetItem):
+        cCount = iParent.childCount()
+        sOut.writeInt(cCount)
+
+        for i in range(cCount):
+            iChild = iParent.child(i)
+            wChild: dti.BaseTreeItem = tree.itemWidget(iChild, 0)
+            sOut.writeQString(wChild.__class__.__name__)
+            self._writeHelper(sOut, tree, iChild)
+            sOut << wChild
+            
+    def _readHelper(self, sIn: QDataStream, tree: QTreeWidget, iParent: QTreeWidgetItem):
+        cCount = sIn.readInt()
+
+        for _ in range(cCount):
+            type = sIn.readQString()
+            wChild: dti.BaseTreeItem = TreeItemFactory.make(type)
+            self._readHelper(sIn, tree, wChild.item)
+            sIn >> wChild
+
+            iParent.addChild(wChild.item)
+            tree.setItemWidget(wChild.item, 0, wChild)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        tree = self.view.treewidget
+        
+        iCount = tree.topLevelItemCount()
+        sout.writeInt(iCount)
+
+        # Top level items
+        for i in range(iCount):
+            iParent = tree.topLevelItem(i)
+            wParent: dti.BaseTreeItem = tree.itemWidget(iParent, 0)
+            sout.writeQString(wParent.__class__.__name__)
+            sout << wParent
+
+            # Child level items
+            self._writeHelper(sout, tree, iParent)
+
         return sout
 
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        tree = self.view.treewidget
+        
+        iCount = sin.readInt()
+
+        # Top level items
+        for i in range(iCount):
+            type = sin.readQString()
+            wParent: dti.BaseTreeItem = TreeItemFactory.make(type)
+            sin >> wParent
+
+            # Child level items
+            self._readHelper(sin, tree, wParent.item)
+
+            tree.addTopLevelItem(wParent.item)
+            tree.setItemWidget(wParent.item, 0, wParent)
+
         return sin

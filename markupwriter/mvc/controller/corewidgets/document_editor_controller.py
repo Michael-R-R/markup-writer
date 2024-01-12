@@ -87,7 +87,10 @@ class DocumentEditorController(QObject):
         
         text += "{}".format(pathList[count-1])
         
+        return text
+        
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        self._writeCurrentFile()
         return sout
     
     def __rrshift__(self, sin: QDataStream) -> QDataStream:

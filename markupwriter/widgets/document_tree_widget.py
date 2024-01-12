@@ -62,6 +62,7 @@ class DocumentTreeWidget(QTreeWidget):
 
         self.setItemWidget(widget.item, 0, widget)
         self.expandItem(selected)
+        self.setCurrentItem(widget.item)
 
         self._emitAdded(widget)
 
@@ -98,6 +99,8 @@ class DocumentTreeWidget(QTreeWidget):
             size = parent.childCount()
             index = parent.indexOfChild(selected)
             self.insertAt((index + direction) % size, selected, parent)
+            
+        self.setCurrentItem(selected)
 
     def moveTo(self, item: QTreeWidgetItem, target: QTreeWidgetItem | None):
         widgetList = self.takeOut(item)

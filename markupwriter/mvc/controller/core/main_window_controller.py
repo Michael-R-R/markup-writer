@@ -46,6 +46,8 @@ class MainWindowController(QObject):
         self.view.setMenuBar(self.model.menuBarController.view)
         self.view.setCentralWidget(self.model.centralController.view)
         self.view.setStatusBar(self.model.statusBarController.view)
+        
+        self.view.closing.connect(self._onSaveProject)
 
         fileMenu = self.model.menuBarController.view.filemenu
         fileMenu.newAction.triggered.connect(self._onNewProject)
@@ -153,4 +155,5 @@ class MainWindowController(QObject):
     @pyqtSlot()
     def _onExit(self):
         if ProjectHelper.askToExit():
+            self._onSaveProject()
             QApplication.quit()
