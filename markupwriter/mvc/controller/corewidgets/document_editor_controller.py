@@ -67,7 +67,7 @@ class DocumentEditorController(QObject):
         if path is None:
             return
         path += self.model.currDocUUID
-        File.write(path, self.view.textEdit())
+        File.write(path, self.view.textEdit.toPlainText())
     
     def _readCurrentFile(self):
         if self.model.currDocUUID == "":
