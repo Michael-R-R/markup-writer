@@ -116,6 +116,8 @@ class MainWindowController(QObject):
 
     @pyqtSlot()
     def _onSaveProject(self) -> bool:
+        if not AppConfig.hasActiveProject():
+            return
         if not Serialize.write(AppConfig.projectFilePath(), self.model):
             return False
         self.view.showStatusMsg("Project saved...", 2000)
