@@ -22,6 +22,7 @@ class DocumentTextEdit(QPlainTextEdit):
         self.plainDocument = de.PlainDocument(self)
 
         self.setDocument(self.plainDocument)
+        self.setEnabled(False)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setTabStopDistance(20.0)

@@ -37,6 +37,7 @@ class DocumentEditorController(QObject):
         self.model.currDocUUID = uuid
         self._readCurrentFile()
         self.view.setPathLabel(self.model.currDocPath)
+        self.view.textEdit.setEnabled(True)
     
     @pyqtSlot(str)
     def onFileRemoved(self, uuid: str):
@@ -45,6 +46,7 @@ class DocumentEditorController(QObject):
         self.model.currDocPath = ""
         self.model.currDocUUID = ""
         self.view.clearAll()
+        self.view.textEdit.setEnabled(False)
     
     @pyqtSlot(str, list)
     def onFileMoved(self, uuid: str, path: list[str]):
