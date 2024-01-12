@@ -30,14 +30,19 @@ class DocumentTreeController(QObject):
         self.view = DocumentTreeView(None)
 
     def setup(self):
+        self.setActionStates(False)
+        
+        # --- Tree bar signals --- #
         treebar = self.view.treebar
         treebar.addItemAction.itemCreated.connect(self._onItemCreated)
         treebar.navUpAction.triggered.connect(self._onItemNavUp)
         treebar.navDownAction.triggered.connect(self._onItemNavDown)
 
+        # --- Tree context menu signals --- #
         tcm = self.view.treewidget.treeContextMenu
         tcm.addItemMenu.itemCreated.connect(self._onItemCreated)
 
+        # --- Item context menu signals --- #
         icm = self.view.treewidget.itemContextMenu
         icm.addItemMenu.itemCreated.connect(self._onItemCreated)
         icm.toggleActiveAction.triggered.connect(self._onItemToggleActive)
@@ -45,8 +50,29 @@ class DocumentTreeController(QObject):
         icm.toTrashAction.triggered.connect(self._onItemMoveToTrash)
         icm.recoverAction.triggered.connect(self._onItemRecover)
 
+        # --- Trash context menu signals --- #
         trcm = self.view.treewidget.trashContextMenu
         trcm.emptyAction.triggered.connect(self._onEmptyTrash)
+        
+    def setActionStates(self, isEnabled: bool):
+        # --- Tree bar --- #
+        treeBar = self.view.treebar
+        treeBar.navUpAction.setEnabled(isEnabled)
+        treeBar.navDownAction.setEnabled(isEnabled)
+        treeBar.addItemAction.setEnabled(isEnabled)
+
+        # --- Tree --- #
+        tree = self.view.treewidget
+        tree.treeContextMenu.addItemMenu.setEnabled(isEnabled)
+        
+    def createRootFolders(self):
+        tree = self.view.treewidget
+        tree.add(dti.PlotFolderItem())
+        tree.add(dti.TimelineFolderItem())
+        tree.add(dti.CharsFolderItem())
+        tree.add(dti.LocFolderItem())
+        tree.add(dti.ObjFolderItem())
+        tree.add(dti.TrashFolderItem()) 
 
     @pyqtSlot()
     def _onItemNavUp(self):

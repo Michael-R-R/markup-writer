@@ -15,6 +15,12 @@ class MainWindowView(QMainWindow):
         
         self.resize(AppConfig.mainWindowSize)
         
+    def updateWindowTitle(self):
+        self.setWindowTitle(AppConfig.fullWindowTitle())
+        
+    def showStatusMsg(self, text: str, msecs: int = 1000):
+        self.statusBar().showMessage(text, msecs)
+        
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.mainWindowSize = e.size()
         return super().resizeEvent(e)

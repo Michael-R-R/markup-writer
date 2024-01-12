@@ -19,6 +19,13 @@ class MainMenuBarController(QObject):
 
         self.model = MainMenuBar(self)
         self.view = MainMenuBarView(None)
-
+        
     def setup(self):
-        pass
+        self.setActionStates(False)
+        
+    def setActionStates(self, isEnabled: bool):
+        # --- File menu --- #
+        fileMenu = self.view.filemenu
+        fileMenu.saveAction.setEnabled(isEnabled)
+        fileMenu.saveAsAction.setEnabled(isEnabled)
+        fileMenu.closeAction.setEnabled(isEnabled)
