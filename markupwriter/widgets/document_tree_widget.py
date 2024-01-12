@@ -61,6 +61,7 @@ class DocumentTreeWidget(QTreeWidget):
             selected.addChild(widget.item)
 
         self.setItemWidget(widget.item, 0, widget)
+        self.expandItem(selected)
 
         self._emitAdded(widget)
 

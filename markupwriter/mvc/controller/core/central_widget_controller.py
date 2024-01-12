@@ -53,6 +53,7 @@ class CentralWidgetController(QObject):
             ]
         )
         
+        # --- Editor slots --- #
         editorController = self.model.docEditorController
         tree = self.model.docTreeController.view.treewidget
         tree.fileAdded.connect(editorController.onFileAdded)
