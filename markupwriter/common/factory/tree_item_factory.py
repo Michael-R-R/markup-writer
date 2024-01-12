@@ -1,14 +1,12 @@
 #!/usr/bin/python
 
-from markupwriter.coresupport.documenttree.treeitem import (
+from markupwriter.support.doctree.item import (
     BaseTreeItem,
-
     ChapterFileItem,
     MiscFileItem,
     SceneFileItem,
     SectionFileItem,
     TitleFileItem,
-
     CharsFolderItem,
     LocFolderItem,
     MiscFolderItem,
@@ -18,6 +16,7 @@ from markupwriter.coresupport.documenttree.treeitem import (
     TimelineFolderItem,
     TrashFolderItem,
 )
+
 
 class TreeItemFactory(object):
     def make(type: str) -> BaseTreeItem:

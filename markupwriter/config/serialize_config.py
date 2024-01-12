@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
-from markupwriter.util import Serialize
+from markupwriter.common.util import Serialize
 from .app_config import AppConfig
 from .highlighter_config import HighlighterConfig
 from .hotkey_config import HotkeyConfig
+
 
 class SerializeConfig(object):
     def read():

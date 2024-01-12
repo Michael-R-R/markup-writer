@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 from .highlighter import (
     BEHAVIOUR,
     Highlighter, 

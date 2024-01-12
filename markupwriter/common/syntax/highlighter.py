@@ -14,7 +14,10 @@ from PyQt6.QtGui import (
     QFont,
 )
 
-from markupwriter.config import HighlighterConfig
+from markupwriter.config import (
+    HighlighterConfig,
+)
+
 
 class BEHAVIOUR(Enum):
     refTag = 0
@@ -22,20 +25,35 @@ class BEHAVIOUR(Enum):
     comment = auto()
     keyword = auto()
 
+
 class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument):
         super().__init__(document)
-        
+
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
-        self.addBehaviour(BEHAVIOUR.refTag, HighlightWordBehaviour(HighlighterConfig.refTagCol, set(), r"[\w']+"))
-        self.addBehaviour(BEHAVIOUR.aliasTag, HighlightWordBehaviour(HighlighterConfig.aliasTagCol, set(), r"[\w']+"))
-        self.addBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, r"%(.*)"))
-        self.addBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.keywordCol, r"@(create|import|as) "))
+        self.addBehaviour(
+            BEHAVIOUR.refTag,
+            HighlightWordBehaviour(HighlighterConfig.refTagCol, set(), r"[\w']+"),
+        )
+        self.addBehaviour(
+            BEHAVIOUR.aliasTag,
+            HighlightWordBehaviour(HighlighterConfig.aliasTagCol, set(), r"[\w']+"),
+        )
+        self.addBehaviour(
+            BEHAVIOUR.comment,
+            HighlightExprBehaviour(HighlighterConfig.commentCol, r"%(.*)"),
+        )
+        self.addBehaviour(
+            BEHAVIOUR.keyword,
+            HighlightExprBehaviour(
+                HighlighterConfig.keywordCol, r"@(create|import|as) "
+            ),
+        )
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self._behaviours.items():
             val.process(self, text)
-    
+
     def updateFormat(self, start: int, end: int, format: QTextCharFormat):
         self.setFormat(start, end, format)
 
@@ -44,14 +62,16 @@ class Highlighter(QSyntaxHighlighter):
             return False
         self._behaviours[type] = val
         return True
-    
+
     def removeBehaviour(self, type: BEHAVIOUR) -> bool:
         if not type in self._behaviours:
             return False
         self._behaviours.pop(type)
         return True
-    
-    def getBehaviour(self, type: BEHAVIOUR) -> HighlightWordBehaviour | HighlightExprBehaviour | None:
+
+    def getBehaviour(
+        self, type: BEHAVIOUR
+    ) -> HighlightWordBehaviour | HighlightExprBehaviour | None:
         if not type in self._behaviours:
             return None
         return self._behaviours[type]
@@ -68,7 +88,7 @@ class HighlightBehaviour(object):
 
     def process(self, highlighter: Highlighter, text: str):
         raise NotImplementedError()
-            
+
     def setColor(self, color: QColor):
         self._color = color
         self._format.setFontWeight(QFont.Weight.Bold)
@@ -76,7 +96,7 @@ class HighlightBehaviour(object):
 
     def setExpression(self, expr: str):
         self._expr = re.compile(expr)
-        
+
 
 class HighlightWordBehaviour(HighlightBehaviour):
     def __init__(self, color: QColor, wordSet: set, expr: str):
@@ -101,21 +121,21 @@ class HighlightWordBehaviour(HighlightBehaviour):
             return False
         self._wordSet.add(word)
         return True
-    
+
     def addList(self, words: list[str]):
         for word in words:
             self.add(word)
-    
+
     def remove(self, word: str) -> bool:
         if not word in self._wordSet:
             return False
         self._wordSet.remove(word)
         return True
-    
+
     def removeList(self, words: list[str]):
         for word in words:
             self.remove(word)
-    
+
     def rename(self, old: str, new: str) -> bool:
         if not old in self._wordSet:
             return False
@@ -124,13 +144,13 @@ class HighlightWordBehaviour(HighlightBehaviour):
         self._wordSet.remove(old)
         self._wordSet.add(new)
         return True
-    
+
     def clear(self):
         self._wordSet.clear()
-    
+
     def getWords(self) -> set:
         return self._wordSet
-    
+
     def doesExist(self, word: str) -> bool:
         return word in self._wordSet
 
@@ -138,7 +158,7 @@ class HighlightWordBehaviour(HighlightBehaviour):
 class HighlightExprBehaviour(HighlightBehaviour):
     def __init__(self, color: QColor, expr: str):
         super().__init__(color, expr)
-            
+
     def process(self, highlighter: Highlighter, text: str):
         it = self._expr.finditer(text)
         for w in it:

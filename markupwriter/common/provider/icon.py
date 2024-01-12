@@ -8,9 +8,10 @@ from PyQt6.QtGui import (
     QIcon,
 )
 
+
 class Icon(object):
     QDir.addSearchPath("icons", "./resources/icons/")
-    
+
     # Common
     CHECK = QIcon("icons:common/check.svg")
     UNCHECK = QIcon("icons:common/uncheck.svg")
@@ -18,7 +19,7 @@ class Icon(object):
     DOWN_ARROW = QIcon("icons:common/down_arrow.svg")
     ADD_ITEM = QIcon("icons:common/add_item.svg")
     MORE_OPTIONS = QIcon("icons:common/more_options.svg")
-    
+
     # Folders
     NOVEL_FOLDER = QIcon("icons:folder/novel.svg")
     PLOT_FOLDER = QIcon("icons:folder/plot.svg")

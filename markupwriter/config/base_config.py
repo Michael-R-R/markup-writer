@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-class BaseConfig():
+
+class BaseConfig:
     def init():
         raise NotImplementedError()
 
