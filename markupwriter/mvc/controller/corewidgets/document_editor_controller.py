@@ -26,7 +26,13 @@ class DocumentEditorController(QObject):
         self.view = DocumentEditorView(None)
         
     def setup(self):
-        pass
+        self.model.tokenizer.tokensChanged.connect(lambda x, y: print(x, y, "\n"))
+    
+    @pyqtSlot()
+    def runTokenizer(self):
+        tokenizer = self.model.tokenizer
+        textEdit = self.view.textEdit
+        tokenizer.tokenize(textEdit.toPlainText())
     
     @pyqtSlot(str, list)
     def onFileAdded(self, uuid: str, path: list[str]):
@@ -38,6 +44,8 @@ class DocumentEditorController(QObject):
         self._readCurrentFile()
         self.view.setPathLabel(self.model.currDocPath)
         self.view.textEdit.setEnabled(True)
+        self.model.tokenizer.reset()
+        self.model.threadPool.start(self.runTokenizer)
     
     @pyqtSlot(str)
     def onFileRemoved(self, uuid: str):
@@ -99,7 +107,6 @@ class DocumentEditorController(QObject):
         return text
         
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
-        self._writeCurrentFile()
         return sout
     
     def __rrshift__(self, sin: QDataStream) -> QDataStream:

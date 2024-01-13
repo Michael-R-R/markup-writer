@@ -1,9 +1,15 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    pyqtSignal,
+    pyqtSlot,
+)
+
 from PyQt6.QtGui import (
     QResizeEvent,
     QTextOption,
     QGuiApplication,
+    QTextCursor,
 )
 
 from PyQt6.QtWidgets import (
@@ -16,6 +22,9 @@ import markupwriter.support.doceditor as de
 
 
 class DocumentTextEdit(QPlainTextEdit):
+    textAdded = pyqtSignal(str)
+    textRemoved = pyqtSignal(str)
+    
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
         

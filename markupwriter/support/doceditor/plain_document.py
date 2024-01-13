@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     QObject,
+    pyqtSlot,
 )
 
 from PyQt6.QtGui import (
@@ -16,21 +17,11 @@ from markupwriter.common.syntax import (
     Highlighter,
 )
 
-from markupwriter.common.referencetag import (
-    RefTagManager,
-)
-
-from markupwriter.common.parsers import (
-    PassiveParser,
-)
-
 
 class PlainDocument(QTextDocument):
     def __init__(self, parent: QObject):
         super().__init__(parent)
 
         self.highlighter = Highlighter(self)
-        self.refTagManager = RefTagManager()
-        self.passiveParser = PassiveParser(self)
 
         self.setDocumentLayout(QPlainTextDocumentLayout(self))
