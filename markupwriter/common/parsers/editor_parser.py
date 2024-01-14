@@ -38,6 +38,5 @@ class EditorParser(QRunnable):
             self.signals.error.emit(str(e))
         
         else:
-            self.ast.prettyPrint(self.ast.root)
             self.signals.finished.emit()
             self.signals.result.emit(self.uuid, self.ast)
