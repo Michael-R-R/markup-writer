@@ -27,7 +27,7 @@ class BEHAVIOUR(Enum):
 
 
 class Highlighter(QSyntaxHighlighter):
-    def __init__(self, document: QTextDocument):
+    def __init__(self, document: QTextDocument | None):
         super().__init__(document)
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()

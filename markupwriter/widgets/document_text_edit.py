@@ -2,14 +2,12 @@
 
 from PyQt6.QtCore import (
     pyqtSignal,
-    pyqtSlot,
 )
 
 from PyQt6.QtGui import (
     QResizeEvent,
     QTextOption,
     QGuiApplication,
-    QTextCursor,
 )
 
 from PyQt6.QtWidgets import (

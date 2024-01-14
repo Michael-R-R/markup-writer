@@ -5,6 +5,10 @@ from PyQt6.QtCore import (
     QThreadPool,
 )
 
+from markupwriter.common.syntax import (
+    Highlighter,
+)
+
 from markupwriter.common.referencetag import (
     RefTagManager,
 )
@@ -16,5 +20,9 @@ class DocumentEditor(QObject):
 
         self.currDocPath = ""
         self.currDocUUID = ""
+        self.highlighter: Highlighter = Highlighter(None)
         self.refTagManager = RefTagManager()
         self.threadPool = QThreadPool(self)
+        
+    def setHighlighterDoc(self, document):
+        self.highlighter.setDocument(document)

@@ -30,7 +30,8 @@ class DocumentEditorController(QObject):
         self.view = DocumentEditorView(None)
         
     def setup(self):
-        pass
+        texteditor = self.view.textEdit
+        self.model.setHighlighterDoc(texteditor.plainDocument)
     
     @pyqtSlot()
     def runTokenizer(self):
