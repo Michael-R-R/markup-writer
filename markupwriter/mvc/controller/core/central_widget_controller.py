@@ -3,6 +3,7 @@
 from PyQt6.QtCore import (
     QObject,
     QDataStream,
+    pyqtSlot,
 )
 
 from markupwriter.mvc.model.core import (
@@ -63,6 +64,11 @@ class CentralWidgetController(QObject):
         tree.fileMoved.connect(editorController.onFileMoved)
         tree.fileDoubleClicked.connect(editorController.onFileDoubleClicked)
         
+    @pyqtSlot()
+    def onSaveAction(self):
+        self.model.docEditorController.writeCurrentFile()
+        self.model.docEditorController.runTokenizer()
+    
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController
         sout << self.model.docEditorController

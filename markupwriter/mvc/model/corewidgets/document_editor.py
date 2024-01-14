@@ -9,9 +9,6 @@ from markupwriter.common.referencetag import (
     RefTagManager,
 )
 
-from markupwriter.common.tokenizers import (
-    Tokenizer,
-)
 
 class DocumentEditor(QObject):
     def __init__(self, parent: QObject | None) -> None:
@@ -20,5 +17,4 @@ class DocumentEditor(QObject):
         self.currDocPath = ""
         self.currDocUUID = ""
         self.refTagManager = RefTagManager()
-        self.tokenizer = Tokenizer(self)
         self.threadPool = QThreadPool(self)

@@ -49,6 +49,7 @@ class MainWindowController(QObject):
         
         self.view.closing.connect(self._onSaveProject)
 
+        # --- main window controller slots --- #
         fileMenu = self.model.menuBarController.view.filemenu
         fileMenu.newAction.triggered.connect(self._onNewProject)
         fileMenu.openAction.triggered.connect(self._onOpenProject)
@@ -56,6 +57,10 @@ class MainWindowController(QObject):
         fileMenu.saveAsAction.triggered.connect(self._onSaveAsProject)
         fileMenu.closeAction.triggered.connect(self._onCloseProject)
         fileMenu.exitAction.triggered.connect(self._onExit)
+        
+        # --- central controller slots --- #
+        centralController = self.model.centralController
+        fileMenu.saveAction.triggered.connect(centralController.onSaveAction)
 
     def show(self):
         self.view.show()

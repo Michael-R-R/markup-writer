@@ -14,6 +14,10 @@ from markupwriter.mvc.view.corewidgets import (
     DocumentEditorView,
 )
 
+from markupwriter.common.tokenizers import (
+    Tokenizer,
+)
+
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
 
@@ -26,26 +30,27 @@ class DocumentEditorController(QObject):
         self.view = DocumentEditorView(None)
         
     def setup(self):
-        self.model.tokenizer.tokensChanged.connect(lambda x, y: print(x, y, "\n"))
+        pass
     
     @pyqtSlot()
     def runTokenizer(self):
-        tokenizer = self.model.tokenizer
-        textEdit = self.view.textEdit
-        tokenizer.tokenize(textEdit.toPlainText())
+        text = self.view.textEdit.toPlainText()
+        tokenizer = Tokenizer(self, text)
+        tokenizer.signals.result.connect(lambda x: print(x))
+        self.model.threadPool.start(tokenizer)
     
     @pyqtSlot(str, list)
     def onFileAdded(self, uuid: str, path: list[str]):
         if self._isIdMatching(uuid):
             return
-        self._writeCurrentFile()
+        self.writeCurrentFile()
         self.model.currDocPath = self._makePathStr(path)
         self.model.currDocUUID = uuid
-        self._readCurrentFile()
+        content = self.readCurrentFile()
+        self.view.textEdit.setPlainText(content)
         self.view.setPathLabel(self.model.currDocPath)
         self.view.textEdit.setEnabled(True)
-        self.model.tokenizer.reset()
-        self.model.threadPool.start(self.runTokenizer)
+        self.runTokenizer()
     
     @pyqtSlot(str)
     def onFileRemoved(self, uuid: str):
@@ -74,10 +79,7 @@ class DocumentEditorController(QObject):
         self.model.currDocPath = self.model.currDocPath.replace(old, new)
         self.view.setPathLabel(self.model.currDocPath)
     
-    def _isIdMatching(self, uuid: str) -> bool:
-        return self.model.currDocUUID == uuid
-    
-    def _writeCurrentFile(self):
+    def writeCurrentFile(self):
         if self.model.currDocUUID == "":
             return
         path = AppConfig.projectContentPath()
@@ -86,15 +88,17 @@ class DocumentEditorController(QObject):
         path += self.model.currDocUUID
         File.write(path, self.view.textEdit.toPlainText())
     
-    def _readCurrentFile(self):
+    def readCurrentFile(self) -> str:
         if self.model.currDocUUID == "":
             return
         path = AppConfig.projectContentPath()
         if path is None:
             return
         path += self.model.currDocUUID
-        content = File.read(path)
-        self.view.textEdit.setPlainText(content)
+        return File.read(path)
+        
+    def _isIdMatching(self, uuid: str) -> bool:
+        return self.model.currDocUUID == uuid
         
     def _makePathStr(self, pathList: list[str]) -> str:
         text = ""

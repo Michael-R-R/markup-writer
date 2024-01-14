@@ -4,56 +4,48 @@ import re
 
 from PyQt6.QtCore import (
     QObject,
+    QRunnable,
     pyqtSignal,
+    pyqtSlot,
 )
 
 
-class Tokenizer(QObject):
-    tokensChanged = pyqtSignal(dict, dict)
+class WorkerSignal(QObject):
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+    result = pyqtSignal(dict)
 
-    def __init__(self, parent: QObject | None) -> None:
-        super().__init__(parent)
-        self._pattern = re.compile(r"^@(create|import)\s")
-        self._prevTokens: dict[str, list[str]] = self._baseDict()
 
-    def tokenize(self, text: str):
-        tokens: dict[str, list[str]] = self._baseDict()
+class Tokenizer(QRunnable):
+    def __init__(self, parent: QObject | None, text: str) -> None:
+        super().__init__()
+        self.text = text
+        self.signals = WorkerSignal(parent)
+        self.pattern = re.compile(r"^@(create|import)\s")
 
-        index = text.find("\n")
-        while index > -1:
-            line = text[: index + 1].strip()
-            text = text[index + 1 :]
-            index = text.find("\n")
+    @pyqtSlot()
+    def run(self):
+        try:
+            tokens: dict[str, set[str]] = {
+                "@create ": set(),
+                "@import ": set(),
+            }
 
-            found = self._pattern.search(line)
-            if found is None:
-                continue
+            index = self.text.find("\n")
+            while index > -1:
+                line = self.text[: index + 1].strip()
+                self.text = self.text[index + 1 :]
+                index = self.text.find("\n")
 
-            tokens[found.group(0)].append(line)
+                found = self.pattern.search(line)
+                if found is None:
+                    continue
 
-        removed: dict[str, list[str]] = dict()
-        for key in self._prevTokens:
-            removed[key] = list()
-            for line in self._prevTokens[key]:
-                if line not in tokens[key]:
-                    removed[key].append(line)
+                tokens[found.group(0)].add(line)
 
-        added: dict[str, list[str]] = dict()
-        for key in tokens:
-            added[key] = list()
-            for line in tokens[key]:
-                if line not in self._prevTokens[key]:
-                    added[key].append(line)
+        except Exception as e:
+            self.signals.error.emit(str(e))
 
-        self._prevTokens = tokens
-
-        self.tokensChanged.emit(removed, added)
-
-    def reset(self):
-        self._prevTokens = self._baseDict()
-
-    def _baseDict(self) -> dict:
-        return {
-            "@create ": list(),
-            "@import ": list(),
-        }
+        else:
+            self.signals.finished.emit()
+            self.signals.result.emit(tokens)
