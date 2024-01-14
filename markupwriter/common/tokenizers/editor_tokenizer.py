@@ -16,7 +16,7 @@ class WorkerSignal(QObject):
     result = pyqtSignal(str, list)
 
 
-class Tokenizer(QRunnable):
+class EditorTokenizer(QRunnable):
     def __init__(self, uuid: str, text: str, parent: QObject | None) -> None:
         super().__init__()
         self.uuid = uuid

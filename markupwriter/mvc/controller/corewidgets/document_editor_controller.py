@@ -15,7 +15,11 @@ from markupwriter.mvc.view.corewidgets import (
 )
 
 from markupwriter.common.tokenizers import (
-    Tokenizer,
+    EditorTokenizer,
+)
+
+from markupwriter.common.parsers import (
+    EditorParser,
 )
 
 from markupwriter.config import AppConfig
@@ -37,9 +41,15 @@ class DocumentEditorController(QObject):
     def runTokenizer(self):
         uuid = self.model.currDocUUID
         text = self.view.textEdit.toPlainText()
-        tokenizer = Tokenizer(uuid, text, self)
-        tokenizer.signals.result.connect(lambda x, y: print(x, y))
+        tokenizer = EditorTokenizer(uuid, text, self)
+        tokenizer.signals.result.connect(self.runParser)
         self.model.threadPool.start(tokenizer)
+        
+    @pyqtSlot(str, list)
+    def runParser(self, uuid: str, tokens: list[list[str]]):
+        parser = EditorParser(uuid, tokens, self)
+        parser.signals.result.connect(lambda: print("Done"))
+        self.model.threadPool.start(parser)
     
     @pyqtSlot(str, list)
     def onFileAdded(self, uuid: str, path: list[str]):

@@ -1,1 +1,1 @@
-from .tokenizer import Tokenizer
+from .editor_tokenizer import EditorTokenizer
