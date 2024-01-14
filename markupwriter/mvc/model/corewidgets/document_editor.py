@@ -20,7 +20,7 @@ class DocumentEditor(QObject):
 
         self.currDocPath = ""
         self.currDocUUID = ""
-        self.highlighter: Highlighter = Highlighter(None)
+        self.highlighter = Highlighter(None)
         self.refTagManager = RefTagManager()
         self.threadPool = QThreadPool(self)
         

@@ -13,23 +13,21 @@ from PyQt6.QtCore import (
 class WorkerSignal(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
-    result = pyqtSignal(dict)
+    result = pyqtSignal(str, list)
 
 
 class Tokenizer(QRunnable):
-    def __init__(self, parent: QObject | None, text: str) -> None:
+    def __init__(self, uuid: str, text: str, parent: QObject | None) -> None:
         super().__init__()
+        self.uuid = uuid
         self.text = text
         self.signals = WorkerSignal(parent)
-        self.pattern = re.compile(r"^@(create|import)\s")
+        self.pattern = re.compile(r"^@(create|import)")
 
     @pyqtSlot()
     def run(self):
         try:
-            tokens: dict[str, set[str]] = {
-                "@create ": set(),
-                "@import ": set(),
-            }
+            tokens: list[list[str]] = list()
 
             index = self.text.find("\n")
             while index > -1:
@@ -40,12 +38,12 @@ class Tokenizer(QRunnable):
                 found = self.pattern.search(line)
                 if found is None:
                     continue
-
-                tokens[found.group(0)].add(line)
+                
+                tokens.append(line.split(" "))
 
         except Exception as e:
             self.signals.error.emit(str(e))
 
         else:
             self.signals.finished.emit()
-            self.signals.result.emit(tokens)
+            self.signals.result.emit(self.uuid, tokens)

@@ -35,9 +35,10 @@ class DocumentEditorController(QObject):
     
     @pyqtSlot()
     def runTokenizer(self):
+        uuid = self.model.currDocUUID
         text = self.view.textEdit.toPlainText()
-        tokenizer = Tokenizer(self, text)
-        tokenizer.signals.result.connect(lambda x: print(x))
+        tokenizer = Tokenizer(uuid, text, self)
+        tokenizer.signals.result.connect(lambda x, y: print(x, y))
         self.model.threadPool.start(tokenizer)
     
     @pyqtSlot(str, list)
