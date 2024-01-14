@@ -48,7 +48,7 @@ class DocumentEditorController(QObject):
     @pyqtSlot(str, list)
     def runParser(self, uuid: str, tokens: list[list[str]]):
         parser = EditorParser(uuid, tokens, self)
-        parser.signals.result.connect(lambda: print("Done"))
+        parser.signals.result.connect(lambda x, y: print("Done"))
         self.model.threadPool.start(parser)
     
     @pyqtSlot(str, list)

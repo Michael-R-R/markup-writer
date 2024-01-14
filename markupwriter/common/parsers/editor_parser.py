@@ -7,11 +7,15 @@ from PyQt6.QtCore import (
     pyqtSlot,
 )
 
+from markupwriter.common.datastructure import (
+    AST,
+)
+
 
 class WorkerSignal(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
-    result = pyqtSignal()
+    result = pyqtSignal(str, AST)
 
 
 class EditorParser(QRunnable):
@@ -21,16 +25,19 @@ class EditorParser(QRunnable):
         super().__init__()
         self.uuid = uuid
         self.tokens = tokens
+        self.ast = AST(uuid)
         self.signals = WorkerSignal(parent)
 
     @pyqtSlot()
     def run(self):
         try:
-            pass
+            for t in self.tokens:
+                self.ast.addAtExpression(t)
         
         except Exception as e:
             self.signals.error.emit(str(e))
         
         else:
+            self.ast.prettyPrint(self.ast.root)
             self.signals.finished.emit()
-            self.signals.result.emit()
+            self.signals.result.emit(self.uuid, self.ast)
