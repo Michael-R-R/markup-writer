@@ -13,7 +13,7 @@ from PyQt6.QtCore import (
 class WorkerSignal(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
-    result = pyqtSignal(str, list)
+    result = pyqtSignal(str, dict)
 
 
 class EditorTokenizer(QRunnable):
@@ -22,12 +22,16 @@ class EditorTokenizer(QRunnable):
         self.uuid = uuid
         self.text = text
         self.signals = WorkerSignal(parent)
-        self.pattern = re.compile(r"^@(create|import)")
+        self.keywordPattern = re.compile(r"^@(create|import)")
+        self.sqbracketPattern = re.compile(r"\[(.*?)\]")
 
     @pyqtSlot()
     def run(self):
         try:
-            tokens: list[list[str]] = list()
+            tokens: dict[str, list[str]] = {
+                "@create": list(),
+                "@import": list(),
+            }
 
             index = self.text.find("\n")
             while index > -1:
@@ -35,11 +39,17 @@ class EditorTokenizer(QRunnable):
                 self.text = self.text[index + 1 :]
                 index = self.text.find("\n")
 
-                found = self.pattern.search(line)
-                if found is None:
+                keywordFound = self.keywordPattern.search(line)
+                if keywordFound is None:
                     continue
                 
-                tokens.append(line.split(" "))
+                namesFound = self.sqbracketPattern.search(line)
+                if namesFound is None:
+                    continue
+                
+                nameList = namesFound.group(0).split(",")
+                
+                tokens[keywordFound.group(0)].append(nameList)
 
         except Exception as e:
             self.signals.error.emit(str(e))

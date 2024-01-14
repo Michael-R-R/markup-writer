@@ -20,8 +20,7 @@ from markupwriter.config import (
 
 
 class BEHAVIOUR(Enum):
-    refTag = 0
-    aliasTag = auto()
+    sqBracket = 0
     comment = auto()
     keyword = auto()
 
@@ -30,14 +29,11 @@ class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument | None):
         super().__init__(document)
 
+            
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
         self.addBehaviour(
-            BEHAVIOUR.refTag,
-            HighlightWordBehaviour(HighlighterConfig.refTagCol, set(), r"[\w']+"),
-        )
-        self.addBehaviour(
-            BEHAVIOUR.aliasTag,
-            HighlightWordBehaviour(HighlighterConfig.aliasTagCol, set(), r"[\w']+"),
+            BEHAVIOUR.sqBracket,
+            HighlightExprBehaviour(HighlighterConfig.sqBracketCol, r"\[|\]"),
         )
         self.addBehaviour(
             BEHAVIOUR.comment,
@@ -46,7 +42,7 @@ class Highlighter(QSyntaxHighlighter):
         self.addBehaviour(
             BEHAVIOUR.keyword,
             HighlightExprBehaviour(
-                HighlighterConfig.keywordCol, r"@(create|import|as) "
+                HighlighterConfig.keywordCol, r"@(create|import) "
             ),
         )
 

@@ -22,18 +22,6 @@ class RefTagManager:
         self._refTagDict.pop(name)
         return True
 
-    def renameRefTag(self, old: str, new: str) -> RefTag | None:
-        if new == "":
-            return None
-        if not old in self._refTagDict:
-            return None
-        if new in self._refTagDict:
-            return None
-        refTag = self._refTagDict.pop(old)
-        refTag.rename(new)
-        self._refTagDict[new] = refTag
-        return refTag
-
     def getRefTag(self, name: str) -> RefTag | None:
         if not name in self._refTagDict:
             return None

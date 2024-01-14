@@ -45,10 +45,9 @@ class DocumentEditorController(QObject):
         tokenizer.signals.result.connect(self.runParser)
         self.model.threadPool.start(tokenizer)
         
-    @pyqtSlot(str, list)
-    def runParser(self, uuid: str, tokens: list[list[str]]):
+    @pyqtSlot(str, dict)
+    def runParser(self, uuid: str, tokens: dict[str, list[str]]):
         parser = EditorParser(uuid, tokens, self)
-        parser.signals.result.connect(lambda x, y: print("Done"))
         self.model.threadPool.start(parser)
     
     @pyqtSlot(str, list)
