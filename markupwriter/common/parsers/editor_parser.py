@@ -7,6 +7,10 @@ from PyQt6.QtCore import (
     pyqtSlot,
 )
 
+from markupwriter.common.referencetag import (
+    RefTagManager,
+)
+
 
 class WorkerSignal(QObject):
     finished = pyqtSignal()
@@ -16,11 +20,16 @@ class WorkerSignal(QObject):
 
 class EditorParser(QRunnable):
     def __init__(
-        self, uuid: str, tokens: dict[str, list[str]], parent: QObject | None
+        self,
+        uuid: str,
+        tokens: dict[str, list[str]],
+        refManager: RefTagManager,
+        parent: QObject | None,
     ) -> None:
         super().__init__()
         self.uuid = uuid
         self.tokens = tokens
+        self.refManager = refManager
         self.signals = WorkerSignal(parent)
 
     @pyqtSlot()
@@ -30,20 +39,20 @@ class EditorParser(QRunnable):
                 "@create": self._handleCreateTag,
                 "@import": self._handleImportTag,
             }
-            
+
             for key in self.tokens:
                 for t in self.tokens[key]:
                     func[key](t)
-        
+
         except Exception as e:
             self.signals.error.emit(str(e))
-        
+
         else:
             self.signals.finished.emit()
             self.signals.result.emit()
 
     def _handleCreateTag(self, names: list[str]):
         print(names)
-    
+
     def _handleImportTag(self, names: list[str]):
         print(names)

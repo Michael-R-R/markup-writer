@@ -23,7 +23,7 @@ class EditorTokenizer(QRunnable):
         self.text = text
         self.signals = WorkerSignal(parent)
         self.keywordPattern = re.compile(r"^@(create|import)")
-        self.sqbracketPattern = re.compile(r"\[(.*?)\]")
+        self.sqbracketPattern = re.compile(r"(?<=\[).+(?=\])")
 
     @pyqtSlot()
     def run(self):
@@ -47,7 +47,9 @@ class EditorTokenizer(QRunnable):
                 if namesFound is None:
                     continue
                 
-                nameList = namesFound.group(0).split(",")
+                nameList = list()
+                for n in namesFound.group(0).split(","):
+                    nameList.append(n.strip())
                 
                 tokens[keywordFound.group(0)].append(nameList)
 
