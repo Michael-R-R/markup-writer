@@ -18,10 +18,6 @@ from markupwriter.common.tokenizers import (
     EditorTokenizer,
 )
 
-from markupwriter.common.parsers import (
-    EditorParser,
-)
-
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
 
@@ -46,9 +42,7 @@ class DocumentEditorController(QObject):
         
     @pyqtSlot(str, dict)
     def runParser(self, uuid: str, tokens: dict[str, list[str]]):
-        parser = EditorParser(uuid, tokens, self.model.refTagManager, self)
-        parser.signals.finished.connect(lambda: print(self.model.refTagManager.refTagDict))
-        self.model.threadPool.start(parser)
+        self.model.parser.run(uuid, tokens)
     
     @pyqtSlot(str, list)
     def onFileAdded(self, uuid: str, path: list[str]):
@@ -66,6 +60,7 @@ class DocumentEditorController(QObject):
     
     @pyqtSlot(str)
     def onFileRemoved(self, uuid: str):
+        self.model.parser.popPrevUUID(uuid)
         if not self._isIdMatching(uuid):
             return
         self.model.currDocPath = ""

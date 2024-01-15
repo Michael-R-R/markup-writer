@@ -14,6 +14,11 @@ from markupwriter.common.referencetag import (
 )
 
 
+from markupwriter.common.parsers import (
+    EditorParser,
+)
+
+
 class DocumentEditor(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
@@ -21,7 +26,8 @@ class DocumentEditor(QObject):
         self.currDocPath = ""
         self.currDocUUID = ""
         self.highlighter = Highlighter(None)
-        self.refTagManager = RefTagManager()
+        self.refManager = RefTagManager()
+        self.parser = EditorParser(self.refManager, self)
         self.threadPool = QThreadPool(self)
         
     def setHighlighterDoc(self, document):

@@ -2,9 +2,6 @@
 
 from PyQt6.QtCore import (
     QObject,
-    QRunnable,
-    pyqtSignal,
-    pyqtSlot,
 )
 
 from markupwriter.common.referencetag import (
@@ -12,54 +9,52 @@ from markupwriter.common.referencetag import (
 )
 
 
-class WorkerSignal(QObject):
-    finished = pyqtSignal()
-    error = pyqtSignal(str)
-
-
-class EditorParser(QRunnable):
+class EditorParser(QObject):
     def __init__(
         self,
-        uuid: str,
-        tokens: dict[str, list[str]],
         refManager: RefTagManager,
         parent: QObject | None,
     ) -> None:
-        super().__init__()
-        self.uuid = uuid
-        self.tokens = tokens
+        super().__init__(parent)
         self.refManager = refManager
-        self.signals = WorkerSignal(parent)
+        self.prevTokens: dict[str, dict[str, list[str]]] = dict()
 
-    @pyqtSlot()
-    def run(self):
-        try:
-            self._handlePrevTokens()
-            self._handleCurrTokens()
+    def run(self, uuid: str, tokens: dict[str, list[str]]):
+        self._handlePrevTokens(uuid)
+        self._handleCurrTokens(uuid, tokens)
 
-        except Exception as e:
-            self.signals.error.emit(str(e))
+        self.prevTokens[uuid] = tokens
+        
+    def popPrevUUID(self, uuid: str):
+        self._handlePrevTokens(uuid)
+        self.prevTokens.pop(uuid)
 
-        else:
-            self.signals.finished.emit()
+    def _handlePrevTokens(self, uuid: str):
+        tempDict = self.prevTokens.get(uuid)
+        if tempDict is None:
+            return
 
-    def _handlePrevTokens(self):
-        pass
-                
-    def _handleCurrTokens(self):
         func: dict[str, function] = {
-                "@tag": self._handleAddTag,
-            }
-        
-        for key in self.tokens:
-                for t in self.tokens[key]:
-                    func[key](t)
-        
+            "@tag": self._handleRemoveTag,
+        }
+
+        for key in tempDict:
+            for t in tempDict[key]:
+                func[key](t)
+
     def _handleRemoveTag(self, names: list[str]):
         for n in names:
             self.refManager.removeTag(n)
 
-    def _handleAddTag(self, names: list[str]):
-        uuid = self.uuid
+    def _handleCurrTokens(self, uuid: str, tokens: dict[str, list[str]]):
+        func: dict[str, function] = {
+            "@tag": self._handleAddTag,
+        }
+
+        for key in tokens:
+            for t in tokens[key]:
+                func[key](uuid, t)
+
+    def _handleAddTag(self, uuid: str, names: list[str]):
         for n in names:
             self.refManager.addTag(n, uuid)
