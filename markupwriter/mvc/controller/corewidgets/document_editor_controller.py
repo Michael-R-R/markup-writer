@@ -38,8 +38,7 @@ class DocumentEditorController(QObject):
         self.model.setHighlighterDoc(texteditor.plainDocument)
     
     @pyqtSlot()
-    def runTokenizer(self):
-        uuid = self.model.currDocUUID
+    def runTokenizer(self, uuid: str):
         text = self.view.textEdit.toPlainText()
         tokenizer = EditorTokenizer(uuid, text, self)
         tokenizer.signals.result.connect(self.runParser)
@@ -48,6 +47,7 @@ class DocumentEditorController(QObject):
     @pyqtSlot(str, dict)
     def runParser(self, uuid: str, tokens: dict[str, list[str]]):
         parser = EditorParser(uuid, tokens, self.model.refTagManager, self)
+        parser.signals.finished.connect(lambda: print(self.model.refTagManager.refTagDict))
         self.model.threadPool.start(parser)
     
     @pyqtSlot(str, list)
@@ -55,13 +55,14 @@ class DocumentEditorController(QObject):
         if self._isIdMatching(uuid):
             return
         self.writeCurrentFile()
+        self.runTokenizer(self.model.currDocUUID)
         self.model.currDocPath = self._makePathStr(path)
         self.model.currDocUUID = uuid
         content = self.readCurrentFile()
         self.view.textEdit.setPlainText(content)
         self.view.setPathLabel(self.model.currDocPath)
         self.view.textEdit.setEnabled(True)
-        self.runTokenizer()
+        self.runTokenizer(uuid)
     
     @pyqtSlot(str)
     def onFileRemoved(self, uuid: str):

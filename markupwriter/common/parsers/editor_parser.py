@@ -15,7 +15,6 @@ from markupwriter.common.referencetag import (
 class WorkerSignal(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
-    result = pyqtSignal()
 
 
 class EditorParser(QRunnable):
@@ -35,24 +34,32 @@ class EditorParser(QRunnable):
     @pyqtSlot()
     def run(self):
         try:
-            func: dict[str, function] = {
-                "@create": self._handleCreateTag,
-                "@import": self._handleImportTag,
-            }
-
-            for key in self.tokens:
-                for t in self.tokens[key]:
-                    func[key](t)
+            self._handlePrevTokens()
+            self._handleCurrTokens()
 
         except Exception as e:
             self.signals.error.emit(str(e))
 
         else:
             self.signals.finished.emit()
-            self.signals.result.emit()
 
-    def _handleCreateTag(self, names: list[str]):
-        print(names)
+    def _handlePrevTokens(self):
+        pass
+                
+    def _handleCurrTokens(self):
+        func: dict[str, function] = {
+                "@tag": self._handleAddTag,
+            }
+        
+        for key in self.tokens:
+                for t in self.tokens[key]:
+                    func[key](t)
+        
+    def _handleRemoveTag(self, names: list[str]):
+        for n in names:
+            self.refManager.removeTag(n)
 
-    def _handleImportTag(self, names: list[str]):
-        print(names)
+    def _handleAddTag(self, names: list[str]):
+        uuid = self.uuid
+        for n in names:
+            self.refManager.addTag(n, uuid)

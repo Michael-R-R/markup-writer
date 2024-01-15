@@ -66,8 +66,9 @@ class CentralWidgetController(QObject):
         
     @pyqtSlot()
     def onSaveAction(self):
-        self.model.docEditorController.writeCurrentFile()
-        self.model.docEditorController.runTokenizer()
+        editorController = self.model.docEditorController
+        editorController.writeCurrentFile()
+        editorController.runTokenizer(editorController.model.currDocUUID)
     
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController

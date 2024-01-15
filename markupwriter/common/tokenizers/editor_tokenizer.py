@@ -22,15 +22,13 @@ class EditorTokenizer(QRunnable):
         self.uuid = uuid
         self.text = text
         self.signals = WorkerSignal(parent)
-        self.keywordPattern = re.compile(r"^@(create|import)")
-        self.sqbracketPattern = re.compile(r"(?<=\[).+(?=\])")
+        self.keywordPattern = re.compile(r"^@(tag)")
 
     @pyqtSlot()
     def run(self):
         try:
             tokens: dict[str, list[str]] = {
-                "@create": list(),
-                "@import": list(),
+                "@tag": list(),
             }
 
             index = self.text.find("\n")
@@ -39,19 +37,16 @@ class EditorTokenizer(QRunnable):
                 self.text = self.text[index + 1 :]
                 index = self.text.find("\n")
 
-                keywordFound = self.keywordPattern.search(line)
-                if keywordFound is None:
+                found = self.keywordPattern.search(line)
+                if found is None:
                     continue
                 
-                namesFound = self.sqbracketPattern.search(line)
-                if namesFound is None:
-                    continue
-                
+                tempList = line[found.end()+1:].split(",")
                 nameList = list()
-                for n in namesFound.group(0).split(","):
+                for n in tempList:
                     nameList.append(n.strip())
-                
-                tokens[keywordFound.group(0)].append(nameList)
+                    
+                tokens[found.group(0)].append(nameList)
 
         except Exception as e:
             self.signals.error.emit(str(e))

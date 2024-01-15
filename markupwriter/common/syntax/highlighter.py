@@ -31,6 +31,7 @@ class Highlighter(QSyntaxHighlighter):
 
             
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
+        
         self.addBehaviour(
             BEHAVIOUR.sqBracket,
             HighlightExprBehaviour(HighlighterConfig.sqBracketCol, r"\[|\]"),
@@ -42,7 +43,7 @@ class Highlighter(QSyntaxHighlighter):
         self.addBehaviour(
             BEHAVIOUR.keyword,
             HighlightExprBehaviour(
-                HighlighterConfig.keywordCol, r"@(create|import) "
+                HighlighterConfig.keywordCol, r"@(tag|char|loc) "
             ),
         )
 
