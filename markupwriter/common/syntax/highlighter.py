@@ -43,7 +43,7 @@ class Highlighter(QSyntaxHighlighter):
         self.addBehaviour(
             BEHAVIOUR.keyword,
             HighlightExprBehaviour(
-                HighlighterConfig.keywordCol, r"@(tag|char|loc) "
+                HighlighterConfig.keywordCol, r"@(tag|pov|loc) "
             ),
         )
 
