@@ -21,6 +21,7 @@ class PreviewPopupWidget(QWidget):
 
         self.setWindowFlag(Qt.WindowType.Popup)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setFixedSize(400, 200)
 
         self.textbrowser = QTextBrowser(self)
         self.textbrowser.setReadOnly(True)
