@@ -50,7 +50,6 @@ class EditorTokenizer(QRunnable):
                 names = namesFound.group(0)
                 
                 nameList = [n.strip() for n in names.split(",")]
-                print(nameList)
                     
                 tokens[tag].append(nameList)
 
