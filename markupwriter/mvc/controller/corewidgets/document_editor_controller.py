@@ -4,7 +4,10 @@ from PyQt6.QtCore import (
     QObject,
     QDataStream,
     pyqtSlot,
-    QPoint,
+)
+
+from PyQt6.QtGui import (
+    QCursor,
 )
 
 from markupwriter.mvc.model.corewidgets import (
@@ -21,7 +24,7 @@ from markupwriter.common.tokenizers import (
 
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
-import markupwriter.widgets.preview_popup_widget as ppw
+from markupwriter.widgets import PreviewPopupWidget
 
 
 class DocumentEditorController(QObject):
@@ -32,18 +35,16 @@ class DocumentEditorController(QObject):
         self.view = DocumentEditorView(None)
         
     def setup(self):
-        texteditor = self.view.textEdit
-        self.model.setHighlighterDoc(texteditor.plainDocument)
+        self.view.textEdit.tagHovered.connect(self.onTagHovered)
         
-        self.view.textEdit.tagClicked.connect(self.onTagClicked)
-        
-    @pyqtSlot(str, QPoint)
-    def onTagClicked(self, tag: str, pos: QPoint):
+    @pyqtSlot(str)
+    def onTagHovered(self, tag: str):
         refTag = self.model.refManager.getTag(tag)
         if refTag is None:
             return
-        w = ppw.PreviewPopupWidget(refTag.docUUID(), self.view)
-        w.move(self.view.mapToGlobal(pos))
+        pos = QCursor.pos()
+        w = PreviewPopupWidget(refTag.docUUID(), self.view)
+        w.move(pos)
         w.show()
     
     @pyqtSlot()
