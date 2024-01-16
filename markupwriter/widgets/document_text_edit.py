@@ -3,13 +3,13 @@
 import re
 
 from PyQt6.QtCore import (
-    Qt,
     pyqtSignal,
-    pyqtSlot,
     QPoint,
+    QTimer,
 )
 
 from PyQt6.QtGui import (
+    QMouseEvent,
     QResizeEvent,
     QTextOption,
     QGuiApplication,
@@ -31,24 +31,19 @@ class DocumentTextEdit(QPlainTextEdit):
         super().__init__(parent)
 
         self.plainDocument = de.PlainDocument(self)
+        
+        self.timer = QTimer(self)
+        self.tag = ""
+        self.point = None
+        self.timer.timeout.connect(self._onTimer)
 
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
-        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setMouseTracking(True)
         self.setTabStopDistance(20.0)
         self.resizeMargins()
-
-        self.customContextMenuRequested.connect(self.onContextMenu)
-
-    @pyqtSlot(QPoint)
-    def onContextMenu(self, pos: QPoint):
-        tag = self._checkForTag(pos)
-        if tag is None:
-            return
-        self.tagClicked.emit(tag, pos)
 
     def resizeMargins(self):
         mSize = QGuiApplication.primaryScreen().size()
@@ -69,6 +64,23 @@ class DocumentTextEdit(QPlainTextEdit):
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         self.resizeMargins()
         super().resizeEvent(e)
+        
+    def mouseMoveEvent(self, e: QMouseEvent | None) -> None:
+        tag = self._checkForTag(e.pos())
+        if not self.timer.isActive():
+            if tag is not None:
+                self.tag = tag
+                self.point = e.pos()
+                self.timer.start(1000)
+        else:
+            if tag is None:
+                self.timer.stop() 
+        
+        super().mouseMoveEvent(e)
+        
+    def _onTimer(self):
+        self.timer.stop()
+        self.tagClicked.emit(self.tag, self.point)
 
     def _checkForTag(self, pos: QPoint) -> str | None:
         cursor = self.cursorForPosition(pos)
