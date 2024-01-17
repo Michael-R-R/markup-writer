@@ -10,6 +10,7 @@ from PyQt6.QtCore import (
 )
 
 from PyQt6.QtGui import (
+    QKeyEvent,
     QMouseEvent,
     QResizeEvent,
     QTextOption,
@@ -69,6 +70,11 @@ class DocumentTextEdit(QPlainTextEdit):
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         self.resizeMargins()
         super().resizeEvent(e)
+        
+    def keyPressEvent(self, e: QKeyEvent | None) -> None:
+        cursor = de.KeyProcessor.process(self.textCursor(), e.key())
+        self.setTextCursor(cursor)
+        return super().keyPressEvent(e)
         
     def mouseMoveEvent(self, e: QMouseEvent | None) -> None:
         if e.buttons() == Qt.MouseButton.LeftButton:
