@@ -13,6 +13,8 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
+from markupwriter.common.tokenizers import PreviewTokenizer
+from markupwriter.common.parsers import PreviewParser
 
 
 class PreviewPopupWidget(QWidget):
@@ -30,9 +32,12 @@ class PreviewPopupWidget(QWidget):
         self.vLayout.addWidget(self.textedit)
 
         path = AppConfig.projectContentPath() + uuid
-        content = File.read(path)
-        # TODO parse to html
-        self.textedit.setHtml(content)
+        text = File.read(path)
+        tokenizer = PreviewTokenizer(text)
+        tokens = tokenizer.run()
+        parser = PreviewParser(text, tokens)
+        html = parser.run()
+        self.textedit.setHtml(html)
         
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.close()

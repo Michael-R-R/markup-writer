@@ -21,6 +21,7 @@ class HotkeyConfig(BaseConfig):
     exitApplication: QKeySequence = None
     navUp: QKeySequence = None
     navDown: QKeySequence = None
+    rename: QKeySequence = None
 
     def init():
         HotkeyConfig.INI_PATH = "./resources/configs/hotkey.ini"
@@ -35,6 +36,7 @@ class HotkeyConfig(BaseConfig):
         HotkeyConfig.exitApplication = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Q)
         HotkeyConfig.navUp = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Up)
         HotkeyConfig.navDown = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Down)
+        HotkeyConfig.rename = QKeySequence(Qt.Key.Key_F2)
 
     def reset():
         HotkeyConfig.init()
@@ -47,6 +49,7 @@ class HotkeyConfig(BaseConfig):
         sOut << HotkeyConfig.exitApplication
         sOut << HotkeyConfig.navUp
         sOut << HotkeyConfig.navDown
+        sOut << HotkeyConfig.rename
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
@@ -57,4 +60,5 @@ class HotkeyConfig(BaseConfig):
         sIn >> HotkeyConfig.exitApplication
         sIn >> HotkeyConfig.navUp
         sIn >> HotkeyConfig.navDown
+        sIn >> HotkeyConfig.rename
         return sIn
