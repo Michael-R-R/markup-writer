@@ -22,6 +22,7 @@ from markupwriter.config import (
 class BEHAVIOUR(Enum):
     sqBracket = 0
     comment = auto()
+    multicomment = auto()
     keyword = auto()
 
 
@@ -29,22 +30,23 @@ class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument | None):
         super().__init__(document)
 
-            
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
-        
+
         self.addBehaviour(
             BEHAVIOUR.sqBracket,
             HighlightExprBehaviour(HighlighterConfig.sqBracketCol, r"\[|\]"),
         )
         self.addBehaviour(
             BEHAVIOUR.comment,
-            HighlightExprBehaviour(HighlighterConfig.commentCol, r"%(.*)"),
+            HighlightExprBehaviour(HighlighterConfig.commentCol, r"#(.*)"),
+        )
+        self.addBehaviour(
+            BEHAVIOUR.multicomment,
+            HighlightMultiExprBehaviour(HighlighterConfig.commentCol, r"<%", r"%>"),
         )
         self.addBehaviour(
             BEHAVIOUR.keyword,
-            HighlightExprBehaviour(
-                HighlighterConfig.keywordCol, r"^@(tag|pov|loc)"
-            ),
+            HighlightExprBehaviour(HighlighterConfig.keywordCol, r"^@(tag|pov|loc)"),
         )
 
     def highlightBlock(self, text: str | None) -> None:
@@ -162,3 +164,34 @@ class HighlightExprBehaviour(HighlightBehaviour):
             start = w.start()
             end = w.end() - start
             highlighter.updateFormat(start, end, self._format)
+
+
+class HighlightMultiExprBehaviour(HighlightBehaviour):
+    def __init__(self, color: QColor, expr: str, end: str):
+        super().__init__(color, expr)
+
+        self._endExpr = re.compile(end)
+
+    def process(self, highlighter: Highlighter, text: str):
+        highlighter.setCurrentBlockState(0)
+
+        startIndex = 0
+        if highlighter.previousBlockState() != 1:
+            startIndex = text.find(self._expr.pattern)
+
+        while startIndex > -1:
+            endMatch = self._endExpr.search(text, startIndex)
+            endIndex = -1 if endMatch is None else endMatch.start()
+            multiLength = 0
+
+            if endIndex < 0:
+                highlighter.setCurrentBlockState(1)
+                multiLength = len(text) - startIndex
+            else:
+                multiLength = (
+                    endIndex - startIndex + (endMatch.end() - endMatch.start())
+                )
+
+            highlighter.updateFormat(startIndex, multiLength, self._format)
+
+            startIndex = text.find(self._expr.pattern, startIndex + multiLength)

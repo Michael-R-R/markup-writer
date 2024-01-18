@@ -69,12 +69,14 @@ class DocumentTextEdit(QPlainTextEdit):
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         self.resizeMargins()
+        
         super().resizeEvent(e)
         
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         cursor = de.KeyProcessor.process(self.textCursor(), e.key())
         self.setTextCursor(cursor)
-        return super().keyPressEvent(e)
+        
+        super().keyPressEvent(e)
         
     def mouseMoveEvent(self, e: QMouseEvent | None) -> None:
         if e.buttons() == Qt.MouseButton.LeftButton:
@@ -99,7 +101,7 @@ class DocumentTextEdit(QPlainTextEdit):
         cursor = self.cursorForPosition(pos)
         cursorPos = cursor.positionInBlock()
         blockText = cursor.block().text()
-        if cursorPos == 0 or cursorPos >= len(blockText):
+        if cursorPos <= 0 or cursorPos >= len(blockText):
             return None
         
         keywordFound = re.search(r"^@(pov|loc)", blockText)

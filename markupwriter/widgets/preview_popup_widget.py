@@ -8,7 +8,7 @@ from PyQt6.QtCore import (
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
-    QTextBrowser,
+    QTextEdit,
 )
 
 from markupwriter.config import AppConfig
@@ -23,16 +23,16 @@ class PreviewPopupWidget(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setFixedSize(400, 200)
 
-        self.textbrowser = QTextBrowser(self)
-        self.textbrowser.setReadOnly(True)
+        self.textedit = QTextEdit(self)
+        self.textedit.setReadOnly(True)
 
         self.vLayout = QVBoxLayout(self)
-        self.vLayout.addWidget(self.textbrowser)
+        self.vLayout.addWidget(self.textedit)
 
         path = AppConfig.projectContentPath() + uuid
         content = File.read(path)
         # TODO parse to html
-        self.textbrowser.setHtml(content)
+        self.textedit.setHtml(content)
         
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.close()
