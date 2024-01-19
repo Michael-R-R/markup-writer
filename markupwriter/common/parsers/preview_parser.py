@@ -1,17 +1,19 @@
 #!/usr/bin/python
 
-from re import Match
-from typing import Iterator
-
 
 class PreviewParser(object):
-    def __init__(self, text: str, tokens: [str, Iterator[Match[str]]]) -> None:
-        self.text = text
+    def __init__(self, tokens: list[(str, str)]) -> None:
         self.tokens = tokens
+        self.html = ""
         
-    def run(self) -> str:
+    def run(self):
         for t in self.tokens:
-            pass
+            match t[0]:
+                case "p": self._processParagraph(t[1])
+                case "#": self._processHeaderOne(t[1])
         
-    def _parseMultiComment(self):
-        pass
+    def _processParagraph(self, line: str):
+        self.html += "<p>{}</p>".format(line)
+        
+    def _processHeaderOne(self, line: str):
+        self.html += "<h1>{}</h1>".format(line)

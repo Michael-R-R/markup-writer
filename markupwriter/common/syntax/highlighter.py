@@ -38,11 +38,11 @@ class Highlighter(QSyntaxHighlighter):
         )
         self.addBehaviour(
             BEHAVIOUR.comment,
-            HighlightExprBehaviour(HighlighterConfig.commentCol, r"#(.*)"),
+            HighlightExprBehaviour(HighlighterConfig.commentCol, r"%(.*)"),
         )
         self.addBehaviour(
             BEHAVIOUR.multicomment,
-            HighlightMultiExprBehaviour(HighlighterConfig.commentCol, r"<%", r"%>"),
+            HighlightMultiExprBehaviour(HighlighterConfig.commentCol, r"<#", r"#>"),
         )
         self.addBehaviour(
             BEHAVIOUR.keyword,

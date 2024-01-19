@@ -34,10 +34,10 @@ class PreviewPopupWidget(QWidget):
         path = AppConfig.projectContentPath() + uuid
         text = File.read(path)
         tokenizer = PreviewTokenizer(text)
-        tokens = tokenizer.run()
-        parser = PreviewParser(text, tokens)
-        html = parser.run()
-        self.textedit.setHtml(html)
+        tokenizer.run()
+        parser = PreviewParser(tokenizer.tokens)
+        parser.run()
+        self.textedit.setHtml(parser.html)
         
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.close()
