@@ -31,9 +31,9 @@ class PreviewPopupWidget(QWidget):
         self.textedit.setEnabled(True)
         self.textedit.setReadOnly(True)
         
-        self.viewButton = QPushButton("View...", self)
+        self.previewButton = QPushButton("Preview...", self)
 
-        self.vLayout.addWidget(self.viewButton)
+        self.vLayout.addWidget(self.previewButton)
         self.vLayout.addWidget(self.textedit)
 
         path = AppConfig.projectContentPath() + uuid

@@ -48,7 +48,7 @@ class DocumentEditorController(QObject):
             return
         pos = QCursor.pos()
         w = PreviewPopupWidget(refTag.docUUID(), self.view)
-        w.viewButton.clicked.connect(
+        w.previewButton.clicked.connect(
             lambda: self.requestedTextPreview.emit(refTag.docUUID())
         )
         size = w.sizeHint()
