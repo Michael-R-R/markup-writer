@@ -10,18 +10,24 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
-import markupwriter.widgets as mw
 
 
 class DocumentPreviewView(QWidget):
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
         
-        self.textbrowser = mw.DocumentPreviewBrowser(self)
+        self.widget = None
+        self.vLayout = QVBoxLayout(self)
         
-        vLayout = QVBoxLayout(self)
-        vLayout.addWidget(self.textbrowser)
-        self.vLayout = vLayout
+    def addWidget(self, widget: QWidget):
+        self.widget = widget
+        self.vLayout.addWidget(widget)
+        
+    def removeWidget(self):
+        if self.widget is None:
+            return
+        self.vLayout.removeWidget(self.widget)
+        self.widget = None
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docPreviewSize = e.size()

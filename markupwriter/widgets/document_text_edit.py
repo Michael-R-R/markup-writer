@@ -32,16 +32,17 @@ import markupwriter.support.doceditor as de
 
 class DocumentTextEdit(QPlainTextEdit):
     tagHovered = pyqtSignal(str)
-    
+
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
 
         self.plainDocument = de.PlainDocument(self)
         self.highlighter = Highlighter(self.plainDocument)
-        
+
         self.hoverTag = ""
         self.hoverTimer = QTimer(self)
         self.hoverTimer.timeout.connect(self._onTimer)
+        self.canResizeMargins = True
 
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
@@ -52,6 +53,9 @@ class DocumentTextEdit(QPlainTextEdit):
         self.resizeMargins()
 
     def resizeMargins(self):
+        if not self.canResizeMargins:
+            return 
+        
         mSize = QGuiApplication.primaryScreen().size()
         mW = mSize.width()
 
@@ -69,15 +73,15 @@ class DocumentTextEdit(QPlainTextEdit):
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         self.resizeMargins()
-        
+
         super().resizeEvent(e)
-        
+
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         cursor = de.KeyProcessor.process(self.textCursor(), e.key())
         self.setTextCursor(cursor)
-        
+
         super().keyPressEvent(e)
-        
+
     def mouseMoveEvent(self, e: QMouseEvent | None) -> None:
         if e.buttons() == Qt.MouseButton.LeftButton:
             self.hoverTimer.stop()
@@ -85,14 +89,14 @@ class DocumentTextEdit(QPlainTextEdit):
             tag = self._checkForTag(e.pos())
             if self.hoverTimer.isActive():
                 if tag is None:
-                    self.hoverTimer.stop() 
+                    self.hoverTimer.stop()
             else:
                 if tag is not None:
                     self.hoverTag = tag
                     self.hoverTimer.start(1000)
-        
+
         super().mouseMoveEvent(e)
-        
+
     def _onTimer(self):
         self.hoverTimer.stop()
         self.tagHovered.emit(self.hoverTag)
@@ -103,7 +107,7 @@ class DocumentTextEdit(QPlainTextEdit):
         blockText = cursor.block().text()
         if cursorPos <= 0 or cursorPos >= len(blockText):
             return None
-        
+
         keywordFound = re.search(r"^@(pov|loc)", blockText)
         if keywordFound is None:
             return None

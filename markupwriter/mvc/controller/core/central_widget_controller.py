@@ -27,56 +27,62 @@ class CentralWidgetController(QObject):
     def setup(self):
         self.model.docTreeController.setup()
         self.model.docEditorController.setup()
-        
+
         self.view.lhSplitter.insertWidget(0, self.model.docTreeController.view)
         self.view.rhSplitter.insertWidget(0, self.model.docEditorController.view)
         self.view.rhSplitter.addWidget(self.model.docPreviewController.view)
         self.view.rvSplitter.addWidget(self.model.consoleController.view)
-        
+
         self.view.lhSplitter.setSizes(
             [
                 AppConfig.docTreeSize.width(),
                 AppConfig.docEditorSize.width() + AppConfig.docPreviewSize.width(),
             ]
         )
-        
+
         self.view.rhSplitter.setSizes(
             [
                 AppConfig.docEditorSize.width(),
                 AppConfig.docPreviewSize.width(),
             ]
         )
-        
+
         self.view.rvSplitter.setSizes(
             [
                 AppConfig.docEditorSize.height(),
                 AppConfig.consoleSize.height(),
             ]
         )
-        
-        # --- Editor slots --- #
+
+        # Controllers
         editorController = self.model.docEditorController
+        previewController = self.model.docPreviewController
         treeController = self.model.docTreeController
+
+        # --- Editor slots --- #
         treeController.fileRenamed.connect(editorController.onFileRenamed)
         tree = treeController.view.treewidget
         tree.fileAdded.connect(editorController.onFileAdded)
         tree.fileRemoved.connect(editorController.onFileRemoved)
         tree.fileMoved.connect(editorController.onFileMoved)
         tree.fileDoubleClicked.connect(editorController.onFileDoubleClicked)
-        
+
+        # --- Preview slots --- #
+        editorController.requestedTextPreview.connect(previewController.onTextPreview)
+
     @pyqtSlot()
     def onSaveAction(self):
         editorController = self.model.docEditorController
         editorController.writeCurrentFile()
         editorController.runTokenizer(editorController.model.currDocUUID)
-    
+
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController
         sout << self.model.docEditorController
         sout << self.model.docPreviewController
         sout << self.model.consoleController
         return sout
-    
+
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
         sin >> self.model.docTreeController
         sin >> self.model.docEditorController

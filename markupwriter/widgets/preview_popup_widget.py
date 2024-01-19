@@ -8,13 +8,12 @@ from PyQt6.QtCore import (
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
-    QTextEdit,
+    QPushButton,
 )
 
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
-from markupwriter.common.tokenizers import PreviewTokenizer
-from markupwriter.common.parsers import PreviewParser
+from . import DocumentTextEdit
 
 
 class PreviewPopupWidget(QWidget):
@@ -24,21 +23,22 @@ class PreviewPopupWidget(QWidget):
         self.setWindowFlag(Qt.WindowType.Popup)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setFixedSize(400, 200)
-
-        self.textedit = QTextEdit(self)
-        self.textedit.setReadOnly(True)
-
+        
         self.vLayout = QVBoxLayout(self)
+
+        self.textedit = DocumentTextEdit(self)
+        self.textedit.canResizeMargins = False
+        self.textedit.setEnabled(True)
+        self.textedit.setReadOnly(True)
+        
+        self.viewButton = QPushButton("View...", self)
+
+        self.vLayout.addWidget(self.viewButton)
         self.vLayout.addWidget(self.textedit)
 
         path = AppConfig.projectContentPath() + uuid
-        text = File.read(path)
-        tokenizer = PreviewTokenizer(text)
-        tokenizer.run()
-        parser = PreviewParser(tokenizer.tokens)
-        parser.run()
-        self.textedit.setHtml(parser.html)
+        self.textedit.setPlainText(File.read(path))
         
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.close()
-        return super().leaveEvent(a0)
+        super().leaveEvent(a0)

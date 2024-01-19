@@ -2,8 +2,9 @@
 
 from PyQt6.QtCore import (
     QObject,
-    QDataStream,
+    pyqtSignal,
     pyqtSlot,
+    QDataStream,
     QPoint,
 )
 
@@ -29,6 +30,8 @@ from markupwriter.widgets import PreviewPopupWidget
 
 
 class DocumentEditorController(QObject):
+    requestedTextPreview = pyqtSignal(str)
+
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
 
@@ -45,6 +48,9 @@ class DocumentEditorController(QObject):
             return
         pos = QCursor.pos()
         w = PreviewPopupWidget(refTag.docUUID(), self.view)
+        w.viewButton.clicked.connect(
+            lambda: self.requestedTextPreview.emit(refTag.docUUID())
+        )
         size = w.sizeHint()
         x = pos.x() - int((size.width() / 2))
         y = pos.y() - int(size.height() / 1.25)
