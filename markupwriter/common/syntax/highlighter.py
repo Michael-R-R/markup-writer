@@ -23,7 +23,14 @@ class BEHAVIOUR(Enum):
     sqBracket = 0
     comment = auto()
     multicomment = auto()
-    keyword = auto()
+    italize = auto()
+    bold = auto()
+    italBold = auto()
+    header1 = auto()
+    header2 = auto()
+    header3 = auto()
+    header4 = auto()
+    tags = auto()
 
 
 class Highlighter(QSyntaxHighlighter):
@@ -36,25 +43,58 @@ class Highlighter(QSyntaxHighlighter):
             BEHAVIOUR.sqBracket,
             HighlightExprBehaviour(HighlighterConfig.sqBracketCol, r"\[|\]"),
         )
+
         self.addBehaviour(
             BEHAVIOUR.comment,
             HighlightExprBehaviour(HighlighterConfig.commentCol, r"%(.*)"),
         )
+
         self.addBehaviour(
             BEHAVIOUR.multicomment,
             HighlightMultiExprBehaviour(HighlighterConfig.commentCol, r"<#", r"#>"),
         )
+
         self.addBehaviour(
-            BEHAVIOUR.keyword,
-            HighlightExprBehaviour(HighlighterConfig.keywordCol, r"^@(tag|pov|loc)"),
+            BEHAVIOUR.tags,
+            HighlightExprBehaviour(HighlighterConfig.tagsCol, r"^@(tag|pov|loc)"),
         )
+
+        italBehaviour = HighlightExprBehaviour(
+            HighlighterConfig.boldCol, r"_(.+?)_(?!_)"
+        )
+        italBehaviour.format.setFontItalic(True)
+        self.addBehaviour(BEHAVIOUR.italize, italBehaviour)
+
+        boldBehaviour = HighlightExprBehaviour(
+            HighlighterConfig.boldCol, r"\*(.+?)\*(?!\*)"
+        )
+        boldBehaviour.format.setFontWeight(QFont.Weight.Bold)
+        self.addBehaviour(BEHAVIOUR.bold, boldBehaviour)
+
+        italBoldBehaviour = HighlightExprBehaviour(
+            HighlighterConfig.italBoldCol, r"\^(.+?)\^(?!\^)"
+        )
+        italBoldBehaviour.format.setFontWeight(QFont.Weight.Bold)
+        italBoldBehaviour.format.setFontItalic(True)
+        self.addBehaviour(BEHAVIOUR.italBold, italBoldBehaviour)
+
+        self.addHeaderBehaviour(BEHAVIOUR.header1, r"^# .*", 34.0)
+        self.addHeaderBehaviour(BEHAVIOUR.header2, r"^## .*", 24.0)
+        self.addHeaderBehaviour(BEHAVIOUR.header3, r"^### .*", 18.72)
+        self.addHeaderBehaviour(BEHAVIOUR.header4, r"^#### .*", 16.0)
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self._behaviours.items():
             val.process(self, text)
 
-    def updateFormat(self, start: int, end: int, format: QTextCharFormat):
-        self.setFormat(start, end, format)
+    def addHeaderBehaviour(self, behaviour: BEHAVIOUR, expr: str, size: float):
+        header = HighlightExprBehaviour(QColor(), expr)
+        format = QTextCharFormat()
+        format.setFontWeight(QFont.Weight.Bold)
+        format.setForeground(QBrush(HighlighterConfig.headerCol))
+        format.setFontPointSize(size)
+        header.format = format
+        self.addBehaviour(behaviour, header)
 
     def addBehaviour(self, type: BEHAVIOUR, val: HighlightBehaviour) -> bool:
         if type in self._behaviours:
@@ -78,20 +118,16 @@ class Highlighter(QSyntaxHighlighter):
 
 class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
-        self._color = color
-        self._format = QTextCharFormat()
         self._expr = re.compile(expr)
 
-        self._format.setFontWeight(QFont.Weight.Bold)
-        self._format.setForeground(QBrush(self._color))
+        self.format = QTextCharFormat()
+        self.format.setForeground(QBrush(color))
 
     def process(self, highlighter: Highlighter, text: str):
         raise NotImplementedError()
 
     def setColor(self, color: QColor):
-        self._color = color
-        self._format.setFontWeight(QFont.Weight.Bold)
-        self._format.setForeground(QBrush(self._color))
+        self.format.setForeground(QBrush(color))
 
     def setExpression(self, expr: str):
         self._expr = re.compile(expr)
@@ -108,12 +144,12 @@ class HighlightWordBehaviour(HighlightBehaviour):
             if not word in self._wordSet:
                 continue
 
-            word = r"\b" + word + r"\b"
+            word = "\\b{}\\b".format(word)
             it = re.finditer(word, text)
             for m in it:
                 start = m.start()
                 end = m.end() - start
-                highlighter.updateFormat(start, end, self._format)
+                highlighter.setFormat(start, end, self.format)
 
     def add(self, word: str) -> bool:
         if word in self._wordSet:
@@ -135,22 +171,10 @@ class HighlightWordBehaviour(HighlightBehaviour):
         for word in words:
             self.remove(word)
 
-    def rename(self, old: str, new: str) -> bool:
-        if not old in self._wordSet:
-            return False
-        if new in self._wordSet:
-            return False
-        self._wordSet.remove(old)
-        self._wordSet.add(new)
-        return True
-
     def clear(self):
         self._wordSet.clear()
 
-    def getWords(self) -> set:
-        return self._wordSet
-
-    def doesExist(self, word: str) -> bool:
+    def exist(self, word: str) -> bool:
         return word in self._wordSet
 
 
@@ -163,7 +187,7 @@ class HighlightExprBehaviour(HighlightBehaviour):
         for w in it:
             start = w.start()
             end = w.end() - start
-            highlighter.updateFormat(start, end, self._format)
+            highlighter.setFormat(start, end, self.format)
 
 
 class HighlightMultiExprBehaviour(HighlightBehaviour):
@@ -192,6 +216,6 @@ class HighlightMultiExprBehaviour(HighlightBehaviour):
                     endIndex - startIndex + (endMatch.end() - endMatch.start())
                 )
 
-            highlighter.updateFormat(startIndex, multiLength, self._format)
+            highlighter.setFormat(startIndex, multiLength, self.format)
 
             startIndex = text.find(self._expr.pattern, startIndex + multiLength)

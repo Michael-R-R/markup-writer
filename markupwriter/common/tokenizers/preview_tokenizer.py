@@ -41,8 +41,6 @@ class PreviewTokenizer(object):
             for found in it:
                 self.text = self.text.replace(found.group(0), "")
 
-        # TODO preprocess text formatting
-
     def _processLine(self, line: str) -> bool:
         for p in self.tokenPatterns:
             found = p.search(line)
