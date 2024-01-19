@@ -10,10 +10,10 @@ class PreviewTokenizer(object):
         self.tokens: list[(str, str)] = list()
         
         self.tokenPatterns = [
-            re.compile(r"^#"),  # title
-            re.compile(r"^##"),  # chapter
-            re.compile(r"^###"),  # scene
-            re.compile(r"^####"),  # section
+            re.compile(r"^# "),  # title
+            re.compile(r"^## "),  # chapter
+            re.compile(r"^### "),  # scene
+            re.compile(r"^#### "),  # section
         ]
         
         self.removePatterns = [
