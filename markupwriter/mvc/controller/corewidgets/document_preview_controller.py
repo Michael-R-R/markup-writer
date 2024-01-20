@@ -14,8 +14,6 @@ from markupwriter.mvc.view.corewidgets import (
     DocumentPreviewView,
 )
 
-from markupwriter.config import AppConfig
-from markupwriter.common.util import File
 import markupwriter.widgets as mw
 
 
@@ -31,12 +29,7 @@ class DocumentPreviewController(QObject):
         
     pyqtSlot(str)
     def onPreviewRequested(self, title: str, uuid: str):
-        # TODO make widget that can cycle plain/html
-        widget = mw.DocumentTextEdit(self.view)
-        widget.setEnabled(True)
-        widget.setReadOnly(True)
-        path = AppConfig.projectContentPath() + uuid
-        widget.setPlainText(File.read(path))
+        widget = mw.DocumentPreviewWidget(uuid, self.view)
         self.view.addPage(title, widget)
         
     def __rlshift__(self, sout: QDataStream) -> QDataStream:

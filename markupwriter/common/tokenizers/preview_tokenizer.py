@@ -1,39 +1,62 @@
 #!/usr/bin/python
 
 import re
-from typing import Iterator
+
+from PyQt6.QtCore import (
+    QObject,
+    QRunnable,
+    pyqtSignal,
+    pyqtSlot,
+)
 
 
-class PreviewTokenizer(object):
-    def __init__(self, text: str) -> None:
+class WorkerSignal(QObject):
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+    result = pyqtSignal(list)
+
+
+class PreviewTokenizer(QRunnable):
+    def __init__(self, text: str, parent: QObject | None) -> None:
+        super().__init__()
         self.text = text
+        self.signals = WorkerSignal(parent)
         self.tokens: list[(str, str)] = list()
-        
+
         self.tokenPatterns = [
             re.compile(r"^# "),  # title
             re.compile(r"^## "),  # chapter
             re.compile(r"^### "),  # scene
             re.compile(r"^#### "),  # section
         ]
-        
+
         self.removePatterns = [
-            re.compile(r"^@(tag|pov|loc).*"),  # tags
-            re.compile(r"%.*"),  # single line comment
-            re.compile(r"<#(\n|.)*?#>"),  # multi line comment
+            re.compile(r"^@(tag|pov|loc).*", re.MULTILINE),  # tags
+            re.compile(r"%.*", re.MULTILINE),  # single line comment
+            re.compile(r"<#(\n|.)*?#>", re.MULTILINE),  # multi line comment
         ]
 
+    @pyqtSlot()
     def run(self):
-        self._preprocess()
+        try:
+            self._preprocess()
 
-        for line in self.text.splitlines():
-            line = line.strip()
-            if line == "":
-                continue
+            for line in self.text.splitlines():
+                line = line.strip()
+                if line == "":
+                    continue
 
-            if self._processLine(line):
-                continue
+                if self._processLine(line):
+                    continue
 
-            self.tokens.append(("p", line))
+                self.tokens.append(("p", line))
+
+        except Exception as e:
+            self.signals.error.emit(str(e))
+
+        else:
+            self.signals.finished.emit()
+            self.signals.result.emit(self.tokens)
 
     def _preprocess(self):
         for pattern in self.removePatterns:
