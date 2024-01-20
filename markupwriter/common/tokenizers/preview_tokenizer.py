@@ -34,7 +34,7 @@ class PreviewTokenizer(object):
                 continue
 
             self.tokens.append(("p", line))
-            
+
         return self.tokens
 
     def _preprocess(self):

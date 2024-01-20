@@ -1,9 +1,5 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    QThreadPool,
-)
-
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -28,7 +24,6 @@ class DocumentPreviewWidget(QWidget):
         self.plainText = File.read(path)
         self.html = ""
         self.isPlainText = True
-        self.threadPool = QThreadPool(self)
         
         self.textedit = QTextEdit(self)
         self.highlighter = Highlighter(self.textedit.document())
