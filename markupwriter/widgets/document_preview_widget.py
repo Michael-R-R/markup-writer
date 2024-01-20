@@ -33,6 +33,7 @@ class DocumentPreviewWidget(QWidget):
         self.textedit = QTextEdit(self)
         self.highlighter = Highlighter(self.textedit.document())
         self.textedit.setReadOnly(True)
+        self.textedit.setTabStopDistance(20.0)
         self.textedit.setPlainText(self.plainText)
         
         self.toggleButton = QPushButton("HTML", self)

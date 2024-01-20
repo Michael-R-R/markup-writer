@@ -70,7 +70,7 @@ class PreviewTokenizer(QRunnable):
             if found is None:
                 continue
 
-            tag = found.group(0)
+            tag = found.group(0).strip()
             text = line[len(tag) :].strip()
             self.tokens.append((tag, text))
             return True
