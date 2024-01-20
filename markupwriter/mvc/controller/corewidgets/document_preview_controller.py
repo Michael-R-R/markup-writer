@@ -26,20 +26,17 @@ class DocumentPreviewController(QObject):
         self.model = DocumentPreview(self)
         self.view = DocumentPreviewView(None)
         
+    def setup(self):
+        pass
+        
     pyqtSlot(str)
-    def onTextPreview(self, uuid: str):
+    def onPreviewRequested(self, title: str, uuid: str):
         widget = mw.DocumentTextEdit(self.view)
         widget.setEnabled(True)
         widget.setReadOnly(True)
         path = AppConfig.projectContentPath() + uuid
         widget.setPlainText(File.read(path))
-        
-        self.view.removeWidget()
-        self.view.addWidget(widget)
-        
-    def onAddBrowserDocument(self, widget: mw.DocumentPreviewBrowser):
-        self.view.removeWidget()
-        self.view.addWidget(widget)
+        self.view.addPage(title, widget)
         
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         return sout

@@ -161,6 +161,30 @@ class DocumentTreeWidget(QTreeWidget):
                 return item
 
         return None
+    
+    def findWidget(self, uuid: str) -> dti.BaseTreeItem | None:
+        def helper(item: QTreeWidgetItem) -> dti.BaseTreeItem | None:
+            for i in range(item.childCount()):
+                child = item.child(i)
+                widget: dti.BaseTreeItem = self.itemWidget(child, 0)
+                if widget.UUID() == uuid:
+                    return widget
+                widget = helper(child)
+                if widget is not None:
+                    return widget
+            
+            return None
+        
+        for i in range(self.topLevelItemCount()):
+            item = self.topLevelItem(i)
+            widget: dti.BaseTreeItem = self.itemWidget(item, 0)
+            if widget.UUID() == uuid:
+                return widget
+            widget = helper(item)
+            if widget is not None:
+                return widget
+        
+        return None
 
     def isInTrash(self, item: QTreeWidgetItem) -> bool:
         trash = self.findTrash()

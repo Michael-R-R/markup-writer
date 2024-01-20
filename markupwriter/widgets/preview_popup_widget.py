@@ -24,20 +24,19 @@ class PreviewPopupWidget(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setFixedSize(400, 200)
         
-        self.vLayout = QVBoxLayout(self)
+        self.previewButton = QPushButton("Preview...", self)
 
         self.textedit = DocumentTextEdit(self)
         self.textedit.canResizeMargins = False
+        self.textedit.setMouseTracking(False)
         self.textedit.setEnabled(True)
         self.textedit.setReadOnly(True)
-        
-        self.previewButton = QPushButton("Preview...", self)
-
-        self.vLayout.addWidget(self.previewButton)
-        self.vLayout.addWidget(self.textedit)
-
         path = AppConfig.projectContentPath() + uuid
         self.textedit.setPlainText(File.read(path))
+
+        self.vLayout = QVBoxLayout(self)
+        self.vLayout.addWidget(self.previewButton)
+        self.vLayout.addWidget(self.textedit)
         
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.close()

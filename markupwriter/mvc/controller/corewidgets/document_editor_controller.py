@@ -30,7 +30,7 @@ from markupwriter.widgets import PreviewPopupWidget
 
 
 class DocumentEditorController(QObject):
-    requestedTextPreview = pyqtSignal(str)
+    textPreviewRequested = pyqtSignal(str)
 
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
@@ -46,14 +46,18 @@ class DocumentEditorController(QObject):
         refTag = self.model.refManager.getTag(tag)
         if refTag is None:
             return
-        pos = QCursor.pos()
-        w = PreviewPopupWidget(refTag.docUUID(), self.view)
-        w.previewButton.clicked.connect(
-            lambda: self.requestedTextPreview.emit(refTag.docUUID())
-        )
+
+        uuid = refTag.docUUID()
+        
+        w = PreviewPopupWidget(uuid, self.view)
+        w.previewButton.clicked.connect(lambda: self.textPreviewRequested.emit(uuid))
+        w.previewButton.clicked.connect(lambda: w.close())
+        
         size = w.sizeHint()
+        pos = QCursor.pos()
         x = pos.x() - int((size.width() / 2))
         y = pos.y() - int(size.height() / 1.25)
+        
         w.move(QPoint(x, y))
         w.show()
 

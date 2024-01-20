@@ -99,6 +99,9 @@ class DocumentTreeController(QObject):
         tree.add(dti.ObjFolderItem())
         tree.add(dti.TrashFolderItem()) 
         
+    def findTreeItem(self, uuid: str) -> dti.BaseTreeItem:
+        return self.view.treewidget.findWidget(uuid)
+        
     @pyqtSlot(str, list)
     def _onFileAdded(self, uuid: str, paths: list[str]):
         path = AppConfig.projectContentPath()
