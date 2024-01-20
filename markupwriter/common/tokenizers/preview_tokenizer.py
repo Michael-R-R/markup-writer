@@ -2,25 +2,11 @@
 
 import re
 
-from PyQt6.QtCore import (
-    QObject,
-    QRunnable,
-    pyqtSignal,
-    pyqtSlot,
-)
 
-
-class WorkerSignal(QObject):
-    finished = pyqtSignal()
-    error = pyqtSignal(str)
-    result = pyqtSignal(list)
-
-
-class PreviewTokenizer(QRunnable):
-    def __init__(self, text: str, parent: QObject | None) -> None:
+class PreviewTokenizer(object):
+    def __init__(self, text: str) -> None:
         super().__init__()
         self.text = text
-        self.signals = WorkerSignal(parent)
         self.tokens: list[(str, str)] = list()
 
         self.tokenPatterns = [
@@ -36,27 +22,20 @@ class PreviewTokenizer(QRunnable):
             re.compile(r"<#(\n|.)*?#>", re.MULTILINE),  # multi line comment
         ]
 
-    @pyqtSlot()
-    def run(self):
-        try:
-            self._preprocess()
+    def run(self) -> list[(str, str)]:
+        self._preprocess()
 
-            for line in self.text.splitlines():
-                line = line.strip()
-                if line == "":
-                    continue
+        for line in self.text.splitlines():
+            line = line.strip()
+            if line == "":
+                continue
 
-                if self._processLine(line):
-                    continue
+            if self._processLine(line):
+                continue
 
-                self.tokens.append(("p", line))
-
-        except Exception as e:
-            self.signals.error.emit(str(e))
-
-        else:
-            self.signals.finished.emit()
-            self.signals.result.emit(self.tokens)
+            self.tokens.append(("p", line))
+            
+        return self.tokens
 
     def _preprocess(self):
         for pattern in self.removePatterns:

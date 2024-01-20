@@ -36,7 +36,7 @@ class DocumentPreviewWidget(QWidget):
         self.textedit.setTabStopDistance(20.0)
         self.textedit.setPlainText(self.plainText)
         
-        self.toggleButton = QPushButton("HTML", self)
+        self.toggleButton = QPushButton("Plain", self)
         self.toggleButton.clicked.connect(self._onToggleButton)
         
         self.vLayout = QVBoxLayout(self)
@@ -47,20 +47,16 @@ class DocumentPreviewWidget(QWidget):
         self.isPlainText = not self.isPlainText
         
         if self.isPlainText:
-            self.toggleButton.setText("HTML")
+            self.toggleButton.setText("Plain")
             self.textedit.setPlainText(self.plainText)
         else:
-            self.toggleButton.setText("Plain")
+            self.toggleButton.setText("HTML")
             self.textedit.clear()
             if self.html == "":
-                tokenizer = PreviewTokenizer(self.plainText, self)
-                tokenizer.signals.result.connect(self._runParser)
-                self.threadPool.start(tokenizer)
+                tokenizer = PreviewTokenizer(self.plainText)
+                tokens = tokenizer.run()
+                parser = PreviewParser()
+                self.html = parser.run(tokens)
+                self.textedit.setHtml(self.html)
             else:
                 self.textedit.setHtml(self.html)
-                
-    def _runParser(self, tokens: list[(str, str)]):
-        parser = PreviewParser(tokens)
-        parser.run()
-        self.html = parser.html
-        self.textedit.setHtml(self.html)

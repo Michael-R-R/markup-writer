@@ -4,11 +4,11 @@ import re
 
 
 class PreviewParser(object):
-    def __init__(self, tokens: list[(str, str)]) -> None:
-        self.tokens = tokens
+    def __init__(self) -> None:
         self.html = ""
 
-        self._func = {
+    def run(self, tokens: list[(str, str)]) -> str:
+        funcs = {
             "p": self._processParagraph,
             "#": self._processHeader1,
             "##": self._processHeader2,
@@ -16,26 +16,27 @@ class PreviewParser(object):
             "####": self._processHeader4,
         }
 
-    def run(self):
-        for t in self.tokens:
-            self._func[t[0]](t[1])
+        for t in tokens:
+            funcs[t[0]](t[1])
 
         self._postprocess()
+
+        return self.html
 
     def _processParagraph(self, line: str):
         self.html += "<p>{}</p>".format(line)
 
     def _processHeader1(self, line: str):
-        self.html += "<h1>{}</h1>".format(line)
+        self.html += "<h1 class='title'>{}</h1>".format(line)
 
     def _processHeader2(self, line: str):
-        self.html += "<h2>{}</h2>".format(line)
+        self.html += "<h2 class='chapter'>{}</h2>".format(line)
 
     def _processHeader3(self, line: str):
-        self.html += "<h3>{}</h3>".format(line)
+        self.html += "<h3 class='scene'>{}</h3>".format(line)
 
     def _processHeader4(self, line: str):
-        self.html += "<h4>{}</h4>".format(line)
+        self.html += "<h4 class='section'>{}</h4>".format(line)
 
     def _searchReplace(self, regex: str, char: str, tag: str):
         expr = re.compile(regex)
