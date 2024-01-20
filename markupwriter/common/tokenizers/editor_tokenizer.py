@@ -22,7 +22,7 @@ class EditorTokenizer(QRunnable):
         self.uuid = uuid
         self.text = text
         self.signals = WorkerSignal(parent)
-        self.tagPattern = re.compile(r"^@(tag)")
+        self.tagPattern = re.compile(r"^@(tag).*", re.MULTILINE)
         self.namesPattern = re.compile(r"(?<=\[).+?(?=\])")
 
     @pyqtSlot()
@@ -32,26 +32,17 @@ class EditorTokenizer(QRunnable):
                 "@tag": list(),
             }
 
-            index = self.text.find("\n")
-            while index > -1:
-                line = self.text[: index + 1].strip()
-                self.text = self.text[index + 1 :]
-                index = self.text.find("\n")
-
-                tagFound = self.tagPattern.search(line)
-                if tagFound is None:
-                    continue
-                
+            it = self.tagPattern.finditer(self.text)
+            for found in it:
+                line = found.group(0)
                 namesFound = self.namesPattern.search(line)
                 if namesFound is None:
-                    return
+                    continue
                 
-                tag = tagFound.group(0)
                 names = namesFound.group(0)
-                
                 nameList = [n.strip() for n in names.split(",")]
-                    
-                tokens[tag].append(nameList)
+                
+                tokens["@tag"].append(nameList)
 
         except Exception as e:
             self.signals.error.emit(str(e))

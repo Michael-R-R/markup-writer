@@ -26,6 +26,9 @@ class EditorParser(QObject):
         self.prevTokens[uuid] = tokens
         
     def popPrevUUID(self, uuid: str):
+        if not uuid in self.prevTokens:
+            return
+        
         self._handlePrevTokens(uuid)
         self.prevTokens.pop(uuid)
 
