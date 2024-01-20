@@ -18,9 +18,9 @@ class BaseFolderItem(BaseTreeItem):
     def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(title, parent)
 
-        self._flags += ITEM_FLAG.folder
-        self._flags += ITEM_FLAG.draggable
-        self._flags += ITEM_FLAG.mutable
+        self.flags += ITEM_FLAG.folder
+        self.flags += ITEM_FLAG.draggable
+        self.flags += ITEM_FLAG.mutable
 
     def shallowcopy(self, other=None):
         other: BaseFolderItem = super().shallowcopy(other)

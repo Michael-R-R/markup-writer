@@ -10,8 +10,6 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtGui import (
     QIcon,
-    QPixmap,
-    QColor,
 )
 
 from PyQt6.QtWidgets import (
@@ -23,10 +21,6 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import (
     AppConfig,
-)
-
-from markupwriter.common.provider import (
-    Icon,
 )
 
 
@@ -43,21 +37,16 @@ class BaseTreeItem(QWidget):
     ICON = 1
     TITLE = 2
     WORD_COUNT = 3
-    ACTIVE = 4
-    GROUP = 5
-    PRIORITY = 6
 
     def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(parent)
 
+        self.item = QTreeWidgetItem()
+        self.flags = ITEM_FLAG.none
+
         self._uuid = str(uuid.uuid1())
-        self._item = QTreeWidgetItem()
         self._title = title
         self._wordCount = "0"
-        self._isActive = False
-        self._groupStatus = QColor(64, 64, 64)
-        self._priorityStatus = QColor(64, 64, 64)
-        self._flags = ITEM_FLAG.none
 
         hLayout = QHBoxLayout(self)
         hLayout.setContentsMargins(1, 2, 1, 2)
@@ -65,21 +54,15 @@ class BaseTreeItem(QWidget):
         hLayout.addWidget(QLabel("title", self))
         hLayout.addStretch()
         hLayout.addWidget(QLabel("wc", self))
-        hLayout.addWidget(QLabel("active", self))
-        hLayout.addWidget(QLabel("group", self))
-        hLayout.addWidget(QLabel("priority", self))
 
         self.applyChanges()
 
     def shallowcopy(self, other=None):
+        other.item = self.item
+        other.flags = self.flags
         other._uuid = self._uuid
-        other._item = self._item
         other._title = self._title
         other._wordCount = self._wordCount
-        other._isActive = self._isActive
-        other._groupStatus = self._groupStatus
-        other._priorityStatus = self._priorityStatus
-        other._flags = self._flags
         return other
 
     def applyIcon(self):
@@ -87,98 +70,50 @@ class BaseTreeItem(QWidget):
 
     def applyChanges(self):
         self.applyIcon()
-        self.title = self._title
-        self.wordCount = self._wordCount
-        self.isActive = self._isActive
-        self.groupStatus = self._groupStatus
-        self.priorityStatus = self._priorityStatus
+        self.setTitle(self._title)
+        self.setWordCount(self._wordCount)
 
     def UUID(self) -> str:
         return self._uuid
 
+    def title(self) -> str:
+        return self._title
+
+    def wordCount(self) -> str:
+        return self._wordCount
+
     def hasFlag(self, flag: int) -> bool:
-        return (self._flags & flag) == flag
+        return (self.flags & flag) == flag
 
-    def flags(self, flags: int) -> int:
-        self._flags = flags
-
-    flags = property(lambda self: self._flags, flags)
-
-    def item(self, val: QTreeWidgetItem):
-        self._item = val
-
-    item = property(lambda self: self._item, item)
-
-    def icon(self, icon: QIcon):
+    def setIcon(self, icon: QIcon):
         label: QLabel = self.children()[self.ICON]
         label.setPixmap(icon.pixmap(AppConfig.ICON_SIZE))
 
-    icon = property(None, icon)
-
-    def title(self, text: str):
+    def setTitle(self, text: str):
         if text == "":
             return
         self._title = text
         label: QLabel = self.children()[self.TITLE]
         label.setText(text)
 
-    title = property(lambda x: x._title, title)
-
-    def wordCount(self, text: str):
+    def setWordCount(self, text: str):
         if not text.isnumeric():
             return
         self._wordCount = text
         label: QLabel = self.children()[self.WORD_COUNT]
         label.setText(text)
 
-    wordCount = property(lambda self: self._wordCount, wordCount)
-
-    def isActive(self, status: bool):
-        self._isActive = status
-        label: QLabel = self.children()[self.ACTIVE]
-        if status:
-            label.setPixmap(Icon.CHECK.pixmap(AppConfig.ICON_SIZE))
-        else:
-            label.setPixmap(Icon.UNCHECK.pixmap(AppConfig.ICON_SIZE))
-
-    isActive = property(lambda self: self._isActive, isActive)
-
-    def groupStatus(self, color: QColor):
-        pix = QPixmap(AppConfig.ICON_SIZE)
-        pix.fill(color)
-        label: QLabel = self.children()[self.GROUP]
-        label.setPixmap(pix)
-
-    groupStatus = property(lambda self: self._groupStatus, groupStatus)
-
-    def priorityStatus(self, color: QColor):
-        pix = QPixmap(AppConfig.ICON_SIZE)
-        pix.fill(color)
-        label: QLabel = self.children()[self.PRIORITY]
-        label.setPixmap(pix)
-
-    priorityStatus = property(lambda self: self._priorityStatus, priorityStatus)
-
-    def toggleActive(self):
-        self.isActive = not self.isActive
-
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut.writeQString(self._uuid)
         sOut.writeQString(self._title)
         sOut.writeQString(self._wordCount)
-        sOut.writeBool(self._isActive)
-        sOut << self._groupStatus
-        sOut << self._priorityStatus
-        sOut.writeInt(self._flags)
+        sOut.writeInt(self.flags)
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         self._uuid = sIn.readQString()
         self._title = sIn.readQString()
         self._wordCount = sIn.readQString()
-        self._isActive = sIn.readBool()
-        sIn >> self._groupStatus
-        sIn >> self._priorityStatus
-        self._flags = sIn.readInt()
+        self.flags = sIn.readInt()
         self.applyChanges()
         return sIn

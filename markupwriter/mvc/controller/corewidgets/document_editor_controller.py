@@ -26,7 +26,7 @@ from markupwriter.common.tokenizers import (
 
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
-from markupwriter.widgets import PreviewPopupWidget
+from markupwriter.widgets import PopupPreviewWidget
 
 
 class DocumentEditorController(QObject):
@@ -49,7 +49,7 @@ class DocumentEditorController(QObject):
 
         uuid = refTag.docUUID()
         
-        w = PreviewPopupWidget(uuid, self.view)
+        w = PopupPreviewWidget(uuid, self.view)
         w.previewButton.clicked.connect(lambda: self.textPreviewRequested.emit(uuid))
         w.previewButton.clicked.connect(lambda: w.close())
         
@@ -74,7 +74,7 @@ class DocumentEditorController(QObject):
 
     @pyqtSlot(str, list)
     def onFileAdded(self, uuid: str, path: list[str]):
-        if self._isIdMatching(uuid):
+        if self._isCurrIdMatching(uuid):
             return
         self.writeCurrentFile()
         self.runTokenizer(self.model.currDocUUID)
@@ -89,7 +89,7 @@ class DocumentEditorController(QObject):
     @pyqtSlot(str)
     def onFileRemoved(self, uuid: str):
         self.model.parser.popPrevUUID(uuid)
-        if not self._isIdMatching(uuid):
+        if not self._isCurrIdMatching(uuid):
             return
         self.model.currDocPath = ""
         self.model.currDocUUID = ""
@@ -98,7 +98,7 @@ class DocumentEditorController(QObject):
 
     @pyqtSlot(str, list)
     def onFileMoved(self, uuid: str, path: list[str]):
-        if not self._isIdMatching(uuid):
+        if not self._isCurrIdMatching(uuid):
             return
         self.model.currDocPath = self._makePathStr(path)
         self.view.setPathLabel(self.model.currDocPath)
@@ -109,7 +109,7 @@ class DocumentEditorController(QObject):
 
     @pyqtSlot(str, str, str)
     def onFileRenamed(self, uuid: str, old: str, new: str):
-        if not self._isIdMatching(uuid):
+        if not self._isCurrIdMatching(uuid):
             return
         self.model.currDocPath = self.model.currDocPath.replace(old, new)
         self.view.setPathLabel(self.model.currDocPath)
@@ -132,7 +132,7 @@ class DocumentEditorController(QObject):
         path += self.model.currDocUUID
         return File.read(path)
 
-    def _isIdMatching(self, uuid: str) -> bool:
+    def _isCurrIdMatching(self, uuid: str) -> bool:
         return self.model.currDocUUID == uuid
 
     def _makePathStr(self, pathList: list[str]) -> str:

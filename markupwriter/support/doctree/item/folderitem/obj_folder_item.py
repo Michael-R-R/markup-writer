@@ -21,8 +21,8 @@ from .base_folder_item import (
 class ObjFolderItem(BaseFolderItem):
     def __init__(self, parent: QWidget = None):
         super().__init__("Objects", parent)
-        self._flags -= ITEM_FLAG.draggable
-        self._flags -= ITEM_FLAG.mutable
+        self.flags -= ITEM_FLAG.draggable
+        self.flags -= ITEM_FLAG.mutable
 
     def shallowcopy(self, other=None):
         other: ObjFolderItem = super().shallowcopy(ObjFolderItem())
@@ -30,7 +30,7 @@ class ObjFolderItem(BaseFolderItem):
         return other
 
     def applyIcon(self):
-        self.icon = Icon.OBJECTS_FOLDER
+        self.setIcon(Icon.OBJECTS_FOLDER)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

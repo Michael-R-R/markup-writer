@@ -29,7 +29,7 @@ class MiscFolderItem(BaseFolderItem):
         return other
 
     def applyIcon(self):
-        self.icon = Icon.MISC_FOLDER
+        self.setIcon(Icon.MISC_FOLDER)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

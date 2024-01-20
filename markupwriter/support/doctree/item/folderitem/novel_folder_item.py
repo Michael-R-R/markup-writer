@@ -22,7 +22,7 @@ class NovelFolderItem(BaseFolderItem):
     def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(title, parent)
 
-        self._flags -= ITEM_FLAG.draggable
+        self.flags -= ITEM_FLAG.draggable
 
         label: QWidget = self.children()[self.TITLE]
         font = label.font()
@@ -35,7 +35,7 @@ class NovelFolderItem(BaseFolderItem):
         return other
 
     def applyIcon(self):
-        self.icon = Icon.NOVEL_FOLDER
+        self.setIcon(Icon.NOVEL_FOLDER)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

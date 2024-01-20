@@ -31,6 +31,7 @@ class DocumentPreviewController(QObject):
         
     pyqtSlot(str)
     def onPreviewRequested(self, title: str, uuid: str):
+        # TODO make widget that can cycle plain/html
         widget = mw.DocumentTextEdit(self.view)
         widget.setEnabled(True)
         widget.setReadOnly(True)

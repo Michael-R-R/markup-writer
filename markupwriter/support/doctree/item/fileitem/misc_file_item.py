@@ -27,7 +27,7 @@ class MiscFileItem(BaseFileItem):
         return other
 
     def applyIcon(self):
-        self.icon = Icon.MISC_FILE
+        self.setIcon(Icon.MISC_FILE)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

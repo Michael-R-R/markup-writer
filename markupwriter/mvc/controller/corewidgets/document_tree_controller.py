@@ -70,7 +70,6 @@ class DocumentTreeController(QObject):
         # --- Item context menu signals --- #
         icm = self.view.treewidget.itemContextMenu
         icm.addItemMenu.itemCreated.connect(self._onItemCreated)
-        icm.toggleActiveAction.triggered.connect(self._onItemToggleActive)
         icm.renameAction.triggered.connect(self._onItemRename)
         icm.toTrashAction.triggered.connect(self._onItemMoveToTrash)
         icm.recoverAction.triggered.connect(self._onItemRecover)
@@ -131,16 +130,6 @@ class DocumentTreeController(QObject):
         self.view.treewidget.add(item)
 
     @pyqtSlot()
-    def _onItemToggleActive(self):
-        tree = self.view.treewidget
-        item = tree.currentItem()
-        if item is None:
-            return
-
-        widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
-        widget.toggleActive()
-
-    @pyqtSlot()
     def _onItemRename(self):
         tree = self.view.treewidget
         item = tree.currentItem()
@@ -148,13 +137,13 @@ class DocumentTreeController(QObject):
             return
 
         widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
-        text = StrDialog.run("Rename", widget.title, None)
+        text = StrDialog.run("Rename", widget.title(), None)
         if text is None:
             return
 
-        oldTitle = widget.title
+        oldTitle = widget.title()
         
-        widget.title = text
+        widget.setTitle(text)
         
         if widget.hasFlag(dti.ITEM_FLAG.file):
             self.fileRenamed.emit(widget.UUID(), oldTitle, text)
@@ -196,31 +185,21 @@ class DocumentTreeController(QObject):
 
         for i in range(item.childCount() - 1, -1, -1):
             tree.remove(item.child(i))
-            
-    def _writeHelper(self, sOut: QDataStream, tree: QTreeWidget, iParent: QTreeWidgetItem):
-        cCount = iParent.childCount()
-        sOut.writeInt(cCount)
-
-        for i in range(cCount):
-            iChild = iParent.child(i)
-            wChild: dti.BaseTreeItem = tree.itemWidget(iChild, 0)
-            sOut.writeQString(wChild.__class__.__name__)
-            self._writeHelper(sOut, tree, iChild)
-            sOut << wChild
-            
-    def _readHelper(self, sIn: QDataStream, tree: QTreeWidget, iParent: QTreeWidgetItem):
-        cCount = sIn.readInt()
-
-        for _ in range(cCount):
-            type = sIn.readQString()
-            wChild: dti.BaseTreeItem = TreeItemFactory.make(type)
-            self._readHelper(sIn, tree, wChild.item)
-            sIn >> wChild
-
-            iParent.addChild(wChild.item)
-            tree.setItemWidget(wChild.item, 0, wChild)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        
+        # recursive helper
+        def helper(sOut: QDataStream, tree: QTreeWidget, iParent: QTreeWidgetItem):
+            cCount = iParent.childCount()
+            sOut.writeInt(cCount)
+
+            for i in range(cCount):
+                iChild = iParent.child(i)
+                wChild: dti.BaseTreeItem = tree.itemWidget(iChild, 0)
+                sOut.writeQString(wChild.__class__.__name__)
+                helper(sOut, tree, iChild)
+                sOut << wChild
+        
         tree = self.view.treewidget
         
         iCount = tree.topLevelItemCount()
@@ -234,11 +213,25 @@ class DocumentTreeController(QObject):
             sout << wParent
 
             # Child level items
-            self._writeHelper(sout, tree, iParent)
+            helper(sout, tree, iParent)
 
         return sout
 
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        
+        # recursive helper
+        def helper(sIn: QDataStream, tree: QTreeWidget, iParent: QTreeWidgetItem):
+            cCount = sIn.readInt()
+
+            for _ in range(cCount):
+                type = sIn.readQString()
+                wChild: dti.BaseTreeItem = TreeItemFactory.make(type)
+                helper(sIn, tree, wChild.item)
+                sIn >> wChild
+
+                iParent.addChild(wChild.item)
+                tree.setItemWidget(wChild.item, 0, wChild)
+        
         tree = self.view.treewidget
         
         iCount = sin.readInt()
@@ -250,7 +243,7 @@ class DocumentTreeController(QObject):
             sin >> wParent
 
             # Child level items
-            self._readHelper(sin, tree, wParent.item)
+            helper(sin, tree, wParent.item)
 
             tree.addTopLevelItem(wParent.item)
             tree.setItemWidget(wParent.item, 0, wParent)

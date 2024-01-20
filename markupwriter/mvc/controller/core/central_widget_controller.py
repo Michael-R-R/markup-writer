@@ -84,7 +84,7 @@ class CentralWidgetController(QObject):
             return
         
         previewController = self.model.docPreviewController
-        previewController.onPreviewRequested(widget.title, uuid)
+        previewController.onPreviewRequested(widget.title(), uuid)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController

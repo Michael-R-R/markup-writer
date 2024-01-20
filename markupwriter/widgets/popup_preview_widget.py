@@ -16,7 +16,7 @@ from markupwriter.common.util import File
 from . import DocumentTextEdit
 
 
-class PreviewPopupWidget(QWidget):
+class PopupPreviewWidget(QWidget):
     def __init__(self, uuid: str, parent: QWidget | None) -> None:
         super().__init__(parent)
 

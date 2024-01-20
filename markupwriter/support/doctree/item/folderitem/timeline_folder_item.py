@@ -21,8 +21,8 @@ from .base_folder_item import (
 class TimelineFolderItem(BaseFolderItem):
     def __init__(self, parent: QWidget = None):
         super().__init__("Timeline", parent)
-        self._flags -= ITEM_FLAG.draggable
-        self._flags -= ITEM_FLAG.mutable
+        self.flags -= ITEM_FLAG.draggable
+        self.flags -= ITEM_FLAG.mutable
 
     def shallowcopy(self, other=None):
         other: TimelineFolderItem = super().shallowcopy(TimelineFolderItem())
@@ -30,7 +30,7 @@ class TimelineFolderItem(BaseFolderItem):
         return other
 
     def applyIcon(self):
-        self.icon = Icon.TIMELINE_FOLDER
+        self.setIcon(Icon.TIMELINE_FOLDER)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

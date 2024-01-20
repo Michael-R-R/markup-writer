@@ -21,8 +21,8 @@ from .base_folder_item import (
 class TrashFolderItem(BaseFolderItem):
     def __init__(self, parent: QWidget = None):
         super().__init__("Trash", parent)
-        self._flags -= ITEM_FLAG.draggable
-        self._flags -= ITEM_FLAG.mutable
+        self.flags -= ITEM_FLAG.draggable
+        self.flags -= ITEM_FLAG.mutable
 
     def shallowcopy(self, other=None):
         other: TrashFolderItem = super().shallowcopy(TrashFolderItem())
@@ -30,7 +30,7 @@ class TrashFolderItem(BaseFolderItem):
         return other
 
     def applyIcon(self):
-        self.icon = Icon.TRASH_FOLDER
+        self.setIcon(Icon.TRASH_FOLDER)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

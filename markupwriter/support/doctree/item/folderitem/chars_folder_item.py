@@ -19,8 +19,8 @@ class CharsFolderItem(BaseFolderItem):
     def __init__(self, parent: QWidget = None):
         super().__init__("Characters", parent)
 
-        self._flags -= ITEM_FLAG.draggable
-        self._flags -= ITEM_FLAG.mutable
+        self.flags -= ITEM_FLAG.draggable
+        self.flags -= ITEM_FLAG.mutable
 
     def shallowcopy(self, other=None):
         other: CharsFolderItem = super().shallowcopy(CharsFolderItem())
@@ -28,7 +28,7 @@ class CharsFolderItem(BaseFolderItem):
         return other
 
     def applyIcon(self):
-        self.icon = Icon.CHARACTERS_FOLDER
+        self.setIcon(Icon.CHARACTERS_FOLDER)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

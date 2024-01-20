@@ -13,7 +13,6 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
-from markupwriter.common.provider import Style
 
 
 class DocumentPreviewView(QWidget):

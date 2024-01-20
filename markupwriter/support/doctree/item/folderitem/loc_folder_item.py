@@ -22,8 +22,8 @@ class LocFolderItem(BaseFolderItem):
     def __init__(self, parent: QWidget = None):
         super().__init__("Locations", parent)
 
-        self._flags -= ITEM_FLAG.draggable
-        self._flags -= ITEM_FLAG.mutable
+        self.flags -= ITEM_FLAG.draggable
+        self.flags -= ITEM_FLAG.mutable
 
     def shallowcopy(self, other=None):
         other: LocFolderItem = super().shallowcopy(LocFolderItem())
@@ -31,7 +31,7 @@ class LocFolderItem(BaseFolderItem):
         return other
 
     def applyIcon(self):
-        self.icon = Icon.LOCATIONS_FOLDER
+        self.setIcon(Icon.LOCATIONS_FOLDER)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

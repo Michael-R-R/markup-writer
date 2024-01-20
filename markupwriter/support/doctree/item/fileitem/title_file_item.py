@@ -27,7 +27,7 @@ class TitleFileItem(BaseFileItem):
         return other
 
     def applyIcon(self):
-        self.icon = Icon.TITLE_FILE
+        self.setIcon(Icon.TITLE_FILE)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         return super().__rlshift__(sOut)

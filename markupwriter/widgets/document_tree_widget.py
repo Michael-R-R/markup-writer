@@ -202,7 +202,7 @@ class DocumentTreeWidget(QTreeWidget):
         iTemp = item
         while iTemp is not None:
             wTemp: dti.BaseTreeItem = self.itemWidget(iTemp, 0)
-            nameList.insert(0, wTemp.title)
+            nameList.insert(0, wTemp.title())
             iTemp = iTemp.parent()
         return nameList
 
