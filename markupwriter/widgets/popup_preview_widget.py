@@ -25,6 +25,7 @@ class PopupPreviewWidget(QWidget):
         self.setFixedSize(400, 200)
         
         self.previewButton = QPushButton("Preview...", self)
+        self.previewButton.clicked.connect(lambda: self.close())
 
         self.textedit = DocumentTextEdit(self)
         self.textedit.canResizeMargins = False

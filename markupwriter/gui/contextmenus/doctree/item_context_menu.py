@@ -28,21 +28,25 @@ class ItemContextMenu(BaseContextMenu):
         self.addItemMenu = AddItemMenu(None)
         self._menu.addMenu(self.addItemMenu)
 
+        self.previewAction = QAction("Preview", self)
         self.renameAction = QAction("Rename", self)
         self.toTrashAction = QAction(Icon.TRASH_FOLDER, "Move to trash", self)
         self.recoverAction = QAction(Icon.TRASH_FOLDER, "Recover", self)
 
+        self._menu.addAction(self.previewAction)
         self._menu.addAction(self.renameAction)
         self._menu.addAction(self.toTrashAction)
         self._menu.addAction(self.recoverAction)
 
     def preprocess(self, args: list[object] | None):
-        inTrash: bool = args[0]
-        isMutable: bool = args[1]
+        isFile: bool = args[0]
+        inTrash: bool = args[1]
+        isMutable: bool = args[2]
 
-        self.recoverAction.setEnabled(inTrash)
+        self.previewAction.setEnabled(isFile)
         self.renameAction.setEnabled(isMutable)
         self.toTrashAction.setEnabled((not inTrash) and isMutable)
+        self.recoverAction.setEnabled(inTrash)
 
     def postprocess(self, args: list[object] | None):
         actions = self._menu.actions()

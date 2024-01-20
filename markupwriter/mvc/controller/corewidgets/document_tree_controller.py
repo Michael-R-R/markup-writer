@@ -41,6 +41,7 @@ import markupwriter.support.doctree.item as dti
 
 
 class DocumentTreeController(QObject):
+    previewRequested = pyqtSignal(str, str)
     fileRenamed = pyqtSignal(str, str, str)
     
     def __init__(self, parent: QObject | None) -> None:
@@ -70,6 +71,7 @@ class DocumentTreeController(QObject):
         # --- Item context menu signals --- #
         icm = self.view.treewidget.itemContextMenu
         icm.addItemMenu.itemCreated.connect(self._onItemCreated)
+        icm.previewAction.triggered.connect(self._onPreviewItem)
         icm.renameAction.triggered.connect(self._onItemRename)
         icm.toTrashAction.triggered.connect(self._onItemMoveToTrash)
         icm.recoverAction.triggered.connect(self._onItemRecover)
@@ -128,6 +130,16 @@ class DocumentTreeController(QObject):
     @pyqtSlot(dti.BaseTreeItem)
     def _onItemCreated(self, item: dti.BaseTreeItem):
         self.view.treewidget.add(item)
+        
+    @pyqtSlot()
+    def _onPreviewItem(self):
+        tree = self.view.treewidget
+        item = tree.currentItem()
+        if item is None:
+            return
+        
+        widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
+        self.previewRequested.emit(widget.title(), widget.UUID())
 
     @pyqtSlot()
     def _onItemRename(self):
@@ -142,7 +154,6 @@ class DocumentTreeController(QObject):
             return
 
         oldTitle = widget.title()
-        
         widget.setTitle(text)
         
         if widget.hasFlag(dti.ITEM_FLAG.file):

@@ -60,7 +60,8 @@ class CentralWidgetController(QObject):
         treeController = self.model.docTreeController
 
         # --- Central slots --- #
-        editorController.textPreviewRequested.connect(self.onPreviewRequested)
+        treeController.previewRequested.connect(self.onTreePreviewRequested)
+        editorController.previewRequested.connect(self.onEditorPreviewRequested)
 
         # --- Editor slots --- #
         treeController.fileRenamed.connect(editorController.onFileRenamed)
@@ -75,9 +76,14 @@ class CentralWidgetController(QObject):
         editorController = self.model.docEditorController
         editorController.writeCurrentFile()
         editorController.runTokenizer(editorController.model.currDocUUID)
+        
+    @pyqtSlot(str, str)
+    def onTreePreviewRequested(self, title: str, uuid: str):
+        previewController = self.model.docPreviewController
+        previewController.onPreviewRequested(title, uuid)
 
     @pyqtSlot(str)
-    def onPreviewRequested(self, uuid: str):
+    def onEditorPreviewRequested(self, uuid: str):
         treeController = self.model.docTreeController
         widget = treeController.findTreeItem(uuid)
         if widget is None:

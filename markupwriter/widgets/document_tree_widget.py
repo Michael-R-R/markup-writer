@@ -272,9 +272,10 @@ class DocumentTreeWidget(QTreeWidget):
             args = [isEmpty]
             self.trashContextMenu.onShowMenu(pos, args)
         else:
+            isFile = widget.hasFlag(dti.ITEM_FLAG.file)
             inTrash = self.isInTrash(item)
             isMutable = widget.hasFlag(dti.ITEM_FLAG.mutable)
-            args = [inTrash, isMutable]
+            args = [isFile, inTrash, isMutable]
             self.itemContextMenu.onShowMenu(pos, args)
 
     @pyqtSlot(QTreeWidgetItem, int)
