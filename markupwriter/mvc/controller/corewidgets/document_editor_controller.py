@@ -39,44 +39,18 @@ class DocumentEditorController(QObject):
         self.view = DocumentEditorView(None)
 
     def setup(self):
-        self.view.textEdit.tagHovered.connect(self.onTagHovered)
+        self.view.textEdit.tagHovered.connect(self._onTagHovered)
 
-    @pyqtSlot(str)
-    def onTagHovered(self, tag: str):
-        refTag = self.model.refManager.getTag(tag)
-        if refTag is None:
-            return
-
-        uuid = refTag.docUUID()
-        
-        w = PopupPreviewWidget(uuid, self.view)
-        w.previewButton.clicked.connect(lambda: self.filePreviewed.emit(uuid))
-        
-        size = w.sizeHint()
-        pos = QCursor.pos()
-        x = pos.x() - int((size.width() / 2))
-        y = pos.y() - int(size.height() / 1.25)
-        
-        w.move(QPoint(x, y))
-        w.show()
-
-    @pyqtSlot()
     def runTokenizer(self, uuid: str):
         text = self.view.textEdit.toPlainText()
         tokenizer = EditorTokenizer(uuid, text, self)
-        tokenizer.signals.result.connect(self.runParser)
+        tokenizer.signals.result.connect(self._onRunParser)
         self.model.threadPool.start(tokenizer)
 
-    @pyqtSlot(str, dict)
-    def runParser(self, uuid: str, tokens: dict[str, list[str]]):
-        self.model.parser.run(uuid, tokens)
-        
-    @pyqtSlot()
     def onSaveAction(self):
         self.writeCurrentFile()
         self.runTokenizer(self.model.currDocUUID)
 
-    @pyqtSlot(str, list)
     def onFileOpened(self, uuid: str, pathList: list[str]):
         if self._isCurrIdMatching(uuid):
             return
@@ -90,7 +64,6 @@ class DocumentEditorController(QObject):
         self.view.textEdit.setEnabled(True)
         self.runTokenizer(uuid)
 
-    @pyqtSlot(str)
     def onFileRemoved(self, uuid: str):
         self.model.parser.popPrevUUID(uuid)
         if not self._isCurrIdMatching(uuid):
@@ -100,14 +73,12 @@ class DocumentEditorController(QObject):
         self.view.clearAll()
         self.view.textEdit.setEnabled(False)
 
-    @pyqtSlot(str, list)
     def onFileMoved(self, uuid: str, path: list[str]):
         if not self._isCurrIdMatching(uuid):
             return
         self.model.currDocPath = self._makePathStr(path)
         self.view.setPathLabel(self.model.currDocPath)
 
-    @pyqtSlot(str, str, str)
     def onFileRenamed(self, uuid: str, old: str, new: str):
         if not self._isCurrIdMatching(uuid):
             return
@@ -144,6 +115,29 @@ class DocumentEditorController(QObject):
         text += "{}".format(pathList[count - 1])
 
         return text
+    
+    @pyqtSlot(str)
+    def _onTagHovered(self, tag: str):
+        refTag = self.model.refManager.getTag(tag)
+        if refTag is None:
+            return
+
+        uuid = refTag.docUUID()
+        
+        w = PopupPreviewWidget(uuid, self.view)
+        w.previewButton.clicked.connect(lambda: self.filePreviewed.emit(uuid))
+        
+        size = w.sizeHint()
+        pos = QCursor.pos()
+        x = pos.x() - int((size.width() / 2))
+        y = pos.y() - int(size.height() / 1.25)
+        
+        w.move(QPoint(x, y))
+        w.show()
+        
+    @pyqtSlot(str, dict)
+    def _onRunParser(self, uuid: str, tokens: dict[str, list[str]]):
+        self.model.parser.run(uuid, tokens)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         return sout

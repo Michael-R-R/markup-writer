@@ -62,12 +62,10 @@ class CentralWidgetController(QObject):
         # --- Central controller slots --- #
         ec.filePreviewed.connect(self._onEditorFilePreviewed)
         tc.filePreviewed.connect(self._onTreeFilePreviewed)
-
-        # --- Editor controller slots --- #
-        tc.fileOpened.connect(ec.onFileOpened)
-        tc.fileMoved.connect(ec.onFileMoved)
-        tc.fileRenamed.connect(ec.onFileRenamed)
-        tc.fileRemoved.connect(ec.onFileRemoved)
+        tc.fileRemoved.connect(self._onFileRemoved)
+        tc.fileOpened.connect(self._onFileOpened)
+        tc.fileMoved.connect(self._onFileMoved)
+        tc.fileRenamed.connect(self._onFileRenamed)
 
     @pyqtSlot()
     def onSaveAction(self):
@@ -87,6 +85,22 @@ class CentralWidgetController(QObject):
         
         pc = self.model.docPreviewController
         pc.onFilePreviewed(widget.title(), uuid)
+        
+    @pyqtSlot(str)
+    def _onFileRemoved(self, uuid: str):
+        self.model.docEditorController.onFileRemoved(uuid)
+        
+    @pyqtSlot(str, list)
+    def _onFileOpened(self, uuid: str, pathList: list[str]):
+        self.model.docEditorController.onFileOpened(uuid, pathList)
+        
+    @pyqtSlot(str, list)
+    def _onFileMoved(self, uuid: str, pathList: list[str]):
+        self.model.docEditorController.onFileMoved(uuid, pathList)
+        
+    @pyqtSlot(str, str, str)
+    def _onFileRenamed(self, uuid: str, old: str, new: str):
+        self.model.docEditorController.onFileRenamed(uuid, old, new)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController
