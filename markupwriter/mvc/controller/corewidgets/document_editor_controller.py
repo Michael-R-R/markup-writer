@@ -70,14 +70,19 @@ class DocumentEditorController(QObject):
     @pyqtSlot(str, dict)
     def runParser(self, uuid: str, tokens: dict[str, list[str]]):
         self.model.parser.run(uuid, tokens)
+        
+    @pyqtSlot()
+    def onSaveAction(self):
+        self.writeCurrentFile()
+        self.runTokenizer(self.model.currDocUUID)
 
     @pyqtSlot(str, list)
-    def onFileAdded(self, uuid: str, path: list[str]):
+    def onFileOpened(self, uuid: str, pathList: list[str]):
         if self._isCurrIdMatching(uuid):
             return
         self.writeCurrentFile()
         self.runTokenizer(self.model.currDocUUID)
-        self.model.currDocPath = self._makePathStr(path)
+        self.model.currDocPath = self._makePathStr(pathList)
         self.model.currDocUUID = uuid
         content = self.readCurrentFile()
         self.view.textEdit.setPlainText(content)
@@ -101,10 +106,6 @@ class DocumentEditorController(QObject):
             return
         self.model.currDocPath = self._makePathStr(path)
         self.view.setPathLabel(self.model.currDocPath)
-
-    @pyqtSlot(str, list)
-    def onFileDoubleClicked(self, uuid: str, path: list[str]):
-        self.onFileAdded(uuid, path)
 
     @pyqtSlot(str, str, str)
     def onFileRenamed(self, uuid: str, old: str, new: str):

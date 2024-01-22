@@ -56,41 +56,37 @@ class CentralWidgetController(QObject):
         )
 
         # Controllers
-        editorController = self.model.docEditorController
-        treeController = self.model.docTreeController
+        ec = self.model.docEditorController
+        tc = self.model.docTreeController
 
-        # --- Central slots --- #
-        treeController.previewRequested.connect(self.onTreePreviewRequested)
-        editorController.previewRequested.connect(self.onEditorPreviewRequested)
+        # --- Central controller slots --- #
+        ec.previewRequested.connect(self._onEditorPreviewRequested)
+        tc.previewRequested.connect(self._onTreePreviewRequested)
 
-        # --- Editor slots --- #
-        treeController.fileRenamed.connect(editorController.onFileRenamed)
-        tree = treeController.view.treewidget
-        tree.fileAdded.connect(editorController.onFileAdded)
-        tree.fileRemoved.connect(editorController.onFileRemoved)
-        tree.fileMoved.connect(editorController.onFileMoved)
-        tree.fileDoubleClicked.connect(editorController.onFileDoubleClicked)
+        # --- Editor controller slots --- #
+        tc.fileOpened.connect(ec.onFileOpened)
+        tc.fileMoved.connect(ec.onFileMoved)
+        tc.fileRenamed.connect(ec.onFileRenamed)
+        tc.fileRemoved.connect(ec.onFileRemoved)
 
     @pyqtSlot()
     def onSaveAction(self):
-        editorController = self.model.docEditorController
-        editorController.writeCurrentFile()
-        editorController.runTokenizer(editorController.model.currDocUUID)
+        self.model.docEditorController.onSaveAction()
         
     @pyqtSlot(str, str)
-    def onTreePreviewRequested(self, title: str, uuid: str):
-        previewController = self.model.docPreviewController
-        previewController.onPreviewRequested(title, uuid)
+    def _onTreePreviewRequested(self, title: str, uuid: str):
+        pc = self.model.docPreviewController
+        pc.onPreviewRequested(title, uuid)
 
     @pyqtSlot(str)
-    def onEditorPreviewRequested(self, uuid: str):
-        treeController = self.model.docTreeController
-        widget = treeController.findTreeItem(uuid)
+    def _onEditorPreviewRequested(self, uuid: str):
+        tc = self.model.docTreeController
+        widget = tc.findTreeItem(uuid)
         if widget is None:
             return
         
-        previewController = self.model.docPreviewController
-        previewController.onPreviewRequested(widget.title(), uuid)
+        pc = self.model.docPreviewController
+        pc.onPreviewRequested(widget.title(), uuid)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController

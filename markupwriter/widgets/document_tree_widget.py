@@ -4,6 +4,7 @@ from PyQt6.QtCore import (
     Qt,
     pyqtSlot,
     pyqtSignal,
+    QDataStream,
     QPoint,
 )
 from PyQt6.QtGui import (
@@ -19,15 +20,16 @@ from PyQt6.QtWidgets import (
     QFrame,
 )
 
+from markupwriter.common.factory import TreeItemFactory
 import markupwriter.gui.contextmenus.doctree as dt
 import markupwriter.support.doctree.item as dti
 
 
 class DocumentTreeWidget(QTreeWidget):
-    fileAdded = pyqtSignal(str, list)
+    fileAdded = pyqtSignal(str)
     fileRemoved = pyqtSignal(str)
+    fileOpened = pyqtSignal(str, list)
     fileMoved = pyqtSignal(str, list)
-    fileDoubleClicked = pyqtSignal(str, list)
 
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
@@ -248,7 +250,8 @@ class DocumentTreeWidget(QTreeWidget):
     def _emitAdded(self, widget: dti.BaseTreeItem):
         if widget.hasFlag(dti.ITEM_FLAG.file):
             nameList = self.getParentNameList(widget.item)
-            self.fileAdded.emit(widget.UUID(), nameList)    
+            self.fileAdded.emit(widget.UUID())
+            self.fileOpened.emit(widget.UUID(), nameList)    
             
     def _emitRemoved(self, widget: dti.BaseTreeItem):
         if widget.hasFlag(dti.ITEM_FLAG.file):
@@ -283,4 +286,64 @@ class DocumentTreeWidget(QTreeWidget):
         widget: dti.BaseTreeItem = self.itemWidget(item, col)
         if widget.hasFlag(dti.ITEM_FLAG.file):
             nameList = self.getParentNameList(item)
-            self.fileDoubleClicked.emit(widget.UUID(), nameList)
+            self.fileOpened.emit(widget.UUID(), nameList)
+            
+    def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        
+        # recursive helper
+        def helper(sOut: QDataStream, iParent: QTreeWidgetItem):
+            cCount = iParent.childCount()
+            sOut.writeInt(cCount)
+
+            for i in range(cCount):
+                iChild = iParent.child(i)
+                wChild: dti.BaseTreeItem = self.itemWidget(iChild, 0)
+                sOut.writeQString(wChild.__class__.__name__)
+                helper(sOut, iChild)
+                sOut << wChild
+        
+        iCount = self.topLevelItemCount()
+        sout.writeInt(iCount)
+
+        # Top level items
+        for i in range(iCount):
+            iParent = self.topLevelItem(i)
+            wParent: dti.BaseTreeItem = self.itemWidget(iParent, 0)
+            sout.writeQString(wParent.__class__.__name__)
+            sout << wParent
+
+            # Child level items
+            helper(sout, iParent)
+
+        return sout
+
+    def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        
+        # recursive helper
+        def helper(sIn: QDataStream, iParent: QTreeWidgetItem):
+            cCount = sIn.readInt()
+
+            for _ in range(cCount):
+                type = sIn.readQString()
+                wChild: dti.BaseTreeItem = TreeItemFactory.make(type)
+                helper(sIn, wChild.item)
+                sIn >> wChild
+
+                iParent.addChild(wChild.item)
+                self.setItemWidget(wChild.item, 0, wChild)
+        
+        iCount = sin.readInt()
+
+        # Top level items
+        for i in range(iCount):
+            type = sin.readQString()
+            wParent: dti.BaseTreeItem = TreeItemFactory.make(type)
+            sin >> wParent
+
+            # Child level items
+            helper(sin, wParent.item)
+
+            self.addTopLevelItem(wParent.item)
+            self.setItemWidget(wParent.item, 0, wParent)
+
+        return sin

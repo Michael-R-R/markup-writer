@@ -26,6 +26,6 @@ class MainMenuBarController(QObject):
     def setActionStates(self, isEnabled: bool):
         # --- File menu --- #
         fileMenu = self.view.filemenu
-        fileMenu.saveAction.setEnabled(isEnabled)
-        fileMenu.saveAsAction.setEnabled(isEnabled)
-        fileMenu.closeAction.setEnabled(isEnabled)
+        fileMenu.saveProjectAction.setEnabled(isEnabled)
+        fileMenu.saveProjectAsAction.setEnabled(isEnabled)
+        fileMenu.closeProjectAction.setEnabled(isEnabled)

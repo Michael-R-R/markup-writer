@@ -46,21 +46,20 @@ class MainWindowController(QObject):
         self.view.setMenuBar(self.model.menuBarController.view)
         self.view.setCentralWidget(self.model.centralController.view)
         self.view.setStatusBar(self.model.statusBarController.view)
-        
-        self.view.closing.connect(self._onSaveProject)
 
         # --- main window controller slots --- #
         fileMenu = self.model.menuBarController.view.filemenu
-        fileMenu.newAction.triggered.connect(self._onNewProject)
-        fileMenu.openAction.triggered.connect(self._onOpenProject)
-        fileMenu.saveAction.triggered.connect(self._onSaveProject)
-        fileMenu.saveAsAction.triggered.connect(self._onSaveAsProject)
-        fileMenu.closeAction.triggered.connect(self._onCloseProject)
+        fileMenu.newProjectAction.triggered.connect(self._onNewProject)
+        fileMenu.openProjectAction.triggered.connect(self._onOpenProject)
+        fileMenu.saveProjectAction.triggered.connect(self._onSaveProject)
+        fileMenu.saveProjectAsAction.triggered.connect(self._onSaveAsProject)
+        fileMenu.closeProjectAction.triggered.connect(self._onCloseProject)
         fileMenu.exitAction.triggered.connect(self._onExit)
+        self.view.closing.connect(self._onSaveProject)
         
         # --- central controller slots --- #
         centralController = self.model.centralController
-        fileMenu.saveAction.triggered.connect(centralController.onSaveAction)
+        fileMenu.saveProjectAction.triggered.connect(centralController.onSaveAction)
 
     def show(self):
         self.view.show()
@@ -125,6 +124,7 @@ class MainWindowController(QObject):
             return
         if not Serialize.write(AppConfig.projectFilePath(), self.model):
             return False
+        self.model.centralController.onSaveAction()
         self.view.showStatusMsg("Project saved...", 2000)
         return True
 

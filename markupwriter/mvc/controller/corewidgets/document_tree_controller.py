@@ -12,29 +12,13 @@ from PyQt6.QtWidgets import (
     QTreeWidgetItem,
 )
 
-from markupwriter.mvc.model.corewidgets import (
-    DocumentTree,
-)
-
-from markupwriter.mvc.view.corewidgets import (
-    DocumentTreeView,
-)
-
+from markupwriter.mvc.model.corewidgets import DocumentTree
+from markupwriter.mvc.view.corewidgets import DocumentTreeView
+from markupwriter.config import AppConfig
+from markupwriter.common.util import File
 from markupwriter.gui.dialogs.modal import (
     StrDialog,
     YesNoDialog,
-)
-
-from markupwriter.common.factory import (
-    TreeItemFactory,
-)
-
-from markupwriter.config import (
-    AppConfig,
-)
-
-from markupwriter.common.util import (
-    File,
 )
 
 import markupwriter.support.doctree.item as dti
@@ -42,6 +26,9 @@ import markupwriter.support.doctree.item as dti
 
 class DocumentTreeController(QObject):
     previewRequested = pyqtSignal(str, str)
+    fileRemoved = pyqtSignal(str)
+    fileOpened = pyqtSignal(str, list)
+    fileMoved = pyqtSignal(str, list)
     fileRenamed = pyqtSignal(str, str, str)
     
     def __init__(self, parent: QObject | None) -> None:
@@ -63,6 +50,8 @@ class DocumentTreeController(QObject):
         tree = self.view.treewidget
         tree.fileAdded.connect(self._onFileAdded)
         tree.fileRemoved.connect(self._onFileRemoved)
+        tree.fileOpened.connect(self._onFileOpened)
+        tree.fileMoved.connect(self._onFileMoved)
 
         # --- Tree context menu signals --- #
         tcm = self.view.treewidget.treeContextMenu
@@ -103,8 +92,8 @@ class DocumentTreeController(QObject):
     def findTreeItem(self, uuid: str) -> dti.BaseTreeItem:
         return self.view.treewidget.findWidget(uuid)
         
-    @pyqtSlot(str, list)
-    def _onFileAdded(self, uuid: str, paths: list[str]):
+    @pyqtSlot(str)
+    def _onFileAdded(self, uuid: str):
         path = AppConfig.projectContentPath()
         if path is None:
             return
@@ -118,6 +107,16 @@ class DocumentTreeController(QObject):
             return
         path += uuid
         File.remove(path)
+        
+        self.fileRemoved.emit(uuid)
+        
+    @pyqtSlot(str, list)
+    def _onFileOpened(self, uuid: str, pathList: list[str]):
+        self.fileOpened.emit(uuid, pathList)
+        
+    @pyqtSlot(str, list)
+    def _onFileMoved(self, uuid: str, pathList: list[str]):
+        self.fileMoved.emit(uuid, pathList)
 
     @pyqtSlot()
     def _onItemNavUp(self):
@@ -198,65 +197,9 @@ class DocumentTreeController(QObject):
             tree.remove(item.child(i))
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
-        
-        # recursive helper
-        def helper(sOut: QDataStream, tree: QTreeWidget, iParent: QTreeWidgetItem):
-            cCount = iParent.childCount()
-            sOut.writeInt(cCount)
-
-            for i in range(cCount):
-                iChild = iParent.child(i)
-                wChild: dti.BaseTreeItem = tree.itemWidget(iChild, 0)
-                sOut.writeQString(wChild.__class__.__name__)
-                helper(sOut, tree, iChild)
-                sOut << wChild
-        
-        tree = self.view.treewidget
-        
-        iCount = tree.topLevelItemCount()
-        sout.writeInt(iCount)
-
-        # Top level items
-        for i in range(iCount):
-            iParent = tree.topLevelItem(i)
-            wParent: dti.BaseTreeItem = tree.itemWidget(iParent, 0)
-            sout.writeQString(wParent.__class__.__name__)
-            sout << wParent
-
-            # Child level items
-            helper(sout, tree, iParent)
-
+        sout << self.view.treewidget
         return sout
 
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
-        
-        # recursive helper
-        def helper(sIn: QDataStream, tree: QTreeWidget, iParent: QTreeWidgetItem):
-            cCount = sIn.readInt()
-
-            for _ in range(cCount):
-                type = sIn.readQString()
-                wChild: dti.BaseTreeItem = TreeItemFactory.make(type)
-                helper(sIn, tree, wChild.item)
-                sIn >> wChild
-
-                iParent.addChild(wChild.item)
-                tree.setItemWidget(wChild.item, 0, wChild)
-        
-        tree = self.view.treewidget
-        
-        iCount = sin.readInt()
-
-        # Top level items
-        for i in range(iCount):
-            type = sin.readQString()
-            wParent: dti.BaseTreeItem = TreeItemFactory.make(type)
-            sin >> wParent
-
-            # Child level items
-            helper(sin, tree, wParent.item)
-
-            tree.addTopLevelItem(wParent.item)
-            tree.setItemWidget(wParent.item, 0, wParent)
-
+        sin >> self.view.treewidget
         return sin
