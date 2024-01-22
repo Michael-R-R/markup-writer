@@ -46,20 +46,22 @@ class MainWindowController(QObject):
         self.view.setMenuBar(self.model.menuBarController.view)
         self.view.setCentralWidget(self.model.centralController.view)
         self.view.setStatusBar(self.model.statusBarController.view)
+        
+        # --- controllers --- #
+        mbc = self.model.menuBarController
+        cc = self.model.centralController
 
         # --- main window controller slots --- #
-        fileMenu = self.model.menuBarController.view.filemenu
-        fileMenu.newProjectAction.triggered.connect(self._onNewProject)
-        fileMenu.openProjectAction.triggered.connect(self._onOpenProject)
-        fileMenu.saveProjectAction.triggered.connect(self._onSaveProject)
-        fileMenu.saveProjectAsAction.triggered.connect(self._onSaveAsProject)
-        fileMenu.closeProjectAction.triggered.connect(self._onCloseProject)
-        fileMenu.exitAction.triggered.connect(self._onExit)
         self.view.closing.connect(self._onSaveProject)
+        mbc.newProjClicked.connect(self._onNewProject)
+        mbc.openProjClicked.connect(self._onOpenProject)
+        mbc.saveProjClicked.connect(self._onSaveProject)
+        mbc.saveProjAsClicked.connect(self._onSaveAsProject)
+        mbc.closeProjClicked.connect(self._onCloseProject)
+        mbc.exitClicked.connect(self._onExit)
         
         # --- central controller slots --- #
-        centralController = self.model.centralController
-        fileMenu.saveProjectAction.triggered.connect(centralController.onSaveAction)
+        mbc.saveDocClicked.connect(cc.onSaveAction)
 
     def show(self):
         self.view.show()
