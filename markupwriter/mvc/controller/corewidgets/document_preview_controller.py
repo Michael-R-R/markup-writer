@@ -28,7 +28,7 @@ class DocumentPreviewController(QObject):
         pass
         
     pyqtSlot(str)
-    def onPreviewRequested(self, title: str, uuid: str):
+    def onFilePreviewed(self, title: str, uuid: str):
         widget = mw.DocumentPreviewWidget(uuid, self.view)
         self.view.addPage(title, widget)
         

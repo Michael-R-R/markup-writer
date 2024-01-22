@@ -7,11 +7,6 @@ from PyQt6.QtCore import (
     pyqtSignal,
 )
 
-from PyQt6.QtWidgets import (
-    QTreeWidget,
-    QTreeWidgetItem,
-)
-
 from markupwriter.mvc.model.corewidgets import DocumentTree
 from markupwriter.mvc.view.corewidgets import DocumentTreeView
 from markupwriter.config import AppConfig
@@ -25,7 +20,7 @@ import markupwriter.support.doctree.item as dti
 
 
 class DocumentTreeController(QObject):
-    previewRequested = pyqtSignal(str, str)
+    filePreviewed = pyqtSignal(str, str)
     fileRemoved = pyqtSignal(str)
     fileOpened = pyqtSignal(str, list)
     fileMoved = pyqtSignal(str, list)
@@ -138,7 +133,7 @@ class DocumentTreeController(QObject):
             return
         
         widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
-        self.previewRequested.emit(widget.title(), widget.UUID())
+        self.filePreviewed.emit(widget.title(), widget.UUID())
 
     @pyqtSlot()
     def _onItemRename(self):

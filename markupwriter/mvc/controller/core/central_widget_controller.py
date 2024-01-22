@@ -60,8 +60,8 @@ class CentralWidgetController(QObject):
         tc = self.model.docTreeController
 
         # --- Central controller slots --- #
-        ec.previewRequested.connect(self._onEditorPreviewRequested)
-        tc.previewRequested.connect(self._onTreePreviewRequested)
+        ec.filePreviewed.connect(self._onEditorFilePreviewed)
+        tc.filePreviewed.connect(self._onTreeFilePreviewed)
 
         # --- Editor controller slots --- #
         tc.fileOpened.connect(ec.onFileOpened)
@@ -74,19 +74,19 @@ class CentralWidgetController(QObject):
         self.model.docEditorController.onSaveAction()
         
     @pyqtSlot(str, str)
-    def _onTreePreviewRequested(self, title: str, uuid: str):
+    def _onTreeFilePreviewed(self, title: str, uuid: str):
         pc = self.model.docPreviewController
-        pc.onPreviewRequested(title, uuid)
+        pc.onFilePreviewed(title, uuid)
 
     @pyqtSlot(str)
-    def _onEditorPreviewRequested(self, uuid: str):
+    def _onEditorFilePreviewed(self, uuid: str):
         tc = self.model.docTreeController
         widget = tc.findTreeItem(uuid)
         if widget is None:
             return
         
         pc = self.model.docPreviewController
-        pc.onPreviewRequested(widget.title(), uuid)
+        pc.onFilePreviewed(widget.title(), uuid)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController
