@@ -50,19 +50,20 @@ class MainWindowController(QObject):
         # --- controllers --- #
         mbc = self.model.menuBarController
         cc = self.model.centralController
-        dtc = cc.model.docTreeController
+        dec = cc.model.docEditorController
 
         # --- main window controller slots --- #
         self.view.closing.connect(self._onSaveProject)
         mbc.newProjClicked.connect(self._onNewProject)
         mbc.openProjClicked.connect(self._onOpenProject)
+        mbc.saveDocClicked.connect(self._onSaveDocument)
         mbc.saveProjClicked.connect(self._onSaveProject)
         mbc.saveProjAsClicked.connect(self._onSaveAsProject)
         mbc.closeProjClicked.connect(self._onCloseProject)
         mbc.exitClicked.connect(self._onExit)
-
-        # --- central controller slots --- #
-        mbc.saveDocClicked.connect(cc.onSaveDocAction)
+        
+        # --- Menu controller slots --- #
+        dec.hasOpenDocument.connect(mbc.setEnableSaveDocAction)
 
     def show(self):
         self.view.show()
@@ -93,7 +94,8 @@ class MainWindowController(QObject):
         mbc.setEnableSaveAsAction(True)
         mbc.setEnableCloseAction(True)
 
-        dtc = self.model.centralController.model.docTreeController
+        cc = self.model.centralController
+        dtc = cc.model.docTreeController
         dtc.setEnabledTreeBarActions(True)
         dtc.setEnabledTreeActions(True)
         dtc.createRootFolders()
@@ -127,25 +129,40 @@ class MainWindowController(QObject):
         mbc.setEnableSaveAsAction(True)
         mbc.setEnableCloseAction(True)
 
-        dtc = self.model.centralController.model.docTreeController
+        cc = self.model.centralController
+        dtc = cc.model.docTreeController
         dtc.setEnabledTreeBarActions(True)
         dtc.setEnabledTreeActions(True)
 
         self.view.showStatusMsg("Project opened...", 2000)
+        
+    @pyqtSlot()
+    def _onSaveDocument(self) -> bool:
+        if not AppConfig.hasActiveProject():
+            return False
+        
+        cc = self.model.centralController
+        dec = cc.model.docEditorController
+        if not dec.onSaveDocument():
+            return False
+        
+        self.view.showStatusMsg("Document saved...", 2000)
+        
+        return True
 
     @pyqtSlot()
     def _onSaveProject(self) -> bool:
         if not AppConfig.hasActiveProject():
-            return
+            return False
         if not Serialize.write(AppConfig.projectFilePath(), self.model):
             return False
-        self.model.centralController.onSaveDocAction()
+        self._onSaveDocument()
         self.view.showStatusMsg("Project saved...", 2000)
         return True
 
     @pyqtSlot()
     def _onSaveAsProject(self):
-        if ProjectHelper.askToSave():
+        if ProjectHelper.askToSave(self.view):
             self._onSaveProject()
 
         pair = ProjectHelper.mkProjectDir(self.view)
@@ -166,7 +183,7 @@ class MainWindowController(QObject):
         if not AppConfig.hasActiveProject():
             return True
 
-        if not ProjectHelper.askToSaveClose():
+        if not ProjectHelper.askToSaveClose(self.view):
             return False
 
         self._onSaveProject()
@@ -176,6 +193,6 @@ class MainWindowController(QObject):
 
     @pyqtSlot()
     def _onExit(self):
-        if ProjectHelper.askToExit():
+        if ProjectHelper.askToExit(self.view):
             self._onSaveProject()
             QApplication.quit()

@@ -1,13 +1,14 @@
 #!/usr/bin/python
 
 from PyQt6.QtWidgets import (
+    QWidget,
     QMessageBox,
 )
 
 
 class YesNoDialog(object):
-    def run(text: str) -> bool:
-        box = QMessageBox()
+    def run(text: str, parent: QWidget | None) -> bool:
+        box = QMessageBox(parent)
         box.setText(text)
         box.setStandardButtons(
             QMessageBox.StandardButton.No | QMessageBox.StandardButton.Yes

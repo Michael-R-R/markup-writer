@@ -59,12 +59,12 @@ class ProjectHelper(object):
         
         return info.fileName(), info.canonicalPath()
 
-    def askToSave() -> bool:
-        return YesNoDialog.run("Save current project?")
+    def askToSave(parent: QWidget | None) -> bool:
+        return YesNoDialog.run("Save current project?", parent)
 
-    def askToSaveClose() -> bool:
-        return YesNoDialog.run("Save and close current project?")
+    def askToSaveClose(parent: QWidget | None) -> bool:
+        return YesNoDialog.run("Save and close current project?", parent)
 
-    def askToExit() -> bool:
-        return YesNoDialog.run("Exit application?")
+    def askToExit(parent: QWidget | None) -> bool:
+        return YesNoDialog.run("Exit application?", parent)
     

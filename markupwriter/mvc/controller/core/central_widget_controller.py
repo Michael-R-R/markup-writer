@@ -67,10 +67,6 @@ class CentralWidgetController(QObject):
         tc.fileOpened.connect(self._onFileOpened)
         tc.fileMoved.connect(self._onFileMoved)
         tc.fileRenamed.connect(self._onFileRenamed)
-
-    @pyqtSlot()
-    def onSaveDocAction(self):
-        self.model.docEditorController.onSaveAction()
         
     @pyqtSlot(str, str)
     def _onTreeFilePreviewed(self, title: str, uuid: str):

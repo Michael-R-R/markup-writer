@@ -30,6 +30,7 @@ from markupwriter.widgets import PopupPreviewWidget
 
 
 class DocumentEditorController(QObject):
+    hasOpenDocument = pyqtSignal(bool)
     filePreviewed = pyqtSignal(str)
 
     def __init__(self, parent: QObject | None) -> None:
@@ -41,12 +42,14 @@ class DocumentEditorController(QObject):
     def setup(self):
         self.view.textEdit.tagHovered.connect(self._onTagHovered)
 
-    def onSaveAction(self):
-        self.writeCurrentFile()
+    def onSaveDocument(self) -> bool:
+        status = self.writeCurrentFile()
         self.runTokenizer(self.model.currDocUUID)
+        
+        return status
 
     def onFileOpened(self, uuid: str, pathList: list[str]):
-        if self._isCurrIdMatching(uuid):
+        if self._hasMatchingID(uuid):
             return
         self.writeCurrentFile()
         self.runTokenizer(self.model.currDocUUID)
@@ -57,54 +60,70 @@ class DocumentEditorController(QObject):
         self.view.setPathLabel(self.model.currDocPath)
         self.view.textEdit.setEnabled(True)
         self.runTokenizer(uuid)
+        
+        self.hasOpenDocument.emit(True)
 
     def onFileRemoved(self, uuid: str):
         self.model.parser.popPrevUUID(uuid)
-        if not self._isCurrIdMatching(uuid):
+        if not self._hasMatchingID(uuid):
             return
         self.model.currDocPath = ""
         self.model.currDocUUID = ""
         self.view.clearAll()
         self.view.textEdit.setEnabled(False)
+        
+        self.hasOpenDocument.emit(False)
 
     def onFileMoved(self, uuid: str, path: list[str]):
-        if not self._isCurrIdMatching(uuid):
+        if not self._hasMatchingID(uuid):
             return
         self.model.currDocPath = self._makePathStr(path)
         self.view.setPathLabel(self.model.currDocPath)
 
     def onFileRenamed(self, uuid: str, old: str, new: str):
-        if not self._isCurrIdMatching(uuid):
+        if not self._hasMatchingID(uuid):
             return
         self.model.currDocPath = self.model.currDocPath.replace(old, new)
         self.view.setPathLabel(self.model.currDocPath)
             
     def runTokenizer(self, uuid: str):
+        if not self._hasDocument():
+            return
+        
         text = self.view.textEdit.toPlainText()
         tokenizer = EditorTokenizer(uuid, text, self)
         tokenizer.signals.result.connect(self._onRunParser)
         self.model.threadPool.start(tokenizer)
 
-    def writeCurrentFile(self):
-        if self.model.currDocUUID == "":
-            return
+    def writeCurrentFile(self) -> bool:
+        if not self._hasDocument():
+            return False
+        
         path = AppConfig.projectContentPath()
         if path is None:
-            return
+            return False
+        
         path += self.model.currDocUUID
         File.write(path, self.view.textEdit.toPlainText())
+        
+        return True
 
-    def readCurrentFile(self) -> str:
-        if self.model.currDocUUID == "":
-            return
+    def readCurrentFile(self) -> str | None:
+        if not self._hasDocument():
+            return None
+        
         path = AppConfig.projectContentPath()
         if path is None:
-            return
+             None
+        
         path += self.model.currDocUUID
         return File.read(path)
 
-    def _isCurrIdMatching(self, uuid: str) -> bool:
+    def _hasMatchingID(self, uuid: str) -> bool:
         return self.model.currDocUUID == uuid
+    
+    def _hasDocument(self) -> bool:
+        return self.model.currDocUUID != ""
 
     def _makePathStr(self, pathList: list[str]) -> str:
         text = ""
