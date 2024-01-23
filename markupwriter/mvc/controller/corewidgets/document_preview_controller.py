@@ -6,6 +6,10 @@ from PyQt6.QtCore import (
     QDataStream,
 )
 
+from PyQt6.QtWidgets import (
+    QWidget,
+)
+
 from markupwriter.mvc.model.corewidgets import (
     DocumentPreview,
 )
@@ -26,11 +30,39 @@ class DocumentPreviewController(QObject):
         
     def setup(self):
         pass
+    
+    def onFileRemoved(self, title: str, uuid: str):
+        index = self._pageIndex(title, uuid)
+        if index < 0:
+            return
+        tabwidget = self.view.tabWidget
+        tabwidget.removeTab(index)
         
-    pyqtSlot(str)
     def onFilePreviewed(self, title: str, uuid: str):
-        widget = mw.DocumentPreviewWidget(uuid, self.view)
-        self.view.addPage(title, widget)
+        widget = mw.DocumentPreviewWidget(title, uuid, self.view)
+        self._addPage(title, uuid, widget)
+        
+    def _addPage(self, title: str, uuid: str, widget: QWidget):
+        tabwidget = self.view.tabWidget
+        index = self._pageIndex(title, uuid)
+        if index > -1:
+            tabwidget.setCurrentIndex(index)
+            return
+
+        tabwidget.addTab(widget, title)
+        tabwidget.setCurrentWidget(widget)
+
+    def _pageIndex(self, title: str, uuid: str) -> int:
+        tabwidget = self.view.tabWidget
+        for i in range(tabwidget.count()):
+            widget: mw.DocumentPreviewWidget = tabwidget.widget(i)
+            if widget is None:
+                continue
+            
+            if widget.checkForMatch(title, uuid):
+                return i
+
+        return -1
         
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         return sout

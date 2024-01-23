@@ -83,9 +83,10 @@ class CentralWidgetController(QObject):
         pc = self.model.docPreviewController
         pc.onFilePreviewed(widget.title(), uuid)
         
-    @pyqtSlot(str)
-    def _onFileRemoved(self, uuid: str):
+    @pyqtSlot(str, str)
+    def _onFileRemoved(self, title: str, uuid: str):
         self.model.docEditorController.onFileRemoved(uuid)
+        self.model.docPreviewController.onFileRemoved(title, uuid)
         
     @pyqtSlot(str, list)
     def _onFileOpened(self, uuid: str, pathList: list[str]):

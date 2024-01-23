@@ -29,23 +29,6 @@ class DocumentPreviewView(QWidget):
         self.vLayout = QVBoxLayout(self)
         self.vLayout.addWidget(self.tabWidget)
 
-    def addPage(self, title: str, widget: QWidget):
-        index = self.pageExist(title)
-        if index > -1:
-            self.tabWidget.setCurrentIndex(index)
-            return
-
-        self.tabWidget.addTab(widget, title)
-        self.tabWidget.setCurrentWidget(widget)
-
-    def pageExist(self, title: str) -> int:
-        for i in range(self.tabWidget.count()):
-            temp = self.tabWidget.tabText(i)
-            if temp == title:
-                return i
-
-        return -1
-
     @pyqtSlot(int)
     def _onTabCloseRequested(self, index: int):
         self.tabWidget.removeTab(index)

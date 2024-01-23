@@ -27,7 +27,7 @@ import markupwriter.support.doctree.item as dti
 
 class DocumentTreeWidget(QTreeWidget):
     fileAdded = pyqtSignal(str)
-    fileRemoved = pyqtSignal(str)
+    fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
     fileMoved = pyqtSignal(str, list)
 
@@ -255,7 +255,7 @@ class DocumentTreeWidget(QTreeWidget):
             
     def _emitRemoved(self, widget: dti.BaseTreeItem):
         if widget.hasFlag(dti.ITEM_FLAG.file):
-            self.fileRemoved.emit(widget.UUID())
+            self.fileRemoved.emit(widget.title(), widget.UUID())
                 
     def _emitMoved(self, widgetList: list[dti.BaseTreeItem]):
         for w in widgetList:

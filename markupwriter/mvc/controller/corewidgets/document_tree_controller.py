@@ -21,7 +21,7 @@ import markupwriter.support.doctree.item as dti
 
 class DocumentTreeController(QObject):
     filePreviewed = pyqtSignal(str, str)
-    fileRemoved = pyqtSignal(str)
+    fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
     fileMoved = pyqtSignal(str, list)
     fileRenamed = pyqtSignal(str, str, str)
@@ -92,15 +92,15 @@ class DocumentTreeController(QObject):
         path += uuid
         File.write(path, "")
     
-    @pyqtSlot(str)
-    def _onFileRemoved(self, uuid: str):
+    @pyqtSlot(str, str)
+    def _onFileRemoved(self, title: str, uuid: str):
         path = AppConfig.projectContentPath()
         if path is None:
             return
         path += uuid
         File.remove(path)
         
-        self.fileRemoved.emit(uuid)
+        self.fileRemoved.emit(title, uuid)
         
     @pyqtSlot(str, list)
     def _onFileOpened(self, uuid: str, pathList: list[str]):
@@ -157,7 +157,7 @@ class DocumentTreeController(QObject):
         if item is None:
             return
 
-        if not YesNoDialog.run("Move to trash?"):
+        if not YesNoDialog.run("Move to trash?", None):
             return
 
         trash = tree.findTrash()
@@ -182,7 +182,7 @@ class DocumentTreeController(QObject):
         if item is None:
             return
 
-        if not YesNoDialog.run("Empty trash?"):
+        if not YesNoDialog.run("Empty trash?", None):
             return
 
         for i in range(item.childCount() - 1, -1, -1):
