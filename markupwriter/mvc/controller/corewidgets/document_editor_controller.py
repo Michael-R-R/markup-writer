@@ -41,12 +41,6 @@ class DocumentEditorController(QObject):
     def setup(self):
         self.view.textEdit.tagHovered.connect(self._onTagHovered)
 
-    def runTokenizer(self, uuid: str):
-        text = self.view.textEdit.toPlainText()
-        tokenizer = EditorTokenizer(uuid, text, self)
-        tokenizer.signals.result.connect(self._onRunParser)
-        self.model.threadPool.start(tokenizer)
-
     def onSaveAction(self):
         self.writeCurrentFile()
         self.runTokenizer(self.model.currDocUUID)
@@ -84,6 +78,12 @@ class DocumentEditorController(QObject):
             return
         self.model.currDocPath = self.model.currDocPath.replace(old, new)
         self.view.setPathLabel(self.model.currDocPath)
+            
+    def runTokenizer(self, uuid: str):
+        text = self.view.textEdit.toPlainText()
+        tokenizer = EditorTokenizer(uuid, text, self)
+        tokenizer.signals.result.connect(self._onRunParser)
+        self.model.threadPool.start(tokenizer)
 
     def writeCurrentFile(self):
         if self.model.currDocUUID == "":

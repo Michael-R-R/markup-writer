@@ -3,6 +3,7 @@
 from PyQt6.QtCore import (
     QObject,
     QDataStream,
+    pyqtSignal,
     pyqtSlot,
 )
 
@@ -68,7 +69,7 @@ class CentralWidgetController(QObject):
         tc.fileRenamed.connect(self._onFileRenamed)
 
     @pyqtSlot()
-    def onSaveAction(self):
+    def onSaveDocAction(self):
         self.model.docEditorController.onSaveAction()
         
     @pyqtSlot(str, str)

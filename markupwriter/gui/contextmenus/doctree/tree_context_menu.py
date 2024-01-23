@@ -20,6 +20,8 @@ class TreeContextMenu(BaseContextMenu):
         self.addItemMenu = AddItemMenu(None)
 
         self._menu.addMenu(self.addItemMenu)
+        
+        self.addItemMenu.setEnabled(False)
 
     def preprocess(self, args: list[object] | None):
         pass

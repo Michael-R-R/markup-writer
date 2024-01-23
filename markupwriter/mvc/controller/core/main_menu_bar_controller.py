@@ -30,21 +30,24 @@ class MainMenuBarController(QObject):
         self.view = MainMenuBarView(None)
 
     def setup(self):
-        self.setActionStates(False)
-
         # --- Main menu slots --- #
         fm = self.view.filemenu
         fm.newProjAction.triggered.connect(lambda: self.newProjClicked.emit())
         fm.openProjAction.triggered.connect(lambda: self.openProjClicked.emit())
-        fm.saveDocumentAction.triggered.connect(lambda: self.saveDocClicked.emit())
+        fm.saveDocAction.triggered.connect(lambda: self.saveDocClicked.emit())
         fm.saveProjAction.triggered.connect(lambda: self.saveProjClicked.emit())
-        fm.saveProjectAsAction.triggered.connect(lambda: self.saveProjAsClicked.emit())
-        fm.closeProjectAction.triggered.connect(lambda: self.closeProjClicked.emit())
+        fm.saveProjAsAction.triggered.connect(lambda: self.saveProjAsClicked.emit())
+        fm.closeProjAction.triggered.connect(lambda: self.closeProjClicked.emit())
         fm.exitAction.triggered.connect(lambda: self.exitClicked.emit())
-
-    def setActionStates(self, isEnabled: bool):
-        # --- File menu --- #
-        fileMenu = self.view.filemenu
-        fileMenu.saveProjAction.setEnabled(isEnabled)
-        fileMenu.saveProjectAsAction.setEnabled(isEnabled)
-        fileMenu.closeProjectAction.setEnabled(isEnabled)
+         
+    def setEnableSaveDocAction(self, isEnabled: bool):
+        self.view.filemenu.saveDocAction.setEnabled(isEnabled)
+        
+    def setEnableSaveAction(self, isEnabled: bool):
+        self.view.filemenu.saveProjAction.setEnabled(isEnabled)
+         
+    def setEnableSaveAsAction(self, isEnabled: bool):
+        self.view.filemenu.saveProjAsAction.setEnabled(isEnabled)
+         
+    def setEnableCloseAction(self, isEnabled: bool):
+        self.view.filemenu.closeProjAction.setEnabled(isEnabled)

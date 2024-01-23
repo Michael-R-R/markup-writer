@@ -33,8 +33,6 @@ class DocumentTreeController(QObject):
         self.view = DocumentTreeView(None)
 
     def setup(self):
-        self.setActionStates(False)
-        
         # --- Tree bar signals --- #
         treebar = self.view.treebar
         treebar.addItemAction.itemCreated.connect(self._onItemCreated)
@@ -64,14 +62,13 @@ class DocumentTreeController(QObject):
         trcm = self.view.treewidget.trashContextMenu
         trcm.emptyAction.triggered.connect(self._onEmptyTrash)
         
-    def setActionStates(self, isEnabled: bool):
-        # --- Tree bar --- #
+    def setEnabledTreeBarActions(self, isEnabled: bool):
         treeBar = self.view.treebar
         treeBar.navUpAction.setEnabled(isEnabled)
         treeBar.navDownAction.setEnabled(isEnabled)
         treeBar.addItemAction.setEnabled(isEnabled)
-
-        # --- Tree --- #
+        
+    def setEnabledTreeActions(self, isEnabled: bool):
         tree = self.view.treewidget
         tree.treeContextMenu.addItemMenu.setEnabled(isEnabled)
         

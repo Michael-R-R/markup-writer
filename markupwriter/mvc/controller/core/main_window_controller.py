@@ -46,10 +46,11 @@ class MainWindowController(QObject):
         self.view.setMenuBar(self.model.menuBarController.view)
         self.view.setCentralWidget(self.model.centralController.view)
         self.view.setStatusBar(self.model.statusBarController.view)
-        
+
         # --- controllers --- #
         mbc = self.model.menuBarController
         cc = self.model.centralController
+        dtc = cc.model.docTreeController
 
         # --- main window controller slots --- #
         self.view.closing.connect(self._onSaveProject)
@@ -59,13 +60,13 @@ class MainWindowController(QObject):
         mbc.saveProjAsClicked.connect(self._onSaveAsProject)
         mbc.closeProjClicked.connect(self._onCloseProject)
         mbc.exitClicked.connect(self._onExit)
-        
+
         # --- central controller slots --- #
-        mbc.saveDocClicked.connect(cc.onSaveAction)
+        mbc.saveDocClicked.connect(cc.onSaveDocAction)
 
     def show(self):
         self.view.show()
-        
+
     def reset(self):
         AppConfig.projectName = None
         AppConfig.projectDir = None
@@ -76,48 +77,60 @@ class MainWindowController(QObject):
     def _onNewProject(self):
         if not self._onCloseProject():
             return
-        
+
         pair = ProjectHelper.mkProjectDir(self.view)
         if pair == (None, None):
             return
-                
+
         AppConfig.projectName = pair[0]
         AppConfig.projectDir = pair[1]
 
         self.model = MainWindow(self)
         self.setup()
 
-        self.model.menuBarController.setActionStates(True)
-        self.model.centralController.model.docTreeController.setActionStates(True)
-        self.model.centralController.model.docTreeController.createRootFolders()
-        
+        mbc = self.model.menuBarController
+        mbc.setEnableSaveAction(True)
+        mbc.setEnableSaveAsAction(True)
+        mbc.setEnableCloseAction(True)
+
+        dtc = self.model.centralController.model.docTreeController
+        dtc.setEnabledTreeBarActions(True)
+        dtc.setEnabledTreeActions(True)
+        dtc.createRootFolders()
+
         self._onSaveProject()
-        
+
         self.view.showStatusMsg("Project created...", 2000)
 
     @pyqtSlot()
     def _onOpenProject(self):
         if not self._onCloseProject():
             return
-        
+
         pair = ProjectHelper.openProjectPath(self.view)
         if pair == (None, None):
             return
-        
+
         AppConfig.projectName = pair[0]
         AppConfig.projectDir = pair[1]
-        
+
         model: MainWindow = Serialize.read(MainWindow, AppConfig.projectFilePath())
         if model is None:
             self.reset()
             return
-        
+
         self.model = model
         self.setup()
 
-        self.model.menuBarController.setActionStates(True)
-        self.model.centralController.model.docTreeController.setActionStates(True)
-        
+        mbc = self.model.menuBarController
+        mbc.setEnableSaveAction(True)
+        mbc.setEnableSaveAsAction(True)
+        mbc.setEnableCloseAction(True)
+
+        dtc = self.model.centralController.model.docTreeController
+        dtc.setEnabledTreeBarActions(True)
+        dtc.setEnabledTreeActions(True)
+
         self.view.showStatusMsg("Project opened...", 2000)
 
     @pyqtSlot()
@@ -126,7 +139,7 @@ class MainWindowController(QObject):
             return
         if not Serialize.write(AppConfig.projectFilePath(), self.model):
             return False
-        self.model.centralController.onSaveAction()
+        self.model.centralController.onSaveDocAction()
         self.view.showStatusMsg("Project saved...", 2000)
         return True
 
@@ -134,31 +147,31 @@ class MainWindowController(QObject):
     def _onSaveAsProject(self):
         if ProjectHelper.askToSave():
             self._onSaveProject()
-            
+
         pair = ProjectHelper.mkProjectDir(self.view)
         if pair == (None, None):
             self.reset()
             return
-        
+
         AppConfig.projectName = pair[0]
         AppConfig.projectDir = pair[1]
         if not self._onSaveProject():
             self.reset()
             return
-        
+
         self.view.updateWindowTitle()
 
     @pyqtSlot()
     def _onCloseProject(self) -> bool:
         if not AppConfig.hasActiveProject():
             return True
-        
+
         if not ProjectHelper.askToSaveClose():
             return False
-        
+
         self._onSaveProject()
         self.reset()
-        
+
         return True
 
     @pyqtSlot()

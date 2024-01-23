@@ -28,3 +28,7 @@ class DocumentTreeBarWidget(QWidget):
         self.hLayout.addWidget(self.titleLabel)
         self.hLayout.addStretch()
         self.hLayout.addWidget(self.toolbar)
+        
+        self.navUpAction.setEnabled(False)
+        self.navDownAction.setEnabled(False)
+        self.addItemAction.setEnabled(False)
