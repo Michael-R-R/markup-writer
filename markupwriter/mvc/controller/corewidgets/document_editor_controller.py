@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import re
+
 from PyQt6.QtCore import (
     QObject,
     pyqtSignal,
@@ -31,6 +33,7 @@ from markupwriter.widgets import PopupPreviewWidget
 
 class DocumentEditorController(QObject):
     hasOpenDocument = pyqtSignal(bool)
+    wcChanged = pyqtSignal(str, str)
     filePreviewed = pyqtSignal(str)
 
     def __init__(self, parent: QObject | None) -> None:
@@ -45,6 +48,7 @@ class DocumentEditorController(QObject):
     def onSaveDocument(self) -> bool:
         status = self.writeCurrentFile()
         self.runTokenizer(self.model.currDocUUID)
+        self.runWordCounter()
         
         return status
 
@@ -94,6 +98,14 @@ class DocumentEditorController(QObject):
         tokenizer = EditorTokenizer(uuid, text, self)
         tokenizer.signals.result.connect(self._onRunParser)
         self.model.threadPool.start(tokenizer)
+        
+    def runWordCounter(self):
+        if not self._hasDocument():
+            return
+        uuid = self.model.currDocUUID
+        text = self.view.textEdit.toPlainText()
+        words = len(re.findall(r"[a-zA-Z'-]+", text))
+        self.wcChanged.emit(uuid, str(words))
 
     def writeCurrentFile(self) -> bool:
         if not self._hasDocument():
