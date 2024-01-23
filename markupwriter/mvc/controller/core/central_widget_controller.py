@@ -99,6 +99,7 @@ class CentralWidgetController(QObject):
     @pyqtSlot(str, str, str)
     def _onFileRenamed(self, uuid: str, old: str, new: str):
         self.model.docEditorController.onFileRenamed(uuid, old, new)
+        self.model.docPreviewController.onFileRenamed(uuid, old, new)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController

@@ -38,6 +38,15 @@ class DocumentPreviewController(QObject):
         tabwidget = self.view.tabWidget
         tabwidget.removeTab(index)
         
+    def onFileRenamed(self, uuid: str, old: str, new: str):
+        index = self._pageIndex(old, uuid)
+        if index < 0:
+            return
+        tabwidget = self.view.tabWidget
+        widget: mw.DocumentPreviewWidget = tabwidget.widget(index)
+        widget.title = new
+        tabwidget.setTabText(index, new)
+        
     def onFilePreviewed(self, title: str, uuid: str):
         widget = mw.DocumentPreviewWidget(title, uuid, self.view)
         self._addPage(title, uuid, widget)
