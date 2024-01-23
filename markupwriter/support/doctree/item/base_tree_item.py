@@ -46,7 +46,8 @@ class BaseTreeItem(QWidget):
 
         self._uuid = str(uuid.uuid1())
         self._title = title
-        self._wordCount = "0"
+        self._wordCount = 0
+        self._totalWordCount = 0
 
         hLayout = QHBoxLayout(self)
         hLayout.setContentsMargins(1, 2, 1, 2)
@@ -63,6 +64,7 @@ class BaseTreeItem(QWidget):
         other._uuid = self._uuid
         other._title = self._title
         other._wordCount = self._wordCount
+        other._totalWordCount = self._totalWordCount
         return other
 
     def applyIcon(self):
@@ -71,7 +73,7 @@ class BaseTreeItem(QWidget):
     def applyChanges(self):
         self.applyIcon()
         self.setTitle(self._title)
-        self.setWordCount(self._wordCount)
+        self.setTotalWordCount(self._totalWordCount)
 
     def UUID(self) -> str:
         return self._uuid
@@ -79,8 +81,11 @@ class BaseTreeItem(QWidget):
     def title(self) -> str:
         return self._title
 
-    def wordCount(self) -> str:
+    def wordCount(self) -> int:
         return self._wordCount
+    
+    def totalWordCount(self) -> int:
+        return self._totalWordCount
 
     def hasFlag(self, flag: int) -> bool:
         return (self.flags & flag) == flag
@@ -96,24 +101,27 @@ class BaseTreeItem(QWidget):
         label: QLabel = self.children()[self.TITLE]
         label.setText(text)
 
-    def setWordCount(self, text: str):
-        if not text.isnumeric():
-            return
-        self._wordCount = text
+    def setWordCount(self, count: int):
+        self._wordCount = count
+        
+    def setTotalWordCount(self, count: int):
+        self._totalWordCount = count
         label: QLabel = self.children()[self.WORD_COUNT]
-        label.setText(text)
+        label.setText(str(count))
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut.writeQString(self._uuid)
         sOut.writeQString(self._title)
-        sOut.writeQString(self._wordCount)
+        sOut.writeInt(self._wordCount)
+        sOut.writeInt(self._totalWordCount)
         sOut.writeInt(self.flags)
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
         self._uuid = sIn.readQString()
         self._title = sIn.readQString()
-        self._wordCount = sIn.readQString()
+        self._wordCount = sIn.readInt()
+        self._totalWordCount = sIn.readInt()
         self.flags = sIn.readInt()
         self.applyChanges()
         return sIn

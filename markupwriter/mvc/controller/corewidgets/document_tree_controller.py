@@ -7,6 +7,10 @@ from PyQt6.QtCore import (
     pyqtSignal,
 )
 
+from PyQt6.QtWidgets import (
+    QTreeWidgetItem,
+)
+
 from markupwriter.mvc.model.corewidgets import DocumentTree
 from markupwriter.mvc.view.corewidgets import DocumentTreeView
 from markupwriter.config import AppConfig
@@ -25,7 +29,7 @@ class DocumentTreeController(QObject):
     fileOpened = pyqtSignal(str, list)
     fileMoved = pyqtSignal(str, list)
     fileRenamed = pyqtSignal(str, str, str)
-    
+
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
 
@@ -38,7 +42,7 @@ class DocumentTreeController(QObject):
         treebar.addItemAction.itemCreated.connect(self._onItemCreated)
         treebar.navUpAction.triggered.connect(self._onItemNavUp)
         treebar.navDownAction.triggered.connect(self._onItemNavDown)
-        
+
         # --- Tree signals --- #
         tree = self.view.treewidget
         tree.fileAdded.connect(self._onFileAdded)
@@ -61,17 +65,7 @@ class DocumentTreeController(QObject):
         # --- Trash context menu signals --- #
         trcm = self.view.treewidget.trashContextMenu
         trcm.emptyAction.triggered.connect(self._onEmptyTrash)
-        
-    def setEnabledTreeBarActions(self, isEnabled: bool):
-        treeBar = self.view.treebar
-        treeBar.navUpAction.setEnabled(isEnabled)
-        treeBar.navDownAction.setEnabled(isEnabled)
-        treeBar.addItemAction.setEnabled(isEnabled)
-        
-    def setEnabledTreeActions(self, isEnabled: bool):
-        tree = self.view.treewidget
-        tree.treeContextMenu.addItemMenu.setEnabled(isEnabled)
-        
+
     def createRootFolders(self):
         tree = self.view.treewidget
         tree.add(dti.PlotFolderItem())
@@ -79,11 +73,42 @@ class DocumentTreeController(QObject):
         tree.add(dti.CharsFolderItem())
         tree.add(dti.LocFolderItem())
         tree.add(dti.ObjFolderItem())
-        tree.add(dti.TrashFolderItem()) 
+        tree.add(dti.TrashFolderItem())
+
+    def onWordCountChanged(self, uuid: str, wc: int):
+        widget = self.findTreeWidget(uuid)
+        if widget is None:
+            return
+        owc = widget.wordCount()
+        twc = widget.totalWordCount() - owc + wc
+        widget.setWordCount(wc)
+        widget.setTotalWordCount(twc)
+
+        self._updateTotalWordCounts(widget.item.parent(), owc, wc)
         
-    def findTreeItem(self, uuid: str) -> dti.BaseTreeItem:
+        # TODO need to handle all edge cases for updating wc
+
+    def findTreeWidget(self, uuid: str) -> dti.BaseTreeItem | None:
         return self.view.treewidget.findWidget(uuid)
+
+    def setEnabledTreeBarActions(self, isEnabled: bool):
+        treeBar = self.view.treebar
+        treeBar.navUpAction.setEnabled(isEnabled)
+        treeBar.navDownAction.setEnabled(isEnabled)
+        treeBar.addItemAction.setEnabled(isEnabled)
+
+    def setEnabledTreeActions(self, isEnabled: bool):
+        tree = self.view.treewidget
+        tree.treeContextMenu.addItemMenu.setEnabled(isEnabled)
         
+    def _updateTotalWordCounts(self, item: QTreeWidgetItem, owc: int, wc: int):
+        tree = self.view.treewidget
+        while item is not None:
+            widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
+            twc = widget.totalWordCount() - owc + wc
+            widget.setTotalWordCount(twc)
+            item = item.parent()
+
     @pyqtSlot(str)
     def _onFileAdded(self, uuid: str):
         path = AppConfig.projectContentPath()
@@ -91,7 +116,7 @@ class DocumentTreeController(QObject):
             return
         path += uuid
         File.write(path, "")
-    
+
     @pyqtSlot(str, str)
     def _onFileRemoved(self, title: str, uuid: str):
         path = AppConfig.projectContentPath()
@@ -99,13 +124,13 @@ class DocumentTreeController(QObject):
             return
         path += uuid
         File.remove(path)
-        
+
         self.fileRemoved.emit(title, uuid)
-        
+
     @pyqtSlot(str, list)
     def _onFileOpened(self, uuid: str, pathList: list[str]):
         self.fileOpened.emit(uuid, pathList)
-        
+
     @pyqtSlot(str, list)
     def _onFileMoved(self, uuid: str, pathList: list[str]):
         self.fileMoved.emit(uuid, pathList)
@@ -121,14 +146,14 @@ class DocumentTreeController(QObject):
     @pyqtSlot(dti.BaseTreeItem)
     def _onItemCreated(self, item: dti.BaseTreeItem):
         self.view.treewidget.add(item)
-        
+
     @pyqtSlot()
     def _onPreviewItem(self):
         tree = self.view.treewidget
         item = tree.currentItem()
         if item is None:
             return
-        
+
         widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
         self.filePreviewed.emit(widget.title(), widget.UUID())
 
@@ -146,7 +171,7 @@ class DocumentTreeController(QObject):
 
         oldTitle = widget.title()
         widget.setTitle(text)
-        
+
         if widget.hasFlag(dti.ITEM_FLAG.file):
             self.fileRenamed.emit(widget.UUID(), oldTitle, text)
 

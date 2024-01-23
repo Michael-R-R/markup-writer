@@ -62,6 +62,7 @@ class CentralWidgetController(QObject):
 
         # --- Central controller slots --- #
         ec.filePreviewed.connect(self._onEditorFilePreviewed)
+        ec.wcChanged.connect(self._onWordCountChanged)
         tc.filePreviewed.connect(self._onTreeFilePreviewed)
         tc.fileRemoved.connect(self._onFileRemoved)
         tc.fileOpened.connect(self._onFileOpened)
@@ -76,7 +77,7 @@ class CentralWidgetController(QObject):
     @pyqtSlot(str)
     def _onEditorFilePreviewed(self, uuid: str):
         tc = self.model.docTreeController
-        widget = tc.findTreeItem(uuid)
+        widget = tc.findTreeWidget(uuid)
         if widget is None:
             return
         
@@ -100,6 +101,10 @@ class CentralWidgetController(QObject):
     def _onFileRenamed(self, uuid: str, old: str, new: str):
         self.model.docEditorController.onFileRenamed(uuid, old, new)
         self.model.docPreviewController.onFileRenamed(uuid, old, new)
+        
+    @pyqtSlot(str, int)
+    def _onWordCountChanged(self, uuid: str, wc: int):
+        self.model.docTreeController.onWordCountChanged(uuid, wc)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController
