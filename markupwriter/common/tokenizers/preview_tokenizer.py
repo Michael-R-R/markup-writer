@@ -17,7 +17,7 @@ class PreviewTokenizer(object):
         ]
 
         self.removePatterns = [
-            re.compile(r"^@(tag|pov|loc).*", re.MULTILINE),  # tags
+            re.compile(r"^@(tag|ref|pov|loc).*", re.MULTILINE),  # tags
             re.compile(r"%.*", re.MULTILINE),  # single line comment
             re.compile(r"<#(\n|.)*?#>", re.MULTILINE),  # multi line comment
         ]

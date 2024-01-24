@@ -108,7 +108,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         if cursorPos <= 0 or cursorPos >= len(blockText):
             return None
 
-        keywordFound = re.search(r"^@(pov|loc)", blockText)
+        keywordFound = re.search(r"^@(ref|pov|loc)", blockText)
         if keywordFound is None:
             return None
         bracketsFound = re.search(r"\[(.*?)\]", blockText)

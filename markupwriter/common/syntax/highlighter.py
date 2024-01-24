@@ -56,7 +56,7 @@ class Highlighter(QSyntaxHighlighter):
 
         self.addBehaviour(
             BEHAVIOUR.tags,
-            HighlightExprBehaviour(HighlighterConfig.tagsCol, r"^@(tag|pov|loc)"),
+            HighlightExprBehaviour(HighlighterConfig.tagsCol, r"^@(tag|ref|pov|loc)"),
         )
 
         italBehaviour = HighlightExprBehaviour(
