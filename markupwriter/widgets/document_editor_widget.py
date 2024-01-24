@@ -108,12 +108,9 @@ class DocumentEditorWidget(QPlainTextEdit):
         if cursorPos <= 0 or cursorPos >= len(blockText):
             return None
 
-        keywordFound = re.search(r"^@(ref|pov|loc)(\(.*\))", blockText)
-        if keywordFound is None:
+        tagFound = re.search(r"^@(ref|pov|loc)(\(.*\))", blockText)
+        if tagFound is None:
             return None
-        namesFound = re.search(r"(\(.*\))", blockText)
-        if namesFound is None:
-            return
 
         rcomma = blockText.rfind(",", 0, cursorPos)
         fcomma = blockText.find(",", cursorPos)

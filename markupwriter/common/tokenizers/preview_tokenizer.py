@@ -46,8 +46,8 @@ class PreviewTokenizer(object):
             it = pattern.finditer(self.text)
             for found in it:
                 tag = found.group(0)
-                pairFound = re.search(r"(?<=\().+?(?=\))", tag)
-                pair = pairFound.group(0).strip().split(",")
+                pair = re.search(r"(?<=\().+?(?=\))", tag).group(0)
+                pair = pair.strip().split(",")
                 if len(pair) != 2:
                     continue
                 self.text = self.text.replace(tag, pair[1])

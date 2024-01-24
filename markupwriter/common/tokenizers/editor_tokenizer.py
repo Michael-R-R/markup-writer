@@ -36,13 +36,9 @@ class EditorTokenizer(QRunnable):
             it = self.linePattern.finditer(self.text)
             for found in it:
                 line = found.group(0)
-                tagFound = self.tagPattern.search(line)
-                namesFound = self.namesPattern.search(line)
-                if namesFound is None:
-                    continue
+                tag = self.tagPattern.search(line).group(0)
+                names = self.namesPattern.search(line).group(0)
                 
-                tag = tagFound.group(0)
-                names = namesFound.group(0)
                 nameList = [n.strip() for n in names.split(",")]
                 
                 tokens[tag].append(nameList)
