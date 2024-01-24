@@ -82,10 +82,11 @@ class DocumentTreeController(QObject):
         
         owc = widget.wordCount()
         twc = widget.totalWordCount() - owc + wc
+        
         widget.setWordCount(wc)
         widget.setTotalWordCount(twc)
 
-        self._updateTotalWordCounts(widget.item.parent(), owc, wc)
+        self._refreshParentWordCounts(widget.item.parent(), owc, wc)
 
     def findTreeWidget(self, uuid: str) -> dti.BaseTreeItem | None:
         return self.view.treewidget.findWidget(uuid)
@@ -100,18 +101,33 @@ class DocumentTreeController(QObject):
         tree = self.view.treewidget
         tree.treeContextMenu.addItemMenu.setEnabled(isEnabled)
         
-    def _refreshTotalWordCounts(self):
+    def _refreshParentWordCounts(self, item: QTreeWidgetItem, owc: int, wc: int):
         tree = self.view.treewidget
         
-        # TODO solve this
-        
-    def _updateTotalWordCounts(self, item: QTreeWidgetItem, owc: int, wc: int):
-        tree = self.view.treewidget
         while item is not None:
             widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
             twc = widget.totalWordCount() - owc + wc
             widget.setTotalWordCount(twc)
             item = item.parent()
+        
+    def _refreshAllWordCounts(self):
+        tree = self.view.treewidget
+        
+        def helper(pitem: QTreeWidgetItem) -> int:
+            pw: dti.BaseTreeItem = tree.itemWidget(pitem, 0)
+            twc = pw.wordCount()
+            
+            for j in range(pitem.childCount()):
+                citem = pitem.child(j)
+                twc += helper(citem)
+                
+            pw.setTotalWordCount(twc)
+            
+            return twc
+        
+        for i in range(tree.topLevelItemCount()):
+            item = tree.topLevelItem(i)
+            helper(item)
 
     @pyqtSlot(str)
     def _onFileAdded(self, uuid: str):
@@ -137,7 +153,7 @@ class DocumentTreeController(QObject):
 
     @pyqtSlot(str, list)
     def _onFileMoved(self, uuid: str, pathList: list[str]):
-        self._refreshTotalWordCounts()
+        self._refreshAllWordCounts()
         self.fileMoved.emit(uuid, pathList)
 
     @pyqtSlot()
