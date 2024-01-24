@@ -20,7 +20,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='main',
+    name='MarkupWriter',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -39,5 +39,10 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='main',
+    name='MarkupWriter',
 )
+
+main = BUNDLE(coll,
+    name='Markup Writer.app',
+    icon=None,
+    bundle_identifier=None)

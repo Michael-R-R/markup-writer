@@ -16,6 +16,7 @@ section.svg
 misc_file.svg
 ----------------------
 
+Books: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 Check: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 Uncheck: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 Up arrow: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>

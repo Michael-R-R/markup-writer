@@ -13,6 +13,7 @@ class Icon(object):
     QDir.addSearchPath("icons", "./resources/icons/")
 
     # Common
+    BOOKS = QIcon("icons:common/books.svg")
     CHECK = QIcon("icons:common/check.svg")
     UNCHECK = QIcon("icons:common/uncheck.svg")
     UP_ARROW = QIcon("icons:common/up_arrow.svg")

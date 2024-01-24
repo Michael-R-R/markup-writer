@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
+from markupwriter.common.provider import Icon
 
 
 class MainWindowView(QMainWindow):
@@ -22,6 +23,8 @@ class MainWindowView(QMainWindow):
     
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
+        
+        self.setWindowIcon(Icon.BOOKS) # TODO get better app icon
         
         self.resize(AppConfig.mainWindowSize)
         
