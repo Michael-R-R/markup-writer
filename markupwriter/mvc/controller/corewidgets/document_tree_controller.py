@@ -79,14 +79,13 @@ class DocumentTreeController(QObject):
         widget = self.findTreeWidget(uuid)
         if widget is None:
             return
+        
         owc = widget.wordCount()
         twc = widget.totalWordCount() - owc + wc
         widget.setWordCount(wc)
         widget.setTotalWordCount(twc)
 
         self._updateTotalWordCounts(widget.item.parent(), owc, wc)
-        
-        # TODO need to handle all edge cases for updating wc
 
     def findTreeWidget(self, uuid: str) -> dti.BaseTreeItem | None:
         return self.view.treewidget.findWidget(uuid)
@@ -100,6 +99,11 @@ class DocumentTreeController(QObject):
     def setEnabledTreeActions(self, isEnabled: bool):
         tree = self.view.treewidget
         tree.treeContextMenu.addItemMenu.setEnabled(isEnabled)
+        
+    def _refreshTotalWordCounts(self):
+        tree = self.view.treewidget
+        
+        # TODO solve this
         
     def _updateTotalWordCounts(self, item: QTreeWidgetItem, owc: int, wc: int):
         tree = self.view.treewidget
@@ -133,6 +137,7 @@ class DocumentTreeController(QObject):
 
     @pyqtSlot(str, list)
     def _onFileMoved(self, uuid: str, pathList: list[str]):
+        self._refreshTotalWordCounts()
         self.fileMoved.emit(uuid, pathList)
 
     @pyqtSlot()
