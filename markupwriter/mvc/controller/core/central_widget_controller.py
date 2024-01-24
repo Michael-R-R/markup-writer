@@ -77,7 +77,7 @@ class CentralWidgetController(QObject):
     @pyqtSlot(str)
     def _onEditorFilePreviewed(self, uuid: str):
         tc = self.model.docTreeController
-        widget = tc.findTreeWidget(uuid)
+        widget = tc.findItemWidget(uuid)
         if widget is None:
             return
         

@@ -65,6 +65,16 @@ class DocumentTreeController(QObject):
         # --- Trash context menu signals --- #
         trcm = self.view.treewidget.trashContextMenu
         trcm.emptyAction.triggered.connect(self._onEmptyTrash)
+        
+    def setEnabledTreeBarActions(self, isEnabled: bool):
+        treeBar = self.view.treebar
+        treeBar.navUpAction.setEnabled(isEnabled)
+        treeBar.navDownAction.setEnabled(isEnabled)
+        treeBar.addItemAction.setEnabled(isEnabled)
+
+    def setEnabledTreeActions(self, isEnabled: bool):
+        tree = self.view.treewidget
+        tree.treeContextMenu.addItemMenu.setEnabled(isEnabled)
 
     def createRootFolders(self):
         tree = self.view.treewidget
@@ -76,7 +86,7 @@ class DocumentTreeController(QObject):
         tree.add(dti.TrashFolderItem())
 
     def onWordCountChanged(self, uuid: str, wc: int):
-        widget = self.findTreeWidget(uuid)
+        widget = self.findItemWidget(uuid)
         if widget is None:
             return
         
@@ -88,18 +98,8 @@ class DocumentTreeController(QObject):
 
         self._refreshParentWordCounts(widget.item.parent(), owc, wc)
 
-    def findTreeWidget(self, uuid: str) -> dti.BaseTreeItem | None:
+    def findItemWidget(self, uuid: str) -> dti.BaseTreeItem | None:
         return self.view.treewidget.findWidget(uuid)
-
-    def setEnabledTreeBarActions(self, isEnabled: bool):
-        treeBar = self.view.treebar
-        treeBar.navUpAction.setEnabled(isEnabled)
-        treeBar.navDownAction.setEnabled(isEnabled)
-        treeBar.addItemAction.setEnabled(isEnabled)
-
-    def setEnabledTreeActions(self, isEnabled: bool):
-        tree = self.view.treewidget
-        tree.treeContextMenu.addItemMenu.setEnabled(isEnabled)
         
     def _refreshParentWordCounts(self, item: QTreeWidgetItem, owc: int, wc: int):
         tree = self.view.treewidget
@@ -144,7 +144,8 @@ class DocumentTreeController(QObject):
             return
         path += uuid
         File.remove(path)
-
+        
+        self._refreshAllWordCounts()
         self.fileRemoved.emit(title, uuid)
 
     @pyqtSlot(str, list)
@@ -224,6 +225,7 @@ class DocumentTreeController(QObject):
     @pyqtSlot()
     def _onEmptyTrash(self):
         tree = self.view.treewidget
+        
         item = tree.currentItem()
         if item is None:
             return
@@ -233,6 +235,9 @@ class DocumentTreeController(QObject):
 
         for i in range(item.childCount() - 1, -1, -1):
             tree.remove(item.child(i))
+            
+        widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
+        widget.setTotalWordCount(0)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.view.treewidget
