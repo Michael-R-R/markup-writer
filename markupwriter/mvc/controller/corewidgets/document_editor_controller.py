@@ -90,10 +90,13 @@ class DocumentEditorController(QObject):
         self.view.setPathLabel(self.model.currDocPath)
             
     def runTokenizer(self, uuid: str):
-        if not self._hasDocument():
-            return
+        text = ""
+        if self._hasMatchingID(uuid):
+            text = self.view.textEdit.toPlainText()
+        else:
+            path = AppConfig.projectContentPath() + uuid
+            text = File.read(path)
         
-        text = self.view.textEdit.toPlainText()
         tokenizer = EditorTokenizer(uuid, text, self)
         tokenizer.signals.result.connect(self._onRunParser)
         self.model.threadPool.start(tokenizer)

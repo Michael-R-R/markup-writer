@@ -25,6 +25,7 @@ import markupwriter.support.doctree.item as dti
 
 class DocumentTreeController(QObject):
     filePreviewed = pyqtSignal(str, str)
+    fileAdded = pyqtSignal(str)
     fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
     fileMoved = pyqtSignal(str, list)
@@ -136,6 +137,8 @@ class DocumentTreeController(QObject):
             return
         path += uuid
         File.write(path, "")
+        
+        self.fileAdded.emit(uuid)
 
     @pyqtSlot(str, str)
     def _onFileRemoved(self, title: str, uuid: str):

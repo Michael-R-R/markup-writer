@@ -326,25 +326,29 @@ class DocumentTreeWidget(QTreeWidget):
 
             for _ in range(cCount):
                 type = sIn.readQString()
-                wChild: dti.BaseTreeItem = TreeItemFactory.make(type)
-                helper(sIn, wChild.item)
-                sIn >> wChild
+                cwidget: dti.BaseTreeItem = TreeItemFactory.make(type)
+                helper(sIn, cwidget.item)
+                sIn >> cwidget
 
-                iParent.addChild(wChild.item)
-                self.setItemWidget(wChild.item, 0, wChild)
+                iParent.addChild(cwidget.item)
+                self.setItemWidget(cwidget.item, 0, cwidget)
+                
+                self.fileAdded.emit(cwidget.UUID())
         
         iCount = sin.readInt()
 
         # Top level items
         for i in range(iCount):
             type = sin.readQString()
-            wParent: dti.BaseTreeItem = TreeItemFactory.make(type)
-            sin >> wParent
+            pwidget: dti.BaseTreeItem = TreeItemFactory.make(type)
+            sin >> pwidget
 
             # Child level items
-            helper(sin, wParent.item)
+            helper(sin, pwidget.item)
 
-            self.addTopLevelItem(wParent.item)
-            self.setItemWidget(wParent.item, 0, wParent)
+            self.addTopLevelItem(pwidget.item)
+            self.setItemWidget(pwidget.item, 0, pwidget)
+            
+            self.fileAdded.emit(pwidget.UUID())
 
         return sin
