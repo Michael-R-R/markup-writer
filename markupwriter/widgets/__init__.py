@@ -1,6 +1,6 @@
 from .document_tree_bar_widget import DocumentTreeBarWidget
 from .document_tree_widget import DocumentTreeWidget
-from .document_editor_bar import DocumentEditorBar
+from .document_editor_bar_widget import DocumentEditorBarWidget
 from .document_editor_widget import DocumentEditorWidget
 from .document_preview_widget import DocumentPreviewWidget
 from .popup_preview_widget import PopupPreviewWidget

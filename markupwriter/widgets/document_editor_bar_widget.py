@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
 )
 
 
-class DocumentEditorBar(QWidget):
+class DocumentEditorBarWidget(QWidget):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
 
