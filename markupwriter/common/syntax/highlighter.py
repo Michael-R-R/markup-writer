@@ -20,7 +20,7 @@ from markupwriter.config import (
 
 
 class BEHAVIOUR(Enum):
-    sqBracket = 0
+    paren = 0
     comment = auto()
     multicomment = auto()
     italize = auto()
@@ -31,6 +31,7 @@ class BEHAVIOUR(Enum):
     header3 = auto()
     header4 = auto()
     tags = auto()
+    keyword = auto()
 
 
 class Highlighter(QSyntaxHighlighter):
@@ -40,8 +41,8 @@ class Highlighter(QSyntaxHighlighter):
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
 
         self.addBehaviour(
-            BEHAVIOUR.sqBracket,
-            HighlightExprBehaviour(HighlighterConfig.sqBracketCol, r"\[|\]"),
+            BEHAVIOUR.paren,
+            HighlightExprBehaviour(HighlighterConfig.parenCol, r"\(|\)"),
         )
 
         self.addBehaviour(
@@ -57,6 +58,11 @@ class Highlighter(QSyntaxHighlighter):
         self.addBehaviour(
             BEHAVIOUR.tags,
             HighlightExprBehaviour(HighlighterConfig.tagsCol, r"^@(tag|ref|pov|loc)"),
+        )
+        
+        self.addBehaviour(
+            BEHAVIOUR.keyword,
+            HighlightExprBehaviour(HighlighterConfig.tagsCol, r"@(r)"),
         )
 
         italBehaviour = HighlightExprBehaviour(

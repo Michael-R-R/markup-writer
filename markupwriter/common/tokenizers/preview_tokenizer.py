@@ -15,9 +15,13 @@ class PreviewTokenizer(object):
             re.compile(r"^### "),  # scene
             re.compile(r"^#### "),  # section
         ]
+        
+        self.replacePatterns = [
+            re.compile(r"@r\(.*\)", re.MULTILINE)
+        ]
 
         self.removePatterns = [
-            re.compile(r"^@(tag|ref|pov|loc).*", re.MULTILINE),  # tags
+            re.compile(r"^@(tag|ref|pov|loc)(\(.*\))", re.MULTILINE),  # tags
             re.compile(r"%.*", re.MULTILINE),  # single line comment
             re.compile(r"<#(\n|.)*?#>", re.MULTILINE),  # multi line comment
         ]
@@ -38,6 +42,17 @@ class PreviewTokenizer(object):
         return self.tokens
 
     def _preprocess(self):
+        for pattern in self.replacePatterns:
+            it = pattern.finditer(self.text)
+            for found in it:
+                tag = found.group(0)
+                pairFound = re.search(r"(?<=\().+?(?=\))", tag)
+                pair = pairFound.group(0).strip().split(",")
+                if len(pair) != 2:
+                    continue
+                self.text = self.text.replace(tag, pair[1])
+                self.text = self.text.replace(pair[0], pair[1])
+        
         for pattern in self.removePatterns:
             it = pattern.finditer(self.text)
             for found in it:

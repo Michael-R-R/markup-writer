@@ -108,11 +108,11 @@ class DocumentEditorWidget(QPlainTextEdit):
         if cursorPos <= 0 or cursorPos >= len(blockText):
             return None
 
-        keywordFound = re.search(r"^@(ref|pov|loc)", blockText)
+        keywordFound = re.search(r"^@(ref|pov|loc)(\(.*\))", blockText)
         if keywordFound is None:
             return None
-        bracketsFound = re.search(r"\[(.*?)\]", blockText)
-        if bracketsFound is None:
+        namesFound = re.search(r"(\(.*\))", blockText)
+        if namesFound is None:
             return
 
         rcomma = blockText.rfind(",", 0, cursorPos)
@@ -121,19 +121,19 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         # single tag
         if rcomma < 0 and fcomma < 0:
-            rindex = blockText.rfind("[", 0, cursorPos)
-            lindex = blockText.find("]", cursorPos)
+            rindex = blockText.rfind("(", 0, cursorPos)
+            lindex = blockText.find(")", cursorPos)
             text = blockText[rindex + 1 : lindex].strip()
         # tag start
         elif rcomma < 0 and fcomma > -1:
-            index = blockText.rfind("[", 0, cursorPos)
+            index = blockText.rfind("(", 0, cursorPos)
             text = blockText[index + 1 : fcomma].strip()
         # tag middle
         elif rcomma > -1 and fcomma > -1:
             text = blockText[rcomma + 1 : fcomma].strip()
         # tag end
         elif rcomma > -1 and fcomma < 0:
-            index = blockText.find("]", cursorPos)
+            index = blockText.find(")", cursorPos)
             text = blockText[rcomma + 1 : index].strip()
 
         return text

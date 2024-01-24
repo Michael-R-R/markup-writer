@@ -13,7 +13,7 @@ from .base_config import BaseConfig
 
 class HighlighterConfig(BaseConfig):
     INI_PATH: str = None
-    sqBracketCol: QColor = None
+    parenCol: QColor = None
     commentCol: QColor = None
     italizeCol: QColor = None
     boldCol: QColor = None
@@ -24,7 +24,7 @@ class HighlighterConfig(BaseConfig):
     def init():
         HighlighterConfig.INI_PATH = "./resources/configs/highlighter.ini"
         # Base-line: 70% lightness, 50% saturation
-        HighlighterConfig.sqBracketCol = QColor(64, 191, 142)
+        HighlighterConfig.parenCol = QColor(64, 191, 142)
         HighlighterConfig.commentCol = QColor(128, 128, 128)
         HighlighterConfig.italizeCol = QColor(255, 153, 0)
         HighlighterConfig.boldCol = QColor(255, 153, 0)
@@ -36,7 +36,7 @@ class HighlighterConfig(BaseConfig):
         HighlighterConfig.init()
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
-        sOut << HighlighterConfig.sqBracketCol
+        sOut << HighlighterConfig.parenCol
         sOut << HighlighterConfig.commentCol
         sOut << HighlighterConfig.italizeCol
         sOut << HighlighterConfig.boldCol
@@ -46,7 +46,7 @@ class HighlighterConfig(BaseConfig):
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
-        sIn >> HighlighterConfig.sqBracketCol
+        sIn >> HighlighterConfig.parenCol
         sIn >> HighlighterConfig.commentCol
         sIn >> HighlighterConfig.italizeCol
         sIn >> HighlighterConfig.boldCol

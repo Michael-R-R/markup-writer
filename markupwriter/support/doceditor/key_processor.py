@@ -12,10 +12,10 @@ from PyQt6.QtGui import (
 class KeyProcessor(object):
     def process(cursor: QTextCursor, key: int) -> QTextCursor:
         match key:
-            case Qt.Key.Key_BracketLeft: return KeyProcessor._handleLeftBracket(cursor)
+            case Qt.Key.Key_ParenLeft: return KeyProcessor._handleLeftParen(cursor)
             case _: return cursor
     
-    def _handleLeftBracket(cursor: QTextCursor) -> QTextCursor:
-        cursor.insertText("]")
+    def _handleLeftParen(cursor: QTextCursor) -> QTextCursor:
+        cursor.insertText(")")
         cursor.movePosition(QTextCursor.MoveOperation.Left)
         return cursor

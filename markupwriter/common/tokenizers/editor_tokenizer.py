@@ -22,9 +22,9 @@ class EditorTokenizer(QRunnable):
         self.uuid = uuid
         self.text = text
         self.signals = WorkerSignal(parent)
-        self.linePattern = re.compile(r"^@(tag).*", re.MULTILINE)
+        self.linePattern = re.compile(r"^@(tag)(\(.*\))", re.MULTILINE)
         self.tagPattern = re.compile(r"^@(tag)")
-        self.namesPattern = re.compile(r"(?<=\[).+?(?=\])")
+        self.namesPattern = re.compile(r"(?<=\().+?(?=\))")
 
     @pyqtSlot()
     def run(self):
