@@ -235,9 +235,6 @@ class DocumentTreeController(QObject):
 
         for i in range(item.childCount() - 1, -1, -1):
             tree.remove(item.child(i))
-            
-        widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
-        widget.setTotalWordCount(0)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.view.treewidget

@@ -72,9 +72,8 @@ class DocumentTreeWidget(QTreeWidget):
         for i in range(item.childCount() - 1, -1, -1):
             child = item.child(i)
             self.remove(child)
-
+            
         widget: dti.BaseTreeItem = self.itemWidget(item, 0)
-        self._emitRemoved(widget)
 
         parent = item.parent()
         if parent is None:
@@ -86,6 +85,8 @@ class DocumentTreeWidget(QTreeWidget):
         self.removeItemWidget(item, 0)
         self.clearSelection()
         self.setCurrentItem(None)
+        
+        self._emitRemoved(widget)
         
     def translate(self, direction: int):
         selected = self.currentItem()
