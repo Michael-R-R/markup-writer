@@ -11,6 +11,11 @@ from markupwriter.config import (
     SerializeConfig,
 )
 
+from markupwriter.common.provider import (
+    Icon,
+    Style
+)
+
 from markupwriter.mvc.controller.core import (
     MainWindowController,
 )
@@ -20,10 +25,12 @@ class Application(object):
     status = -1
     controller: MainWindowController = None
 
-    def start():
-        AppConfig.init()
-        HighlighterConfig.init()
-        HotkeyConfig.init()
+    def start(wd: str):
+        AppConfig.init(wd)
+        HighlighterConfig.init(wd)
+        HotkeyConfig.init(wd)
+        Icon.init(wd)
+        Style.init(wd)
         SerializeConfig.read()
 
     def run(argv: list[str]):

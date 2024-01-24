@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import os
+
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -19,7 +21,7 @@ class DocumentPreviewWidget(QWidget):
     def __init__(self, title: str, uuid: str, parent: QWidget | None) -> None:
         super().__init__(parent)
 
-        path = AppConfig.projectContentPath() + uuid
+        path = os.path.join(AppConfig.projectContentPath(), uuid)
 
         self.title = title
         self.uuid = uuid
@@ -51,7 +53,7 @@ class DocumentPreviewWidget(QWidget):
         return title == self.title and uuid == self.uuid
 
     def _onRefreshButton(self):
-        path = AppConfig.projectContentPath() + self.uuid
+        path = os.path.join(AppConfig.projectContentPath(), self.uuid)
         if not File.exists(path):
             self.close()
 

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 import sys
 
 try:
@@ -15,7 +16,9 @@ from markupwriter.application import (
 )
 
 if __name__ == "__main__":
-    Application.start()
+    workingDir = os.path.dirname(__file__)
+    
+    Application.start(workingDir)
     Application.run(sys.argv[1:])
     Application.close()
 

@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import os
+
 from PyQt6.QtCore import (
     QDataStream,
 )
@@ -21,8 +23,8 @@ class HighlighterConfig(BaseConfig):
     headerCol: QColor = None
     tagsCol: QColor = None
 
-    def init():
-        HighlighterConfig.INI_PATH = "./resources/configs/highlighter.ini"
+    def init(wd: str):
+        HighlighterConfig.INI_PATH = os.path.join(wd, "resources/configs/highlighter.ini")
         # Base-line: 70% lightness, 50% saturation
         HighlighterConfig.parenCol = QColor(64, 191, 142)
         HighlighterConfig.commentCol = QColor(128, 128, 128)

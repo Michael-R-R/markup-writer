@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import os
+
 from PyQt6.QtCore import (
     QEvent,
     Qt,
@@ -32,7 +34,7 @@ class PopupPreviewWidget(QWidget):
         self.textedit.setMouseTracking(False)
         self.textedit.setEnabled(True)
         self.textedit.setReadOnly(True)
-        path = AppConfig.projectContentPath() + uuid
+        path = os.path.join(AppConfig.projectContentPath(), uuid)
         self.textedit.setPlainText(File.read(path))
 
         self.vLayout = QVBoxLayout(self)

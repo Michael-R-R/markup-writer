@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import os
+
 from PyQt6.QtCore import (
     Qt,
     QDataStream,
@@ -24,8 +26,8 @@ class HotkeyConfig(BaseConfig):
     navDown: QKeySequence = None
     rename: QKeySequence = None
 
-    def init():
-        HotkeyConfig.INI_PATH = "./resources/configs/hotkey.ini"
+    def init(wd: str):
+        HotkeyConfig.INI_PATH = os.path.join(wd, "resources/configs/hotkey.ini")
         HotkeyConfig.openProject = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_O)
         HotkeyConfig.saveDocument = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_S)
         HotkeyConfig.saveProject = QKeySequence(

@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import os
+
 from PyQt6.QtCore import (
     QDir,
 )
@@ -10,8 +12,13 @@ from markupwriter.common.util import (
 
 
 class Style(object):
-    QDir.addSearchPath("styles", "./resources/styles/")
+    TREE_VIEW: str = None
+    EDITOR_VIEW: str = None
+    PREVIEW_VIEW: str = None
+    
+    def init(wd: str):
+        QDir.addSearchPath("styles", os.path.join(wd, "resources/styles/"))
 
-    TREE_VIEW: str = File.read("styles:tree_view.qss")
-    EDITOR_VIEW: str = File.read("styles:editor_view.qss")
-    PREVIEW_VIEW: str = File.read("styles:preview_view.qss")
+        Style.TREE_VIEW: str = File.read("styles:tree_view.qss")
+        Style.EDITOR_VIEW: str = File.read("styles:editor_view.qss")
+        Style.PREVIEW_VIEW: str = File.read("styles:preview_view.qss")

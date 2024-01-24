@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import re
+import os
 
 from PyQt6.QtCore import (
     QObject,
@@ -94,7 +95,7 @@ class DocumentEditorController(QObject):
         if self._hasMatchingID(uuid):
             text = self.view.textEdit.toPlainText()
         else:
-            path = AppConfig.projectContentPath() + uuid
+            path = os.path.join(AppConfig.projectContentPath(), uuid)
             text = File.read(path)
         
         tokenizer = EditorTokenizer(uuid, text, self)
@@ -117,7 +118,7 @@ class DocumentEditorController(QObject):
         if path is None:
             return False
         
-        path += self.model.currDocUUID
+        path = os.path.join(path, self.model.currDocUUID)
         File.write(path, self.view.textEdit.toPlainText())
         
         self.runWordCounter()
@@ -132,7 +133,7 @@ class DocumentEditorController(QObject):
         if path is None:
              None
         
-        path += self.model.currDocUUID
+        path = os.path.join(path, self.model.currDocUUID)
         return File.read(path)
 
     def _hasMatchingID(self, uuid: str) -> bool:

@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import os
+
 from PyQt6.QtCore import (
     QObject,
     QDataStream,
@@ -135,7 +137,7 @@ class DocumentTreeController(QObject):
         path = AppConfig.projectContentPath()
         if path is None:
             return
-        path += uuid
+        path = os.path.join(path, uuid)
         File.write(path, "")
         
         self.fileAdded.emit(uuid)
@@ -145,7 +147,7 @@ class DocumentTreeController(QObject):
         path = AppConfig.projectContentPath()
         if path is None:
             return
-        path += uuid
+        path = os.path.join(path, uuid)
         File.remove(path)
         
         self._refreshAllWordCounts()
