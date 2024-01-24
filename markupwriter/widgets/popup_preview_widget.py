@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
-from . import DocumentTextEdit
+from . import DocumentEditorWidget
 
 
 class PopupPreviewWidget(QWidget):
@@ -27,7 +27,7 @@ class PopupPreviewWidget(QWidget):
         self.previewButton = QPushButton("Preview...", self)
         self.previewButton.clicked.connect(lambda: self.close())
 
-        self.textedit = DocumentTextEdit(self)
+        self.textedit = DocumentEditorWidget(self)
         self.textedit.canResizeMargins = False
         self.textedit.setMouseTracking(False)
         self.textedit.setEnabled(True)

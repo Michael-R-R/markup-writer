@@ -30,7 +30,7 @@ from markupwriter.common.syntax import (
 import markupwriter.support.doceditor as de
 
 
-class DocumentTextEdit(QPlainTextEdit):
+class DocumentEditorWidget(QPlainTextEdit):
     tagHovered = pyqtSignal(str)
 
     def __init__(self, parent: QWidget | None):

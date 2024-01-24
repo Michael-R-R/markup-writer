@@ -19,7 +19,7 @@ class DocumentEditorView(QWidget):
         super().__init__(parent)
         
         self.editorBar = mw.DocumentEditorBar(self)
-        self.textEdit = mw.DocumentTextEdit(self)
+        self.textEdit = mw.DocumentEditorWidget(self)
         
         hLayout = QHBoxLayout()
         hLayout.addStretch()
