@@ -3,19 +3,28 @@
 import os
 import sys
 
+# Check for dependacies
 try:
     import PyQt6.QtCore
     import PyQt6.QtWidgets
     import PyQt6.QtGui
-except Exception:
-    print("ERROR::main::cannot import PyQt6 dependecies")
+except Exception as e:
+    print(str(e))
     sys.exit(1)
-
-from markupwriter.application import (
-    Application,
-)
+    
+# Set Windows app id
+try:
+    from ctypes import windll
+    
+    myappid = "michaelrule.markupwriter.version 0.1.0"
+    windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+except ImportError:
+    pass
 
 if __name__ == "__main__":
+    from markupwriter.application import (
+    Application,
+)
     wd = os.path.dirname(__file__)
     
     Application.start(wd)
