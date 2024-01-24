@@ -16,9 +16,9 @@ from markupwriter.application import (
 )
 
 if __name__ == "__main__":
-    workingDir = os.path.dirname(__file__)
+    wd = os.path.dirname(__file__)
     
-    Application.start(workingDir)
+    Application.start(wd)
     Application.run(sys.argv[1:])
     Application.close()
 
