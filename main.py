@@ -16,15 +16,14 @@ except Exception as e:
 try:
     from ctypes import windll
     
-    myappid = "michaelrule.markupwriter.version 0.1.0"
+    myappid = "michaelrule.markupwriter.version"
     windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 except ImportError:
     pass
 
 if __name__ == "__main__":
-    from markupwriter.application import (
-    Application,
-)
+    from markupwriter.application import Application
+    
     wd = os.path.dirname(__file__)
     
     Application.start(wd)
