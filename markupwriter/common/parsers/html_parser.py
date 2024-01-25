@@ -6,9 +6,7 @@ import re
 class HtmlParser(object):
     def __init__(self) -> None:
         self.html = ""
-
-    def run(self, tokens: list[(str, str)]) -> str:
-        funcs = {
+        self.parseDict = {
             "p": self._processParagraph,
             "#": self._processHeader1,
             "##": self._processHeader2,
@@ -16,27 +14,26 @@ class HtmlParser(object):
             "####": self._processHeader4,
         }
 
-        for t in tokens:
-            funcs[t[0]](t[1])
-
+    def run(self, tokens: list[(str, str)]) -> str:
+        self._process(tokens)
         self._postprocess()
 
         return self.html
 
-    def _processParagraph(self, line: str):
-        self.html += "<p>{}</p>".format(line)
+    def _processParagraph(self, text: str):
+        self.html += "<p>{}</p>".format(text)
 
-    def _processHeader1(self, line: str):
-        self.html += "<h1 class='title'>{}</h1>".format(line)
+    def _processHeader1(self, text: str):
+        self.html += "<h1 class='title'>{}</h1>".format(text)
 
-    def _processHeader2(self, line: str):
-        self.html += "<h2 class='chapter'>{}</h2>".format(line)
+    def _processHeader2(self, text: str):
+        self.html += "<h2 class='chapter'>{}</h2>".format(text)
 
-    def _processHeader3(self, line: str):
-        self.html += "<h3 class='scene'>{}</h3>".format(line)
+    def _processHeader3(self, text: str):
+        self.html += "<h3 class='scene'>{}</h3>".format(text)
 
-    def _processHeader4(self, line: str):
-        self.html += "<h4 class='section'>{}</h4>".format(line)
+    def _processHeader4(self, text: str):
+        self.html += "<h4 class='section'>{}</h4>".format(text)
 
     def _searchReplace(self, regex: str, char: str, tag: str):
         expr = re.compile(regex)
@@ -46,6 +43,12 @@ class HtmlParser(object):
             text = pattern.replace(char, "")
             tag = tag.replace("?", text)
             self.html = self.html.replace(pattern, tag)
+
+    def _process(self, tokens: list[(str, str)]):
+        for t in tokens:
+            tag = t[0]
+            text = t[1]
+            self.parseDict[tag](text)
 
     def _postprocess(self):
         self._searchReplace(r"_(.+?)_(?!_)", "_", "<i>?</i>")  # italize
