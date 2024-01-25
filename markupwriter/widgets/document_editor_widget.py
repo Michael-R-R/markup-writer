@@ -14,6 +14,7 @@ from PyQt6.QtGui import (
     QMouseEvent,
     QResizeEvent,
     QTextOption,
+    QTextCursor,
     QGuiApplication,
 )
 
@@ -51,6 +52,11 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setMouseTracking(True)
         self.setTabStopDistance(20.0)
         self.resizeMargins()
+        
+    def cursorToEnd(self):
+        cursor = self.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.End)
+        self.setTextCursor(cursor)
 
     def resizeMargins(self):
         if not self.canResizeMargins:

@@ -57,12 +57,16 @@ class DocumentEditorController(QObject):
             return
         self.writeCurrentFile()
         self.runTokenizer(self.model.currDocUUID)
+        
         self.model.currDocPath = self._makePathStr(pathList)
         self.model.currDocUUID = uuid
+        
         content = self.readCurrentFile()
         self.view.textEdit.setPlainText(content)
-        self.view.setPathLabel(self.model.currDocPath)
+        self.view.textEdit.cursorToEnd()
         self.view.textEdit.setEnabled(True)
+        self.view.setPathLabel(self.model.currDocPath)
+        
         self.runTokenizer(uuid)
 
         self.hasOpenDocument.emit(True)
