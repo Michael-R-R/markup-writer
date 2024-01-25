@@ -1,0 +1,19 @@
+[Desktop Entry]
+
+# The type of the thing this desktop file refers to (e.g. can be Link)
+Type=Application
+
+# The application name.
+Name=Markup Writer
+
+# Tooltip comment to show in menus.
+Comment=A novel writing application.
+
+# The path (folder) in which the executable is run
+Path=/opt/MarkupWriter
+
+# The executable (can include arguments)
+Exec=/opt/MarkupWriter/MarkupWriter
+
+# The icon for the entry, use the target filesystem path.
+Icon=MarkupWriter
