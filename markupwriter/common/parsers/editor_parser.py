@@ -12,52 +12,52 @@ from markupwriter.common.referencetag import (
 class EditorParser(QObject):
     def __init__(
         self,
-        refManager: RefTagManager,
         parent: QObject | None,
     ) -> None:
         super().__init__(parent)
-        self.refManager = refManager
+
         self.prevTokens: dict[str, dict[str, list[str]]] = dict()
+        self.prevHandlers: dict[str, function] = {
+            "@tag": self._handleRemoveTag,
+        }
+        self.currHandlers: dict[str, function] = {
+            "@tag": self._handleAddTag,
+        }
 
-    def run(self, uuid: str, tokens: dict[str, list[str]]):
-        self._handlePrevTokens(uuid)
-        self._handleCurrTokens(uuid, tokens)
-
-        self.prevTokens[uuid] = tokens
-        
-    def popPrevUUID(self, uuid: str):
+    def popPrevUUID(self, uuid: str, refManager: RefTagManager):
         if not uuid in self.prevTokens:
             return
-        
-        self._handlePrevTokens(uuid)
+        self._handlePrevTokens(uuid, refManager)
         self.prevTokens.pop(uuid)
 
-    def _handlePrevTokens(self, uuid: str):
+    def run(self, uuid: str, tokens: dict[str, list[str]], refManager: RefTagManager):
+        self._handlePrevTokens(uuid, refManager)
+        self._handleCurrTokens(uuid, tokens, refManager)
+
+        self.prevTokens[uuid] = tokens
+
+    # --- Previous Tokens --- #
+    def _handlePrevTokens(self, uuid: str, refManager: RefTagManager):
         tempDict = self.prevTokens.get(uuid)
         if tempDict is None:
             return
 
-        func: dict[str, function] = {
-            "@tag": self._handleRemoveTag,
-        }
-
         for key in tempDict:
             for t in tempDict[key]:
-                func[key](t)
+                self.prevHandlers[key](t, refManager)
 
-    def _handleRemoveTag(self, names: list[str]):
+    def _handleRemoveTag(self, names: list[str], refManager: RefTagManager):
         for n in names:
-            self.refManager.removeTag(n)
+            refManager.removeTag(n)
 
-    def _handleCurrTokens(self, uuid: str, tokens: dict[str, list[str]]):
-        func: dict[str, function] = {
-            "@tag": self._handleAddTag,
-        }
-
+    # --- Current tokens --- #
+    def _handleCurrTokens(
+        self, uuid: str, tokens: dict[str, list[str]], refManager: RefTagManager
+    ):
         for key in tokens:
             for t in tokens[key]:
-                func[key](uuid, t)
+                self.currHandlers[key](uuid, t, refManager)
 
-    def _handleAddTag(self, uuid: str, names: list[str]):
+    def _handleAddTag(self, uuid: str, names: list[str], refManager: RefTagManager):
         for n in names:
-            self.refManager.addTag(n, uuid)
+            refManager.addTag(n, uuid)

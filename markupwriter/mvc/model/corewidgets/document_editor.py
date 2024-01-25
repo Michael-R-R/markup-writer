@@ -24,5 +24,5 @@ class DocumentEditor(QObject):
         self.currDocPath = ""
         self.currDocUUID = ""
         self.refManager = RefTagManager()
-        self.parser = EditorParser(self.refManager, self)
+        self.parser = EditorParser(self)
         self.threadPool = QThreadPool(self)

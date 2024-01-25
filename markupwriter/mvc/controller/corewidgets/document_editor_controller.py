@@ -49,7 +49,7 @@ class DocumentEditorController(QObject):
     def onSaveDocument(self) -> bool:
         status = self.writeCurrentFile()
         self.runTokenizer(self.model.currDocUUID)
-        
+
         return status
 
     def onFileOpened(self, uuid: str, pathList: list[str]):
@@ -64,18 +64,18 @@ class DocumentEditorController(QObject):
         self.view.setPathLabel(self.model.currDocPath)
         self.view.textEdit.setEnabled(True)
         self.runTokenizer(uuid)
-        
+
         self.hasOpenDocument.emit(True)
 
     def onFileRemoved(self, uuid: str):
-        self.model.parser.popPrevUUID(uuid)
+        self.model.parser.popPrevUUID(uuid, self.model.refManager)
         if not self._hasMatchingID(uuid):
             return
         self.model.currDocPath = ""
         self.model.currDocUUID = ""
         self.view.clearAll()
         self.view.textEdit.setEnabled(False)
-        
+
         self.hasOpenDocument.emit(False)
 
     def onFileMoved(self, uuid: str, path: list[str]):
@@ -89,7 +89,7 @@ class DocumentEditorController(QObject):
             return
         self.model.currDocPath = self.model.currDocPath.replace(old, new)
         self.view.setPathLabel(self.model.currDocPath)
-            
+
     def runTokenizer(self, uuid: str):
         text = ""
         if self._hasMatchingID(uuid):
@@ -97,11 +97,11 @@ class DocumentEditorController(QObject):
         else:
             path = os.path.join(AppConfig.projectContentPath(), uuid)
             text = File.read(path)
-        
+
         tokenizer = EditorTokenizer(uuid, text, self)
         tokenizer.signals.result.connect(self._onRunParser)
         self.model.threadPool.start(tokenizer)
-        
+
     def runWordCounter(self):
         if not self._hasDocument():
             return
@@ -113,32 +113,32 @@ class DocumentEditorController(QObject):
     def writeCurrentFile(self) -> bool:
         if not self._hasDocument():
             return False
-        
+
         path = AppConfig.projectContentPath()
         if path is None:
             return False
-        
+
         path = os.path.join(path, self.model.currDocUUID)
         File.write(path, self.view.textEdit.toPlainText())
-        
+
         self.runWordCounter()
-        
+
         return True
 
     def readCurrentFile(self) -> str | None:
         if not self._hasDocument():
             return None
-        
+
         path = AppConfig.projectContentPath()
         if path is None:
-             None
-        
+            None
+
         path = os.path.join(path, self.model.currDocUUID)
         return File.read(path)
 
     def _hasMatchingID(self, uuid: str) -> bool:
         return self.model.currDocUUID == uuid
-    
+
     def _hasDocument(self) -> bool:
         return self.model.currDocUUID != ""
 
@@ -151,7 +151,7 @@ class DocumentEditorController(QObject):
         text += "{}".format(pathList[count - 1])
 
         return text
-    
+
     @pyqtSlot(str)
     def _onTagHovered(self, tag: str):
         refTag = self.model.refManager.getTag(tag)
@@ -159,21 +159,21 @@ class DocumentEditorController(QObject):
             return
 
         uuid = refTag.docUUID()
-        
+
         w = PopupPreviewWidget(uuid, self.view)
         w.previewButton.clicked.connect(lambda: self.filePreviewed.emit(uuid))
-        
+
         size = w.sizeHint()
         pos = QCursor.pos()
         x = pos.x() - int((size.width() / 2))
         y = pos.y() - int(size.height() / 1.25)
-        
+
         w.move(QPoint(x, y))
         w.show()
-        
+
     @pyqtSlot(str, dict)
     def _onRunParser(self, uuid: str, tokens: dict[str, list[str]]):
-        self.model.parser.run(uuid, tokens)
+        self.model.parser.run(uuid, tokens, self.model.refManager)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         return sout
