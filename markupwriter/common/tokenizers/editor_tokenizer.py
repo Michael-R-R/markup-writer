@@ -19,12 +19,17 @@ class WorkerSignal(QObject):
 class EditorTokenizer(QRunnable):
     def __init__(self, uuid: str, text: str, parent: QObject | None) -> None:
         super().__init__()
+        
+        lineRegex = r"^@(tag)(\(.*\))"
+        tagRegex = r"^@(tag)"
+        namesRegex = r"(?<=\().+?(?=\))"
+        
         self.uuid = uuid
         self.text = text
         self.signals = WorkerSignal(parent)
-        self.linePattern = re.compile(r"^@(tag)(\(.*\))", re.MULTILINE)
-        self.tagPattern = re.compile(r"^@(tag)")
-        self.namesPattern = re.compile(r"(?<=\().+?(?=\))")
+        self.linePattern = re.compile(lineRegex, re.MULTILINE)
+        self.tagPattern = re.compile(tagRegex)
+        self.namesPattern = re.compile(namesRegex)
 
     @pyqtSlot()
     def run(self):

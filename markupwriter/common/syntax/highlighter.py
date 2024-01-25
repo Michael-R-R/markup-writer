@@ -38,56 +38,68 @@ class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument | None):
         super().__init__(document)
 
+        parenRegex = r"\(|\)"
+        commentRegex = r"%(.*)"
+        multiComRegex = [r"<#", r"#>"]
+        tagsRegex = r"^@(tag|ref|pov|loc)"
+        keywordRegex = r"@(r)"
+        boldRegex = r"\*(.+?)\*(?!\*)"
+        italRegex = r"_(.+?)_(?!_)"
+        italBoldRegex = r"\^(.+?)\^(?!\^)"
+        headerRegex = [r"^# .*", r"^## .*", r"^### .*", r"^#### .*"]
+
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
 
         self.addBehaviour(
             BEHAVIOUR.paren,
-            HighlightExprBehaviour(HighlighterConfig.parenCol, r"\(|\)"),
+            HighlightExprBehaviour(HighlighterConfig.parenCol, parenRegex),
         )
 
         self.addBehaviour(
             BEHAVIOUR.comment,
-            HighlightExprBehaviour(HighlighterConfig.commentCol, r"%(.*)"),
-        )
-
-        self.addBehaviour(
-            BEHAVIOUR.multicomment,
-            HighlightMultiExprBehaviour(HighlighterConfig.commentCol, r"<#", r"#>"),
+            HighlightExprBehaviour(HighlighterConfig.commentCol, commentRegex),
         )
 
         self.addBehaviour(
             BEHAVIOUR.tags,
-            HighlightExprBehaviour(HighlighterConfig.tagsCol, r"^@(tag|ref|pov|loc)"),
-        )
-        
-        self.addBehaviour(
-            BEHAVIOUR.keyword,
-            HighlightExprBehaviour(HighlighterConfig.tagsCol, r"@(r)"),
+            HighlightExprBehaviour(HighlighterConfig.tagsCol, tagsRegex),
         )
 
-        italBehaviour = HighlightExprBehaviour(
-            HighlighterConfig.boldCol, r"_(.+?)_(?!_)"
+        self.addBehaviour(
+            BEHAVIOUR.keyword,
+            HighlightExprBehaviour(HighlighterConfig.tagsCol, keywordRegex),
         )
+
+        self.addBehaviour(
+            BEHAVIOUR.multicomment,
+            HighlightMultiExprBehaviour(
+                HighlighterConfig.commentCol, multiComRegex[0], multiComRegex[1]
+            ),
+        )
+
+        # Header behaviours
+        self.addHeaderBehaviour(BEHAVIOUR.header1, headerRegex[0], 34.0)
+        self.addHeaderBehaviour(BEHAVIOUR.header2, headerRegex[1], 24.0)
+        self.addHeaderBehaviour(BEHAVIOUR.header3, headerRegex[2], 18.72)
+        self.addHeaderBehaviour(BEHAVIOUR.header4, headerRegex[3], 16.0)
+
+        # Italize behaviour
+        italBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, italRegex)
         italBehaviour.format.setFontItalic(True)
         self.addBehaviour(BEHAVIOUR.italize, italBehaviour)
 
-        boldBehaviour = HighlightExprBehaviour(
-            HighlighterConfig.boldCol, r"\*(.+?)\*(?!\*)"
-        )
+        # Bold behaviour
+        boldBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, boldRegex)
         boldBehaviour.format.setFontWeight(QFont.Weight.Bold)
         self.addBehaviour(BEHAVIOUR.bold, boldBehaviour)
 
+        # Italize+Bold behaviour
         italBoldBehaviour = HighlightExprBehaviour(
-            HighlighterConfig.italBoldCol, r"\^(.+?)\^(?!\^)"
+            HighlighterConfig.italBoldCol, italBoldRegex
         )
         italBoldBehaviour.format.setFontWeight(QFont.Weight.Bold)
         italBoldBehaviour.format.setFontItalic(True)
         self.addBehaviour(BEHAVIOUR.italBold, italBoldBehaviour)
-
-        self.addHeaderBehaviour(BEHAVIOUR.header1, r"^# .*", 34.0)
-        self.addHeaderBehaviour(BEHAVIOUR.header2, r"^## .*", 24.0)
-        self.addHeaderBehaviour(BEHAVIOUR.header3, r"^### .*", 18.72)
-        self.addHeaderBehaviour(BEHAVIOUR.header4, r"^#### .*", 16.0)
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self._behaviours.items():
