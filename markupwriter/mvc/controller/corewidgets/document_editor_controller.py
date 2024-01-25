@@ -47,21 +47,25 @@ class DocumentEditorController(QObject):
         self.view.textEdit.tagHovered.connect(self._onTagHovered)
 
     def onSaveDocument(self) -> bool:
-        status = self.writeCurrentFile()
-        self.runTokenizer(self.model.currDocUUID)
+        uuid = self.model.currDocUUID
+        status = self.writeDoc(uuid)
+        if status:
+            self.runTokenizer(uuid)
 
         return status
 
     def onFileOpened(self, uuid: str, pathList: list[str]):
         if self._hasMatchingID(uuid):
             return
-        self.writeCurrentFile()
-        self.runTokenizer(self.model.currDocUUID)
+        
+        prevUUID = self.model.currDocUUID
+        self.writeDoc(prevUUID)
+        self.runTokenizer(prevUUID)
         
         self.model.currDocPath = self._makePathStr(pathList)
         self.model.currDocUUID = uuid
         
-        content = self.readCurrentFile()
+        content = self.readDoc(uuid)
         self.view.textEdit.setPlainText(content)
         self.view.textEdit.cursorToEnd()
         self.view.textEdit.setEnabled(True)
@@ -75,6 +79,7 @@ class DocumentEditorController(QObject):
         self.model.parser.popPrevUUID(uuid, self.model.refManager)
         if not self._hasMatchingID(uuid):
             return
+        
         self.model.currDocPath = ""
         self.model.currDocUUID = ""
         self.view.clearAll()
@@ -114,7 +119,7 @@ class DocumentEditorController(QObject):
         count = len(re.findall(r"[a-zA-Z'-]+", text))
         self.wcChanged.emit(uuid, count)
 
-    def writeCurrentFile(self) -> bool:
+    def writeDoc(self, uuid: str) -> bool:
         if not self._hasDocument():
             return False
 
@@ -122,22 +127,23 @@ class DocumentEditorController(QObject):
         if path is None:
             return False
 
-        path = os.path.join(path, self.model.currDocUUID)
-        File.write(path, self.view.textEdit.toPlainText())
+        path = os.path.join(path, uuid)
+        if not File.write(path, self.view.textEdit.toPlainText()):
+            return False
 
         self.runWordCounter()
 
         return True
 
-    def readCurrentFile(self) -> str | None:
+    def readDoc(self, uuid: str) -> str | None:
         if not self._hasDocument():
             return None
 
         path = AppConfig.projectContentPath()
         if path is None:
-            None
+            return None
 
-        path = os.path.join(path, self.model.currDocUUID)
+        path = os.path.join(path, uuid)
         return File.read(path)
 
     def _hasMatchingID(self, uuid: str) -> bool:
