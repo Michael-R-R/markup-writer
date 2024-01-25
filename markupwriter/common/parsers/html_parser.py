@@ -3,7 +3,7 @@
 import re
 
 
-class PreviewParser(object):
+class HtmlParser(object):
     def __init__(self) -> None:
         self.html = ""
 

@@ -13,8 +13,8 @@ from PyQt6.QtWidgets import (
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
 from markupwriter.common.syntax import Highlighter
-from markupwriter.common.tokenizers import PreviewTokenizer
-from markupwriter.common.parsers import PreviewParser
+from markupwriter.common.tokenizers import HtmlTokenizer
+from markupwriter.common.parsers import HtmlParser
 
 
 class DocumentPreviewWidget(QWidget):
@@ -80,9 +80,9 @@ class DocumentPreviewWidget(QWidget):
 
     def _setHtmlText(self, text: str):
         if text == "":
-            tokenizer = PreviewTokenizer(self.plainText)
+            tokenizer = HtmlTokenizer(self.plainText)
             tokens = tokenizer.run()
-            parser = PreviewParser()
+            parser = HtmlParser()
             text = parser.run(tokens)
 
         self.html = text
