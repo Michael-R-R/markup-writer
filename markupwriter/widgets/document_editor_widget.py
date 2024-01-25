@@ -57,6 +57,11 @@ class DocumentEditorWidget(QPlainTextEdit):
         cursor = self.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.End)
         self.setTextCursor(cursor)
+        
+    def moveCursorTo(self, pos: int):
+        cursor = self.textCursor()
+        cursor.setPosition(pos)
+        self.setTextCursor(cursor)
 
     def resizeMargins(self):
         if not self.canResizeMargins:

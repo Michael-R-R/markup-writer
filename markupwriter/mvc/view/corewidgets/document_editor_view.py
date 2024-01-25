@@ -32,9 +32,10 @@ class DocumentEditorView(QWidget):
         vLayout.addWidget(self.textEdit)
         self.vLayout = vLayout
         
-    def clearAll(self):
+    def reset(self):
         self.editorBar.pathLabel.clear()
         self.textEdit.clear()
+        self.textEdit.setEnabled(False)
         
     def setPathLabel(self, path: str):
         self.editorBar.pathLabel.setText(path)
