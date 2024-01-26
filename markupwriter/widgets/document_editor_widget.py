@@ -59,6 +59,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         cursor = self.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.End)
         self.setTextCursor(cursor)
+        self.centerCursor()
         
     def moveCursorTo(self, pos: int):
         cursor = self.textCursor()
