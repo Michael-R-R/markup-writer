@@ -47,6 +47,8 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
+        self.setCenterOnScroll(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setMouseTracking(True)
@@ -62,6 +64,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         cursor = self.textCursor()
         cursor.setPosition(pos)
         self.setTextCursor(cursor)
+        self.centerCursor()
 
     def resizeMargins(self):
         if not self.canResizeMargins:
