@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    Qt,
+)
+
 from PyQt6.QtWidgets import (
     QWidget,
-    QHBoxLayout,
+    QGridLayout,
     QLabel,
 )
 
@@ -12,11 +16,15 @@ class DocumentEditorBarWidget(QWidget):
         super().__init__(parent)
 
         self.pathLabel = QLabel("", self)
-
-        self.hLayout = QHBoxLayout(self)
-        self.hLayout.addStretch()
-        self.hLayout.addWidget(self.pathLabel)
-        self.hLayout.addStretch()
+        
+        self.mLayout = QGridLayout(self)
+        self.mLayout.addWidget(self.pathLabel, 0, 1, Qt.AlignmentFlag.AlignHCenter)
+        
+        self.mLayout.setColumnStretch(0, 0)
+        self.mLayout.setColumnStretch(2, 0)
         
     def reset(self):
         self.pathLabel.clear()
+        
+    def addPath(self, path: str):
+        self.pathLabel.setText(path)

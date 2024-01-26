@@ -36,25 +36,10 @@ class DocumentEditorView(QWidget):
     def reset(self):
         self.editorBar.reset()
         self.textEdit.reset()
-        
-    def setPathLabel(self, path: str):
-        self.editorBar.pathLabel.setText(path)
-        
-    def adjustSearchBox(self):
-        if not self.searchReplace.isVisible():
-            return
-        
-        vb = self.textEdit.verticalScrollBar()
-        vbw = vb.width() if vb.isVisible() else 0
-        ww = self.textEdit.width()
-        fw = self.textEdit.frameWidth()
-        srw = self.searchReplace.width()
-        x = ww - vbw - srw - 2 * fw
-        y = 2 * fw
-        self.searchReplace.move(x, y)
-        
+        self.searchReplace.reset()
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorSize = e.size()
-        self.adjustSearchBox()
-        super().resizeEvent(e)
+        self.searchReplace.adjustPos(self.textEdit)
+        
+        return super().resizeEvent(e)

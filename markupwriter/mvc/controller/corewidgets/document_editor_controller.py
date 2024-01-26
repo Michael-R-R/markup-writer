@@ -80,7 +80,7 @@ class DocumentEditorController(QObject):
         self.view.textEdit.moveCursorTo(info[0])
         self.view.textEdit.setEnabled(True)
         self.view.textEdit.setFocus()
-        self.view.setPathLabel(self.model.currDocPath)
+        self.view.editorBar.addPath(self.model.currDocPath)
 
         self.runTokenizer(uuid)
 
@@ -97,13 +97,13 @@ class DocumentEditorController(QObject):
         if not self._hasMatchingID(uuid):
             return
         self.model.currDocPath = self._makePathStr(path)
-        self.view.setPathLabel(self.model.currDocPath)
+        self.view.editorBar.addPath(self.model.currDocPath)
 
     def onFileRenamed(self, uuid: str, old: str, new: str):
         if not self._hasMatchingID(uuid):
             return
         self.model.currDocPath = self.model.currDocPath.replace(old, new)
-        self.view.setPathLabel(self.model.currDocPath)
+        self.view.editorBar.addPath(self.model.currDocPath)
 
     def runTokenizer(self, uuid: str):
         text = ""
@@ -189,7 +189,8 @@ class DocumentEditorController(QObject):
             searchBox.hide()
         else:
             searchBox.show()
-            self.view.adjustSearchBox()
+            textedit = self.view.textEdit
+            searchBox.adjustPos(textedit)
 
     @pyqtSlot(str)
     def _onTagHovered(self, tag: str):

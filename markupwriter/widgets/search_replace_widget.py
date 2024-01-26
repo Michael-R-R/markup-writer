@@ -6,6 +6,7 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtGui import (
     QAction,
+    QResizeEvent,
 )
 
 from PyQt6.QtWidgets import (
@@ -15,6 +16,7 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QLabel,
     QToolBar,
+    QPlainTextEdit,
 )
 
 from markupwriter.common.provider import Icon
@@ -58,3 +60,21 @@ class SearchReplaceWidget(QFrame):
         self.mLayout.addWidget(self.searchToolbar, 0, 2)
         self.mLayout.addWidget(self.replaceInput, 1, 0)
         self.mLayout.addWidget(self.replaceToolbar, 1, 1)
+        
+    def reset(self):
+        self.hide()
+        self.searchInput.clear()
+        self.replaceInput.clear()
+        
+    def adjustPos(self, textedit: QPlainTextEdit):
+        if not self.isVisible():
+            return
+        
+        vb = textedit.verticalScrollBar()
+        vbw = vb.width() if vb.isVisible() else 0
+        ww = textedit.width()
+        fw = textedit.frameWidth()
+        srw = self.width()
+        x = ww - vbw - srw - 2 * fw
+        y = 2 * fw
+        self.move(x, y)
