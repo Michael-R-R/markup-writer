@@ -44,8 +44,13 @@ class DocumentEditorController(QObject):
         self.view = DocumentEditorView(None)
 
     def setup(self):
-        self.view.textEdit.searchAction.triggered.connect(self._onToggleSearchBox)
-        self.view.textEdit.tagHovered.connect(self._onTagHovered)
+        # --- Text edit --- #
+        textEdit = self.view.textEdit
+        textEdit.searchAction.triggered.connect(self._onToggleSearchBox)
+        textEdit.tagHovered.connect(self._onTagHovered)
+        
+        # --- Search widget --- #
+        searchWidget = self.view.searchWidget
 
     def reset(self):
         self.model.currDocPath = ""
@@ -184,13 +189,7 @@ class DocumentEditorController(QObject):
 
     @pyqtSlot()
     def _onToggleSearchBox(self):
-        searchBox = self.view.searchReplace
-        if searchBox.isVisible():
-            searchBox.hide()
-        else:
-            searchBox.show()
-            textedit = self.view.textEdit
-            searchBox.adjustPos(textedit)
+        self.view.searchWidget.toggle()
 
     @pyqtSlot(str)
     def _onTagHovered(self, tag: str):

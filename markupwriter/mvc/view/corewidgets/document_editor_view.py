@@ -20,7 +20,7 @@ class DocumentEditorView(QWidget):
         
         self.editorBar = mw.DocumentEditorBarWidget(self)
         self.textEdit = mw.DocumentEditorWidget(self)
-        self.searchReplace = mw.SearchReplaceWidget(self.textEdit)
+        self.searchWidget = mw.SearchReplaceWidget(self.textEdit)
         
         self.hLayout = QHBoxLayout()
         self.hLayout.addStretch()
@@ -31,15 +31,15 @@ class DocumentEditorView(QWidget):
         self.vLayout.addLayout(self.hLayout)
         self.vLayout.addWidget(self.textEdit)
         
-        self.searchReplace.hide()
+        self.searchWidget.hide()
         
     def reset(self):
         self.editorBar.reset()
         self.textEdit.reset()
-        self.searchReplace.reset()
+        self.searchWidget.reset()
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorSize = e.size()
-        self.searchReplace.adjustPos(self.textEdit)
+        self.searchWidget.adjustPos()
         
         return super().resizeEvent(e)
