@@ -44,8 +44,9 @@ class DocumentEditorController(QObject):
         self.view = DocumentEditorView(None)
 
     def setup(self):
+        self.view.textEdit.searchAction.triggered.connect(self._onToggleSearchBox)
         self.view.textEdit.tagHovered.connect(self._onTagHovered)
-        
+
     def reset(self):
         self.model.currDocPath = ""
         self.model.currDocUUID = ""
@@ -62,25 +63,25 @@ class DocumentEditorController(QObject):
     def onFileOpened(self, uuid: str, pathList: list[str]):
         if self._hasMatchingID(uuid):
             return
-        
+
         prevUUID = self.model.currDocUUID
         self.writeDoc(prevUUID)
         self.runTokenizer(prevUUID)
-        
+
         self.model.currDocPath = self._makePathStr(pathList)
         self.model.currDocUUID = uuid
-        
+
         info: (int, str) = self.readDoc(uuid)
         if info == (None, None):
             self.onFileRemoved(uuid)
             return
-        
+
         self.view.textEdit.setPlainText(info[1])
         self.view.textEdit.moveCursorTo(info[0])
         self.view.textEdit.setEnabled(True)
         self.view.textEdit.setFocus()
         self.view.setPathLabel(self.model.currDocPath)
-        
+
         self.runTokenizer(uuid)
 
         self.hasOpenDocument.emit(True)
@@ -135,7 +136,7 @@ class DocumentEditorController(QObject):
         textedit = self.view.textEdit
         content = "cpos:{}\n".format(textedit.textCursor().position())
         content += textedit.toPlainText()
-        
+
         path = os.path.join(path, uuid)
         if not File.write(path, content):
             return False
@@ -156,13 +157,13 @@ class DocumentEditorController(QObject):
         content = File.read(path)
         if content is None:
             return (None, None)
-        
+
         cpos = 0
         found = re.search(r"^cpos:.+", content)
         if found is not None:
             cpos = int(found.group(0)[5:])
-            content = content[found.end()+1:]
-        
+            content = content[found.end() + 1 :]
+
         return (cpos, content)
 
     def _hasMatchingID(self, uuid: str) -> bool:
@@ -180,6 +181,15 @@ class DocumentEditorController(QObject):
         text += "{}".format(pathList[count - 1])
 
         return text
+
+    @pyqtSlot()
+    def _onToggleSearchBox(self):
+        searchBox = self.view.searchReplace
+        if searchBox.isVisible():
+            searchBox.hide()
+        else:
+            searchBox.show()
+            self.view.adjustSearchBox()
 
     @pyqtSlot(str)
     def _onTagHovered(self, tag: str):

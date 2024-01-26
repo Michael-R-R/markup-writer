@@ -31,6 +31,8 @@ class DocumentEditorView(QWidget):
         self.vLayout.addLayout(self.hLayout)
         self.vLayout.addWidget(self.textEdit)
         
+        self.searchReplace.hide()
+        
     def reset(self):
         self.editorBar.reset()
         self.textEdit.reset()
@@ -38,17 +40,21 @@ class DocumentEditorView(QWidget):
     def setPathLabel(self, path: str):
         self.editorBar.pathLabel.setText(path)
         
+    def adjustSearchBox(self):
+        if not self.searchReplace.isVisible():
+            return
+        
+        vb = self.textEdit.verticalScrollBar()
+        vbw = vb.width() if vb.isVisible() else 0
+        ww = self.textEdit.width()
+        fw = self.textEdit.frameWidth()
+        srw = self.searchReplace.width()
+        x = ww - vbw - srw - 2 * fw
+        y = 2 * fw
+        self.searchReplace.move(x, y)
+        
+        
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorSize = e.size()
-        
-        # TODO test
-        sw = 0
-        ww = self.textEdit.width()
-        wh = self.textEdit.height()
-        tb = self.textEdit.frameWidth()
-        rh = self.searchReplace.height()
-        rw = self.searchReplace.width()
-        rl = ww - sw - rw - 2*tb
-        self.searchReplace.move(rl, 2*tb)
-        
-        return super().resizeEvent(e)
+        self.adjustSearchBox()
+        super().resizeEvent(e)
