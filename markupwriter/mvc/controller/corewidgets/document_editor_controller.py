@@ -78,6 +78,7 @@ class DocumentEditorController(QObject):
         self.view.textEdit.setPlainText(info[1])
         self.view.textEdit.moveCursorTo(info[0])
         self.view.textEdit.setEnabled(True)
+        self.view.textEdit.setFocus()
         self.view.setPathLabel(self.model.currDocPath)
         
         self.runTokenizer(uuid)

@@ -17,3 +17,6 @@ class DocumentEditorBarWidget(QWidget):
         self.hLayout.addStretch()
         self.hLayout.addWidget(self.pathLabel)
         self.hLayout.addStretch()
+        
+    def reset(self):
+        self.pathLabel.clear()

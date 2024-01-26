@@ -20,26 +20,35 @@ class DocumentEditorView(QWidget):
         
         self.editorBar = mw.DocumentEditorBarWidget(self)
         self.textEdit = mw.DocumentEditorWidget(self)
+        self.searchReplace = mw.SearchReplaceWidget(self.textEdit)
         
-        hLayout = QHBoxLayout()
-        hLayout.addStretch()
-        hLayout.addWidget(self.editorBar)
-        hLayout.addStretch()
-        self.hLayout = hLayout
+        self.hLayout = QHBoxLayout()
+        self.hLayout.addStretch()
+        self.hLayout.addWidget(self.editorBar)
+        self.hLayout.addStretch()
         
-        vLayout = QVBoxLayout(self)
-        vLayout.addLayout(self.hLayout)
-        vLayout.addWidget(self.textEdit)
-        self.vLayout = vLayout
+        self.vLayout = QVBoxLayout(self)
+        self.vLayout.addLayout(self.hLayout)
+        self.vLayout.addWidget(self.textEdit)
         
     def reset(self):
-        self.editorBar.pathLabel.clear()
-        self.textEdit.clear()
-        self.textEdit.setEnabled(False)
+        self.editorBar.reset()
+        self.textEdit.reset()
         
     def setPathLabel(self, path: str):
         self.editorBar.pathLabel.setText(path)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docEditorSize = e.size()
+        
+        # TODO test
+        sw = 0
+        ww = self.textEdit.width()
+        wh = self.textEdit.height()
+        tb = self.textEdit.frameWidth()
+        rh = self.searchReplace.height()
+        rw = self.searchReplace.width()
+        rl = ww - sw - rw - 2*tb
+        self.searchReplace.move(rl, 2*tb)
+        
         return super().resizeEvent(e)

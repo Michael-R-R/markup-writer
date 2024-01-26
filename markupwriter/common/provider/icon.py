@@ -13,6 +13,7 @@ from PyQt6.QtGui import (
 
 class Icon(object):
     # Common
+    PLACE_HOLDER: QIcon = None
     BOOKS: QIcon = None
     CHECK: QIcon = None
     UNCHECK: QIcon = None
@@ -40,6 +41,8 @@ class Icon(object):
     
     def init(workingDir: str):
         QDir.addSearchPath("icons", os.path.join(workingDir, "resources/icons/"))
+        
+        Icon.PLACE_HOLDER = QIcon("icons:common/holder.svg")
 
         # Common
         Icon.BOOKS = QIcon("icons:common/books.svg")

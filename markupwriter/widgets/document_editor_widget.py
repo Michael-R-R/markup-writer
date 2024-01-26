@@ -16,6 +16,8 @@ from PyQt6.QtGui import (
     QTextOption,
     QTextCursor,
     QGuiApplication,
+    QAction,
+    QKeySequence,
 )
 
 from PyQt6.QtWidgets import (
@@ -54,6 +56,14 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setMouseTracking(True)
         self.setTabStopDistance(20.0)
         self.resizeMargins()
+        
+        self.searchAction = QAction("search", self)
+        self.searchAction.setShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F))
+        self.addAction(self.searchAction)
+        
+    def reset(self):
+        self.clear()
+        self.setEnabled(False)
         
     def cursorToEnd(self):
         cursor = self.textCursor()
