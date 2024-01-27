@@ -25,7 +25,7 @@ class DocumentEditorView(QWidget):
         self.gLayout.addWidget(self.editorBar, 0, 0)
         self.gLayout.addWidget(self.textEdit, 1, 0)
         
-        self.searchWidget.hide()
+        #self.searchWidget.hide()
         
     def reset(self):
         self.editorBar.reset()

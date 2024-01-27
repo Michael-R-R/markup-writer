@@ -6,6 +6,7 @@ from PyQt6.QtCore import (
     Qt,
     pyqtSignal,
     pyqtSlot,
+    QSize,
 )
 
 from PyQt6.QtGui import (
@@ -15,8 +16,6 @@ from PyQt6.QtGui import (
 from PyQt6.QtWidgets import (
     QFrame,
     QGridLayout,
-    QSpacerItem,
-    QSizePolicy,
     QLineEdit,
     QLabel,
     QToolBar,
@@ -44,8 +43,8 @@ class SearchReplaceWidget(QFrame):
         self.resultsLabel.setMaximumHeight(20)
 
         self.searchToolbar = QToolBar(self)
+        self.searchToolbar.setIconSize(QSize(12,12))
         self.searchToolbar.setContentsMargins(0, 0, 0, 0)
-        self.searchToolbar.setMaximumHeight(20)
         self.prevAction = QAction(Icon.UP_ARROW, "Previous match", self)
         self.nextAction = QAction(Icon.DOWN_ARROW, "Next match", self)
         self.closeAction = QAction(Icon.UNCHECK, "Close", self)
@@ -58,15 +57,15 @@ class SearchReplaceWidget(QFrame):
         self.replaceInput.setMaximumHeight(20)
 
         self.replaceToolbar = QToolBar(self)
+        self.replaceToolbar.setIconSize(QSize(12,12))
         self.replaceToolbar.setContentsMargins(0, 0, 0, 0)
-        self.replaceToolbar.setMaximumHeight(20)
         self.replaceAction = QAction(Icon.PLACE_HOLDER, "Replace", self)
         self.replaceAllAction = QAction(Icon.PLACE_HOLDER, "Replace all", self)
         self.replaceToolbar.addAction(self.replaceAction)
         self.replaceToolbar.addAction(self.replaceAllAction)
 
         self.gLayout = QGridLayout(self)
-        self.gLayout.setVerticalSpacing(4)
+        self.gLayout.setVerticalSpacing(0)
         self.gLayout.addWidget(self.searchInput, 0, 0)
         self.gLayout.addWidget(self.resultsLabel, 0, 1)
         self.gLayout.addWidget(self.searchToolbar, 0, 2)

@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     Qt,
+    QSize,
 )
 
 from PyQt6.QtGui import (
@@ -27,6 +28,7 @@ class DocumentEditorBarWidget(QWidget):
         self.pathLabel = QLabel("", self)
 
         self.toolBar = QToolBar(self)
+        self.toolBar.setIconSize(QSize(18, 18))
         self.closeAction = QAction(Icon.UNCHECK, "Close", self.toolBar)
         
         wpolicy = QSizePolicy.Policy.Expanding
