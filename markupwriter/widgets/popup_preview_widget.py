@@ -9,7 +9,7 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtWidgets import (
     QWidget,
-    QVBoxLayout,
+    QGridLayout,
     QPushButton,
 )
 
@@ -29,17 +29,17 @@ class PopupPreviewWidget(QWidget):
         self.previewButton = QPushButton("Preview...", self)
         self.previewButton.clicked.connect(lambda: self.close())
 
-        self.textedit = DocumentEditorWidget(self)
-        self.textedit.canResizeMargins = False
-        self.textedit.setMouseTracking(False)
-        self.textedit.setEnabled(True)
-        self.textedit.setReadOnly(True)
+        self.textEdit = DocumentEditorWidget(self)
+        self.textEdit.canResizeMargins = False
+        self.textEdit.setMouseTracking(False)
+        self.textEdit.setEnabled(True)
+        self.textEdit.setReadOnly(True)
         path = os.path.join(AppConfig.projectContentPath(), uuid)
-        self.textedit.setPlainText(File.read(path))
-
-        self.vLayout = QVBoxLayout(self)
-        self.vLayout.addWidget(self.previewButton)
-        self.vLayout.addWidget(self.textedit)
+        self.textEdit.setPlainText(File.read(path))
+        
+        self.gLayout = QGridLayout(self)
+        self.gLayout.addWidget(self.previewButton, 0, 0)
+        self.gLayout.addWidget(self.textEdit, 1, 0)
         
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.close()
