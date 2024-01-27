@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
+from PyQt6.QtCore import (
+    Qt,
+)
+
 from PyQt6.QtWidgets import (
     QWidget,
-    QHBoxLayout,
+    QGridLayout,
     QLabel,
     QToolBar,
 )
@@ -23,11 +27,10 @@ class DocumentTreeBarWidget(QWidget):
         self.toolbar.addAction(self.navUpAction)
         self.toolbar.addAction(self.navDownAction)
         self.toolbar.addAction(self.addItemAction)
-
-        self.hLayout = QHBoxLayout(self)
-        self.hLayout.addWidget(self.titleLabel)
-        self.hLayout.addStretch()
-        self.hLayout.addWidget(self.toolbar)
+        
+        self.gLayout = QGridLayout(self)
+        self.gLayout.addWidget(self.titleLabel, 0, 0, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.toolbar, 0, 1, Qt.AlignmentFlag.AlignRight)
         
         self.navUpAction.setEnabled(False)
         self.navDownAction.setEnabled(False)
