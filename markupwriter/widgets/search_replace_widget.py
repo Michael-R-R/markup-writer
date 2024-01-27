@@ -11,6 +11,7 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtGui import (
     QAction,
+    QTextCursor,
 )
 
 from PyQt6.QtWidgets import (
@@ -30,6 +31,10 @@ class SearchReplaceWidget(QFrame):
         super().__init__(textEdit)
 
         self.textEdit = textEdit
+        self.searchText = ""
+        self.index = 0
+        self.found = None
+        self.count = -1
 
         self.setAutoFillBackground(True)
         self.setFrameStyle(QFrame.Shape.StyledPanel | QFrame.Shadow.Plain)
@@ -43,7 +48,7 @@ class SearchReplaceWidget(QFrame):
         self.resultsLabel.setMaximumHeight(20)
 
         self.searchToolbar = QToolBar(self)
-        self.searchToolbar.setIconSize(QSize(12,12))
+        self.searchToolbar.setIconSize(QSize(12, 12))
         self.searchToolbar.setContentsMargins(0, 0, 0, 0)
         self.prevAction = QAction(Icon.UP_ARROW, "Previous match", self)
         self.nextAction = QAction(Icon.DOWN_ARROW, "Next match", self)
@@ -57,7 +62,7 @@ class SearchReplaceWidget(QFrame):
         self.replaceInput.setMaximumHeight(20)
 
         self.replaceToolbar = QToolBar(self)
-        self.replaceToolbar.setIconSize(QSize(12,12))
+        self.replaceToolbar.setIconSize(QSize(12, 12))
         self.replaceToolbar.setContentsMargins(0, 0, 0, 0)
         self.replaceAction = QAction(Icon.PLACE_HOLDER, "Replace", self)
         self.replaceAllAction = QAction(Icon.PLACE_HOLDER, "Replace all", self)
@@ -73,12 +78,22 @@ class SearchReplaceWidget(QFrame):
         self.gLayout.addWidget(self.replaceToolbar, 1, 1)
 
         self.searchInput.textChanged.connect(self._onSearchChanged)
+        self.prevAction.triggered.connect(self._onPrevMatch)
+        self.nextAction.triggered.connect(self._onNextMatch)
         self.closeAction.triggered.connect(lambda: self.hide())
 
-    def reset(self):
-        self.hide()
+    def reset(self, doHide: bool = True):
+        if doHide:
+            self.hide()
+            
         self.searchInput.clear()
         self.replaceInput.clear()
+        self.resultsLabel.setText("No results")
+        
+        self.searchText = ""
+        self.index = 0
+        self.found = None
+        self.count = 0
 
     def toggle(self):
         if self.isVisible():
@@ -96,12 +111,51 @@ class SearchReplaceWidget(QFrame):
         ww = self.textEdit.width()
         fw = self.textEdit.frameWidth()
         srw = self.width()
+
         x = ww - vbw - srw - 2 * fw
         y = 2 * fw
         self.move(x, y)
 
-    pyqtSlot()
+    @pyqtSlot(str)
+    def _onSearchChanged(self, searchText: str):
+        if searchText == "":
+            self.reset(False)
+            return
+        
+        content = self.textEdit.toPlainText()
+        self.searchText = searchText
+        self.index = 0
+        self.found = list(re.finditer("\\b{}\\b".format(searchText), content, re.MULTILINE))
+        self.count = len(self.found)
 
-    def _onSearchChanged(self, text: str):
-        print(text)
-        # TODO implement
+        if self.count <= 0:
+            self.resultsLabel.setText("No results")
+        else:
+            self._traverseSearch(0)
+            
+    @pyqtSlot()
+    def _onNextMatch(self):
+        self._traverseSearch(1)
+        
+    @pyqtSlot()
+    def _onPrevMatch(self):
+        self._traverseSearch(-1)
+        
+    def _traverseSearch(self, direction: int):
+        if self.count <= 0:
+            return
+        
+        self.index = (self.index + direction) % self.count
+        self._updateResultsLabel(self.index+1, self.count)
+        found = self.found[self.index]
+        
+        cursor = self.textEdit.textCursor()
+        cursor.setPosition(found.start())
+        cursor.setPosition(found.end(), QTextCursor.MoveMode.KeepAnchor)
+        self.textEdit.setTextCursor(cursor)
+        
+    def _updateResultsLabel(self, index: int, count: int):
+        if count <= 0:
+            self.resultsLabel.setText("No results") # dog
+        else:
+            self.resultsLabel.setText("{} of {}".format(index, count))
