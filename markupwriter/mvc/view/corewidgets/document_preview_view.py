@@ -8,7 +8,7 @@ from PyQt6.QtGui import QResizeEvent
 
 from PyQt6.QtWidgets import (
     QWidget,
-    QVBoxLayout,
+    QGridLayout,
     QTabWidget,
 )
 
@@ -24,14 +24,9 @@ class DocumentPreviewView(QWidget):
         self.tabWidget.setMovable(True)
         self.tabWidget.setContentsMargins(0, 0, 0, 0)
         self.tabWidget.setStyleSheet("padding: 0px;")
-        self.tabWidget.tabCloseRequested.connect(self._onTabCloseRequested)
-
-        self.vLayout = QVBoxLayout(self)
-        self.vLayout.addWidget(self.tabWidget)
-
-    @pyqtSlot(int)
-    def _onTabCloseRequested(self, index: int):
-        self.tabWidget.removeTab(index)
+        
+        self.gLayout = QGridLayout(self)
+        self.gLayout.addWidget(self.tabWidget, 0, 0)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docPreviewSize = e.size()

@@ -24,20 +24,21 @@ import markupwriter.widgets as mw
 class DocumentPreviewController(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
-        
+
         self.model = DocumentPreview(self)
         self.view = DocumentPreviewView(None)
-        
+
     def setup(self):
-        pass
-    
+        tabWidget = self.view.tabWidget
+        tabWidget.tabCloseRequested.connect(self._onTabCloseRequested)
+
     def onFileRemoved(self, title: str, uuid: str):
         index = self._pageIndex(title, uuid)
         if index < 0:
             return
         tabwidget = self.view.tabWidget
         tabwidget.removeTab(index)
-        
+
     def onFileRenamed(self, uuid: str, old: str, new: str):
         index = self._pageIndex(old, uuid)
         if index < 0:
@@ -46,11 +47,11 @@ class DocumentPreviewController(QObject):
         widget: mw.DocumentPreviewWidget = tabwidget.widget(index)
         widget.title = new
         tabwidget.setTabText(index, new)
-        
+
     def onFilePreviewed(self, title: str, uuid: str):
         widget = mw.DocumentPreviewWidget(title, uuid, self.view)
         self._addPage(title, uuid, widget)
-        
+
     def _addPage(self, title: str, uuid: str, widget: QWidget):
         tabwidget = self.view.tabWidget
         index = self._pageIndex(title, uuid)
@@ -67,14 +68,18 @@ class DocumentPreviewController(QObject):
             widget: mw.DocumentPreviewWidget = tabwidget.widget(i)
             if widget is None:
                 continue
-            
+
             if widget.checkForMatch(title, uuid):
                 return i
 
         return -1
-        
+
+    @pyqtSlot(int)
+    def _onTabCloseRequested(self, index: int):
+        self.view.tabWidget.removeTab(index)
+
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         return sout
-    
+
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
         return sin

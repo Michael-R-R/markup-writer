@@ -6,8 +6,7 @@ from PyQt6.QtGui import (
 
 from PyQt6.QtWidgets import (
     QWidget,
-    QHBoxLayout,
-    QVBoxLayout,
+    QGridLayout,
 )
 
 from markupwriter.config import AppConfig
@@ -22,14 +21,9 @@ class DocumentEditorView(QWidget):
         self.textEdit = mw.DocumentEditorWidget(self)
         self.searchWidget = mw.SearchReplaceWidget(self.textEdit)
         
-        self.hLayout = QHBoxLayout()
-        self.hLayout.addStretch()
-        self.hLayout.addWidget(self.editorBar)
-        self.hLayout.addStretch()
-        
-        self.vLayout = QVBoxLayout(self)
-        self.vLayout.addLayout(self.hLayout)
-        self.vLayout.addWidget(self.textEdit)
+        self.gLayout = QGridLayout(self)
+        self.gLayout.addWidget(self.editorBar, 0, 0)
+        self.gLayout.addWidget(self.textEdit, 1, 0)
         
         self.searchWidget.hide()
         

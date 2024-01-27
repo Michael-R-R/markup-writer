@@ -7,7 +7,7 @@ from PyQt6.QtGui import (
 from PyQt6.QtWidgets import (
     QWidget,
     QTabWidget,
-    QVBoxLayout,
+    QGridLayout,
 )
 
 from markupwriter.config import AppConfig
@@ -17,12 +17,10 @@ class ConsoleView(QWidget):
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
         
-        tabwidget = QTabWidget(self)
-        self.tabwidget = tabwidget
+        self.tabwidget = QTabWidget(self)
         
-        vLayout = QVBoxLayout(self)
-        vLayout.addWidget(self.tabwidget)
-        self.vLayout = vLayout
+        self.gLayout = QGridLayout(self)
+        self.gLayout.addWidget(self.tabwidget, 0, 0)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.consoleSize = e.size()
