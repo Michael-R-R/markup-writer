@@ -44,11 +44,15 @@ class DocumentEditorController(QObject):
         self.view = DocumentEditorView(None)
 
     def setup(self):
+        # --- Editor bar --- #
+        editorBar = self.view.editorBar
+        editorBar.closeAction.triggered.connect(self._onCloseDocument)
+
         # --- Text edit --- #
         textEdit = self.view.textEdit
         textEdit.searchAction.triggered.connect(self._onToggleSearchBox)
         textEdit.tagHovered.connect(self._onTagHovered)
-        
+
         # --- Search widget --- #
         searchWidget = self.view.searchWidget
 
@@ -56,6 +60,7 @@ class DocumentEditorController(QObject):
         self.model.currDocPath = ""
         self.model.currDocUUID = ""
         self.view.reset()
+        self.hasOpenDocument.emit(False)
 
     def onSaveDocument(self) -> bool:
         uuid = self.model.currDocUUID
@@ -81,11 +86,12 @@ class DocumentEditorController(QObject):
             self.onFileRemoved(uuid)
             return
 
+        self.view.editorBar.addPath(self.model.currDocPath)
+        self.view.editorBar.addCloseAction()
         self.view.textEdit.setPlainText(info[1])
         self.view.textEdit.moveCursorTo(info[0])
         self.view.textEdit.setEnabled(True)
         self.view.textEdit.setFocus()
-        self.view.editorBar.addPath(self.model.currDocPath)
 
         self.runTokenizer(uuid)
 
@@ -96,7 +102,6 @@ class DocumentEditorController(QObject):
         if not self._hasMatchingID(uuid):
             return
         self.reset()
-        self.hasOpenDocument.emit(False)
 
     def onFileMoved(self, uuid: str, path: list[str]):
         if not self._hasMatchingID(uuid):
@@ -186,6 +191,11 @@ class DocumentEditorController(QObject):
         text += "{}".format(pathList[count - 1])
 
         return text
+
+    @pyqtSlot()
+    def _onCloseDocument(self):
+        self.onSaveDocument()
+        self.reset()
 
     @pyqtSlot()
     def _onToggleSearchBox(self):
