@@ -4,8 +4,7 @@ import os
 
 from PyQt6.QtWidgets import (
     QWidget,
-    QVBoxLayout,
-    QHBoxLayout,
+    QGridLayout,
     QTextEdit,
     QPushButton,
 )
@@ -40,14 +39,11 @@ class DocumentPreviewWidget(QWidget):
 
         self.toggleButton = QPushButton("Plain", self)
         self.toggleButton.clicked.connect(self._onToggleButton)
-
-        self.hLayout = QHBoxLayout()
-        self.hLayout.addWidget(self.refreshButton)
-        self.hLayout.addWidget(self.toggleButton)
-
-        self.vLayout = QVBoxLayout(self)
-        self.vLayout.addWidget(self.textedit)
-        self.vLayout.addLayout(self.hLayout)
+        
+        self.mLayout = QGridLayout(self)
+        self.mLayout.addWidget(self.textedit, 0, 0, 1, 2)
+        self.mLayout.addWidget(self.refreshButton, 1, 0)
+        self.mLayout.addWidget(self.toggleButton, 1, 1)
 
     def checkForMatch(self, title: str, uuid: str) -> bool:
         return title == self.title and uuid == self.uuid

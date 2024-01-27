@@ -95,4 +95,4 @@ class SearchReplaceWidget(QFrame):
     pyqtSlot()
     def _onSearchChanged(self, text: str):
         print(text)
-        print(self.textEdit.toPlainText())
+        # TODO implement
