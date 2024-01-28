@@ -12,6 +12,7 @@ from PyQt6.QtCore import (
 from PyQt6.QtGui import (
     QAction,
     QTextCursor,
+    QTextDocument,
 )
 
 from PyQt6.QtWidgets import (
@@ -31,10 +32,8 @@ class SearchReplaceWidget(QFrame):
         super().__init__(textEdit)
 
         self.textEdit = textEdit
-        self.searchText = ""
         self.index = 0
         self.found = None
-        self.count = -1
 
         self.setAutoFillBackground(True)
         self.setFrameStyle(QFrame.Shape.StyledPanel | QFrame.Shadow.Plain)
@@ -82,20 +81,20 @@ class SearchReplaceWidget(QFrame):
         self.searchInput.textChanged.connect(self._onSearchChanged)
         self.prevAction.triggered.connect(self._onPrevMatch)
         self.nextAction.triggered.connect(self._onNextMatch)
+        self.replaceAction.triggered.connect(self._onReplaceMatch)
+        self.replaceAllAction.triggered.connect(self._onReplaceAllMatch)
         self.closeAction.triggered.connect(lambda: self.hide())
 
     def reset(self, doHide: bool = True):
         if doHide:
             self.hide()
-            
+
         self.searchInput.clear()
         self.replaceInput.clear()
         self.resultsLabel.setText("No results")
-        
-        self.searchText = ""
+
         self.index = 0
         self.found = None
-        self.count = 0
 
     def toggle(self):
         if self.isVisible():
@@ -123,53 +122,92 @@ class SearchReplaceWidget(QFrame):
         if searchText == "":
             self.reset(False)
             return
-        
-        content = self.textEdit.toPlainText()
-        self.searchText = searchText
-        self.index = 0
-        self.found = list(re.finditer("\\b{}\\b".format(searchText), content, re.MULTILINE))
-        self.count = len(self.found)
 
-        if self.count <= 0:
+        content = self.textEdit.toPlainText()
+        self.index = 0
+        self.found = list(
+            re.finditer("\\b{}\\b".format(searchText), content, re.MULTILINE)
+        )
+
+        if len(self.found) <= 0:
             self.resultsLabel.setText("No results")
         else:
             self._traverseSearch(0)
-            
+
     @pyqtSlot()
     def _onNextMatch(self):
         self._traverseSearch(1)
-        
+
     @pyqtSlot()
     def _onPrevMatch(self):
         self._traverseSearch(-1)
-        
-    @pyqtSlot(str)
-    def _onReplaceChanged(self, replaceText: str):
-        pass
-    
+
     @pyqtSlot()
     def _onReplaceMatch(self):
-        pass
-    
-    @pyqtSlot()
-    def _onReplaceAllMatch(self):
-        pass
-        
-    def _traverseSearch(self, direction: int):
-        if self.count <= 0:
+        replaceText = self.replaceInput.text()
+        if replaceText == "":
             return
         
-        self.index = (self.index + direction) % self.count
-        self._updateResultsLabel(self.index+1, self.count)
-        found = self.found[self.index]
+        count = len(self.found)
+        if count <= 0:
+            return
+
+        self._traverseSearch(0)
         
+        cursor = self.textEdit.textCursor()
+        cursor.beginEditBlock()
+        cursor.removeSelectedText()
+        cursor.insertText(replaceText)
+        cursor.endEditBlock()
+        self.textEdit.setTextCursor(cursor)
+        
+        self._onSearchChanged(self.searchInput.text())
+
+    @pyqtSlot()
+    def _onReplaceAllMatch(self):
+        replaceText = self.replaceInput.text()
+        if replaceText == "":
+            return
+        if len(self.found) <= 0:
+            return
+        
+        found = self.found[self.index]
+        searchText = found.group(0)
+        
+        doc = self.textEdit.document()
+        prevCursor = self.textEdit.textCursor()
+        prevCursor.setPosition(0)
+        prevCursor = doc.find(searchText, prevCursor)
+        currCursor = prevCursor
+        prevCursor.beginEditBlock()
+        while not currCursor.isNull():
+            prevCursor = currCursor
+            currCursor.removeSelectedText()
+            currCursor.insertText(replaceText)
+            currCursor = doc.find(searchText, prevCursor)
+        
+        prevCursor.endEditBlock()
+        self.textEdit.setTextCursor(prevCursor)
+        
+        self.index = 0
+        self.found = None
+        self._updateResultsLabel(-1, -1)
+
+    def _traverseSearch(self, direction: int):
+        count = len(self.found)
+        if count <= 0:
+            self._updateResultsLabel(-1, -1)
+            return
+
+        self.index = (self.index + direction) % count
+        self._updateResultsLabel(self.index + 1, count)
+        found = self.found[self.index]
+
         cursor = self.textEdit.textCursor()
         cursor.setPosition(found.start())
         cursor.setPosition(found.end(), QTextCursor.MoveMode.KeepAnchor)
         self.textEdit.setTextCursor(cursor)
-        
+
     def _updateResultsLabel(self, index: int, count: int):
-        if count <= 0:
-            self.resultsLabel.setText("No results") # dog
-        else:
-            self.resultsLabel.setText("{} of {}".format(index, count))
+        text = "No results" if count <= 0 else "{} of {}".format(index, count)
+        self.resultsLabel.setText(text)
