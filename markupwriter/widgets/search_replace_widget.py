@@ -40,6 +40,7 @@ class SearchReplaceWidget(QFrame):
         self.setFrameStyle(QFrame.Shape.StyledPanel | QFrame.Shadow.Plain)
 
         self.searchInput = QLineEdit(self)
+        self.searchInput.setPlaceholderText("Search")
         self.searchInput.setContentsMargins(0, 0, 0, 0)
         self.searchInput.setMaximumHeight(20)
 
@@ -58,6 +59,7 @@ class SearchReplaceWidget(QFrame):
         self.searchToolbar.addAction(self.closeAction)
 
         self.replaceInput = QLineEdit(self)
+        self.replaceInput.setPlaceholderText("Replace")
         self.replaceInput.setContentsMargins(0, 0, 0, 0)
         self.replaceInput.setMaximumHeight(20)
 
@@ -140,6 +142,18 @@ class SearchReplaceWidget(QFrame):
     @pyqtSlot()
     def _onPrevMatch(self):
         self._traverseSearch(-1)
+        
+    @pyqtSlot(str)
+    def _onReplaceChanged(self, replaceText: str):
+        pass
+    
+    @pyqtSlot()
+    def _onReplaceMatch(self):
+        pass
+    
+    @pyqtSlot()
+    def _onReplaceAllMatch(self):
+        pass
         
     def _traverseSearch(self, direction: int):
         if self.count <= 0:
