@@ -58,6 +58,7 @@ class CentralWidgetController(QObject):
         # Controllers
         ec = self.model.docEditorController
         tc = self.model.docTreeController
+        pc = self.model.docPreviewController
 
         # --- Central controller slots --- #
         ec.filePreviewed.connect(self._onEditorFilePreviewed)
@@ -67,6 +68,7 @@ class CentralWidgetController(QObject):
         tc.fileOpened.connect(self._onFileOpened)
         tc.fileMoved.connect(self._onFileMoved)
         tc.fileRenamed.connect(self._onFileRenamed)
+        pc.resizeRequested.connect(self._onPreviewResizeRequested)
         
     @pyqtSlot(str, str)
     def _onTreeFilePreviewed(self, title: str, uuid: str):
@@ -104,6 +106,14 @@ class CentralWidgetController(QObject):
     @pyqtSlot(str, int)
     def _onWordCountChanged(self, uuid: str, wc: int):
         self.model.docTreeController.onWordCountChanged(uuid, wc)
+        
+    @pyqtSlot()
+    def _onPreviewResizeRequested(self):
+        splitter = self.view.rhSplitter
+        sizes = splitter.sizes()
+        if sizes[0] > 0:
+            sizes[1] = int(sizes[0]/2)
+            splitter.setSizes(sizes)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model.docTreeController

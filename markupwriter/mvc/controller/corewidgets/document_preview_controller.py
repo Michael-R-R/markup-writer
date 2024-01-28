@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     QObject,
+    pyqtSignal,
     pyqtSlot,
     QDataStream,
 )
@@ -22,6 +23,8 @@ import markupwriter.widgets as mw
 
 
 class DocumentPreviewController(QObject):
+    resizeRequested = pyqtSignal()
+    
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
 
@@ -49,6 +52,10 @@ class DocumentPreviewController(QObject):
         tabwidget.setTabText(index, new)
 
     def onFilePreviewed(self, title: str, uuid: str):
+        ww = self.view.size().width()
+        if ww <= 0:
+            self.resizeRequested.emit()
+        
         widget = mw.DocumentPreviewWidget(title, uuid, self.view)
         self._addPage(title, uuid, widget)
 
