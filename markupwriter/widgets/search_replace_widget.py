@@ -33,7 +33,7 @@ class SearchReplaceWidget(QFrame):
 
         self.textEdit = textEdit
         self.index = 0
-        self.found = None
+        self.found = list()
 
         self.setAutoFillBackground(True)
         self.setFrameStyle(QFrame.Shape.StyledPanel | QFrame.Shadow.Plain)
@@ -94,7 +94,7 @@ class SearchReplaceWidget(QFrame):
         self.resultsLabel.setText("No results")
 
         self.index = 0
-        self.found = None
+        self.found = list()
 
     def toggle(self):
         if self.isVisible():
@@ -190,7 +190,7 @@ class SearchReplaceWidget(QFrame):
         self.textEdit.setTextCursor(prevCursor)
         
         self.index = 0
-        self.found = None
+        self.found = list()
         self._updateResultsLabel(-1, -1)
 
     def _traverseSearch(self, direction: int):
