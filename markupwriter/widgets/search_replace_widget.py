@@ -97,10 +97,8 @@ class SearchReplaceWidget(QFrame):
         self.found = list()
 
     def toggle(self):
-        if self.isVisible():
-            self.hide()
-        else:
-            self.show()
+        if self.isVisible(): self.hide()
+        else: self.show()
 
     def adjustPos(self):
         if not self.isVisible():
@@ -120,18 +118,19 @@ class SearchReplaceWidget(QFrame):
     def runSearch(self):
         searchText = self.searchInput.text()
         if searchText == "":
-            self.found = list()
             self.index = -1
+            self.found = list()
             self._updateStates()
             self._clearHighlighting()
             return
-        
+
         prevLength = len(self.found)
-            
+
+        searchText = "\\b{}\\b".format(searchText)
         content = self.textEdit.toPlainText()
         self.found = list(re.finditer(searchText, content, re.MULTILINE))
         self.index = -1
-        
+
         if len(self.found) > 0:
             highlighter = self.textEdit.highlighter
             behaviour = highlighter.getBehaviour(BEHAVIOUR.searchword)
@@ -140,9 +139,9 @@ class SearchReplaceWidget(QFrame):
             highlighter.rehighlight()
         elif prevLength > 0:
             self._clearHighlighting()
-        
+
         self._updateStates()
-        
+
     @pyqtSlot()
     def _onNextMatch(self):
         self._runMatch(1)
@@ -153,13 +152,11 @@ class SearchReplaceWidget(QFrame):
 
     @pyqtSlot()
     def _onReplaceMatch(self):
-        if self.index < 0:
-            self._onNextMatch()
-        else:
-            self._selectText()
-        
+        if self.index < 0: self._onNextMatch()
+        else: self._selectText()
+
         replaceText = self.replaceInput.text()
-        
+
         cursor = self.textEdit.textCursor()
         cursor.beginEditBlock()
         cursor.removeSelectedText()
@@ -170,10 +167,9 @@ class SearchReplaceWidget(QFrame):
         searchText = self.searchInput.text()
         content = self.textEdit.toPlainText()
         self.found = list(re.finditer(searchText, content, re.MULTILINE))
-        if len(self.found) > 0:
-            self._runMatch(0)
-        else:
-            self._updateStates()
+        
+        if len(self.found) > 0: self._runMatch(0)
+        else: self._updateStates()
 
     @pyqtSlot()
     def _onReplaceAllMatch(self):
@@ -184,7 +180,7 @@ class SearchReplaceWidget(QFrame):
         cursor = self.textEdit.textCursor()
         cursor.setPosition(0)
         cursor.beginEditBlock()
-        
+
         prevCursor = doc.find(searchText, cursor)
         currCursor = prevCursor
         while not currCursor.isNull():
@@ -211,16 +207,16 @@ class SearchReplaceWidget(QFrame):
         # Otherwise update the index(+-)
         else:
             self.index = (self.index + direction) % len(self.found)
-            
+
         self._selectText()
         self._updateStates()
 
     def _selectText(self):
-        if self.index < 0:
-            return
-        
+        if len(self.found) <= 0: return
+        if self.index < 0: return
+
         found = self.found[self.index]
-        
+
         cursor = self.textEdit.textCursor()
         cursor.setPosition(found.start())
         cursor.setPosition(found.end(), QTextCursor.MoveMode.KeepAnchor)
@@ -228,8 +224,8 @@ class SearchReplaceWidget(QFrame):
 
     def _updateStates(self):
         count = len(self.found)
-        
-        index = "?" if self.index < 0 else self.index+1
+
+        index = "?" if self.index < 0 else self.index + 1
         text = "None" if count <= 0 else "{} of {}".format(index, count)
         self.resultsLabel.setText(text)
 
@@ -256,7 +252,7 @@ class SearchReplaceWidget(QFrame):
         self.searchInput.setFocus()
         self.runSearch()
         return super().showEvent(a0)
-    
+
     def hideEvent(self, a0: QHideEvent | None) -> None:
         self._clearHighlighting()
         return super().hideEvent(a0)
