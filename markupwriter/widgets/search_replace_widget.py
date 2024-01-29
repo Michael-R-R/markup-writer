@@ -97,8 +97,10 @@ class SearchReplaceWidget(QFrame):
         self.found = list()
 
     def toggle(self):
-        if self.isVisible(): self.hide()
-        else: self.show()
+        if self.isVisible():
+            self.hide()
+        else:
+            self.show()
 
     def adjustPos(self):
         if not self.isVisible():
@@ -152,8 +154,10 @@ class SearchReplaceWidget(QFrame):
 
     @pyqtSlot()
     def _onReplaceMatch(self):
-        if self.index < 0: self._onNextMatch()
-        else: self._selectText()
+        if self.index < 0:
+            self._onNextMatch()
+        else:
+            self._selectText()
 
         replaceText = self.replaceInput.text()
 
@@ -167,9 +171,11 @@ class SearchReplaceWidget(QFrame):
         searchText = self.searchInput.text()
         content = self.textEdit.toPlainText()
         self.found = list(re.finditer(searchText, content, re.MULTILINE))
-        
-        if len(self.found) > 0: self._runMatch(0)
-        else: self._updateStates()
+
+        if len(self.found) > 0:
+            self._runMatch(0)
+        else:
+            self._updateStates()
 
     @pyqtSlot()
     def _onReplaceAllMatch(self):
@@ -212,8 +218,10 @@ class SearchReplaceWidget(QFrame):
         self._updateStates()
 
     def _selectText(self):
-        if len(self.found) <= 0: return
-        if self.index < 0: return
+        if len(self.found) <= 0:
+            return
+        if self.index < 0:
+            return
 
         found = self.found[self.index]
 
