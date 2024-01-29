@@ -94,6 +94,10 @@ class DocumentEditorController(QObject):
         self.view.textEdit.setFocus()
 
         self.runTokenizer(uuid)
+        
+        searchWidget = self.view.searchWidget
+        if searchWidget.isVisible():
+            searchWidget.runSearch()
 
         self.hasOpenDocument.emit(True)
 

@@ -22,6 +22,7 @@ class HighlighterConfig(BaseConfig):
     italBoldCol: QColor = None
     headerCol: QColor = None
     tagsCol: QColor = None
+    searchedCol: QColor = None
 
     def init(wd: str):
         HighlighterConfig.INI_PATH = os.path.join(wd, "resources/configs/highlighter.ini")
@@ -33,6 +34,7 @@ class HighlighterConfig(BaseConfig):
         HighlighterConfig.italBoldCol = QColor(255, 153, 0)
         HighlighterConfig.headerCol = QColor(66, 113, 174)
         HighlighterConfig.tagsCol = QColor(217, 140, 179)
+        HighlighterConfig.searchedCol = QColor(255, 153, 0)
 
     def reset():
         HighlighterConfig.init()
@@ -45,6 +47,7 @@ class HighlighterConfig(BaseConfig):
         sOut << HighlighterConfig.italBoldCol
         sOut << HighlighterConfig.headerCol
         sOut << HighlighterConfig.tagsCol
+        sOut << HighlighterConfig.searchedCol
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
@@ -55,4 +58,5 @@ class HighlighterConfig(BaseConfig):
         sIn >> HighlighterConfig.italBoldCol
         sIn >> HighlighterConfig.headerCol
         sIn >> HighlighterConfig.tagsCol
+        sIn >> HighlighterConfig.searchedCol
         return sIn

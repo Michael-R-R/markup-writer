@@ -32,6 +32,7 @@ class BEHAVIOUR(Enum):
     header4 = auto()
     tags = auto()
     keyword = auto()
+    searchword = auto()
 
 
 class Highlighter(QSyntaxHighlighter):
@@ -78,10 +79,10 @@ class Highlighter(QSyntaxHighlighter):
         )
 
         # Header behaviours
-        self.addHeaderBehaviour(BEHAVIOUR.header1, headerRegex[0], 34.0)
-        self.addHeaderBehaviour(BEHAVIOUR.header2, headerRegex[1], 24.0)
-        self.addHeaderBehaviour(BEHAVIOUR.header3, headerRegex[2], 18.72)
-        self.addHeaderBehaviour(BEHAVIOUR.header4, headerRegex[3], 16.0)
+        self.addHeaderBehaviour(BEHAVIOUR.header1, headerRegex[0])
+        self.addHeaderBehaviour(BEHAVIOUR.header2, headerRegex[1])
+        self.addHeaderBehaviour(BEHAVIOUR.header3, headerRegex[2])
+        self.addHeaderBehaviour(BEHAVIOUR.header4, headerRegex[3])
 
         # Italize behaviour
         italBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, italRegex)
@@ -101,16 +102,20 @@ class Highlighter(QSyntaxHighlighter):
         italBoldBehaviour.format.setFontItalic(True)
         self.addBehaviour(BEHAVIOUR.italBold, italBoldBehaviour)
 
+        # Searched word
+        searchedWordBehaviour = HighlightWordBehaviour(QColor(255, 255, 255), set())
+        searchedWordBehaviour.format.setBackground(HighlighterConfig.searchedCol)
+        self.addBehaviour(BEHAVIOUR.searchword, searchedWordBehaviour)
+
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self._behaviours.items():
             val.process(self, text)
 
-    def addHeaderBehaviour(self, behaviour: BEHAVIOUR, expr: str, size: float):
+    def addHeaderBehaviour(self, behaviour: BEHAVIOUR, expr: str):
         header = HighlightExprBehaviour(QColor(), expr)
         format = QTextCharFormat()
         format.setFontWeight(QFont.Weight.Bold)
         format.setForeground(QBrush(HighlighterConfig.headerCol))
-        format.setFontPointSize(size)
         header.format = format
         self.addBehaviour(behaviour, header)
 
@@ -128,7 +133,12 @@ class Highlighter(QSyntaxHighlighter):
 
     def getBehaviour(
         self, type: BEHAVIOUR
-    ) -> HighlightWordBehaviour | HighlightExprBehaviour | None:
+    ) -> (
+        HighlightWordBehaviour
+        | HighlightExprBehaviour
+        | HighlightMultiExprBehaviour
+        | None
+    ):
         if not type in self._behaviours:
             return None
         return self._behaviours[type]
@@ -152,21 +162,16 @@ class HighlightBehaviour(object):
 
 
 class HighlightWordBehaviour(HighlightBehaviour):
-    def __init__(self, color: QColor, wordSet: set, expr: str):
-        super().__init__(color, expr)
+    def __init__(self, color: QColor, wordSet: set):
+        super().__init__(color, "")
         self._wordSet = wordSet
 
     def process(self, highlighter: Highlighter, text: str):
-        wordCounter = Counter(self._expr.findall(text))
-        for word, _ in wordCounter.items():
-            if not word in self._wordSet:
-                continue
-
-            word = "\\b{}\\b".format(word)
+        for word in self._wordSet:
             it = re.finditer(word, text)
-            for m in it:
-                start = m.start()
-                end = m.end() - start
+            for found in it:
+                start = found.start()
+                end = found.end() - start
                 highlighter.setFormat(start, end, self.format)
 
     def add(self, word: str) -> bool:

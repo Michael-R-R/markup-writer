@@ -3,16 +3,15 @@
 import re
 
 from PyQt6.QtCore import (
-    Qt,
-    pyqtSignal,
     pyqtSlot,
     QSize,
 )
 
 from PyQt6.QtGui import (
     QAction,
+    QHideEvent,
+    QShowEvent,
     QTextCursor,
-    QTextDocument,
 )
 
 from PyQt6.QtWidgets import (
@@ -21,14 +20,15 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QLabel,
     QToolBar,
-    QPlainTextEdit,
 )
 
 from markupwriter.common.provider import Icon
+from markupwriter.common.syntax import BEHAVIOUR
+from . import DocumentEditorWidget
 
 
 class SearchReplaceWidget(QFrame):
-    def __init__(self, textEdit: QPlainTextEdit | None) -> None:
+    def __init__(self, textEdit: DocumentEditorWidget | None) -> None:
         super().__init__(textEdit)
 
         self.textEdit = textEdit
@@ -78,21 +78,21 @@ class SearchReplaceWidget(QFrame):
         self.gLayout.addWidget(self.replaceInput, 1, 0)
         self.gLayout.addWidget(self.replaceToolbar, 1, 1)
 
-        self.searchInput.textChanged.connect(self._onSearchChanged)
+        self.searchInput.textChanged.connect(self.runSearch)
         self.prevAction.triggered.connect(self._onPrevMatch)
         self.nextAction.triggered.connect(self._onNextMatch)
         self.replaceAction.triggered.connect(self._onReplaceMatch)
         self.replaceAllAction.triggered.connect(self._onReplaceAllMatch)
         self.closeAction.triggered.connect(lambda: self.hide())
 
-    def reset(self, doHide: bool = True):
-        if doHide:
-            self.hide()
-
+    def reset(self):
+        self.hide()
         self.searchInput.clear()
         self.replaceInput.clear()
-        self.resultsLabel.setText("No results")
-
+        self.resultsLabel.setText("None")
+        self._setSearchActionStates(False)
+        self._setReplaceActionStates(False)
+        self._clearHighlighting()
         self.index = 0
         self.found = list()
 
@@ -101,7 +101,6 @@ class SearchReplaceWidget(QFrame):
             self.hide()
         else:
             self.show()
-            self.adjustPos()
 
     def adjustPos(self):
         if not self.isVisible():
@@ -117,42 +116,49 @@ class SearchReplaceWidget(QFrame):
         y = 2 * fw
         self.move(x, y)
 
-    @pyqtSlot(str)
-    def _onSearchChanged(self, searchText: str):
+    @pyqtSlot()
+    def runSearch(self):
+        searchText = self.searchInput.text()
         if searchText == "":
-            self.reset(False)
+            self.found = list()
+            self.index = -1
+            self._updateStates()
+            self._clearHighlighting()
             return
-
+        
+        prevLength = len(self.found)
+            
         content = self.textEdit.toPlainText()
-        self.index = 0
-        self.found = list(
-            re.finditer("\\b{}\\b".format(searchText), content, re.MULTILINE)
-        )
-
-        if len(self.found) <= 0:
-            self.resultsLabel.setText("No results")
-        else:
-            self._traverseSearch(0)
-
+        self.found = list(re.finditer(searchText, content, re.MULTILINE))
+        self.index = -1
+        
+        if len(self.found) > 0:
+            highlighter = self.textEdit.highlighter
+            behaviour = highlighter.getBehaviour(BEHAVIOUR.searchword)
+            behaviour.clear()
+            behaviour.add(searchText)
+            highlighter.rehighlight()
+        elif prevLength > 0:
+            self._clearHighlighting()
+        
+        self._updateStates()
+        
     @pyqtSlot()
     def _onNextMatch(self):
-        self._traverseSearch(1)
+        self._runMatch(1)
 
     @pyqtSlot()
     def _onPrevMatch(self):
-        self._traverseSearch(-1)
+        self._runMatch(-1)
 
     @pyqtSlot()
     def _onReplaceMatch(self):
-        replaceText = self.replaceInput.text()
-        if replaceText == "":
-            return
+        if self.index < 0:
+            self._onNextMatch()
+        else:
+            self._selectText()
         
-        count = len(self.found)
-        if count <= 0:
-            return
-
-        self._traverseSearch(0)
+        replaceText = self.replaceInput.text()
         
         cursor = self.textEdit.textCursor()
         cursor.beginEditBlock()
@@ -160,54 +166,97 @@ class SearchReplaceWidget(QFrame):
         cursor.insertText(replaceText)
         cursor.endEditBlock()
         self.textEdit.setTextCursor(cursor)
-        
-        self._onSearchChanged(self.searchInput.text())
+
+        searchText = self.searchInput.text()
+        content = self.textEdit.toPlainText()
+        self.found = list(re.finditer(searchText, content, re.MULTILINE))
+        if len(self.found) > 0:
+            self._runMatch(0)
+        else:
+            self._updateStates()
 
     @pyqtSlot()
     def _onReplaceAllMatch(self):
         replaceText = self.replaceInput.text()
-        if replaceText == "":
-            return
-        if len(self.found) <= 0:
-            return
-        
-        found = self.found[self.index]
-        searchText = found.group(0)
-        
+        searchText = self.searchInput.text()
+
         doc = self.textEdit.document()
-        prevCursor = self.textEdit.textCursor()
-        prevCursor.setPosition(0)
-        prevCursor = doc.find(searchText, prevCursor)
+        cursor = self.textEdit.textCursor()
+        cursor.setPosition(0)
+        cursor.beginEditBlock()
+        
+        prevCursor = doc.find(searchText, cursor)
         currCursor = prevCursor
-        prevCursor.beginEditBlock()
         while not currCursor.isNull():
             prevCursor = currCursor
             currCursor.removeSelectedText()
             currCursor.insertText(replaceText)
             currCursor = doc.find(searchText, prevCursor)
-        
+
         prevCursor.endEditBlock()
         self.textEdit.setTextCursor(prevCursor)
-        
-        self.index = 0
+
+        self.index = -1
         self.found = list()
-        self._updateResultsLabel(-1, -1)
+        self._updateStates()
 
-    def _traverseSearch(self, direction: int):
-        count = len(self.found)
-        if count <= 0:
-            self._updateResultsLabel(-1, -1)
+    def _runMatch(self, direction: int):
+        # Find closet match to cursor
+        if self.index < 0:
+            cpos = self.textEdit.textCursor().position()
+            for f in self.found:
+                self.index += 1
+                if f.start() > cpos:
+                    break
+        # Otherwise update the index(+-)
+        else:
+            self.index = (self.index + direction) % len(self.found)
+            
+        self._selectText()
+        self._updateStates()
+
+    def _selectText(self):
+        if self.index < 0:
             return
-
-        self.index = (self.index + direction) % count
-        self._updateResultsLabel(self.index + 1, count)
+        
         found = self.found[self.index]
-
+        
         cursor = self.textEdit.textCursor()
         cursor.setPosition(found.start())
         cursor.setPosition(found.end(), QTextCursor.MoveMode.KeepAnchor)
         self.textEdit.setTextCursor(cursor)
 
-    def _updateResultsLabel(self, index: int, count: int):
-        text = "No results" if count <= 0 else "{} of {}".format(index, count)
+    def _updateStates(self):
+        count = len(self.found)
+        
+        index = "?" if self.index < 0 else self.index+1
+        text = "None" if count <= 0 else "{} of {}".format(index, count)
         self.resultsLabel.setText(text)
+
+        isEnabled = count > 0
+        self._setSearchActionStates(isEnabled)
+        self._setReplaceActionStates(isEnabled)
+
+    def _setSearchActionStates(self, isEnabled: bool):
+        self.prevAction.setEnabled(isEnabled)
+        self.nextAction.setEnabled(isEnabled)
+
+    def _setReplaceActionStates(self, isEnabled: bool):
+        self.replaceAction.setEnabled(isEnabled)
+        self.replaceAllAction.setEnabled(isEnabled)
+
+    def _clearHighlighting(self):
+        highlighter = self.textEdit.highlighter
+        behaviour = highlighter.getBehaviour(BEHAVIOUR.searchword)
+        behaviour.clear()
+        highlighter.rehighlight()
+
+    def showEvent(self, a0: QShowEvent | None) -> None:
+        self.adjustPos()
+        self.searchInput.setFocus()
+        self.runSearch()
+        return super().showEvent(a0)
+    
+    def hideEvent(self, a0: QHideEvent | None) -> None:
+        self._clearHighlighting()
+        return super().hideEvent(a0)
