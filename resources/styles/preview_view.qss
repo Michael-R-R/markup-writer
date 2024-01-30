@@ -1,3 +1,14 @@
-QWidget {
-    background-color: rgb(36, 36, 36);
+QWidget
+{
+    border: 0px;
+}
+
+QTextEdit
+{
+    font: 11pt "Courier New";
+}
+
+QPushButton
+{
+    border: 1px solid rgb(28, 28, 28);
 }

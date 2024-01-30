@@ -48,6 +48,7 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setMouseTracking(True)
