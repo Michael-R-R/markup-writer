@@ -13,20 +13,13 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtGui import (
     QCursor,
+    QTextCursor,
 )
 
-from markupwriter.mvc.model.corewidgets import (
-    DocumentEditor,
-)
-
-from markupwriter.mvc.view.corewidgets import (
-    DocumentEditorView,
-)
-
-from markupwriter.common.tokenizers import (
-    EditorTokenizer,
-)
-
+from markupwriter.mvc.model.corewidgets import DocumentEditor
+from markupwriter.mvc.view.corewidgets import DocumentEditorView
+from markupwriter.common.tokenizers import EditorTokenizer
+from markupwriter.common.syntax import BEHAVIOUR
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
 from markupwriter.widgets import PopupPreviewWidget
@@ -45,7 +38,8 @@ class DocumentEditorController(QObject):
 
     def setup(self):
         # --- View signals --- #
-        self.view.searchAction.triggered.connect(self._onToggleSearchBox)
+        view = self.view
+        view.searchAction.triggered.connect(self._onToggleSearchBox)
 
         # --- Editor bar signals--- #
         editorBar = self.view.editorBar
@@ -55,8 +49,14 @@ class DocumentEditorController(QObject):
         textEdit = self.view.textEdit
         textEdit.tagHovered.connect(self._onTagHovered)
 
-        # --- Search widget --- #
-        searchWidget = self.view.searchWidget
+        # --- Search box signals --- #
+        searchBox = self.view.searchBox
+        searchBox.searchChanged.connect(self._runSearch)
+        searchBox.nextAction.triggered.connect(self._onNextMatch)
+        searchBox.prevAction.triggered.connect(self._onPrevMatch)
+        searchBox.replaceAction.triggered.connect(self._onReplaceMatch)
+        searchBox.replaceAllAction.triggered.connect(self._onReplaceAllMatch)
+        searchBox.closeAction.triggered.connect(self._onToggleSearchBox)
 
     def reset(self):
         self.model.currDocPath = ""
@@ -97,9 +97,9 @@ class DocumentEditorController(QObject):
 
         self.runTokenizer(uuid)
 
-        searchWidget = self.view.searchWidget
-        if searchWidget.isVisible():
-            searchWidget.runSearch()
+        searchBox = self.view.searchBox
+        if searchBox.isVisible():
+            searchBox.onSearchChanged(searchBox.searchInput.text())
 
         self.hasOpenDocument.emit(True)
 
@@ -232,7 +232,111 @@ class DocumentEditorController(QObject):
     def _onToggleSearchBox(self):
         if not self._hasDocument():
             return
-        self.view.searchWidget.toggle()
+
+        searchBox = self.view.searchBox
+        if searchBox.toggle():
+            self.view.adjustSearchBoxPos()
+            searchBox.searchInput.setFocus()
+            searchBox.onSearchChanged(searchBox.searchInput.text())
+        else:
+            textEdit = self.view.textEdit
+            highlighter = textEdit.highlighter
+            behaviour = highlighter.getBehaviour(BEHAVIOUR.searchText)
+            behaviour.clear()
+            highlighter.rehighlight()
+
+    @pyqtSlot(str, bool)
+    def _runSearch(self, text: str, doHighlighter: bool = True):
+        searchBox = self.view.searchBox
+        textEdit = self.view.textEdit
+
+        found = list()
+        if text != "":
+            content = textEdit.toPlainText()
+            found = list(re.finditer(text, content, re.MULTILINE))
+
+        if doHighlighter:
+            highlighter = textEdit.highlighter
+            behaviour = highlighter.getBehaviour(BEHAVIOUR.searchText)
+            if len(found) > 0:
+                behaviour.clear()
+                behaviour.add(text)
+                highlighter.rehighlight()
+            elif searchBox.foundCount() > 0:
+                behaviour.clear()
+                highlighter.rehighlight()
+
+        searchBox.setFound(found)
+
+    @pyqtSlot()
+    def _onNextMatch(self):
+        self._onRunMatch(1)
+
+    @pyqtSlot()
+    def _onPrevMatch(self):
+        self._onRunMatch(-1)
+
+    @pyqtSlot()
+    def _onReplaceMatch(self) -> bool:
+        if not self._onRunMatch(0):
+            return False
+
+        searchBox = self.view.searchBox
+        searchText = searchBox.searchInput.text()
+        replaceText = searchBox.replaceInput.text()
+
+        textEdit = self.view.textEdit
+        cursor = textEdit.textCursor()
+        cursor.beginEditBlock()
+        cursor.removeSelectedText()
+        cursor.insertText(replaceText)
+        cursor.endEditBlock()
+        textEdit.setTextCursor(cursor)
+
+        searchBox.onSearchChanged(searchText, False)
+
+        return self._onRunMatch(0)
+
+    @pyqtSlot()
+    def _onReplaceAllMatch(self):
+        searchBox = self.view.searchBox
+        textEdit = self.view.textEdit
+        searchText = searchBox.searchInput.text()
+        replaceText = searchBox.replaceInput.text()
+
+        doc = textEdit.document()
+        cursor = textEdit.textCursor()
+        cursor.setPosition(0)
+        cursor.beginEditBlock()
+
+        prevCursor = doc.find(searchText, cursor)
+        currCursor = prevCursor
+        while not currCursor.isNull():
+            prevCursor = currCursor
+            currCursor.removeSelectedText()
+            currCursor.insertText(replaceText)
+            currCursor = doc.find(searchText, prevCursor)
+
+        prevCursor.endEditBlock()
+        textEdit.setTextCursor(prevCursor)
+
+        searchBox.setFound(list())
+
+    def _onRunMatch(self, direction: int) -> bool:
+        searchBox = self.view.searchBox
+        textEdit = self.view.textEdit
+        cursor = textEdit.textCursor()
+        cpos = cursor.position()
+
+        found = searchBox.runMatch(cpos, direction)
+        if found is None:
+            return False
+
+        cursor.setPosition(found.start())
+        cursor.setPosition(found.end(), QTextCursor.MoveMode.KeepAnchor)
+        textEdit.setTextCursor(cursor)
+
+        return True
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         return sout

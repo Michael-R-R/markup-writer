@@ -32,7 +32,7 @@ class BEHAVIOUR(Enum):
     header4 = auto()
     tags = auto()
     keyword = auto()
-    searchword = auto()
+    searchText = auto()
 
 
 class Highlighter(QSyntaxHighlighter):
@@ -105,7 +105,7 @@ class Highlighter(QSyntaxHighlighter):
         # Searched word
         searchedWordBehaviour = HighlightWordBehaviour(QColor(255, 255, 255), set())
         searchedWordBehaviour.format.setBackground(HighlighterConfig.searchedCol)
-        self.addBehaviour(BEHAVIOUR.searchword, searchedWordBehaviour)
+        self.addBehaviour(BEHAVIOUR.searchText, searchedWordBehaviour)
 
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self._behaviours.items():

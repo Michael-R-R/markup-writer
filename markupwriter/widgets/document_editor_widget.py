@@ -5,6 +5,7 @@ import re
 from PyQt6.QtCore import (
     Qt,
     pyqtSignal,
+    pyqtSlot,
     QPoint,
     QTimer,
 )
@@ -47,7 +48,6 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setMouseTracking(True)
@@ -115,10 +115,6 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         super().mouseMoveEvent(e)
 
-    def _onTimer(self):
-        self.hoverTimer.stop()
-        self.tagHovered.emit(self.hoverTag)
-
     def _checkForTag(self, pos: QPoint) -> str | None:
         cursor = self.cursorForPosition(pos)
         cursorPos = cursor.positionInBlock()
@@ -152,3 +148,8 @@ class DocumentEditorWidget(QPlainTextEdit):
             text = blockText[rcomma + 1 : index].strip()
 
         return text
+    
+    @pyqtSlot()
+    def _onTimer(self):
+        self.hoverTimer.stop()
+        self.tagHovered.emit(self.hoverTag)
