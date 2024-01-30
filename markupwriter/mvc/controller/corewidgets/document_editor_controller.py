@@ -44,13 +44,15 @@ class DocumentEditorController(QObject):
         self.view = DocumentEditorView(None)
 
     def setup(self):
-        # --- Editor bar --- #
+        # --- View signals --- #
+        self.view.searchAction.triggered.connect(self._onToggleSearchBox)
+
+        # --- Editor bar signals--- #
         editorBar = self.view.editorBar
         editorBar.closeAction.triggered.connect(self._onCloseDocument)
 
-        # --- Text edit --- #
+        # --- Text edit signals --- #
         textEdit = self.view.textEdit
-        textEdit.searchAction.triggered.connect(self._onToggleSearchBox)
         textEdit.tagHovered.connect(self._onTagHovered)
 
         # --- Search widget --- #
@@ -94,7 +96,7 @@ class DocumentEditorController(QObject):
         self.view.textEdit.setFocus()
 
         self.runTokenizer(uuid)
-        
+
         searchWidget = self.view.searchWidget
         if searchWidget.isVisible():
             searchWidget.runSearch()
@@ -201,10 +203,7 @@ class DocumentEditorController(QObject):
         self.onSaveDocument()
         self.reset()
 
-    @pyqtSlot()
-    def _onToggleSearchBox(self):
-        self.view.searchWidget.toggle()
-
+    # ---- Document editor slots ---- #
     @pyqtSlot(str)
     def _onTagHovered(self, tag: str):
         refTag = self.model.refManager.getTag(tag)
@@ -227,6 +226,13 @@ class DocumentEditorController(QObject):
     @pyqtSlot(str, dict)
     def _onRunParser(self, uuid: str, tokens: dict[str, list[str]]):
         self.model.parser.run(uuid, tokens, self.model.refManager)
+
+    # ---- Search replace slots ---- #
+    @pyqtSlot()
+    def _onToggleSearchBox(self):
+        if not self._hasDocument():
+            return
+        self.view.searchWidget.toggle()
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         return sout
