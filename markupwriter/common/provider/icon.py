@@ -2,10 +2,6 @@
 
 import os
 
-from PyQt6.QtCore import (
-    QDir,
-)
-
 from PyQt6.QtGui import (
     QIcon,
 )
@@ -39,33 +35,33 @@ class Icon(object):
     SECTION_FILE: QIcon = None
     MISC_FILE: QIcon = None
     
-    def init(workingDir: str):
-        QDir.addSearchPath("icons", os.path.join(workingDir, "resources/icons/"))
+    def init(wd: str):
+        dir = os.path.join(wd, "resources/icons/")
         
-        Icon.PLACE_HOLDER = QIcon("icons:common/holder.svg")
+        Icon.PLACE_HOLDER = QIcon(os.path.join(dir, "common/holder.svg"))
 
         # Common
-        Icon.BOOKS = QIcon("icons:common/books.svg")
-        Icon.CHECK = QIcon("icons:common/check.svg")
-        Icon.UNCHECK = QIcon("icons:common/uncheck.svg")
-        Icon.UP_ARROW = QIcon("icons:common/up_arrow.svg")
-        Icon.DOWN_ARROW = QIcon("icons:common/down_arrow.svg")
-        Icon.ADD_ITEM = QIcon("icons:common/add_item.svg")
-        Icon.MORE_OPTIONS = QIcon("icons:common/more_options.svg")
+        Icon.BOOKS = QIcon(os.path.join(dir, "common/books.svg"))
+        Icon.CHECK = QIcon(os.path.join(dir, "common/check.svg"))
+        Icon.UNCHECK = QIcon(os.path.join(dir, "common/uncheck.svg"))
+        Icon.UP_ARROW = QIcon(os.path.join(dir, "common/up_arrow.svg"))
+        Icon.DOWN_ARROW = QIcon(os.path.join(dir, "common/down_arrow.svg"))
+        Icon.ADD_ITEM = QIcon(os.path.join(dir, "common/add_item.svg"))
+        Icon.MORE_OPTIONS = QIcon(os.path.join(dir, "common/more_options.svg"))
 
         # Folders
-        Icon.NOVEL_FOLDER = QIcon("icons:folder/novel.svg")
-        Icon.PLOT_FOLDER = QIcon("icons:folder/plot.svg")
-        Icon.TIMELINE_FOLDER = QIcon("icons:folder/timeline.svg")
-        Icon.CHARACTERS_FOLDER = QIcon("icons:folder/characters.svg")
-        Icon.LOCATIONS_FOLDER = QIcon("icons:folder/locations.svg")
-        Icon.OBJECTS_FOLDER = QIcon("icons:folder/objects.svg")
-        Icon.TRASH_FOLDER = QIcon("icons:folder/trash.svg")
-        Icon.MISC_FOLDER = QIcon("icons:folder/misc_folder.svg")
+        Icon.NOVEL_FOLDER = QIcon(os.path.join(dir, "folder/novel.svg"))
+        Icon.PLOT_FOLDER = QIcon(os.path.join(dir, "folder/plot.svg"))
+        Icon.TIMELINE_FOLDER = QIcon(os.path.join(dir, "folder/timeline.svg"))
+        Icon.CHARACTERS_FOLDER = QIcon(os.path.join(dir, "folder/characters.svg"))
+        Icon.LOCATIONS_FOLDER = QIcon(os.path.join(dir, "folder/locations.svg"))
+        Icon.OBJECTS_FOLDER = QIcon(os.path.join(dir, "folder/objects.svg"))
+        Icon.TRASH_FOLDER = QIcon(os.path.join(dir, "folder/trash.svg"))
+        Icon.MISC_FOLDER = QIcon(os.path.join(dir, "folder/misc_folder.svg"))
 
         # Files
-        Icon.TITLE_FILE = QIcon("icons:file/title_page.svg")
-        Icon.CHAPTER_FILE = QIcon("icons:file/chapter.svg")
-        Icon.SCENE_FILE = QIcon("icons:file/scene.svg")
-        Icon.SECTION_FILE = QIcon("icons:file/section.svg")
-        Icon.MISC_FILE = QIcon("icons:file/misc_file.svg")
+        Icon.TITLE_FILE = QIcon(os.path.join(dir, "file/title_page.svg"))
+        Icon.CHAPTER_FILE = QIcon(os.path.join(dir, "file/chapter.svg"))
+        Icon.SCENE_FILE = QIcon(os.path.join(dir, "file/scene.svg"))
+        Icon.SECTION_FILE = QIcon(os.path.join(dir, "file/section.svg"))
+        Icon.MISC_FILE = QIcon(os.path.join(dir, "file/misc_file.svg"))
