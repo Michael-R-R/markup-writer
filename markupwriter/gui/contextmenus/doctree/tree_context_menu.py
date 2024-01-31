@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    QObject,
+from PyQt6.QtWidgets import (
+    QWidget,
 )
 
 from markupwriter.gui.menus.doctree import (
@@ -14,10 +14,10 @@ from markupwriter.gui.contextmenus import (
 
 
 class TreeContextMenu(BaseContextMenu):
-    def __init__(self, parent: QObject | None):
+    def __init__(self, parent: QWidget | None):
         super().__init__(parent)
 
-        self.addItemMenu = AddItemMenu(None)
+        self.addItemMenu = AddItemMenu(parent)
 
         self._menu.addMenu(self.addItemMenu)
         

@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    QObject,
-)
-
 from PyQt6.QtGui import (
     QAction,
+)
+
+from PyQt6.QtWidgets import (
+    QWidget,
 )
 
 from markupwriter.common.provider import (
@@ -22,10 +22,10 @@ from markupwriter.gui.contextmenus import (
 
 
 class ItemContextMenu(BaseContextMenu):
-    def __init__(self, parent: QObject | None) -> None:
+    def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
 
-        self.addItemMenu = AddItemMenu(None)
+        self.addItemMenu = AddItemMenu(parent)
         self._menu.addMenu(self.addItemMenu)
 
         self.previewAction = QAction("Preview", self)

@@ -6,14 +6,15 @@ from PyQt6.QtCore import (
 )
 
 from PyQt6.QtWidgets import (
+    QWidget,
     QMenu,
 )
 
 
 class BaseContextMenu(QObject):
-    def __init__(self, parent: QObject | None) -> None:
+    def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
-        self._menu = QMenu()
+        self._menu = QMenu(parent)
 
     def preprocess(self, args: list[object] | None):
         raise NotImplementedError()

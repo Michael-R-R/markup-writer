@@ -3,6 +3,11 @@ QWidget
     border: 0px;
 }
 
+QTabWidget
+{
+    padding: 0;
+}
+
 QTextEdit
 {
     font: 11pt "Courier New";
@@ -13,7 +18,13 @@ QPushButton
     border: 1px solid rgb(28, 28, 28);
 }
 
-QTabWidget
+QToolButton
 {
-    padding: 0;
+    background: rgba(0, 0, 0, 0%);
+    border-radius: 4px;
+}
+
+QToolButton::hover
+{
+   background: rgba(144, 144, 144, 20%);
 }

@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    QObject,
-)
-
 from PyQt6.QtGui import (
     QAction,
+)
+
+from PyQt6.QtWidgets import (
+    QWidget,
 )
 
 from markupwriter.common.provider import (
@@ -18,7 +18,7 @@ from markupwriter.gui.contextmenus import (
 
 
 class TrashContextMenu(BaseContextMenu):
-    def __init__(self, parent: QObject | None) -> None:
+    def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
 
         self.emptyAction = QAction(Icon.TRASH_FOLDER, "Empty trash", self)

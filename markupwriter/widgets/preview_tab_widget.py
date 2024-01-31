@@ -1,17 +1,18 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import QEvent
-
 from PyQt6.QtCore import (
+    pyqtSlot,
     QSize,
 )
-from PyQt6.QtGui import QMouseEvent
 
 from PyQt6.QtWidgets import (
     QWidget,
     QTabWidget,
     QTabBar,
+    QToolButton,
 )
+
+from markupwriter.common.provider import Icon
 
 
 class PreviewTabWidget(QTabWidget):
@@ -26,7 +27,17 @@ class PreviewTabWidget(QTabWidget):
         self.setMouseTracking(True)
 
         self.currentChanged.connect(self._onCurrentChanged)
-
+        
+    def tabInserted(self, index: int) -> None:
+        super().tabInserted(index)
+        
+        tabBar = self.tabBar()
+        closeButton = QToolButton(tabBar)
+        closeButton.setIcon(Icon.UNCHECK)
+        closeButton.clicked.connect(self._onCloseButtonClicked)
+        tabBar.setTabButton(index, QTabBar.ButtonPosition.RightSide, closeButton)
+    
+    @pyqtSlot(int)
     def _onCurrentChanged(self, index: int):
         tabBar = self.tabBar()
         if tabBar is None:
@@ -44,3 +55,8 @@ class PreviewTabWidget(QTabWidget):
             tabBar.adjustSize()
             
         self._prevIndex = index
+        
+    @pyqtSlot()
+    def _onCloseButtonClicked(self):
+        index = self.currentIndex()
+        self.tabCloseRequested.emit(index)
