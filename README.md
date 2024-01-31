@@ -8,6 +8,8 @@ to support large novel organization needs.
 Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a> and <a href="https://github.com/vkbo/novelWriter">novelWriter</a>.
 
 ## Supports
++ Open source
++ Free forever
 + Fast document opening/saving
 + In-text markup language
 + Reference tag hover-over popup preview functionality
