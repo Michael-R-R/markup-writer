@@ -5,3 +5,4 @@ from .document_editor_widget import DocumentEditorWidget
 from .document_preview_widget import DocumentPreviewWidget
 from .popup_preview_widget import PopupPreviewWidget
 from .search_replace_widget import SearchReplaceWidget
+from .preview_tab_widget import PreviewTabWidget

@@ -31,7 +31,7 @@ QMenuBar::item:pressed
 QMenu
 {
     color: white;
-    background-color: rgb(32, 32, 32);
+    background-color: rgb(40, 40, 40);
     border: 0px;
 }
 
@@ -43,7 +43,7 @@ QMenu::item
 
 QMenu::separator
 {
-    background-color: rgb(0, 0, 0);
+    background-color: rgb(28, 28, 28);
     height: 1px;
 }
 
@@ -213,39 +213,34 @@ QTabWidget::pane
 {
 	border: 2px solid rgb(28, 28, 28);
     border-radius: 2px;
-	top: 1px;
 }
 
 QTabBar::tab 
 {
-    background-color: qlineargradient(spread:repeat, x1:1, y1:0, x2:1, y2:1, 
-									  stop:0 rgba(84, 84, 84, 255), 
-									  stop:1 rgba(59, 59, 59, 255));
+    background-color: rgb(32, 32, 32);
 	color: white;
 	border-style: solid;
 	border-radius: 2px;
 	border-width: 1px;
-	border-color: rgb(28, 28, 28);
+	border-color: rgb(24, 24, 24);
 	border-bottom: none;
 	padding: 5px;
 	padding-left: 15px;
 	padding-right: 15px;
 }
 
-QTabBar::tab:last
-{
-	margin-right: 0; 
-}
-
 QTabBar::tab:!selected
 {
 	color: #b1b1b1;
 	border-bottom-style: solid;
-	background-color: rgb(32, 32, 32);
+	background-color: rgb(28, 28, 28);
+    margin-top: 2px;
 }
 
 QTabBar::tab:selected
 {
+    margin-left: -4px;
+    margin-right: -4px;
 	margin-bottom: 0px;
 }
 
@@ -254,11 +249,26 @@ QTabBar::tab:!selected:hover
 	border-top-color: rgb(144, 144, 144);
 }
 
+QTabBar::tab:first:selected
+{
+    margin-left: 0;
+}
+
+QTabBar::tab:last
+{
+	margin-right: 0; 
+}
+
+QTabBar::tab:only-one
+{
+    margin: 0;
+}
+
 QTreeView
 {
 	color: white;
 	background-color: rgb(40, 40, 40);
-	border: 0px;
+	border: 2px solid rgb(28, 28, 28);
 	padding: 8px;
 }
 

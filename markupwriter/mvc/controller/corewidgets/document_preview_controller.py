@@ -9,6 +9,7 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtWidgets import (
     QWidget,
+    QTabBar,
 )
 
 from markupwriter.mvc.model.corewidgets import (
@@ -24,7 +25,7 @@ import markupwriter.widgets as mw
 
 class DocumentPreviewController(QObject):
     resizeRequested = pyqtSignal()
-    
+
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
 
@@ -55,7 +56,7 @@ class DocumentPreviewController(QObject):
         ww = self.view.size().width()
         if ww <= 0:
             self.resizeRequested.emit()
-        
+
         widget = mw.DocumentPreviewWidget(title, uuid, self.view)
         self._addPage(title, uuid, widget)
 

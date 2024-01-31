@@ -12,3 +12,8 @@ QPushButton
 {
     border: 1px solid rgb(28, 28, 28);
 }
+
+QTabWidget
+{
+    padding: 0;
+}
