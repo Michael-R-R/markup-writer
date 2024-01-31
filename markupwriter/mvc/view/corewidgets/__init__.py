@@ -1,4 +1,3 @@
 from .document_tree_view import DocumentTreeView
 from .document_editor_view import DocumentEditorView
-from .console_view import ConsoleView
 from .document_preview_view import DocumentPreviewView

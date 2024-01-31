@@ -20,10 +20,8 @@ class CentralWidgetView(QWidget):
 
         self.lhSplitter = QSplitter(Qt.Orientation.Horizontal)
         self.rhSplitter = QSplitter(Qt.Orientation.Horizontal)
-        self.rvSplitter = QSplitter(Qt.Orientation.Vertical)
 
-        self.lhSplitter.addWidget(self.rvSplitter)
-        self.rvSplitter.addWidget(self.rhSplitter)
+        self.lhSplitter.addWidget(self.rhSplitter)
         
         self.gLayout = QGridLayout(self)
         self.gLayout.addWidget(self.lhSplitter, 0, 0)

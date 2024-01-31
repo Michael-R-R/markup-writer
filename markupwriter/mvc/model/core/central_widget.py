@@ -7,7 +7,6 @@ from PyQt6.QtCore import (
 from markupwriter.mvc.controller.corewidgets import (
     DocumentTreeController,
     DocumentEditorController,
-    ConsoleController,
     DocumentPreviewController,
 )
 
@@ -18,5 +17,4 @@ class CentralWidget(QObject):
 
         self.docTreeController = DocumentTreeController(self)
         self.docEditorController = DocumentEditorController(self)
-        self.consoleController = ConsoleController(self)
         self.docPreviewController = DocumentPreviewController(self)
