@@ -69,7 +69,7 @@ class SearchReplaceWidget(QFrame):
         self.replaceToolbar.addAction(self.replaceAllAction)
 
         self.gLayout = QGridLayout(self)
-        self.gLayout.setVerticalSpacing(0)
+        self.gLayout.setVerticalSpacing(2)
         self.gLayout.addWidget(self.searchInput, 0, 0)
         self.gLayout.addWidget(self.resultsLabel, 0, 1)
         self.gLayout.addWidget(self.searchToolbar, 0, 2)
