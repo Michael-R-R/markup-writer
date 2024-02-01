@@ -47,7 +47,8 @@ class DocumentEditorController(QObject):
 
         # --- Text edit signals --- #
         textEdit = self.view.textEdit
-        textEdit.tagHovered.connect(self._onTagHovered)
+        textEdit.tagPopupRequested.connect(self._onTagPopupRequested)
+        textEdit.tagPreviewRequested.connect(self._onTagPreviewRequested)
 
         # --- Search box signals --- #
         searchBox = self.view.searchBox
@@ -205,7 +206,7 @@ class DocumentEditorController(QObject):
 
     # ---- Document editor slots ---- #
     @pyqtSlot(str)
-    def _onTagHovered(self, tag: str):
+    def _onTagPopupRequested(self, tag: str):
         refTag = self.model.refManager.getTag(tag)
         if refTag is None:
             return
@@ -222,6 +223,14 @@ class DocumentEditorController(QObject):
 
         w.move(QPoint(x, y))
         w.show()
+        
+    @pyqtSlot(str)
+    def _onTagPreviewRequested(self, tag: str):
+        refTag = self.model.refManager.getTag(tag)
+        if refTag is None:
+            return
+
+        self.filePreviewed.emit(refTag.docUUID())
 
     @pyqtSlot(str, dict)
     def _onRunParser(self, uuid: str, tokens: dict[str, list[str]]):

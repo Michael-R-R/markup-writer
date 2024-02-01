@@ -7,7 +7,6 @@ from PyQt6.QtCore import (
     pyqtSignal,
     pyqtSlot,
     QPoint,
-    QTimer,
 )
 
 from PyQt6.QtGui import (
@@ -33,7 +32,8 @@ import markupwriter.support.doceditor as de
 
 
 class DocumentEditorWidget(QPlainTextEdit):
-    tagHovered = pyqtSignal(str)
+    tagPopupRequested = pyqtSignal(str)
+    tagPreviewRequested = pyqtSignal(str)
 
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
@@ -41,30 +41,27 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.plainDocument = de.PlainDocument(self)
         self.highlighter = Highlighter(self.plainDocument)
 
-        self.hoverTag = ""
-        self.hoverTimer = QTimer(self)
-        self.hoverTimer.timeout.connect(self._onTimer)
         self.canResizeMargins = True
 
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
+        self.setMouseTracking(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
-        self.setMouseTracking(True)
         self.setTabStopDistance(20.0)
         self.resizeMargins()
-        
+
     def reset(self):
         self.clear()
         self.setEnabled(False)
-        
+
     def cursorToEnd(self):
         cursor = self.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.End)
         self.setTextCursor(cursor)
         self.centerCursor()
-        
+
     def moveCursorTo(self, pos: int):
         cursor = self.textCursor()
         cursor.setPosition(pos)
@@ -73,8 +70,8 @@ class DocumentEditorWidget(QPlainTextEdit):
 
     def resizeMargins(self):
         if not self.canResizeMargins:
-            return 
-        
+            return
+
         mSize = QGuiApplication.primaryScreen().size()
         mW = mSize.width()
 
@@ -93,28 +90,49 @@ class DocumentEditorWidget(QPlainTextEdit):
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         self.resizeMargins()
 
-        super().resizeEvent(e)
+        return super().resizeEvent(e)
 
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         cursor = de.KeyProcessor.process(self.textCursor(), e.key())
         self.setTextCursor(cursor)
 
-        super().keyPressEvent(e)
+        return super().keyPressEvent(e)
 
-    def mouseMoveEvent(self, e: QMouseEvent | None) -> None:
-        if e.buttons() == Qt.MouseButton.LeftButton:
-            self.hoverTimer.stop()
-        else:
-            tag = self._checkForTag(e.pos())
-            if self.hoverTimer.isActive():
-                if tag is None:
-                    self.hoverTimer.stop()
-            else:
+    def mousePressEvent(self, e: QMouseEvent | None) -> None:
+        ctrl = Qt.KeyboardModifier.ControlModifier
+        alt = Qt.KeyboardModifier.AltModifier
+        button = Qt.MouseButton.LeftButton
+
+        if e.modifiers() == ctrl:
+            if e.button() == button:
+                tag = self._checkForTag(e.pos())
                 if tag is not None:
-                    self.hoverTag = tag
-                    self.hoverTimer.start(1000)
+                    self.tagPopupRequested.emit(tag)
+                return None
+        elif e.modifiers() == (ctrl | alt):
+            if e.button() == button:
+                tag = self._checkForTag(e.pos())
+                if tag is not None:
+                    self.tagPreviewRequested.emit(tag)
+                return None
 
-        super().mouseMoveEvent(e)
+        return super().mousePressEvent(e)
+    
+    def mouseMoveEvent(self, e: QMouseEvent | None) -> None:
+        viewport = self.viewport()
+        mods = e.modifiers()
+        ctrl = Qt.KeyboardModifier.ControlModifier
+        alt = Qt.KeyboardModifier.AltModifier
+        if mods == ctrl or mods == (ctrl | alt):
+            tag = self._checkForTag(e.pos())
+            if tag is not None:
+                viewport.setCursor(Qt.CursorShape.PointingHandCursor)
+            else:
+                viewport.setCursor(Qt.CursorShape.IBeamCursor)
+        else:
+            viewport.setCursor(Qt.CursorShape.IBeamCursor)
+        
+        return super().mouseMoveEvent(e)
 
     def _checkForTag(self, pos: QPoint) -> str | None:
         cursor = self.cursorForPosition(pos)
@@ -149,8 +167,3 @@ class DocumentEditorWidget(QPlainTextEdit):
             text = blockText[rcomma + 1 : index].strip()
 
         return text
-    
-    @pyqtSlot()
-    def _onTimer(self):
-        self.hoverTimer.stop()
-        self.tagHovered.emit(self.hoverTag)
