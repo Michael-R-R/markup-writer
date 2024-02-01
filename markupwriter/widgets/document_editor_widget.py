@@ -5,7 +5,6 @@ import re
 from PyQt6.QtCore import (
     Qt,
     pyqtSignal,
-    pyqtSlot,
     QPoint,
 )
 
@@ -32,8 +31,8 @@ import markupwriter.support.doceditor as de
 
 
 class DocumentEditorWidget(QPlainTextEdit):
-    tagPopupRequested = pyqtSignal(str)
-    tagPreviewRequested = pyqtSignal(str)
+    tagPopupRequested = pyqtSignal(str, int)
+    tagPreviewRequested = pyqtSignal(str, int)
 
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
@@ -93,10 +92,17 @@ class DocumentEditorWidget(QPlainTextEdit):
         return super().resizeEvent(e)
 
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
+        self._onChangeCursorShape(e.modifiers(), self.viewport())
+        
         cursor = de.KeyProcessor.process(self.textCursor(), e.key())
         self.setTextCursor(cursor)
 
         return super().keyPressEvent(e)
+    
+    def keyReleaseEvent(self, e: QKeyEvent | None) -> None:
+        self._onChangeCursorShape(e.modifiers(), self.viewport())
+        
+        return super().keyReleaseEvent(e)
 
     def mousePressEvent(self, e: QMouseEvent | None) -> None:
         ctrl = Qt.KeyboardModifier.ControlModifier
@@ -105,65 +111,38 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         if e.modifiers() == ctrl:
             if e.button() == button:
-                tag = self._checkForTag(e.pos())
-                if tag is not None:
-                    self.tagPopupRequested.emit(tag)
+                pair: (str, int) = self._onTextBlockClicked(e.pos())
+                if pair != (None, None):
+                    self.tagPopupRequested.emit(pair[0], pair[1])
                 return None
         elif e.modifiers() == (ctrl | alt):
             if e.button() == button:
-                tag = self._checkForTag(e.pos())
-                if tag is not None:
-                    self.tagPreviewRequested.emit(tag)
+                pair: (str, int) = self._onTextBlockClicked(e.pos())
+                if pair != (None, None):
+                    self.tagPreviewRequested.emit(pair[0], pair[1])
                 return None
 
         return super().mousePressEvent(e)
     
     def mouseMoveEvent(self, e: QMouseEvent | None) -> None:
-        viewport = self.viewport()
-        mods = e.modifiers()
-        ctrl = Qt.KeyboardModifier.ControlModifier
-        alt = Qt.KeyboardModifier.AltModifier
-        if mods == ctrl or mods == (ctrl | alt):
-            tag = self._checkForTag(e.pos())
-            if tag is not None:
-                viewport.setCursor(Qt.CursorShape.PointingHandCursor)
-            else:
-                viewport.setCursor(Qt.CursorShape.IBeamCursor)
-        else:
-            viewport.setCursor(Qt.CursorShape.IBeamCursor)
+        self._onChangeCursorShape(e.modifiers(), self.viewport())
         
         return super().mouseMoveEvent(e)
-
-    def _checkForTag(self, pos: QPoint) -> str | None:
+    
+    def _onTextBlockClicked(self, pos: QPoint) -> (str | None, int | None):
         cursor = self.cursorForPosition(pos)
-        cursorPos = cursor.positionInBlock()
-        blockText = cursor.block().text()
-        if cursorPos <= 0 or cursorPos >= len(blockText):
-            return None
-
-        tagFound = re.search(r"^@(ref|pov|loc)(\(.*\))", blockText)
-        if tagFound is None:
-            return None
-
-        rcomma = blockText.rfind(",", 0, cursorPos)
-        fcomma = blockText.find(",", cursorPos)
-        text = None
-
-        # single tag
-        if rcomma < 0 and fcomma < 0:
-            rindex = blockText.rfind("(", 0, cursorPos)
-            lindex = blockText.find(")", cursorPos)
-            text = blockText[rindex + 1 : lindex].strip()
-        # tag start
-        elif rcomma < 0 and fcomma > -1:
-            index = blockText.rfind("(", 0, cursorPos)
-            text = blockText[index + 1 : fcomma].strip()
-        # tag middle
-        elif rcomma > -1 and fcomma > -1:
-            text = blockText[rcomma + 1 : fcomma].strip()
-        # tag end
-        elif rcomma > -1 and fcomma < 0:
-            index = blockText.find(")", cursorPos)
-            text = blockText[rcomma + 1 : index].strip()
-
-        return text
+        cpos = cursor.positionInBlock()
+        textBlock = cursor.block().text()
+        if cpos <= 0 or cpos >= len(textBlock):
+            return (None, None)
+        
+        return (textBlock, cpos)
+    
+    def _onChangeCursorShape(self, mods: Qt.KeyboardModifier, vp: QWidget):
+        ctrl = Qt.KeyboardModifier.ControlModifier
+        alt = Qt.KeyboardModifier.AltModifier
+        
+        if mods == ctrl or mods == (ctrl | alt):
+            vp.setCursor(Qt.CursorShape.PointingHandCursor)
+        else:
+            vp.setCursor(Qt.CursorShape.IBeamCursor)

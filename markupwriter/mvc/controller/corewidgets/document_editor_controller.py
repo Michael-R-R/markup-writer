@@ -205,8 +205,12 @@ class DocumentEditorController(QObject):
         self.reset()
 
     # ---- Document editor slots ---- #
-    @pyqtSlot(str)
-    def _onTagPopupRequested(self, tag: str):
+    @pyqtSlot(str, int)
+    def _onTagPopupRequested(self, blockText: str, pos: int):
+        tag = self._parseTagFromBlock(blockText, pos)
+        if tag is None:
+            return
+        
         refTag = self.model.refManager.getTag(tag)
         if refTag is None:
             return
@@ -224,13 +228,45 @@ class DocumentEditorController(QObject):
         w.move(QPoint(x, y))
         w.show()
         
-    @pyqtSlot(str)
-    def _onTagPreviewRequested(self, tag: str):
+    @pyqtSlot(str, int)
+    def _onTagPreviewRequested(self, blockText: str, pos: int):
+        tag = self._parseTagFromBlock(blockText, pos)
+        if tag is None:
+            return
+        
         refTag = self.model.refManager.getTag(tag)
         if refTag is None:
             return
 
         self.filePreviewed.emit(refTag.docUUID())
+        
+    def _parseTagFromBlock(self, blockText: str, pos: int) -> str | None:
+        found = re.search(r"^@(ref|pov|loc)(\(.*\))", blockText)
+        if found is None:
+            return None
+        
+        rcomma = blockText.rfind(",", 0, pos)
+        fcomma = blockText.find(",", pos)
+        text = None
+        
+        # single tag
+        if rcomma < 0 and fcomma < 0:
+            rindex = blockText.rfind("(", 0, pos)
+            lindex = blockText.find(")", pos)
+            text = blockText[rindex + 1 : lindex].strip()
+        # tag start
+        elif rcomma < 0 and fcomma > -1:
+            index = blockText.rfind("(", 0, pos)
+            text = blockText[index + 1 : fcomma].strip()
+        # tag middle
+        elif rcomma > -1 and fcomma > -1:
+            text = blockText[rcomma + 1 : fcomma].strip()
+        # tag end
+        elif rcomma > -1 and fcomma < 0:
+            index = blockText.find(")", pos)
+            text = blockText[rcomma + 1 : index].strip()
+
+        return text
 
     @pyqtSlot(str, dict)
     def _onRunParser(self, uuid: str, tokens: dict[str, list[str]]):
