@@ -2,6 +2,8 @@
 
 from PyQt6.QtCore import (
     QFile,
+    QFileInfo,
+    QDir,
     QIODevice,
     QTextStream,
 )
@@ -23,6 +25,14 @@ class File(object):
         stream << content
 
         return True
+    
+    def findAllFiles(path: str) -> list[str]:
+        info = QFileInfo(path)
+        if not info.isDir():
+            return list()
+        
+        qinfo = QDir(path)
+        return qinfo.entryList(QDir.Filter.Files)
     
     def remove(path: str) -> bool:
         return QFile.remove(path)

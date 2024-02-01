@@ -19,6 +19,7 @@ from markupwriter.mvc.view.core import (
 
 from markupwriter.support.mainwindow import (
     ProjectHelper,
+    StartupParser,
 )
 
 from markupwriter.config import (
@@ -133,6 +134,8 @@ class MainWindowController(QObject):
         dtc = cc.model.docTreeController
         dtc.setEnabledTreeBarActions(True)
         dtc.setEnabledTreeActions(True)
+        
+        StartupParser.run(cc)
 
         self.view.showStatusMsg("Project opened...", 2000)
         
