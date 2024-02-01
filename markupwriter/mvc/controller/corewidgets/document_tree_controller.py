@@ -192,7 +192,7 @@ class DocumentTreeController(QObject):
             return
 
         widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
-        text = StrDialog.run("Rename", widget.title(), None)
+        text = StrDialog.run("Rename", widget.title(), self.view)
         if text is None:
             return
 
@@ -209,7 +209,7 @@ class DocumentTreeController(QObject):
         if item is None:
             return
 
-        if not YesNoDialog.run("Move to trash?", None):
+        if not YesNoDialog.run("Move to trash?", self.view):
             return
 
         trash = tree.findTrash()
@@ -235,7 +235,7 @@ class DocumentTreeController(QObject):
         if item is None:
             return
 
-        if not YesNoDialog.run("Empty trash?", None):
+        if not YesNoDialog.run("Empty trash?", self.view):
             return
 
         for i in range(item.childCount() - 1, -1, -1):

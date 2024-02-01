@@ -24,7 +24,7 @@ from markupwriter.gui.dialogs.modal import (
 
 class ProjectHelper(object):
     def mkProjectDir(parent: QWidget | None) -> (str | None, str | None):
-        name: str = StrDialog.run("Project name?", "Default", None)
+        name: str = StrDialog.run("Project name?", "Default", parent)
         if name is None:
             return None, None
         name = name.strip()

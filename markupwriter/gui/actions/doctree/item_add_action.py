@@ -1,13 +1,16 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
-    QObject,
     pyqtSignal,
 )
 
 from PyQt6.QtGui import (
     QAction,
     QCursor,
+)
+
+from PyQt6.QtWidgets import (
+    QWidget,
 )
 
 from markupwriter.common.provider import (
@@ -26,10 +29,10 @@ from markupwriter.gui.menus.doctree import (
 class ItemAddAction(QAction):
     itemCreated = pyqtSignal(BaseTreeItem)
 
-    def __init__(self, parent: QObject):
+    def __init__(self, parent: QWidget):
         super().__init__(Icon.ADD_ITEM, "Add item", parent)
 
-        self._addItemMenu = AddItemMenu(None)
+        self._addItemMenu = AddItemMenu(parent)
         self._addItemMenu.itemCreated.connect(lambda item: self.itemCreated.emit(item))
         self.setMenu(self._addItemMenu)
 

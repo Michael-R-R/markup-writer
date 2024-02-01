@@ -43,7 +43,6 @@ class DocumentTreeWidget(QTreeWidget):
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setFrameStyle(QFrame.Shape.NoFrame)
         self.setHeaderHidden(True)
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.draggedItem = None
         self.treeContextMenu = dt.TreeContextMenu(self)

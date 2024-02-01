@@ -70,23 +70,23 @@ class AddItemMenu(QMenu):
     def setupFolderAction(self, action: QAction, folderClass):
         self._folderMenu.addAction(action)
         action.triggered.connect(
-            lambda: self.onFolderCreate(action.text(), folderClass)
+            lambda: self.onFolderCreate(action.text(), folderClass, self)
         )
 
     def setupFileAction(self, action: QAction, fileClass):
         self._fileMenu.addAction(action)
-        action.triggered.connect(lambda: self.createFile(action.text(), fileClass))
+        action.triggered.connect(lambda: self.onFileCreate(action.text(), fileClass, self))
 
-    def onFolderCreate(self, label: str, folderClass):
-        text = StrDialog.run("Enter Name", label, None)
+    def onFolderCreate(self, label: str, folderClass, parent: QWidget | None):
+        text = StrDialog.run("Enter Name", label, parent)
         if text is None:
             return
 
         folder = folderClass(text)
         self.itemCreated.emit(folder)
 
-    def createFile(self, label: str, fileClass):
-        text = StrDialog.run("Enter Name", label, None)
+    def onFileCreate(self, label: str, fileClass, parent: QWidget | None):
+        text = StrDialog.run("Enter Name", label, parent)
         if text is None:
             return
 
