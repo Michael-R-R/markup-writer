@@ -12,6 +12,7 @@ class HtmlTokenizer(object):
         self.renameRegex = re.compile(r"@r\(.*\)", re.MULTILINE)
 
         self.removeRegexes = [
+            re.compile(r"^cpos:.*"), # cursor pos
             re.compile(r"^@(tag|ref|pov|loc)(\(.*\))", re.MULTILINE),  # tags
             re.compile(r"%.*", re.MULTILINE),  # single line comment
             re.compile(r"<#(\n|.)*?#>", re.MULTILINE),  # multi line comment
