@@ -22,9 +22,9 @@ class BEHAVIOUR(Enum):
     paren = 0
     comment = auto()
     multicomment = auto()
-    italize = auto()
     bold = auto()
-    italBold = auto()
+    italize = auto()
+    boldItal = auto()
     header = auto()
     tags = auto()
     keyword = auto()
@@ -40,9 +40,9 @@ class Highlighter(QSyntaxHighlighter):
         multiComRegex = [r"<#", r"#>"]
         tagsRegex = r"^@(tag|ref|pov|loc)"
         keywordRegex = r"@(r)"
-        boldRegex = r"\*(.+?)\*(?!\*)"
-        italRegex = r"_(.+?)_(?!_)"
-        italBoldRegex = r"\^(.+?)\^(?!\^)"
+        boldRegex = r"@bold"
+        italRegex = r"@ital"
+        boldItalRegex = r"@boldItal"
         headerRegex = r"^#{1,4} .*"
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
@@ -81,23 +81,21 @@ class Highlighter(QSyntaxHighlighter):
         headerBehaviour.format.setFontWeight(QFont.Weight.Bold)
         self.addBehaviour(BEHAVIOUR.header, headerBehaviour)
 
-        # Italize behaviour
-        italBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, italRegex)
-        italBehaviour.format.setFontItalic(True)
-        self.addBehaviour(BEHAVIOUR.italize, italBehaviour)
-
         # Bold behaviour
         boldBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, boldRegex)
         boldBehaviour.format.setFontWeight(QFont.Weight.Bold)
         self.addBehaviour(BEHAVIOUR.bold, boldBehaviour)
 
-        # Italize+Bold behaviour
-        italBoldBehaviour = HighlightExprBehaviour(
-            HighlighterConfig.italBoldCol, italBoldRegex
-        )
-        italBoldBehaviour.format.setFontWeight(QFont.Weight.Bold)
-        italBoldBehaviour.format.setFontItalic(True)
-        self.addBehaviour(BEHAVIOUR.italBold, italBoldBehaviour)
+        # Italize behaviour
+        italBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, italRegex)
+        italBehaviour.format.setFontItalic(True)
+        self.addBehaviour(BEHAVIOUR.italize, italBehaviour)
+        
+        # Bold+Italize behaviour
+        boldItalBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, boldItalRegex)
+        boldItalBehaviour.format.setFontWeight(QFont.Weight.Bold)
+        boldItalBehaviour.format.setFontItalic(True)
+        self.addBehaviour(BEHAVIOUR.boldItal, boldItalBehaviour)
 
         # Searched word
         searchedWordBehaviour = HighlightWordBehaviour(QColor(255, 255, 255), set())

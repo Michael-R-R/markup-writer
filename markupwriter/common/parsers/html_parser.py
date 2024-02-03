@@ -31,9 +31,9 @@ class HtmlParser(object):
             self.parseDict[tag](text)
 
     def _postprocess(self):
-        self._searchReplace(r"_(.+?)_(?!_)", "_", "<i>?</i>")  # italize
-        self._searchReplace(r"\*(.+?)\*(?!\*)", "*", "<b>?</b>")  # bold
-        self._searchReplace(r"\^(.+?)\^(?!\^)", "^", "<i><b>?</b></i>")  # ital+bold
+        self._searchReplace(r"@bold\(.*\)", "<b>?</b>")  # bold
+        self._searchReplace(r"@ital\(.*\)", "<i>?</i>")  # italize
+        self._searchReplace(r"@boldItal\(.*\)", "<b><i>?</i></b>")  # bold+italize
 
     def _createHTML(self) -> str:
         tpath = os.path.join(AppConfig.WORKING_DIR, "resources/html/preview.html")
@@ -48,6 +48,7 @@ class HtmlParser(object):
         
         template = template.replace("/*style*/", css)
         template = template.replace("<!--body-->", self.body)
+        print(template)
         
         return template
 
@@ -64,13 +65,18 @@ class HtmlParser(object):
         self.body += "<h3 class='scene'>{}</h3>\n".format(text)
 
     def _processHeader4(self, text: str):
-        self.body += "<h4 class='section'>{}</h4>\n".format(text)
+        self.body += "<p class='section'></p>\n"
 
-    def _searchReplace(self, regex: str, char: str, tag: str):
-        expr = re.compile(regex)
-        it = expr.finditer(self.body)
+    def _searchReplace(self, regex: str, html: str):
+        tagRegex = re.compile(regex)
+        textRegex = re.compile(r"(?<=\().+?(?=\))")
+        
+        it = tagRegex.finditer(self.body)
         for found in it:
-            pattern = found.group(0)
-            text = pattern.replace(char, "")
-            tag = tag.replace("?", text)
-            self.body = self.body.replace(pattern, tag)
+            tag = found.group(0)
+            textFound = textRegex.search(tag)
+            if textFound is None:
+                continue
+            
+            html = html.replace("?", textFound.group(0))
+            self.body = self.body.replace(tag, html)

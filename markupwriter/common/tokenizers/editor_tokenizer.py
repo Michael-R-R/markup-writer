@@ -20,7 +20,7 @@ class EditorTokenizer(QRunnable):
     def __init__(self, uuid: str, text: str, parent: QObject | None) -> None:
         super().__init__()
 
-        lineRegex = r"^@(tag)(\(.*\))"
+        lineRegex = r"^@(tag)\(.*\)"
         tagRegex = r"^@(tag)"
         namesRegex = r"(?<=\().+?(?=\))"
 
