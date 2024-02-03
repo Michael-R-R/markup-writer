@@ -32,7 +32,7 @@ class HtmlTokenizer(object):
         return self.tokens
 
     def _preprocess(self):
-        # Preprocess replacement tokens
+        # replacement tokens
         it = self.renameRegex.finditer(self.text)
         for found in it:
             tag = found.group(0)
@@ -46,7 +46,7 @@ class HtmlTokenizer(object):
             self.text = self.text.replace(tag, pair[1])
             self.text = self.text.replace(pair[0], pair[1])
         
-        # Preprocess remove tokens
+        # remove tokens
         for pattern in self.removeRegexes:
             it = pattern.finditer(self.text)
             for found in it:
