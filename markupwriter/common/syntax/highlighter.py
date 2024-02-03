@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from enum import auto, Enum
-from collections import Counter
 import re
 
 from PyQt6.QtGui import (
@@ -26,10 +25,7 @@ class BEHAVIOUR(Enum):
     italize = auto()
     bold = auto()
     italBold = auto()
-    header1 = auto()
-    header2 = auto()
-    header3 = auto()
-    header4 = auto()
+    header = auto()
     tags = auto()
     keyword = auto()
     searchText = auto()
@@ -47,7 +43,7 @@ class Highlighter(QSyntaxHighlighter):
         boldRegex = r"\*(.+?)\*(?!\*)"
         italRegex = r"_(.+?)_(?!_)"
         italBoldRegex = r"\^(.+?)\^(?!\^)"
-        headerRegex = [r"^# .*", r"^## .*", r"^### .*", r"^#### .*"]
+        headerRegex = r"^#{1,4} .*"
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
 
@@ -78,11 +74,12 @@ class Highlighter(QSyntaxHighlighter):
             ),
         )
 
-        # Header behaviours
-        self.addHeaderBehaviour(BEHAVIOUR.header1, headerRegex[0])
-        self.addHeaderBehaviour(BEHAVIOUR.header2, headerRegex[1])
-        self.addHeaderBehaviour(BEHAVIOUR.header3, headerRegex[2])
-        self.addHeaderBehaviour(BEHAVIOUR.header4, headerRegex[3])
+        # Header behaviour
+        headerBehaviour = HighlightExprBehaviour(
+            HighlighterConfig.headerCol, headerRegex
+        )
+        headerBehaviour.format.setFontWeight(QFont.Weight.Bold)
+        self.addBehaviour(BEHAVIOUR.header, headerBehaviour)
 
         # Italize behaviour
         italBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, italRegex)
@@ -110,14 +107,6 @@ class Highlighter(QSyntaxHighlighter):
     def highlightBlock(self, text: str | None) -> None:
         for _, val in self._behaviours.items():
             val.process(self, text)
-
-    def addHeaderBehaviour(self, behaviour: BEHAVIOUR, expr: str):
-        header = HighlightExprBehaviour(QColor(), expr)
-        format = QTextCharFormat()
-        format.setFontWeight(QFont.Weight.Bold)
-        format.setForeground(QBrush(HighlighterConfig.headerCol))
-        header.format = format
-        self.addBehaviour(behaviour, header)
 
     def addBehaviour(self, type: BEHAVIOUR, val: HighlightBehaviour) -> bool:
         if type in self._behaviours:
