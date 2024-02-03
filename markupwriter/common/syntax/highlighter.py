@@ -169,19 +169,11 @@ class HighlightWordBehaviour(HighlightBehaviour):
         self._wordSet.add(word)
         return True
 
-    def addList(self, words: list[str]):
-        for word in words:
-            self.add(word)
-
     def remove(self, word: str) -> bool:
         if not word in self._wordSet:
             return False
         self._wordSet.remove(word)
         return True
-
-    def removeList(self, words: list[str]):
-        for word in words:
-            self.remove(word)
 
     def clear(self):
         self._wordSet.clear()
