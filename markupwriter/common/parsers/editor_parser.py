@@ -1,25 +1,18 @@
 #!/usr/bin/python
 
-from PyQt6.QtCore import (
-    QObject,
-)
-
 from markupwriter.common.referencetag import (
     RefTagManager,
 )
 
 
-class EditorParser(QObject):
-    def __init__(
-        self,
-        parent: QObject | None,
-    ) -> None:
-        super().__init__(parent)
-
+class EditorParser(object):
+    def __init__(self) -> None:
         self.prevTokens: dict[str, dict[str, list[str]]] = dict()
+        
         self.prevHandlers: dict[str, function] = {
             "@tag": self._handleRemoveTag,
         }
+        
         self.currHandlers: dict[str, function] = {
             "@tag": self._handleAddTag,
         }
@@ -38,26 +31,26 @@ class EditorParser(QObject):
 
     # --- Previous Tokens --- #
     def _handlePrevTokens(self, uuid: str, refManager: RefTagManager):
-        tempDict = self.prevTokens.get(uuid)
-        if tempDict is None:
+        prevTokens = self.prevTokens.get(uuid)
+        if prevTokens is None:
             return
 
-        for key in tempDict:
-            for t in tempDict[key]:
-                self.prevHandlers[key](t, refManager)
+        for token in prevTokens:
+            for tlist in prevTokens[token]:
+                self.prevHandlers[token](uuid, tlist, refManager)
 
-    def _handleRemoveTag(self, names: list[str], refManager: RefTagManager):
-        for n in names:
-            refManager.removeTag(n)
+    def _handleRemoveTag(self, uuid: str, names: list[str], refManager: RefTagManager):
+        for tag in names:
+            refManager.removeTag(tag, uuid)
 
     # --- Current tokens --- #
     def _handleCurrTokens(
         self, uuid: str, tokens: dict[str, list[str]], refManager: RefTagManager
     ):
-        for key in tokens:
-            for t in tokens[key]:
-                self.currHandlers[key](uuid, t, refManager)
+        for token in tokens:
+            for tlist in tokens[token]:
+                self.currHandlers[token](uuid, tlist, refManager)
 
     def _handleAddTag(self, uuid: str, names: list[str], refManager: RefTagManager):
-        for n in names:
-            refManager.addTag(n, uuid)
+        for tag in names:
+            refManager.addTag(tag, uuid)

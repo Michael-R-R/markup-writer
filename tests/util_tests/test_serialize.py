@@ -4,7 +4,7 @@ from PyQt6.QtCore import (
     QDataStream,
 )
 
-from markupwriter.util import Serialize
+from markupwriter.common.util import Serialize
 
 class TestSquare:
     w = 0

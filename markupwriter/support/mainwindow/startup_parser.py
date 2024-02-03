@@ -27,5 +27,5 @@ class StartupParser(object):
             tokenizer = EditorTokenizer(uuid, content, None)
             tokenizer.run()
             
-            parser = EditorParser(None)
+            parser = EditorParser()
             parser.run(uuid, tokenizer.tokens, refManager)

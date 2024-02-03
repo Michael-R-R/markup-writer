@@ -29,10 +29,11 @@ class EditorTokenizer(QRunnable):
         self.linePattern = re.compile(lineRegex, re.MULTILINE)
         self.tagPattern = re.compile(tagRegex)
         self.namesPattern = re.compile(namesRegex)
+        self.signals = WorkerSignal(parent)
+        
         self.tokens: dict[str, list[str]] = {
             "@tag": list(),
         }
-        self.signals = WorkerSignal(parent)
 
     @pyqtSlot()
     def run(self):
@@ -44,6 +45,7 @@ class EditorTokenizer(QRunnable):
                 tag = self.tagPattern.search(line)
                 if tag is None:
                     continue
+                
                 names = self.namesPattern.search(line)
                 if names is None:
                     continue

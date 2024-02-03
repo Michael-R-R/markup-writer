@@ -1,31 +1,37 @@
 #!/usr/bin/python
 
-from .ref_tag import RefTag
-
 
 class RefTagManager:
     def __init__(self) -> None:
-        self.refTagDict: dict[str, RefTag] = dict()
+        self._refTagDict: dict[str, str] = dict()  # <tag, uuid>
 
-    def addTag(self, name: str, docUUID: str) -> RefTag | None:
-        if name == "":
-            return None
-        if name in self.refTagDict:
-            return None
-        refTag = RefTag(docUUID, name)
-        self.refTagDict[name] = refTag
-        return refTag
-
-    def removeTag(self, name: str) -> bool:
-        if not name in self.refTagDict:
+    def addTag(self, tag: str, uuid: str) -> bool:
+        if tag == "":
             return False
-        self.refTagDict.pop(name)
+
+        if tag in self._refTagDict:
+            return False
+
+        self._refTagDict[tag] = uuid
+
         return True
 
-    def getTag(self, name: str) -> RefTag | None:
-        if not name in self.refTagDict:
-            return None
-        return self.refTagDict[name]
+    def removeTag(self, tag: str, uuid: str) -> bool:
+        if not tag in self._refTagDict:
+            return False
+        
+        if uuid != self._refTagDict[tag]:
+            return False
 
-    def hasTag(self, name: str) -> bool:
-        return name in self.refTagDict
+        self._refTagDict.pop(tag)
+
+        return True
+
+    def findUUID(self, tag: str) -> str | None:
+        if not tag in self._refTagDict:
+            return None
+
+        return self._refTagDict[tag]
+
+    def tagExists(self, tag: str) -> bool:
+        return tag in self._refTagDict

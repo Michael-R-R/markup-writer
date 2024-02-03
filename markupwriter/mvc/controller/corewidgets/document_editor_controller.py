@@ -211,19 +211,17 @@ class DocumentEditorController(QObject):
         if tag is None:
             return
         
-        refTag = self.model.refManager.getTag(tag)
-        if refTag is None:
+        uuid = self.model.refManager.findUUID(tag)
+        if uuid is None:
             return
-
-        uuid = refTag.docUUID()
 
         w = PopupPreviewWidget(uuid, self.view)
         w.previewButton.clicked.connect(lambda: self.filePreviewed.emit(uuid))
 
         size = w.sizeHint()
-        pos = QCursor.pos()
-        x = pos.x() - int((size.width() / 2))
-        y = pos.y() - int(size.height() / 1.25)
+        cpos = QCursor.pos()
+        x = cpos.x() - int((size.width() / 2))
+        y = cpos.y() - int(size.height() / 1.25)
 
         w.move(QPoint(x, y))
         w.show()
@@ -234,11 +232,11 @@ class DocumentEditorController(QObject):
         if tag is None:
             return
         
-        refTag = self.model.refManager.getTag(tag)
-        if refTag is None:
+        uuid = self.model.refManager.findUUID(tag)
+        if uuid is None:
             return
 
-        self.filePreviewed.emit(refTag.docUUID())
+        self.filePreviewed.emit(uuid)
         
     def _parseTagFromBlock(self, blockText: str, pos: int) -> str | None:
         found = re.search(r"^@(ref|pov|loc)(\(.*\))", blockText)
@@ -247,26 +245,26 @@ class DocumentEditorController(QObject):
         
         rcomma = blockText.rfind(",", 0, pos)
         fcomma = blockText.find(",", pos)
-        text = None
+        tag = None
         
         # single tag
         if rcomma < 0 and fcomma < 0:
             rindex = blockText.rfind("(", 0, pos)
             lindex = blockText.find(")", pos)
-            text = blockText[rindex + 1 : lindex].strip()
+            tag = blockText[rindex + 1 : lindex].strip()
         # tag start
         elif rcomma < 0 and fcomma > -1:
             index = blockText.rfind("(", 0, pos)
-            text = blockText[index + 1 : fcomma].strip()
+            tag = blockText[index + 1 : fcomma].strip()
         # tag middle
         elif rcomma > -1 and fcomma > -1:
-            text = blockText[rcomma + 1 : fcomma].strip()
+            tag = blockText[rcomma + 1 : fcomma].strip()
         # tag end
         elif rcomma > -1 and fcomma < 0:
             index = blockText.find(")", pos)
-            text = blockText[rcomma + 1 : index].strip()
+            tag = blockText[rcomma + 1 : index].strip()
 
-        return text
+        return tag
 
     @pyqtSlot(str, dict)
     def _onRunParser(self, uuid: str, tokens: dict[str, list[str]]):

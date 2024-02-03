@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from markupwriter.util import Hash
+from markupwriter.common.util import Hash
 
 def testHash_emptyIsZero():
     hash1 = Hash.compute("")
