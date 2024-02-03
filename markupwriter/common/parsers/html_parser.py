@@ -48,12 +48,11 @@ class HtmlParser(object):
         
         template = template.replace("/*style*/", css)
         template = template.replace("<!--body-->", self.body)
-        print(template)
         
         return template
 
     def _processParagraph(self, text: str):
-        self.body += "<p>{}</p>\n".format(text)
+        self.body += "<p class='paragraph'>{}</p>\n".format(text)
 
     def _processHeader1(self, text: str):
         self.body += "<h1 class='title'>{}</h1>\n".format(text)
@@ -62,10 +61,10 @@ class HtmlParser(object):
         self.body += "<h2 class='chapter'>{}</h2>\n".format(text)
 
     def _processHeader3(self, text: str):
-        self.body += "<h3 class='scene'>{}</h3>\n".format(text)
+        self.body += "<p class='scene'>* * *</p>\n"
 
     def _processHeader4(self, text: str):
-        self.body += "<p class='section'></p>\n"
+        self.body += "<div class='section'><br><br></div>\n"
 
     def _searchReplace(self, regex: str, html: str):
         tagRegex = re.compile(regex)
