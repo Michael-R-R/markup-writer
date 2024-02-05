@@ -15,7 +15,12 @@ body {
     text-align: center;
 }
 
-.paragraph {
+.indent {
     text-indent: 40px;
+    margin: 0;
+}
+
+.noindent {
+    text-indent: 0;
     margin: 0;
 }

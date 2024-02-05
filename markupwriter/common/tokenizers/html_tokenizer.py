@@ -9,13 +9,14 @@ class HtmlTokenizer(object):
         self.text = text
         self.body = ""
 
-        self.parenRegex = re.compile(r"(?<=\().+?(?=\))")
+        self.parenRegex = re.compile(r"(?<=\()(\n|.)*?(?=\))")
 
         self.replaceFuncs = {
-            r"@bold\(.*\)": self._preprocessBold,
-            r"@ital\(.*\)": self._preprocessItal,
-            r"@boldItal\(.*\)": self._preprocessBoldItal,
+            r"@bold\((\n|.)*?\)": self._preprocessBold,
+            r"@ital\((\n|.)*?\)": self._preprocessItal,
+            r"@boldItal\((\n|.)*?\)": self._preprocessBoldItal,
             r"@r\(.*\)": self._preprocessRename,
+            r"@vspace\(.*\)": self._preprocessVSpace
         }
 
         self.removeFuncs = {
@@ -46,50 +47,32 @@ class HtmlTokenizer(object):
             self.removeFuncs[tag](tag)
 
     def _preprocessBold(self, tag: str):
-        it = re.finditer(tag, self.text, re.MULTILINE)
-        for found in it:
-            if found is None:
-                continue
-        
-            found = found.group(0)
-            text = self.parenRegex.search(found)
-            if text is None:
-                continue
-            
-            text = text.group(0)
-            htmlText = "<b>{}</b>".format(text)
-            
-            self.text = self.text.replace(found, htmlText)
+        self._preprocessFormat(tag, "<b>?</b>")
 
     def _preprocessItal(self, tag: str):
-        it = re.finditer(tag, self.text, re.MULTILINE)
-        for found in it:
-            if found is None:
-                continue
-        
-            found = found.group(0)
-            text = self.parenRegex.search(found)
-            if text is None:
-                continue
-            
-            text = text.group(0)
-            htmlText = "<i>{}</i>".format(text)
-            
-            self.text = self.text.replace(found, htmlText)
+        self._preprocessFormat(tag, "<i>?</i>")
 
     def _preprocessBoldItal(self, tag: str):
+        self._preprocessFormat(tag, "<b><i>?</i></b>")
+
+    def _preprocessFormat(self, tag: str, htmlTag: str):
         it = re.finditer(tag, self.text, re.MULTILINE)
         for found in it:
-            if found is None:
-                continue
-        
             found = found.group(0)
             text = self.parenRegex.search(found)
             if text is None:
                 continue
             
-            text = text.group(0)
-            htmlText = "<b><i>{}</i></b>".format(text)
+            htmlText = ""
+            lines = text.group(0).splitlines()
+            size = len(lines)
+            for i in range(size-1):
+                if lines[i] == "":
+                    continue
+                htmlText += htmlTag.replace("?", lines[i]) + "\n"
+                
+            if size > 0:
+                htmlText += htmlTag.replace("?", lines[size-1])
             
             self.text = self.text.replace(found, htmlText)
 
@@ -108,6 +91,19 @@ class HtmlTokenizer(object):
             self.text = self.text.replace(tag, pair[1])
             self.text = self.text.replace(pair[0], pair[1])
 
+    def _preprocessVSpace(self, tag: str):
+        it = re.finditer(tag, self.text, re.MULTILINE)
+        for found in it:
+            found = found.group(0)
+            text = self.parenRegex.search(found)
+            text = None if text is None else text.group(0)
+            if text is None:
+                continue
+            if not text.isnumeric():
+                continue
+            htmlText = "<br>" * int(text)
+            self.text = self.text.replace(found, htmlText)
+
     def _preprocessRemove(self, tag: str):
         it = re.finditer(tag, self.text, re.MULTILINE)
         for found in it:
@@ -118,7 +114,6 @@ class HtmlTokenizer(object):
     def _process(self) -> bool:
         # Process line by line
         for line in self.text.splitlines():
-            line = line.strip()
             if line == "":
                 continue
 
@@ -162,4 +157,7 @@ class HtmlTokenizer(object):
         return True
     
     def _processParagraph(self, text: str):
-        self.body += "<p class='paragraph'>{}</p>\n".format(text)
+        if text.startswith("\t"):
+            self.body += "<p class='indent'>{}</p>\n".format(text.strip())
+        else:
+            self.body += "<p class='noindent'>{}</p>\n".format(text)
