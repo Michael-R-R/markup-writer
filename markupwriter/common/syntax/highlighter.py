@@ -39,7 +39,7 @@ class Highlighter(QSyntaxHighlighter):
         commentRegex = r"%(.*)"
         multiComRegex = [r"<#", r"#>"]
         tagsRegex = r"^@(tag|ref|pov|loc)"
-        keywordRegex = r"@(vspace|alignL|alignC|alignR)"
+        keywordRegex = r"@(vspace|newPage|alignL|alignC|alignR)"
         boldRegex = r"@bold"
         italRegex = r"@ital"
         boldItalRegex = r"@boldItal"

@@ -34,7 +34,8 @@ class HtmlTokenizer(object):
             r"@alignL": self._processAlignL,
             r"@alignC": self._processAlignC,
             r"@alignR": self._processAlignR,
-            r"@vspace": self._preprocessVSpace,
+            r"@vspace": self._processVSpace,
+            r"@newPage": self._processNewPage,
         }
 
     def run(self) -> str:
@@ -151,7 +152,7 @@ class HtmlTokenizer(object):
         
         return True
     
-    def _preprocessVSpace(self, text: str) -> bool:
+    def _processVSpace(self, text: str) -> bool:
         found = self.parenRegex.search(text)
         if found is None:
             return False
@@ -162,6 +163,20 @@ class HtmlTokenizer(object):
         htmlText = "<br>" * int(found)
         
         self.body += "<p class='vspace'>{}</p>".format(htmlText)
+        
+        return True
+    
+    def _processNewPage(self, text: str) -> bool:
+        found = self.parenRegex.search(text)
+        if found is None:
+            return False
+        found = found.group(0)
+        if not found.isnumeric():
+            return False
+        
+        htmlText = "<p class='newPage'>&#160;</p>\n" * int(found)
+        
+        self.body += htmlText
         
         return True
     

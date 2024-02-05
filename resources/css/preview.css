@@ -38,3 +38,8 @@ p {
 .alignR {
     text-align: right;
 }
+
+.newPage
+{
+	page-break-before: left;
+}
