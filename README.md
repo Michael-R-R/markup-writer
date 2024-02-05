@@ -1,4 +1,4 @@
-![image](https://github.com/Michael-R-R/markup-writer/assets/54217603/60a1cd48-1ddc-4e64-8b10-2ffa2f623754)
+![image](https://github.com/Michael-R-R/markup-writer/assets/54217603/968f9e5b-b523-499d-bf6d-12edb851edbc)
 
 # Description
 In-development plain-text with rich-text previewing support novel writing application. Aims to deliver 
