@@ -28,10 +28,10 @@ class HtmlTokenizer(object):
         }
 
         self.processFuncs = {
-            r"^# ": self._processHeader1,
-            r"^## ": self._processHeader2,
-            r"^### ": self._processHeader3,
-            r"^#### ": self._processHeader4,
+            r"^@title\(.*\)": self._processTitle,
+            r"^@chapter\(.*\)": self._processChapter,
+            r"^@scene\(.*\)": self._processScene,
+            r"^@section\(.*\)": self._processSection,
             r"@alignL\(.*\)": self._processAlignL,
             r"@alignC\(.*\)": self._processAlignC,
             r"@alignR\(.*\)": self._processAlignR,
@@ -130,30 +130,30 @@ class HtmlTokenizer(object):
             if not isProcessed:
                 self._processParagraph(line)
 
-    def _processHeader1(self, tag: str, text: str) -> bool:
+    def _processTitle(self, tag: str, text: str) -> bool:
         found = re.search(tag, text)
         if found is None:
             return False
-        text = text[found.end():]
-        self.body += "<h1 class='title'>{}</h1>\n".format(text)
+        htmlText = self.parenRegex.search(found.group(0))
+        self.body += "<h1 class='title'>{}</h1>\n".format(htmlText.group(0))
         return True
     
-    def _processHeader2(self, tag: str, text: str) -> bool:
+    def _processChapter(self, tag: str, text: str) -> bool:
         found = re.search(tag, text)
         if found is None:
             return False
-        text = text[found.end():]
-        self.body += "<h2 class='chapter'>{}</h2>\n".format(text)
+        htmlText = self.parenRegex.search(found.group(0))
+        self.body += "<h2 class='chapter'>{}</h2>\n".format(htmlText.group(0))
         return True
     
-    def _processHeader3(self, tag: str, text: str) -> bool:
+    def _processScene(self, tag: str, text: str) -> bool:
         found = re.search(tag, text)
         if found is None:
             return False
         self.body += "<p class='scene'><br>* * *<br></p>\n"
         return True
     
-    def _processHeader4(self, tag: str, text: str) -> bool:
+    def _processSection(self, tag: str, text: str) -> bool:
         found = re.search(tag, text)
         if found is None:
             return False

@@ -43,7 +43,7 @@ class Highlighter(QSyntaxHighlighter):
         boldRegex = r"@bold"
         italRegex = r"@ital"
         boldItalRegex = r"@boldItal"
-        headerRegex = r"^#{1,4} .*"
+        headerRegex = r"^@(title|chapter|scene|section)"
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
 
