@@ -52,6 +52,9 @@ class DocumentPreviewWidget(QWidget):
         path = os.path.join(AppConfig.projectContentPath(), self.uuid)
         if not File.exists(path):
             self.close()
+            
+        vb = self.textedit.verticalScrollBar()
+        vbpos = vb.value()
 
         text = File.read(path)
         self.plainText = text
@@ -60,6 +63,8 @@ class DocumentPreviewWidget(QWidget):
             self._setPlainText(text)
         else:
             self._setHtmlText(self.html)
+            
+        vb.setValue(vbpos)
 
     def _onToggleButton(self):
         self.isPlainText = not self.isPlainText
@@ -77,9 +82,10 @@ class DocumentPreviewWidget(QWidget):
     def _setHtmlText(self, text: str):
         if text == "":
             tokenizer = HtmlTokenizer(self.plainText)
-            tokens = tokenizer.run()
+            body = tokenizer.run()
+            
             parser = HtmlParser()
-            text = parser.run(tokens)
+            text = parser.run(body)
 
         self.html = text
         self.toggleButton.setText("HTML")
