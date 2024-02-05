@@ -162,7 +162,7 @@ class HtmlTokenizer(object):
         
         htmlText = "<br>" * int(found)
         
-        self.body += "<p class='vspace'>{}</p>".format(htmlText)
+        self.body += "<p class='vspace'>{}</p>\n".format(htmlText)
         
         return True
     
