@@ -2,16 +2,31 @@
 
 import re
 
+from PyQt6.QtCore import (
+    QObject,
+    QRunnable,
+    pyqtSignal,
+    pyqtSlot,
+)
 
-class HtmlTokenizer(object):
-    def __init__(self, text: str) -> None:
+
+class WorkerSignal(QObject):
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+    result = pyqtSignal(list)
+
+
+class HtmlTokenizer(QRunnable):
+    def __init__(self, text: str, parent: QObject | None) -> None:
         super().__init__()
+        
         self.text = text
-        self.body = ""
+        self.tokens: list[(str, str)] = list() # tag, text
+        self.signals = WorkerSignal(parent)
 
         self.parenRegex = re.compile(r"(?<=\().*?(?=\))")
         self.nlParenRegex = re.compile(r"(?<=\()(\n|.)*?(?=\))")
-        self.tokenRegex = re.compile(r"^@.*(?=\()")
+        self.keywordRegex = re.compile(r"^@.*(?=\()")
 
         self.replaceDict = {
             r"@bold\((\n|.)*?\)": self._preprocessBold,
@@ -26,23 +41,18 @@ class HtmlTokenizer(object):
             r"<#(\n|.)*?#>": self._preprocessRemove,
         }
 
-        self.tokenDict = {
-            r"@title": self._processTitle,
-            r"@chapter": self._processChapter,
-            r"@scene": self._processScene,
-            r"@section": self._processSection,
-            r"@alignL": self._processAlignL,
-            r"@alignC": self._processAlignC,
-            r"@alignR": self._processAlignR,
-            r"@vspace": self._processVSpace,
-            r"@newPage": self._processNewPage,
-        }
-
-    def run(self) -> str:
-        self._preprocess()
-        self._process()
-
-        return self.body
+    @pyqtSlot()
+    def run(self):
+        try:
+            self._preprocess()
+            self._process()
+            
+        except Exception as e:
+            self.signals.error.emit(str(e))
+            
+        else:
+            self.signals.finished.emit()
+            self.signals.result.emit(self.tokens)
 
     def _preprocess(self):
         for tag in self.replaceDict:
@@ -68,16 +78,18 @@ class HtmlTokenizer(object):
             if text is None:
                 continue
             
-            htmlText = ""
             lines = text.group(0).splitlines()
             size = len(lines)
-            if size > 0:
-                for i in range(size-1):
-                    if lines[i] == "":
-                        continue
-                    htmlText += htmlTag.replace("?", lines[i]) + "\n"
-                    
-                htmlText += htmlTag.replace("?", lines[size-1])
+            if size <= 0:
+                return
+            
+            htmlText = ""
+            for i in range(size-1):
+                if lines[i] == "":
+                    continue
+                htmlText += htmlTag.replace("?", lines[i]) + "\n"
+                
+            htmlText += htmlTag.replace("?", lines[size-1])
                 
             self.text = self.text.replace(found, htmlText)
 
@@ -89,99 +101,25 @@ class HtmlTokenizer(object):
             self.text = self.text.replace(found.group(0), "")
 
     def _process(self):
-        # Process line by line
         for line in self.text.splitlines():
             if line == "":
                 continue
 
-            token = self.tokenRegex.search(line)
-            if token is not None:
-                token = token.group(0)
-                self.tokenDict[token](line)
+            if line.startswith("@"):
+                token: (str, str) = self._processKeyword(line)
+                self.tokens.append(token)
             else:
-                self._processParagraph(line)
-
-    def _processTitle(self, text: str) -> bool:
-        found = self.parenRegex.search(text)
-        if found is None:
-            return False
-        htmlText = found.group(0)
-        self.body += "<h1 class='title'>{}</h1>\n".format(htmlText)
-        return True
-    
-    def _processChapter(self, text: str) -> bool:
-        found = self.parenRegex.search(text)
-        if found is None:
-            return False
-        htmlText = found.group(0)
-        self.body += "<h2 class='chapter'>{}</h2>\n".format(htmlText)
-        return True
-    
-    def _processScene(self, text: str) -> bool:
-        found = self.parenRegex.search(text)
-        if found is None:
-            return False
-        self.body += "<p class='scene'><br>* * *<br></p>\n"
-        return True
-    
-    def _processSection(self, text: str) -> bool:
-        found = self.parenRegex.search(text)
-        if found is None:
-            return False
-        self.body += "<div class='section'><br><br></div>\n"
-        return True
-    
-    def _processAlignL(self, text: str) -> bool:
-        return self._processAlign(text, "<p class='alignL'>?</p>\n")
-    
-    def _processAlignC(self, text: str) -> bool:
-        return self._processAlign(text, "<p class='alignC'>?</p>\n")
-    
-    def _processAlignR(self, text: str) -> bool:
-        return self._processAlign(text, "<p class='alignR'>?</p>\n")
-    
-    def _processAlign(self, text: str, html: str) -> bool:
-        found = self.parenRegex.search(text)
-        if found is None:
-            return False
-        found = found.group(0)
-
-        html = html.replace("?", found)
+                self.tokens.append(("p", line))
+                
+    def _processKeyword(self, line: str) -> (str, str):
+        keyword = self.keywordRegex.search(line)
+        if keyword is None:
+            return ("", "")
+        keyword = keyword.group(0)
         
-        self.body += html
+        text = self.parenRegex.search(line)
+        if text is None:
+            return ("", "")
+        text = text.group(0)
         
-        return True
-    
-    def _processVSpace(self, text: str) -> bool:
-        found = self.parenRegex.search(text)
-        if found is None:
-            return False
-        found = found.group(0)
-        if not found.isnumeric():
-            return False
-        
-        htmlText = "<br>" * int(found)
-        
-        self.body += "<p class='vspace'>{}</p>\n".format(htmlText)
-        
-        return True
-    
-    def _processNewPage(self, text: str) -> bool:
-        found = self.parenRegex.search(text)
-        if found is None:
-            return False
-        found = found.group(0)
-        if not found.isnumeric():
-            return False
-        
-        htmlText = "<p class='newPage'>&#160;</p>\n" * int(found)
-        
-        self.body += htmlText
-        
-        return True
-    
-    def _processParagraph(self, text: str):
-        if text.startswith("\t"):
-            self.body += "<p class='indent'>{}</p>\n".format(text.strip())
-        else:
-            self.body += "<p class='noindent'>{}</p>\n".format(text)
+        return (keyword, text)
