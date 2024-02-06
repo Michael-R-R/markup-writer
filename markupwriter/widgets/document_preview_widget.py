@@ -45,7 +45,7 @@ class DocumentPreviewWidget(QWidget):
 
         self.toggleButton = QPushButton("Plain", self)
         self.toggleButton.clicked.connect(self._onToggleButton)
-        
+
         self.mLayout = QGridLayout(self)
         self.mLayout.addWidget(self.textedit, 0, 0, 1, 2)
         self.mLayout.addWidget(self.refreshButton, 1, 0)
@@ -58,9 +58,8 @@ class DocumentPreviewWidget(QWidget):
         path = os.path.join(AppConfig.projectContentPath(), self.uuid)
         if not File.exists(path):
             self.close()
-            
-        vb = self.textedit.verticalScrollBar()
-        vbpos = vb.value()
+
+        vbValue = self.textedit.verticalScrollBar().value()
 
         text = File.read(path)
         self.plainText = text
@@ -69,8 +68,8 @@ class DocumentPreviewWidget(QWidget):
             self._setPlainText(text)
         else:
             self._runHtmlTokenizer()
-            
-        vb.setValue(vbpos)
+
+        self.textedit.verticalScrollBar().setValue(vbValue)
 
     def _onToggleButton(self):
         self.isPlainText = not self.isPlainText
@@ -89,33 +88,42 @@ class DocumentPreviewWidget(QWidget):
         if self.html == "":
             self.refreshButton.setEnabled(False)
             self.toggleButton.setEnabled(False)
-            
+
             tokenizer = HtmlTokenizer(self.plainText, self)
             tokenizer.signals.error.connect(self._onError)
             tokenizer.signals.result.connect(self._onTokenizerFinished)
             self.threadPool.start(tokenizer)
+            self.toggleButton.setText("Tokenizing...")
         else:
             self.toggleButton.setText("HTML")
             self.textedit.setHtml(self.html)
-            
+
     @pyqtSlot(list)
     def _onTokenizerFinished(self, tokens: list[(str, str)]):
         parser = HtmlParser(tokens, self)
         parser.signals.error.connect(self._onError)
         parser.signals.result.connect(self._onParserFinished)
         self.threadPool.start(parser)
-    
+        self.toggleButton.setText("Parsing...")
+
     @pyqtSlot(str)
     def _onParserFinished(self, html: str):
-        self.html = html
+        self.refreshButton.setEnabled(True)
+        self.toggleButton.setEnabled(True)
+        
         self.toggleButton.setText("HTML")
+        self.html = html
         self.textedit.setHtml(html)
         
-        self.refreshButton.setEnabled(True)
-        self.toggleButton.setEnabled(True)
-        
+    @pyqtSlot(str)
+    def _onProgressUpdate(self, status: str):
+        self.toggleButton.setText(status)
+
     @pyqtSlot(str)
     def _onError(self, e: str):
-        print(e)
         self.refreshButton.setEnabled(True)
         self.toggleButton.setEnabled(True)
+        self.toggleButton.setText("HTML")
+        
+        self.html = ""
+        self.textedit.setPlainText("ERROR: {}".format(e))

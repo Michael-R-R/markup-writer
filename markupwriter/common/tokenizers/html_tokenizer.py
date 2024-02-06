@@ -101,7 +101,8 @@ class HtmlTokenizer(QRunnable):
             self.text = self.text.replace(found.group(0), "")
 
     def _process(self):
-        for line in self.text.splitlines():
+        lines = self.text.splitlines()
+        for line in lines:
             if line == "":
                 continue
 
