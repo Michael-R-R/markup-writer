@@ -20,6 +20,7 @@ class MainMenuBarController(QObject):
     saveDocClicked = pyqtSignal()
     saveProjClicked = pyqtSignal()
     saveProjAsClicked = pyqtSignal()
+    exportClicked = pyqtSignal()
     closeProjClicked = pyqtSignal()
     exitClicked = pyqtSignal()
 
@@ -37,6 +38,7 @@ class MainMenuBarController(QObject):
         fm.saveDocAction.triggered.connect(lambda: self.saveDocClicked.emit())
         fm.saveProjAction.triggered.connect(lambda: self.saveProjClicked.emit())
         fm.saveProjAsAction.triggered.connect(lambda: self.saveProjAsClicked.emit())
+        fm.exportAction.triggered.connect(lambda: self.exportClicked.emit())
         fm.closeProjAction.triggered.connect(lambda: self.closeProjClicked.emit())
         fm.exitAction.triggered.connect(lambda: self.exitClicked.emit())
          
@@ -48,6 +50,9 @@ class MainMenuBarController(QObject):
          
     def setEnableSaveAsAction(self, isEnabled: bool):
         self.view.filemenu.saveProjAsAction.setEnabled(isEnabled)
+         
+    def setEnableExportAction(self, isEnabled: bool):
+        self.view.filemenu.exportAction.setEnabled(isEnabled)
          
     def setEnableCloseAction(self, isEnabled: bool):
         self.view.filemenu.closeProjAction.setEnabled(isEnabled)

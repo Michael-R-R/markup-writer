@@ -23,6 +23,7 @@ class FileMainMenu(QMenu):
         self.saveDocAction = QAction("Save Document", self)
         self.saveProjAction = QAction("Save Project", self)
         self.saveProjAsAction = QAction("Save Project As...", self)
+        self.exportAction = QAction("Export...", self)
         self.closeProjAction = QAction("Close Project", self)
         self.exitAction = QAction("Exit", self)
 
@@ -34,6 +35,8 @@ class FileMainMenu(QMenu):
         self.addSeparator()
         self.addAction(self.saveProjAction)
         self.addAction(self.saveProjAsAction)
+        self.addSeparator()
+        self.addAction(self.exportAction)
         self.addSeparator()
         self.addAction(self.closeProjAction)
         self.addSeparator()
@@ -49,4 +52,5 @@ class FileMainMenu(QMenu):
         self.saveDocAction.setEnabled(False)
         self.saveProjAction.setEnabled(False)
         self.saveProjAsAction.setEnabled(False)
+        self.exportAction.setEnabled(False)
         self.closeProjAction.setEnabled(False)

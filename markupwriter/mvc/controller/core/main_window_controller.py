@@ -30,6 +30,10 @@ from markupwriter.common.util import (
     Serialize,
 )
 
+from markupwriter.widgets import (
+    ExportSelectWidget,
+)
+
 
 class MainWindowController(QObject):
     def __init__(self, parent: QObject | None) -> None:
@@ -60,6 +64,7 @@ class MainWindowController(QObject):
         mbc.saveDocClicked.connect(self._onSaveDocument)
         mbc.saveProjClicked.connect(self._onSaveProject)
         mbc.saveProjAsClicked.connect(self._onSaveAsProject)
+        mbc.exportClicked.connect(self._onExportProject)
         mbc.closeProjClicked.connect(self._onCloseProject)
         mbc.exitClicked.connect(self._onExit)
         
@@ -93,6 +98,7 @@ class MainWindowController(QObject):
         mbc = self.model.menuBarController
         mbc.setEnableSaveAction(True)
         mbc.setEnableSaveAsAction(True)
+        mbc.setEnableExportAction(True)
         mbc.setEnableCloseAction(True)
 
         cc = self.model.centralController
@@ -128,6 +134,7 @@ class MainWindowController(QObject):
         mbc = self.model.menuBarController
         mbc.setEnableSaveAction(True)
         mbc.setEnableSaveAsAction(True)
+        mbc.setEnableExportAction(True)
         mbc.setEnableCloseAction(True)
 
         cc = self.model.centralController
@@ -180,6 +187,19 @@ class MainWindowController(QObject):
             return
 
         self.view.updateWindowTitle()
+        
+    @pyqtSlot()
+    def _onExportProject(self):
+        cc = self.model.centralController
+        dtc = cc.model.docTreeController
+        
+        widget = ExportSelectWidget(dtc.view.treewidget, self.view)
+        if widget.exec() == 1:
+            item = widget.value
+            if item is not None:
+                buildList = dtc.buildExportTree(item)
+                for f in buildList:
+                    print(f.title())
 
     @pyqtSlot()
     def _onCloseProject(self) -> bool:

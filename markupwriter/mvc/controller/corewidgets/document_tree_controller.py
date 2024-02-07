@@ -103,6 +103,23 @@ class DocumentTreeController(QObject):
 
     def findItemWidget(self, uuid: str) -> dti.BaseTreeItem | None:
         return self.view.treewidget.findWidget(uuid)
+    
+    def buildExportTree(self, root: QTreeWidgetItem) -> list[dti.BaseFileItem]:
+        tree = self.view.treewidget
+        
+        def helper(pitem: QTreeWidgetItem, result: list[dti.BaseFileItem]) -> list[dti.BaseFileItem]:
+            pw: dti.BaseTreeItem = tree.itemWidget(pitem, 0)
+            
+            if pw.hasFlag(dti.ITEM_FLAG.file):
+                result.append(pw)
+            
+            for i in range(pitem.childCount()):
+                citem = pitem.child(i)
+                result = helper(citem, result)
+            
+            return result
+        
+        return helper(root, list())
         
     def _refreshParentWordCounts(self, item: QTreeWidgetItem, owc: int, wc: int):
         tree = self.view.treewidget
