@@ -20,6 +20,7 @@ from markupwriter.mvc.view.core import (
 from markupwriter.support.mainwindow import (
     ProjectHelper,
     StartupParser,
+    ExportHelper,
 )
 
 from markupwriter.config import (
@@ -28,10 +29,6 @@ from markupwriter.config import (
 
 from markupwriter.common.util import (
     Serialize,
-)
-
-from markupwriter.widgets import (
-    ExportSelectWidget,
 )
 
 
@@ -193,13 +190,7 @@ class MainWindowController(QObject):
         cc = self.model.centralController
         dtc = cc.model.docTreeController
         
-        widget = ExportSelectWidget(dtc.view.treewidget, self.view)
-        if widget.exec() == 1:
-            item = widget.value
-            if item is not None:
-                buildList = dtc.buildExportTree(item)
-                for f in buildList:
-                    print(f.title())
+        ExportHelper.exportEPUB3(dtc, self.view)
 
     @pyqtSlot()
     def _onCloseProject(self) -> bool:
