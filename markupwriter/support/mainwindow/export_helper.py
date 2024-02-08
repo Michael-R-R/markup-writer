@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import textwrap
 
 from PyQt6.QtWidgets import (
     QWidget,
@@ -52,13 +53,13 @@ class ExportHelper(object):
                         cbody += parser.body
                     
                     # TODO testing directory
-                    npath = os.path.join("./resources/.tests/novel", "{}.html".format(count))
+                    npath = os.path.join("./resources/.tests/novel", "{}.xhtml".format(count))
                     page = ExportHelper._createHtmlPage(cbody)
                     File.write(npath, page)
                     count += 1
                     
     def _createHtmlPage(body: str) -> str:
-        tpath = os.path.join(AppConfig.WORKING_DIR, "resources/html/preview.html")
+        tpath = os.path.join(AppConfig.WORKING_DIR, "resources/html/preview.xhtml")
         template: str = File.read(tpath)
         if template is None:
             return ""
@@ -67,6 +68,9 @@ class ExportHelper(object):
         css: str = File.read(cpath)
         if css is None:
             return ""
+        
+        css = textwrap.indent(css, "\t" * 3)
+        body = textwrap.indent(body, "\t" * 2)
 
         template = template.replace("/*style*/", css)
         template = template.replace("<!--body-->", body)

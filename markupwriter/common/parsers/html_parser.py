@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import textwrap
 
 from PyQt6.QtCore import (
     QObject,
@@ -25,7 +26,7 @@ class HtmlParser(QRunnable):
 
         self.tokens: list[(str, str)] = tokens
         self.body = ""
-        self.html = ""
+        self.xhtml = ""
         self.signals = WorkerSignal(parent)
 
         self.tokenDict = {
@@ -52,7 +53,7 @@ class HtmlParser(QRunnable):
 
         else:
             self.signals.finished.emit()
-            self.signals.result.emit(self.html)
+            self.signals.result.emit(self.xhtml)
 
     def _processTokens(self):
         for t in self.tokens:  # keyword(0), text(1)
@@ -86,8 +87,8 @@ class HtmlParser(QRunnable):
         if not text.isnumeric():
             return
 
-        htmlText = "<br>" * int(text)
-        self.body += "<p class='vspace'>{}</p>\n".format(htmlText)
+        brTag = "<br>" * int(text)
+        self.body += "<p class='vspace'>{}</p>\n".format(brTag)
 
     def _processNewPage(self, text: str):
         if not text.isnumeric():
@@ -103,7 +104,7 @@ class HtmlParser(QRunnable):
             self.body += "<p class='noindent'>{}</p>\n".format(text)
 
     def _createHtmlPage(self):
-        tpath = os.path.join(AppConfig.WORKING_DIR, "resources/html/preview.html")
+        tpath = os.path.join(AppConfig.WORKING_DIR, "resources/html/preview.xhtml")
         template: str = File.read(tpath)
         if template is None:
             return ""
@@ -112,8 +113,11 @@ class HtmlParser(QRunnable):
         css: str = File.read(cpath)
         if css is None:
             return ""
+        
+        css = textwrap.indent(css, "\t" * 3)
+        self.body = textwrap.indent(self.body, "\t" * 2)
 
         template = template.replace("/*style*/", css)
         template = template.replace("<!--body-->", self.body)
 
-        self.html = template
+        self.xhtml = template

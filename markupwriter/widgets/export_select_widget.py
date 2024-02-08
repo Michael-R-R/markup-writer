@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import (
     QTreeWidgetItem,
     QDialog,
     QPushButton,
+    QLayout,
 )
 
 import markupwriter.support.doctree.item as dti
@@ -21,11 +22,12 @@ class ExportSelectWidget(QDialog):
     def __init__(self, tree: QTreeWidget, parent: QWidget | None) -> None:
         super().__init__(parent)
 
-        self.setWindowFlag(Qt.WindowType.Window)
         self.setWindowTitle("Export (EPUB3)")
 
-        self.gLayout = QGridLayout(self)
         self.value: QTreeWidgetItem = None
+        
+        self.gLayout = QGridLayout(self)
+        self.gLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
         count = 0
         for i in range(tree.topLevelItemCount()):
