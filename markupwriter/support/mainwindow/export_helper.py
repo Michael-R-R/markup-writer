@@ -32,27 +32,31 @@ class ExportHelper(object):
             
             if item is not None:
                 contentPath = AppConfig.projectContentPath()
-                body = ""
                 
+                count = 0
                 buildList = dtc.buildExportTree(item)
-                for f in buildList:
-                    path = os.path.join(contentPath, f.UUID())
-                    text = File.read(path)
-                    if text is None:
-                        continue
+                for chapter in buildList:
+                    cbody = ""
+                    for file in chapter:
+                        path = os.path.join(contentPath, file.UUID())
+                        text = File.read(path)
+                        if text is None:
+                            continue
+                        
+                        tokenizer = HtmlTokenizer(text, None)
+                        tokenizer.run()
+                        
+                        parser = HtmlParser(tokenizer.tokens, None)
+                        parser.run()
+                        
+                        cbody += parser.body
                     
-                    tokenizer = HtmlTokenizer(text, None)
-                    tokenizer.run()
+                    # TODO testing directory
+                    npath = os.path.join("./resources/.tests/novel", "{}.html".format(count))
+                    page = ExportHelper._createHtmlPage(cbody)
+                    File.write(npath, page)
+                    count += 1
                     
-                    parser = HtmlParser(tokenizer.tokens, None)
-                    parser.run()
-                    
-                    body += parser.body
-                
-                # TODO test
-                page = ExportHelper._createHtmlPage(body)
-                File.write("./resources/.tests/novel.html", page)
-                
     def _createHtmlPage(body: str) -> str:
         tpath = os.path.join(AppConfig.WORKING_DIR, "resources/html/preview.html")
         template: str = File.read(tpath)
@@ -68,4 +72,3 @@ class ExportHelper(object):
         template = template.replace("<!--body-->", body)
         
         return template
-                    

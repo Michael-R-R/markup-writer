@@ -68,7 +68,7 @@ class DocumentTreeController(QObject):
         # --- Trash context menu signals --- #
         trcm = self.view.treewidget.trashContextMenu
         trcm.emptyAction.triggered.connect(self._onEmptyTrash)
-        
+
     def setEnabledTreeBarActions(self, isEnabled: bool):
         treeBar = self.view.treebar
         treeBar.navUpAction.setEnabled(isEnabled)
@@ -92,10 +92,10 @@ class DocumentTreeController(QObject):
         widget = self.findItemWidget(uuid)
         if widget is None:
             return
-        
+
         owc = widget.wordCount()
         twc = widget.totalWordCount() - owc + wc
-        
+
         widget.setWordCount(wc)
         widget.setTotalWordCount(twc)
 
@@ -103,48 +103,55 @@ class DocumentTreeController(QObject):
 
     def findItemWidget(self, uuid: str) -> dti.BaseTreeItem | None:
         return self.view.treewidget.findWidget(uuid)
-    
-    def buildExportTree(self, root: QTreeWidgetItem) -> list[dti.BaseFileItem]:
+
+    def buildExportTree(self, root: QTreeWidgetItem) -> list[list[dti.BaseFileItem]]:
         tree = self.view.treewidget
-        
-        def helper(pitem: QTreeWidgetItem, result: list[dti.BaseFileItem]) -> list[dti.BaseFileItem]:
+
+        def helper(
+            pitem: QTreeWidgetItem, flist: list[dti.BaseFileItem]
+        ) -> list[dti.BaseFileItem]:
             pw: dti.BaseTreeItem = tree.itemWidget(pitem, 0)
-            
+
             if pw.hasFlag(dti.ITEM_FLAG.file):
-                result.append(pw)
-            
+                flist.append(pw)
+
             for i in range(pitem.childCount()):
                 citem = pitem.child(i)
-                result = helper(citem, result)
-            
-            return result
-        
-        return helper(root, list())
-        
+                flist = helper(citem, flist)
+
+            return flist
+
+        buildList: list[list[dti.BaseFileItem]] = list()
+        for i in range(root.childCount()):
+            pitem = root.child(i)
+            buildList.append(helper(pitem, list()))
+
+        return buildList
+
     def _refreshParentWordCounts(self, item: QTreeWidgetItem, owc: int, wc: int):
         tree = self.view.treewidget
-        
+
         while item is not None:
             widget: dti.BaseTreeItem = tree.itemWidget(item, 0)
             twc = widget.totalWordCount() - owc + wc
             widget.setTotalWordCount(twc)
             item = item.parent()
-        
+
     def _refreshAllWordCounts(self):
         tree = self.view.treewidget
-        
+
         def helper(pitem: QTreeWidgetItem) -> int:
             pw: dti.BaseTreeItem = tree.itemWidget(pitem, 0)
             twc = pw.wordCount()
-            
+
             for j in range(pitem.childCount()):
                 citem = pitem.child(j)
                 twc += helper(citem)
-                
+
             pw.setTotalWordCount(twc)
-            
+
             return twc
-        
+
         for i in range(tree.topLevelItemCount()):
             item = tree.topLevelItem(i)
             helper(item)
@@ -156,7 +163,7 @@ class DocumentTreeController(QObject):
             return
         path = os.path.join(path, uuid)
         File.write(path, "")
-        
+
         self.fileAdded.emit(uuid)
 
     @pyqtSlot(str, str)
@@ -166,7 +173,7 @@ class DocumentTreeController(QObject):
             return
         path = os.path.join(path, uuid)
         File.remove(path)
-        
+
         self._refreshAllWordCounts()
         self.fileRemoved.emit(title, uuid)
 
@@ -247,7 +254,7 @@ class DocumentTreeController(QObject):
     @pyqtSlot()
     def _onEmptyTrash(self):
         tree = self.view.treewidget
-        
+
         item = tree.currentItem()
         if item is None:
             return
