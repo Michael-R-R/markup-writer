@@ -52,26 +52,18 @@ class ExportHelper(object):
                         
                         cbody += parser.body
                     
-                    # TODO testing directory
-                    npath = os.path.join("./resources/.tests/novel", "{}.xhtml".format(count))
+                    # TODO write to directory
                     page = ExportHelper._createHtmlPage(cbody)
-                    File.write(npath, page)
                     count += 1
                     
     def _createHtmlPage(body: str) -> str:
-        tpath = os.path.join(AppConfig.WORKING_DIR, "resources/html/preview.xhtml")
-        template: str = File.read(tpath)
+        tpath = "resources/templates/xhtml/export.xhtml"
+        path = os.path.join(AppConfig.WORKING_DIR, tpath)
+        template: str = File.read(path)
         if template is None:
             return ""
 
-        cpath = os.path.join(AppConfig.WORKING_DIR, "resources/css/preview.css")
-        css: str = File.read(cpath)
-        if css is None:
-            return ""
-        
-        css = textwrap.indent(css, "\t" * 3)
-
-        template = template.replace("/*style*/", css)
+        body = textwrap.indent(body, "\t" * 2)
         template = template.replace("<!--body-->", body)
         
         return template

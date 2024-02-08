@@ -104,20 +104,22 @@ class XHtmlParser(QRunnable):
             self.body += "<p class='noindent'>{}</p>\n".format(text)
 
     def _createHtmlPage(self):
-        tpath = os.path.join(AppConfig.WORKING_DIR, "resources/html/preview.xhtml")
-        template: str = File.read(tpath)
+        tpath = "resources/templates/xhtml/preview.xhtml"
+        ppath = os.path.join(AppConfig.WORKING_DIR, tpath)
+        template: str = File.read(ppath)
         if template is None:
             return ""
 
-        cpath = os.path.join(AppConfig.WORKING_DIR, "resources/css/preview.css")
+        tpath = "resources/templates/css/base.css"
+        cpath = os.path.join(AppConfig.WORKING_DIR, tpath)
         css: str = File.read(cpath)
         if css is None:
             return ""
         
         css = textwrap.indent(css, "\t" * 3)
-        self.body = textwrap.indent(self.body, "\t" * 2)
+        body = textwrap.indent(self.body, "\t" * 2)
 
         template = template.replace("/*style*/", css)
-        template = template.replace("<!--body-->", self.body)
+        template = template.replace("<!--body-->", body)
 
         self.xhtml = template
