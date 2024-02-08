@@ -6,14 +6,19 @@ from PyQt6.QtCore import (
 )
 
 from PyQt6.QtWidgets import (
+    QDialog,
     QWidget,
     QGridLayout,
     QTreeWidget,
     QTreeWidgetItem,
-    QDialog,
+    QLineEdit,
+    QToolButton,
     QPushButton,
     QLayout,
+    QFileDialog,
 )
+
+from markupwriter.common.provider import Icon
 
 import markupwriter.support.doctree.item as dti
 
@@ -24,11 +29,13 @@ class ExportSelectWidget(QDialog):
 
         self.setWindowTitle("Export (EPUB3)")
 
+        self.dir = ""
         self.value: QTreeWidgetItem = None
-        
+
         self.gLayout = QGridLayout(self)
         self.gLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
+        # Add novel widgets to layout
         count = 0
         for i in range(tree.topLevelItemCount()):
             item = tree.topLevelItem(i)
@@ -44,13 +51,42 @@ class ExportSelectWidget(QDialog):
                 )
                 count += 1
 
+        self.dirLineEdit = QLineEdit("", self)
+        self.dirLineEdit.setReadOnly(True)
+        self.dirButton = QToolButton(self)
+        self.dirButton.setIcon(Icon.MISC_FOLDER)
+        self.dirButton.clicked.connect(self._onDirButtonClicked)
+        self.gLayout.addWidget(self.dirLineEdit, count + 1, 0)
+        self.gLayout.addWidget(
+            self.dirButton, count + 1, 1, Qt.AlignmentFlag.AlignRight
+        )
+
         self.cancelButton = QPushButton("Cancel", self)
         self.cancelButton.clicked.connect(self._onCancelClicked)
-        self.gLayout.addWidget(self.cancelButton, count + 1, 0, count + 1, 2)
+        self.gLayout.addWidget(self.cancelButton, count + 2, 0, count + 2, 2)
 
     def _onItemSelected(self, item: QTreeWidgetItem):
-        self.value = item
-        self.accept()
+        if self.dir == "":
+            self.reject()
+        else:
+            self.value = item
+            self.accept()
+
+    @pyqtSlot()
+    def _onDirButtonClicked(self):
+        dir = QFileDialog.getExistingDirectory(
+            self,
+            "Export Directory",
+            "/home",
+            QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontResolveSymlinks,
+        )
+        if dir == "":
+            self.dir = ""
+            self.dirLineEdit.clear()
+            return
+        
+        self.dir = dir
+        self.dirLineEdit.setText(dir)
 
     @pyqtSlot()
     def _onCancelClicked(self):

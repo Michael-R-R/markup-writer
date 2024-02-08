@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="bookid" version="3.0">
+<metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title>%title%</dc:title>
+    <dc:creator>%author%</dc:creator>
+    <dc:source>URN:ISBN:%isbn%</dc:source>
+    <dc:identifier id="isbn">%isbn%</dc:identifier>
+    <dc:date>%date%</dc:date>
+    <dc:language>en</dc:language>
+    <dc:type>Text</dc:type>
+</metadata>
+
+<manifest>
+
+</manifest>
+
+<spine>
+
+</spine>

@@ -26,6 +26,10 @@ class File(object):
 
         return True
     
+    def mkdir(path: str) -> bool:
+        dir = QDir()
+        return dir.mkdir(path)
+    
     def findAllFiles(path: str) -> list[str]:
         info = QFileInfo(path)
         if not info.isDir():
