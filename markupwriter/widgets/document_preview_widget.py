@@ -17,8 +17,8 @@ from PyQt6.QtWidgets import (
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
 from markupwriter.common.syntax import Highlighter
-from markupwriter.common.tokenizers import HtmlTokenizer
-from markupwriter.common.parsers import HtmlParser
+from markupwriter.common.tokenizers import XHtmlTokenizer
+from markupwriter.common.parsers import XHtmlParser
 
 
 class DocumentPreviewWidget(QWidget):
@@ -89,7 +89,7 @@ class DocumentPreviewWidget(QWidget):
             self.refreshButton.setEnabled(False)
             self.toggleButton.setEnabled(False)
 
-            tokenizer = HtmlTokenizer(self.plainText, self)
+            tokenizer = XHtmlTokenizer(self.plainText, self)
             tokenizer.signals.error.connect(self._onError)
             tokenizer.signals.result.connect(self._onTokenizerFinished)
             self.threadPool.start(tokenizer)
@@ -100,7 +100,7 @@ class DocumentPreviewWidget(QWidget):
 
     @pyqtSlot(list)
     def _onTokenizerFinished(self, tokens: list[(str, str)]):
-        parser = HtmlParser(tokens, self)
+        parser = XHtmlParser(tokens, self)
         parser.signals.error.connect(self._onError)
         parser.signals.result.connect(self._onParserFinished)
         self.threadPool.start(parser)

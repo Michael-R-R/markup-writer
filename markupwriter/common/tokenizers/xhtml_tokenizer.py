@@ -16,7 +16,7 @@ class WorkerSignal(QObject):
     result = pyqtSignal(list)
 
 
-class HtmlTokenizer(QRunnable):
+class XHtmlTokenizer(QRunnable):
     def __init__(self, text: str, parent: QObject | None) -> None:
         super().__init__()
         

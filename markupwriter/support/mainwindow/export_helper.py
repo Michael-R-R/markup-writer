@@ -19,8 +19,8 @@ from markupwriter.common.util import (
     File,
 )
 
-from markupwriter.common.tokenizers import HtmlTokenizer
-from markupwriter.common.parsers import HtmlParser
+from markupwriter.common.tokenizers import XHtmlTokenizer
+from markupwriter.common.parsers import XHtmlParser
 
 import markupwriter.mvc.controller.corewidgets as wcore
 
@@ -44,10 +44,10 @@ class ExportHelper(object):
                         if text is None:
                             continue
                         
-                        tokenizer = HtmlTokenizer(text, None)
+                        tokenizer = XHtmlTokenizer(text, None)
                         tokenizer.run()
                         
-                        parser = HtmlParser(tokenizer.tokens, None)
+                        parser = XHtmlParser(tokenizer.tokens, None)
                         parser.run()
                         
                         cbody += parser.body
@@ -70,7 +70,6 @@ class ExportHelper(object):
             return ""
         
         css = textwrap.indent(css, "\t" * 3)
-        body = textwrap.indent(body, "\t" * 2)
 
         template = template.replace("/*style*/", css)
         template = template.replace("<!--body-->", body)

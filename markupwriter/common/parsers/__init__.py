@@ -1,2 +1,2 @@
 from .editor_parser import EditorParser
-from .html_parser import HtmlParser
+from .xhtml_parser import XHtmlParser

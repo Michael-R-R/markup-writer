@@ -20,7 +20,7 @@ class WorkerSignal(QObject):
     result = pyqtSignal(str)
 
 
-class HtmlParser(QRunnable):
+class XHtmlParser(QRunnable):
     def __init__(self, tokens: list[(str, str)], parent: QObject | None) -> None:
         super().__init__()
 
