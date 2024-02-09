@@ -38,6 +38,7 @@ class EpubExporter(object):
         exportDir = widget.dir
         item = widget.value
         if item is None:
+            ErrorDialog.run("Error: selected item is 'None'", None)
             return
 
         self._setupPaths(exportDir)
