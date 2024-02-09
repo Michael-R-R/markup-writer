@@ -25,6 +25,7 @@ class EpubExporter(object):
         self.metaPath = ""
         self.oebpsPath = ""
         self.cssPath = ""
+        self.fontsPath = ""
         self.imgPath = ""
 
     def export(self, dtc: wcore.DocumentTreeController, parent: QWidget | None):
@@ -40,7 +41,7 @@ class EpubExporter(object):
         self._setupPaths(exportDir)
         self._mkDirectories()
         self._mkFiles()
-        self._createPages(dtc, item)
+        self._create(dtc, item)
 
     def _setupPaths(self, exportDir: str):
         self.wd = AppConfig.WORKING_DIR
@@ -48,12 +49,14 @@ class EpubExporter(object):
         self.metaPath = os.path.join(exportDir, "META-INF")
         self.oebpsPath = os.path.join(exportDir, "OEBPS")
         self.cssPath = os.path.join(self.oebpsPath, "css")
+        self.fontsPath = os.path.join(self.oebpsPath, "fonts")
         self.imgPath = os.path.join(self.oebpsPath, "images")
 
     def _mkDirectories(self):
         File.mkdir(self.metaPath)
         File.mkdir(self.oebpsPath)
         File.mkdir(self.cssPath)
+        File.mkdir(self.fontsPath)
         File.mkdir(self.imgPath)
 
     def _mkFiles(self):
@@ -71,7 +74,7 @@ class EpubExporter(object):
         dst = os.path.join(self.cssPath, "base.css")
         shutil.copyfile(src, dst)
 
-    def _createPages(self, dtc: wcore.DocumentTreeController, item: QTreeWidgetItem):
+    def _create(self, dtc: wcore.DocumentTreeController, item: QTreeWidgetItem):
         if item is None:
             return
 
@@ -138,6 +141,8 @@ class EpubExporter(object):
         return "<itemref idref='{}'/>\n".format(title)
 
     def _mkContentOPF(self, manifest: str, spine: str):
+        # TODO replace metadata
+        
         # add css resources to manifest
         names = File.findAllFiles(self.cssPath)
         for n in names:
@@ -151,7 +156,7 @@ class EpubExporter(object):
             ext = File.fileExtension(n)
             manifest += "<item id='{}' href='images/{}' media-type='image/{}'/>".format(n, n, ext)
             
-        # TODO replace metadata
+        # TODO add font resources to manifest    
             
         manifest = textwrap.indent(manifest, "\t")
         spine = textwrap.indent(spine, "\t")
