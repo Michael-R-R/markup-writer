@@ -20,7 +20,7 @@ from markupwriter.mvc.view.core import (
 from markupwriter.support.mainwindow import (
     ProjectHelper,
     StartupParser,
-    ExportHelper,
+    EpubExporter,
 )
 
 from markupwriter.config import (
@@ -190,7 +190,8 @@ class MainWindowController(QObject):
         cc = self.model.centralController
         dtc = cc.model.docTreeController
         
-        ExportHelper.exportEPUB3(dtc, self.view)
+        exporter = EpubExporter()
+        exporter.export(dtc, self.view)
 
     @pyqtSlot()
     def _onCloseProject(self) -> bool:
