@@ -80,9 +80,6 @@ class EpubExporter(object):
         shutil.copyfile(src, dst)
 
     def _create(self, dtc: wcore.DocumentTreeController, item: QTreeWidgetItem):
-        if item is None:
-            return
-
         contentPath = AppConfig.projectContentPath()
         manifest = ""
         spine = ""
