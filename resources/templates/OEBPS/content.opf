@@ -11,9 +11,9 @@
 </metadata>
 
 <manifest>
-
+%manifest%
 </manifest>
 
 <spine>
-
+%spine%
 </spine>
