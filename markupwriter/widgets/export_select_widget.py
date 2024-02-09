@@ -61,10 +61,6 @@ class ExportSelectWidget(QDialog):
             self.dirButton, count + 1, 1, Qt.AlignmentFlag.AlignRight
         )
 
-        self.cancelButton = QPushButton("Cancel", self)
-        self.cancelButton.clicked.connect(self._onCancelClicked)
-        self.gLayout.addWidget(self.cancelButton, count + 2, 0, count + 2, 2)
-
     def _onItemSelected(self, item: QTreeWidgetItem):
         if self.dir == "":
             self.reject()
@@ -87,7 +83,3 @@ class ExportSelectWidget(QDialog):
         
         self.dir = dir
         self.dirLineEdit.setText(dir)
-
-    @pyqtSlot()
-    def _onCancelClicked(self):
-        self.reject()

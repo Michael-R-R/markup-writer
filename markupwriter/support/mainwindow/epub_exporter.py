@@ -109,8 +109,11 @@ class EpubExporter(object):
             self._mkPageResources(title, page)
             manifest += self._parseManifest(title)
             spine += self._parseSpine(title)
-            self._mkContentOPF(manifest, spine)
             count += 1
+        
+        self._mkContentOPF(manifest, spine)
+        
+        # TODO zip and make .epub
 
     def _mkPage(self, body: str) -> str:
         tpath = "resources/templates/xhtml/export.xhtml"
