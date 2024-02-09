@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
-import markupwriter.widgets as mw
+import markupwriter.gui.widgets as mw
 
 
 class DocumentEditorView(QWidget):

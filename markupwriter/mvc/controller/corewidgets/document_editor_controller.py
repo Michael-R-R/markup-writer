@@ -22,7 +22,7 @@ from markupwriter.common.tokenizers import EditorTokenizer
 from markupwriter.common.syntax import BEHAVIOUR
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
-from markupwriter.widgets import PopupPreviewWidget
+from markupwriter.gui.widgets import PopupPreviewWidget
 
 
 class DocumentEditorController(QObject):

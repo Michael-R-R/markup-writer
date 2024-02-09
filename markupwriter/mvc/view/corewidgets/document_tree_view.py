@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import AppConfig
 from markupwriter.common.provider import Style
-import markupwriter.widgets as mw
+import markupwriter.gui.widgets as mw
 
 
 class DocumentTreeView(QWidget):

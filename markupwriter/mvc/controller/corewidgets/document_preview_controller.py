@@ -19,7 +19,7 @@ from markupwriter.mvc.view.corewidgets import (
     DocumentPreviewView,
 )
 
-import markupwriter.widgets as mw
+import markupwriter.gui.widgets as mw
 
 
 class DocumentPreviewController(QObject):

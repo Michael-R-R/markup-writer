@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
-from markupwriter.widgets import ExportSelectWidget
+from markupwriter.gui.widgets import ExportSelectWidget
 from markupwriter.common.tokenizers import XHtmlTokenizer
 from markupwriter.common.parsers import XHtmlParser
 
