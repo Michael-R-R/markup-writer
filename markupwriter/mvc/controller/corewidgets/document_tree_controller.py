@@ -104,7 +104,7 @@ class DocumentTreeController(QObject):
     def findItemWidget(self, uuid: str) -> dti.BaseTreeItem | None:
         return self.view.treewidget.findWidget(uuid)
 
-    def buildExportTree(self, root: QTreeWidgetItem) -> list[list[dti.BaseFileItem]]:
+    def buildExportList(self, root: QTreeWidgetItem) -> list[list[dti.BaseFileItem]]:
         tree = self.view.treewidget
 
         def helper(

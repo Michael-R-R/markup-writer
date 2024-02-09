@@ -85,7 +85,7 @@ class EpubExporter(object):
         spine = ""
         count = 0
 
-        buildList = dtc.buildExportTree(item)
+        buildList = dtc.buildExportList(item)
         for c in buildList:
             # Make xhtml body
             cbody = ""
@@ -107,6 +107,7 @@ class EpubExporter(object):
             title = "{}_{}".format(count, c[0].title()) if len(c) > 0 else ""
             if title == "":
                 continue
+            
             page = self._mkPage(cbody)
             self._mkPageResources(title, page)
             manifest += self._parseManifest(title)
