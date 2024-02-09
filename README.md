@@ -15,5 +15,6 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a> and <a 
 + Reference tag popup preview functionality
 + Multi-document tab preview with support to view either plain/html text
 + Flexible document tree
-+ Search and replace functionality
++ Document search and replace functionality
++ .epub3 exporter
 + Plus more to come...
