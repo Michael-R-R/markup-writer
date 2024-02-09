@@ -3,6 +3,7 @@
 import os
 import shutil
 import textwrap
+import shutil
 
 from PyQt6.QtWidgets import (
     QWidget,
@@ -12,6 +13,7 @@ from PyQt6.QtWidgets import (
 from markupwriter.config import AppConfig
 from markupwriter.common.util import File
 from markupwriter.gui.widgets import ExportSelectWidget
+from markupwriter.gui.dialogs.modal import ErrorDialog
 from markupwriter.common.tokenizers import XHtmlTokenizer
 from markupwriter.common.parsers import XHtmlParser
 
@@ -43,16 +45,18 @@ class EpubExporter(object):
         self._mkFiles()
         self._create(dtc, item)
 
-    def _setupPaths(self, exportDir: str):
+    def _setupPaths(self, rootDir: str):
         self.wd = AppConfig.WORKING_DIR
-        self.exportDir = exportDir
-        self.metaPath = os.path.join(exportDir, "META-INF")
-        self.oebpsPath = os.path.join(exportDir, "OEBPS")
+        self.rootDir = rootDir
+        self.exportDir = os.path.join(rootDir, "data")
+        self.metaPath = os.path.join(self.exportDir, "META-INF")
+        self.oebpsPath = os.path.join(self.exportDir, "OEBPS")
         self.cssPath = os.path.join(self.oebpsPath, "css")
         self.fontsPath = os.path.join(self.oebpsPath, "fonts")
         self.imgPath = os.path.join(self.oebpsPath, "images")
 
     def _mkDirectories(self):
+        File.mkdir(self.exportDir)
         File.mkdir(self.metaPath)
         File.mkdir(self.oebpsPath)
         File.mkdir(self.cssPath)
@@ -110,10 +114,9 @@ class EpubExporter(object):
             manifest += self._parseManifest(title)
             spine += self._parseSpine(title)
             count += 1
-        
+
         self._mkContentOPF(manifest, spine)
-        
-        # TODO zip and make .epub
+        self._mkEPUB3()
 
     def _mkPage(self, body: str) -> str:
         tpath = "resources/templates/xhtml/export.xhtml"
@@ -145,30 +148,41 @@ class EpubExporter(object):
 
     def _mkContentOPF(self, manifest: str, spine: str):
         # TODO replace metadata
-        
+
         # add css resources to manifest
         names = File.findAllFiles(self.cssPath)
         for n in names:
             manifest += "<item id='{}' href='css/{}' media-type='text/css'/>\n".format(
                 n, n
             )
-            
+
         # add img resources to manifest
         names = File.findAllFiles(self.imgPath)
         for n in names:
             ext = File.fileExtension(n)
-            manifest += "<item id='{}' href='images/{}' media-type='image/{}'/>".format(n, n, ext)
-            
-        # TODO add font resources to manifest    
-            
+            manifest += "<item id='{}' href='images/{}' media-type='image/{}'/>".format(
+                n, n, ext
+            )
+
+        # TODO add font resources to manifest
+
         manifest = textwrap.indent(manifest, "\t")
         spine = textwrap.indent(spine, "\t")
-        
+
         # create content.opf
         tpath = os.path.join(self.wd, "resources/templates/OEBPS/content.opf")
         opf: str = File.read(tpath)
         opf = opf.replace(r"%manifest%", manifest)
         opf = opf.replace(r"%spine%", spine)
-        
+
         wpath = os.path.join(self.oebpsPath, "content.opf")
         File.write(wpath, opf)
+
+    def _mkEPUB3(self):
+        try:
+            zipPath = os.path.join(self.rootDir, "novel")
+            shutil.make_archive(zipPath, "zip", self.exportDir)
+            os.rename(zipPath + ".zip", zipPath + ".epub")
+
+        except Exception as e:
+            ErrorDialog.run(str(e), None)
