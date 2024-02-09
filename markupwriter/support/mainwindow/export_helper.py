@@ -9,16 +9,9 @@ from PyQt6.QtWidgets import (
     QTreeWidgetItem,
 )
 
-from markupwriter.widgets import (
-    ExportSelectWidget,
-)
-
 from markupwriter.config import AppConfig
-
-from markupwriter.common.util import (
-    File,
-)
-
+from markupwriter.common.util import File
+from markupwriter.widgets import ExportSelectWidget
 from markupwriter.common.tokenizers import XHtmlTokenizer
 from markupwriter.common.parsers import XHtmlParser
 
@@ -44,11 +37,10 @@ class ExportHelper(object):
             ExportHelper._createReqDirectories()
             ExportHelper._createReqFiles()
 
-            content: list[(str, str)] = ExportHelper._createContent(dtc, item)
+            pages: list[(str, str)] = ExportHelper._createPages(dtc, item)
 
-            ExportHelper._createResources(content)
-            ExportHelper._createContentOPF(content)
-            ExportHelper._createTocNCX(content)
+            ExportHelper._createResources(pages)
+            ExportHelper._createContentOPF(pages)
 
     def _createReqPaths(exportDir: str):
         ExportHelper.wd = AppConfig.WORKING_DIR
@@ -82,10 +74,10 @@ class ExportHelper(object):
         dst = os.path.join(ExportHelper.cssPath, "base.css")
         shutil.copyfile(src, dst)
 
-    def _createContent(
+    def _createPages(
         dtc: wcore.DocumentTreeController, item: QTreeWidgetItem
     ) -> list[str]:
-        content: list[(str, str)] = list()
+        pages: list[(str, str)] = list()
 
         if item is not None:
             contentPath = AppConfig.projectContentPath()
@@ -116,36 +108,33 @@ class ExportHelper(object):
 
                 page = ExportHelper._createXHtmlPage(cbody)
 
-                content.append((title, page))
+                pages.append((title, page))
 
-        return content
+        return pages
 
-    def _createResources(content: list[(str, str)]):
+    def _createResources(pages: list[(str, str)]):
         # TODO create css/img/etc. resources
-        
-        for c in content:
-            fName = "{}.xhtml".format(c[0])
-            path = os.path.join(ExportHelper.oebpsPath, fName)
-            File.write(path, c[1])
 
-    def _createContentOPF(content: list[(str, str)]):
+        for p in pages:
+            fName = "{}.xhtml".format(p[0])
+            path = os.path.join(ExportHelper.oebpsPath, fName)
+            File.write(path, p[1])
+
+    def _createContentOPF(pages: list[(str, str)]):
         tpath = os.path.join(ExportHelper.wd, "resources/templates/OEBPS/content.opf")
         opf: str = File.read(tpath)
 
         # TODO replace metadata
 
         spine = ""
-        manifest = (
-            "<item id='ncx' href='toc.ncx' media-type='application/x-dtbncx+xml'/>\n"
-        )
-        manifest += "<item id='base-css' href='css/base.css' media-type='text/css'/>\n"
+        manifest = "<item id='base-css' href='css/base.css' media-type='text/css'/>\n"
 
         # TODO add img items
 
-        for c in content:
-            itemRef = "<itemref idref='{}'/>\n".format(c[0])
+        for p in pages:
+            itemRef = "<itemref idref='{}'/>\n".format(p[0])
             item = "<item id='{}' href='{}.xhtml' media-type='application/xhtml+xml'/>\n".format(
-                c[0], c[0]
+                p[0], p[0]
             )
 
             spine += itemRef
@@ -159,30 +148,6 @@ class ExportHelper(object):
 
         wpath = os.path.join(ExportHelper.oebpsPath, "content.opf")
         File.write(wpath, opf)
-
-    def _createTocNCX(content: list[(str, str)]):
-        tpath = os.path.join(ExportHelper.wd, "resources/templates/OEBPS/toc.ncx")
-        ncx: str = File.read(tpath)
-
-        # TODO replace metadata
-
-        count = 1
-        navMap = ""
-        for c in content:
-            navLabel = "<navLabel><text>{}</text></navLabel>".format(c[0])
-            src = "<content src='{}'/>".format(c[0])
-            navPoint = "<navPoint id='{}' playOrder='{}'>{}{}</navPoint>\n".format(
-                c[0], count, navLabel, src
-            )
-            
-            navMap += navPoint
-            count += 1
-            
-        navMap = textwrap.indent(navMap, "\t" * 2)
-        ncx = ncx.replace(r"%navmap%", navMap)
-
-        wpath = os.path.join(ExportHelper.oebpsPath, "toc.ncx")
-        File.write(wpath, ncx)
 
     def _createXHtmlPage(body: str) -> str:
         tpath = "resources/templates/xhtml/export.xhtml"
