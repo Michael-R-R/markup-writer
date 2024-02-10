@@ -52,6 +52,7 @@ class DocumentTreeController(QObject):
         tree.fileRemoved.connect(self._onFileRemoved)
         tree.fileOpened.connect(self._onFileOpened)
         tree.fileMoved.connect(self._onFileMoved)
+        tree.dropComplete.connect(self._onDropComplete)
 
         # --- Tree context menu signals --- #
         tcm = self.view.treewidget.treeContextMenu
@@ -138,6 +139,7 @@ class DocumentTreeController(QObject):
             item = item.parent()
 
     def _refreshAllWordCounts(self):
+        print("called")
         tree = self.view.treewidget
 
         def helper(pitem: QTreeWidgetItem) -> int:
@@ -183,8 +185,11 @@ class DocumentTreeController(QObject):
 
     @pyqtSlot(str, list)
     def _onFileMoved(self, uuid: str, pathList: list[str]):
-        self._refreshAllWordCounts()
         self.fileMoved.emit(uuid, pathList)
+        
+    @pyqtSlot()
+    def _onDropComplete(self):
+        self._refreshAllWordCounts()
 
     @pyqtSlot()
     def _onItemNavUp(self):

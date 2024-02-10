@@ -30,6 +30,7 @@ class DocumentTreeWidget(QTreeWidget):
     fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
     fileMoved = pyqtSignal(str, list)
+    dropComplete = pyqtSignal()
 
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
@@ -39,12 +40,12 @@ class DocumentTreeWidget(QTreeWidget):
         self.setUniformRowHeights(True)
         self.setAllColumnsShowFocus(True)
         self.setDragDropMode(QTreeWidget.DragDropMode.InternalMove)
-        self.setSelectionMode(QTreeWidget.SelectionMode.SingleSelection)
+        self.setSelectionMode(QTreeWidget.SelectionMode.ExtendedSelection)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setFrameStyle(QFrame.Shape.NoFrame)
         self.setHeaderHidden(True)
 
-        self.draggedItem = None
+        self.draggedItems: list[QTreeWidgetItem] = list()
         self.treeContextMenu = dt.TreeContextMenu(self)
         self.itemContextMenu = dt.ItemContextMenu(self)
         self.trashContextMenu = dt.TrashContextMenu(self)
@@ -220,12 +221,14 @@ class DocumentTreeWidget(QTreeWidget):
             self.setCurrentItem(None)
 
     def dragEnterEvent(self, e: QDragEnterEvent | None) -> None:
-        selected = self.currentItem()
-        widget: dti.BaseTreeItem = self.itemWidget(selected, 0)
-        if not widget.hasFlag(dti.ITEM_FLAG.draggable):
-            return
-
-        self.draggedItem = selected
+        self.draggedItems.clear()
+        sList = self.selectedItems()
+        for s in sList:
+            widget: dti.BaseTreeItem = self.itemWidget(s, 0)
+            if not widget.hasFlag(dti.ITEM_FLAG.draggable):
+                self.draggedItems.clear()
+                return
+            self.draggedItems.append(s)
 
         super().dragEnterEvent(e)
 
@@ -233,19 +236,23 @@ class DocumentTreeWidget(QTreeWidget):
         if not self.currentIndex().isValid():
             return
 
-        item = self.draggedItem
-        if item is None:
-            return
-
-        widgetList = self.copyWidgets(item, list())
+        copyList: list[list[dti.BaseTreeItem]] = list()
+        for s in self.draggedItems:
+            copyList.append(self.copyWidgets(s, list()))
+        
         super().dropEvent(e)
-        self.setWidgetList(widgetList)
-        self.setCurrentItem(item)
-        self.expandItem(item)
-
-        self.draggedItem = None
-
-        self._emitMoved(widgetList)
+            
+        for i in range(len(copyList)):
+            clist = copyList[i]
+            item = self.draggedItems[i]
+            self.setWidgetList(clist)
+            item.setSelected(True)
+            
+        for clist in copyList:
+            self._emitMoved(clist)
+        
+        self.draggedItems.clear()
+        self.dropComplete.emit()
                 
     def _emitAdded(self, widget: dti.BaseTreeItem):
         if widget.hasFlag(dti.ITEM_FLAG.file):
