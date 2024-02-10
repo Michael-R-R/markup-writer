@@ -55,6 +55,7 @@ class EpubExporter(object):
         self.cssPath = os.path.join(self.oebpsPath, "css")
         self.fontsPath = os.path.join(self.oebpsPath, "fonts")
         self.imgPath = os.path.join(self.oebpsPath, "images")
+        self.textPath = os.path.join(self.oebpsPath, "text")
 
     def _mkDirectories(self):
         File.mkdir(self.exportDir)
@@ -63,6 +64,7 @@ class EpubExporter(object):
         File.mkdir(self.cssPath)
         File.mkdir(self.fontsPath)
         File.mkdir(self.imgPath)
+        File.mkdir(self.textPath)
 
     def _mkFiles(self):
         # mimetype
@@ -110,7 +112,7 @@ class EpubExporter(object):
             
             page = self._mkPage(cbody)
             self._mkPageResources(title, page)
-            manifest += self._parseManifest(title)
+            manifest += self._parsePageManifest(title)
             spine += self._parseSpine(title)
             count += 1
 
@@ -134,11 +136,11 @@ class EpubExporter(object):
 
         # write page to disk
         fName = "{}.xhtml".format(title)
-        path = os.path.join(self.oebpsPath, fName)
+        path = os.path.join(self.textPath, fName)
         File.write(path, page)
 
-    def _parseManifest(self, title: str) -> str:
-        return "<item id='{}' href='{}.xhtml' media-type='application/xhtml+xml'/>\n".format(
+    def _parsePageManifest(self, title: str) -> str:
+        return "<item id='{}' href='text/{}.xhtml' media-type='application/xhtml+xml'/>\n".format(
             title, title
         )
 
