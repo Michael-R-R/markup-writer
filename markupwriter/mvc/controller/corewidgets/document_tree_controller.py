@@ -139,7 +139,6 @@ class DocumentTreeController(QObject):
             item = item.parent()
 
     def _refreshAllWordCounts(self):
-        print("called")
         tree = self.view.treewidget
 
         def helper(pitem: QTreeWidgetItem) -> int:

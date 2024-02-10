@@ -42,6 +42,7 @@ class DocumentTreeWidget(QTreeWidget):
         self.setDragDropMode(QTreeWidget.DragDropMode.InternalMove)
         self.setSelectionMode(QTreeWidget.SelectionMode.ExtendedSelection)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setFrameStyle(QFrame.Shape.NoFrame)
         self.setHeaderHidden(True)
 
@@ -244,9 +245,11 @@ class DocumentTreeWidget(QTreeWidget):
             
         for i in range(len(copyList)):
             clist = copyList[i]
-            item = self.draggedItems[i]
             self.setWidgetList(clist)
+            
+            item = self.draggedItems[i]
             item.setSelected(True)
+            self.expandItem(item.parent())
             
         for clist in copyList:
             self._emitMoved(clist)
