@@ -1,6 +1,4 @@
 body {
-    width: 100%;
-    height: auto;
     margin-left: 3%;
     margin-right: 3%;
 }
@@ -11,9 +9,11 @@ p {
 
 .image {
     display: block;
-    max-width: 100%;
     width: 90%;
-    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 16px;
+    margin-bottom: 16px;
     text-align: center;
 }
 
@@ -27,6 +27,13 @@ p {
 
 .scene {
     text-align: center;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.section {
+    margin-top: 16px;
+    margin-bottom: 16px;
 }
 
 .indent {

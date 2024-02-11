@@ -70,10 +70,10 @@ class XHtmlParser(QRunnable):
         self.body += "<h2 class='chapter'>{}</h2>\n".format(text)
 
     def _processScene(self, _: str):
-        self.body += "<p class='scene'><br>* * *<br></p>\n"
+        self.body += "<p class='scene'>* * *</p>\n"
 
     def _processSection(self, _: str):
-        self.body += "<div class='section'><br><br></div>\n"
+        self.body += "<p class='section'>&#160;</p>\n"
 
     def _processAlignL(self, text: str):
         self.body += "<p class='alignL'>{}</p>\n".format(text)
@@ -88,8 +88,8 @@ class XHtmlParser(QRunnable):
         if not text.isnumeric():
             return
 
-        brTag = "<br>" * int(text)
-        self.body += "<p class='vspace'>{}</p>\n".format(brTag)
+        htmlText = "<p class='vspace'>&#160;</p>\n" * int(text)
+        self.body += htmlText
 
     def _processNewPage(self, text: str):
         if not text.isnumeric():
@@ -99,7 +99,7 @@ class XHtmlParser(QRunnable):
         self.body += htmlText
         
     def _processImg(self, text: str):
-        htmlText = "<p class='image'><br><img src='{}' alt=''><br></p>\n".format(text)
+        htmlText = "<p class='image'><img src='{}' alt=''></p>\n".format(text)
         self.body += htmlText
 
     def _processParagraph(self, text: str):
