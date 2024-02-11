@@ -45,6 +45,10 @@ class File(object):
         info = QFile(path)
         return info.exists()
     
+    def fileName(path: str) -> str:
+        info = QFileInfo(path)
+        return info.fileName()
+    
     def fileExtension(path: str) -> str | None:
         info = QFileInfo(path)
         if info.isDir():

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import re
 import shutil
 import textwrap
 import shutil
@@ -133,6 +134,23 @@ class EpubExporter(object):
 
     def _mkPageResources(self, title: str, page: str):
         # TODO parse page for css/img/etc. resources
+        
+        # parse images
+        srcRegex = re.compile(r"(?<=').*?(?=')")
+        imgRegex = re.compile(r"<img src='.*?'\s")
+        it = imgRegex.finditer(page)
+        for found in it:
+            tag = found.group(0)
+            src = srcRegex.search(tag)
+            if src is None:
+                continue
+            src = src.group(0)
+            name = File.fileName(src)
+            page = page.replace(tag, "<img src='../images/{}' ".format(name))
+            path = os.path.join(self.imgPath, name)
+            if File.exists(path):
+                continue
+            shutil.copyfile(src, path)
 
         # write page to disk
         fName = "{}.xhtml".format(title)

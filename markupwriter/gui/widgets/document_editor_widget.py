@@ -24,9 +24,8 @@ from PyQt6.QtWidgets import (
     QFrame,
 )
 
-from markupwriter.common.syntax import (
-    Highlighter,
-)
+from markupwriter.common.syntax import Highlighter
+from markupwriter.common.util import File
 
 import markupwriter.support.doceditor as de
 
@@ -97,7 +96,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         if source.hasUrls():
             extRegex = re.compile(r"\b\.(jpeg|jpg|png|gif)\b")
             for url in source.urls():
-                imgPath = url.toString().strip()
+                imgPath = url.path()
                 found = extRegex.search(url.toString().strip())
                 if found is None:
                     continue
