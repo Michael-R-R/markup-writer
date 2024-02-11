@@ -133,8 +133,6 @@ class EpubExporter(object):
         return template
 
     def _mkPageResources(self, title: str, page: str):
-        # TODO parse page for css/img/etc. resources
-        
         # parse images
         srcRegex = re.compile(r"(?<=').*?(?=')")
         imgRegex = re.compile(r"<img src='.*?'\s")
@@ -182,8 +180,6 @@ class EpubExporter(object):
             manifest += "<item id='{}' href='images/{}' media-type='image/{}'/>".format(
                 n, n, ext
             )
-
-        # TODO add font resources to manifest
 
         manifest = textwrap.indent(manifest, "\t")
         spine = textwrap.indent(spine, "\t")
