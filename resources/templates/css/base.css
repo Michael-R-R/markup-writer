@@ -7,6 +7,14 @@ p {
     margin: 0;
 }
 
+.image {
+    display: block;
+    max-width: 100%;
+    width: 90%;
+    height: auto;
+    text-align: center;
+}
+
 .title {
     text-align: center;
 }
@@ -39,7 +47,6 @@ p {
     text-align: right;
 }
 
-.newPage
-{
+.newPage {
 	page-break-before: left;
 }

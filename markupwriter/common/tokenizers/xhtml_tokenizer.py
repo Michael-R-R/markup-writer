@@ -107,12 +107,12 @@ class XHtmlTokenizer(QRunnable):
                 continue
 
             if line.startswith("@"):
-                token: (str, str) = self._processKeyword(line)
+                token: tuple[str, str] = self._processKeyword(line)
                 self.tokens.append(token)
             else:
                 self.tokens.append(("p", line))
                 
-    def _processKeyword(self, line: str) -> (str, str):
+    def _processKeyword(self, line: str) -> tuple[str, str]:
         keyword = self.keywordRegex.search(line)
         if keyword is None:
             return ("", "")

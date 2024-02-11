@@ -40,6 +40,7 @@ class XHtmlParser(QRunnable):
             r"@alignR": self._processAlignR,
             r"@vspace": self._processVSpace,
             r"@newPage": self._processNewPage,
+            r"@img": self._processImg,
         }
 
     @pyqtSlot()
@@ -95,6 +96,10 @@ class XHtmlParser(QRunnable):
             return
 
         htmlText = "<p class='newPage'>&#160;</p>\n" * int(text)
+        self.body += htmlText
+        
+    def _processImg(self, text: str):
+        htmlText = "<p class='image'><br><img src='{}' alt=''><br></p>\n".format(text)
         self.body += htmlText
 
     def _processParagraph(self, text: str):
