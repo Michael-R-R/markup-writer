@@ -33,7 +33,7 @@ class SpellCheck(object):
     
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
         count = sin.readInt()
-        for i in range(count):
+        for _ in range(count):
             self.addWord(sin.readQString())
             
         return sin

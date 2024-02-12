@@ -18,17 +18,16 @@ from PyQt6.QtGui import (
     QTextOption,
     QTextCursor,
     QGuiApplication,
-    QAction,
 )
 
 from PyQt6.QtWidgets import (
     QPlainTextEdit,
     QWidget,
     QFrame,
-    QMenu,
 )
 
 from markupwriter.common.syntax import Highlighter
+from markupwriter.gui.contextmenus.doceditor import EditorContextMenu
 
 import markupwriter.support.doceditor as de
 
@@ -100,7 +99,7 @@ class DocumentEditorWidget(QPlainTextEdit):
             extRegex = re.compile(r"\b\.(jpeg|jpg|png|gif)\b")
             for url in source.urls():
                 imgPath = url.path()
-                found = extRegex.search(url.toString().strip())
+                found = extRegex.search(imgPath)
                 if found is None:
                     continue
                 imgTag = "@img({})\n".format(imgPath)
@@ -108,42 +107,9 @@ class DocumentEditorWidget(QPlainTextEdit):
         else:
             return super().insertFromMimeData(source)
 
-    # TODO refactor this
     def contextMenuEvent(self, e: QContextMenuEvent | None) -> None:
-        menu = self.createStandardContextMenu()
-
-        cursor = self.cursorForPosition(e.pos())
-        cpos = cursor.positionInBlock()
-        textBlock = cursor.block().text()
-        if cpos > 0 or cpos < len(textBlock):
-            cursor.select(QTextCursor.SelectionType.WordUnderCursor)
-            self.setTextCursor(cursor)
-            word = self.textCursor().selectedText()
-            endict = self.spellChecker.endict
-            if not endict.check(word):
-                spellingMenu = QMenu("Spelling suggestions")
-                slist = endict.suggest(word)
-                count = 5 if len(slist) > 5 else len(slist)
-                for i in range(count):
-                    action = QAction(slist[i], spellingMenu)
-                    action.triggered.connect(
-                        lambda _, val=slist[i]: self.makeWordCorrection(val)
-                    )
-                    spellingMenu.addAction(action)
-                if len(spellingMenu.actions()) > 0:
-                    menu.insertSeparator(menu.actions()[0])
-                    menu.insertMenu(menu.actions()[0], spellingMenu)
-
-        menu.exec(e.globalPos())
-
-    # TODO refactor this
-    def makeWordCorrection(self, word: str):
-        cursor = self.textCursor()
-        cursor.beginEditBlock()
-        cursor.removeSelectedText()
-        cursor.insertText(word)
-        cursor.endEditBlock()
-        self.setTextCursor(cursor)
+        contextMenu = EditorContextMenu(self, self.spellChecker.endict, e.pos(), self)
+        contextMenu.onShowMenu(e.globalPos())
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         self.resizeMargins()
@@ -209,7 +175,7 @@ class DocumentEditorWidget(QPlainTextEdit):
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.spellChecker
         return sout
-    
+
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
         sin >> self.spellChecker
         return sin
