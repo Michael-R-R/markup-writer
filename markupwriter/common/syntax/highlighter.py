@@ -22,38 +22,31 @@ class BEHAVIOUR(Enum):
     paren = 0
     comment = auto()
     multicomment = auto()
-    bold = auto()
-    italize = auto()
-    boldItal = auto()
-    header = auto()
-    tags = auto()
     keyword = auto()
+    formatting = auto()
+    header = auto()
     searchText = auto()
     spellCheck = auto()
 
 
 class Highlighter(QSyntaxHighlighter):
-    def __init__(self, document: QTextDocument | None, enchantDict: enchant.Dict):
+    def __init__(self, document: QTextDocument | None, endict: enchant.Dict | None):
         super().__init__(document)
 
         parenRegex = r"\(|\)"
         commentRegex = r"%(.*)"
         multiComRegex = [r"<#", r"#>"]
-        tagsRegex = r"^@(tag|ref|pov|loc)"
-        keywordRegex = r"@(img|vspace|newPage|alignL|alignC|alignR)"
-        boldRegex = r"@bold"
-        italRegex = r"@ital"
-        boldItalRegex = r"@boldItal"
+        keywordRegex = r"@(tag|ref|pov|loc|img|vspace|newPage|alignL|alignC|alignR)"
+        formattingRegex = r"@(bold|ital)"
         headerRegex = r"^@(title|chapter|scene|section)"
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
 
-        self.addBehaviour(
-            BEHAVIOUR.spellCheck,
-            HighlightSpellBehaviour(
-                QColor(255, 255, 255), r"(?iu)[\w\']+", enchantDict
-            ),
-        )
+        if endict is not None:
+            self.addBehaviour(
+                BEHAVIOUR.spellCheck,
+                HighlightSpellBehaviour(QColor(255, 255, 255), r"(?iu)[\w\']+", endict),
+            )
 
         self.addBehaviour(
             BEHAVIOUR.paren,
@@ -66,46 +59,28 @@ class Highlighter(QSyntaxHighlighter):
         )
 
         self.addBehaviour(
-            BEHAVIOUR.tags,
-            HighlightExprBehaviour(HighlighterConfig.tagsCol, tagsRegex),
-        )
-
-        self.addBehaviour(
-            BEHAVIOUR.keyword,
-            HighlightExprBehaviour(HighlighterConfig.tagsCol, keywordRegex),
-        )
-
-        self.addBehaviour(
             BEHAVIOUR.multicomment,
             HighlightMultiExprBehaviour(
                 HighlighterConfig.commentCol, multiComRegex[0], multiComRegex[1]
             ),
         )
 
-        # Header behaviour
+        self.addBehaviour(
+            BEHAVIOUR.keyword,
+            HighlightExprBehaviour(HighlighterConfig.keywordCol, keywordRegex),
+        )
+
+        self.addBehaviour(
+            BEHAVIOUR.formatting,
+            HighlightExprBehaviour(HighlighterConfig.formattingCol, formattingRegex),
+        )
+
+        # Headers
         headerBehaviour = HighlightExprBehaviour(
             HighlighterConfig.headerCol, headerRegex
         )
         headerBehaviour.format.setFontWeight(QFont.Weight.Bold)
         self.addBehaviour(BEHAVIOUR.header, headerBehaviour)
-
-        # Bold behaviour
-        boldBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, boldRegex)
-        boldBehaviour.format.setFontWeight(QFont.Weight.Bold)
-        self.addBehaviour(BEHAVIOUR.bold, boldBehaviour)
-
-        # Italize behaviour
-        italBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, italRegex)
-        italBehaviour.format.setFontItalic(True)
-        self.addBehaviour(BEHAVIOUR.italize, italBehaviour)
-
-        # Bold+Italize behaviour
-        boldItalBehaviour = HighlightExprBehaviour(
-            HighlighterConfig.boldCol, boldItalRegex
-        )
-        boldItalBehaviour.format.setFontWeight(QFont.Weight.Bold)
-        boldItalBehaviour.format.setFontItalic(True)
-        self.addBehaviour(BEHAVIOUR.boldItal, boldItalBehaviour)
 
         # Searched word
         searchedWordBehaviour = HighlightWordBehaviour(QColor(255, 255, 255), set())
@@ -132,6 +107,7 @@ class Highlighter(QSyntaxHighlighter):
         self, type: BEHAVIOUR
     ) -> (
         HighlightWordBehaviour
+        | HighlightSpellBehaviour
         | HighlightExprBehaviour
         | HighlightMultiExprBehaviour
         | None
@@ -167,7 +143,14 @@ class HighlightSpellBehaviour(HighlightBehaviour):
         )
         self.enchantDict = enchantDict
 
+        exclude = "tag|ref|pov|loc|img|title|chapter|scene|section"
+        self.excludeRegex = re.compile(r"@({})\(.*?\)".format(exclude))
+
     def process(self, highlighter: Highlighter, text: str):
+        check = self.excludeRegex.search(text)
+        if check is not None:
+            return
+
         it = self._expr.finditer(text)
         for found in it:
             if self.enchantDict.check(found.group(0)):
