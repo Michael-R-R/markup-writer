@@ -99,7 +99,7 @@ class XHtmlParser(QRunnable):
         self.body += htmlText
         
     def _processImg(self, text: str):
-        htmlText = "<p class='image'><img src='{}' alt=''></p>\n".format(text)
+        htmlText = "<p class='image'><img src='{}' alt='' width='512'></p>\n".format(text)
         self.body += htmlText
 
     def _processParagraph(self, text: str):
