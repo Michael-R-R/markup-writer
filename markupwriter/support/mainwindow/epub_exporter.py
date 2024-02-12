@@ -127,7 +127,7 @@ class EpubExporter(object):
         if template is None:
             return ""
 
-        body = textwrap.indent(body, "\t" * 3)
+        body = textwrap.indent(body, "\t" * 2)
         template = template.replace("<!--body-->", body)
 
         return template
@@ -175,7 +175,7 @@ class EpubExporter(object):
         names = File.findAllFiles(self.imgPath)
         for n in names:
             ext = File.fileExtension(n)
-            manifest += "<item id='{}' href='images/{}' media-type='image/{}'/>".format(
+            manifest += "<item id='{}' href='images/{}' media-type='image/{}'/>\n".format(
                 n, n, ext
             )
 
