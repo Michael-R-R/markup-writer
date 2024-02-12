@@ -18,3 +18,8 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a> and <a 
 + Document search and replace functionality
 + epub3 exporter
 + Plus more to come...
+
+## Dependices
++ PyQt6 6.6.1
++ pyenchant 3.2.2
++ Python >=3.6.1
