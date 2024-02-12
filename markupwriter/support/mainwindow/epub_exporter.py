@@ -164,8 +164,6 @@ class EpubExporter(object):
         return "<itemref idref='{}'/>\n".format(title)
 
     def _mkContentOPF(self, manifest: str, spine: str):
-        # TODO replace metadata
-
         # add css resources to manifest
         names = File.findAllFiles(self.cssPath)
         for n in names:
