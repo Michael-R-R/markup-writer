@@ -23,6 +23,9 @@ class SpellCheck(object):
             return
         self._sessionSet.remove(word)
         self.endict.remove_from_session(word)
+        
+    def hasWord(self, word: str) -> bool:
+        return word in self._sessionSet
     
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout.writeInt(len(self._sessionSet))
