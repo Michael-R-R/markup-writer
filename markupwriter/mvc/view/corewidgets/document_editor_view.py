@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     Qt,
+    QDataStream,
 )
 
 from PyQt6.QtGui import (
@@ -56,3 +57,11 @@ class DocumentEditorView(QWidget):
         self.adjustSearchBoxPos()
 
         return super().resizeEvent(e)
+
+    def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        sout << self.textEdit
+        return sout
+
+    def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        sin >> self.textEdit
+        return sin
