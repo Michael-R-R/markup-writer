@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
-import re
-import os
+import re, os
 
 from PyQt6.QtCore import (
     QObject,
@@ -14,6 +13,7 @@ from PyQt6.QtCore import (
 from PyQt6.QtGui import (
     QCursor,
     QTextCursor,
+    QTextDocument,
 )
 
 from markupwriter.mvc.model.corewidgets import DocumentEditor
@@ -358,7 +358,7 @@ class DocumentEditorController(QObject):
             prevCursor = currCursor
             currCursor.removeSelectedText()
             currCursor.insertText(replaceText)
-            currCursor = doc.find(searchText, prevCursor)
+            currCursor = doc.find(searchText, prevCursor, QTextDocument.FindFlag.FindCaseSensitively)
 
         prevCursor.endEditBlock()
         textEdit.setTextCursor(prevCursor)
