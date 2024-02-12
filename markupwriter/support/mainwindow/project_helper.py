@@ -23,7 +23,7 @@ from markupwriter.gui.dialogs.modal import (
 
 
 class ProjectHelper(object):
-    def mkProjectDir(parent: QWidget | None) -> (str | None, str | None):
+    def mkProjectDir(parent: QWidget | None) -> tuple[str | None, str | None]:
         name: str = StrDialog.run("Project name?", "Default", parent)
         if name is None:
             return None, None
@@ -48,7 +48,7 @@ class ProjectHelper(object):
 
         return name, path
 
-    def openProjectPath(parent: QWidget) -> (str | None, str | None):
+    def openProjectPath(parent: QWidget) -> tuple[str | None, str | None]:
         path = QFileDialog.getOpenFileName(
             parent, "Open Project", "/home", "Markup Writer Files (*.mwf)"
         )

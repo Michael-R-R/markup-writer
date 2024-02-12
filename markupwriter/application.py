@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import (
     AppConfig,
+    ProjectConfig,
     HighlighterConfig,
     HotkeyConfig,
     SerializeConfig,
@@ -27,6 +28,7 @@ class Application(object):
 
     def start(wd: str):
         AppConfig.init(wd)
+        ProjectConfig.init(wd)
         HighlighterConfig.init(wd)
         HotkeyConfig.init(wd)
         Icon.init(wd)

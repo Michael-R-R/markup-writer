@@ -2,7 +2,7 @@
 
 import os
 
-from markupwriter.config import AppConfig
+from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 from markupwriter.common.tokenizers import EditorTokenizer
 from markupwriter.common.parsers import EditorParser
@@ -11,7 +11,7 @@ import markupwriter.mvc.controller.core.central_widget_controller as cwc
 
 class StartupParser(object):
     def run(cwc: cwc.CentralWidgetController):
-        cpath = AppConfig.projectContentPath()
+        cpath = ProjectConfig.contentPath()
         if cpath is None:
             return
         

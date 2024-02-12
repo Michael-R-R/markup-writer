@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.mvc.model.corewidgets import DocumentTree
 from markupwriter.mvc.view.corewidgets import DocumentTreeView
-from markupwriter.config import AppConfig
+from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 from markupwriter.gui.dialogs.modal import (
     StrDialog,
@@ -159,7 +159,7 @@ class DocumentTreeController(QObject):
 
     @pyqtSlot(str)
     def _onFileAdded(self, uuid: str):
-        path = AppConfig.projectContentPath()
+        path = ProjectConfig.contentPath()
         if path is None:
             return
         path = os.path.join(path, uuid)
@@ -169,7 +169,7 @@ class DocumentTreeController(QObject):
 
     @pyqtSlot(str, str)
     def _onFileRemoved(self, title: str, uuid: str):
-        path = AppConfig.projectContentPath()
+        path = ProjectConfig.contentPath()
         if path is None:
             return
         path = os.path.join(path, uuid)

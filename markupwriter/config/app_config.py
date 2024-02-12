@@ -16,8 +16,7 @@ class AppConfig(BaseConfig):
     APP_NAME: str = None
     APP_EXTENSION: str = None
     ICON_SIZE: QSize = None
-    projectName: str = None
-    projectDir: str = None
+    
     mainWindowSize: QSize = None
     docTreeSize: QSize = None
     docEditorSize: QSize = None
@@ -38,24 +37,12 @@ class AppConfig(BaseConfig):
         AppConfig.docPreviewSize = QSize(100, 100)
         AppConfig.consoleSize = QSize(100, 100)
 
-    def reset():
-        AppConfig.init()
+    def reset(wd: str):
+        AppConfig.init(wd)
 
-    def hasActiveProject() -> bool:
-        return AppConfig.projectDir is not None
 
-    def fullWindowTitle() -> str:
-        return "{} - {}".format(AppConfig.APP_NAME, AppConfig.projectName)
-
-    def projectFilePath() -> str | None:
-        if AppConfig.projectDir is None:
-            return None
-        return os.path.join(AppConfig.projectDir, AppConfig.projectName)
-
-    def projectContentPath() -> str | None:
-        if AppConfig.projectDir is None:
-            return None
-        return os.path.join(AppConfig.projectDir, "data/content/")
+    def setWindowTitle(projectName: str | None) -> str:
+        return "{} - {}".format(AppConfig.APP_NAME, projectName)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << AppConfig.mainWindowSize

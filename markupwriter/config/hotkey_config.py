@@ -44,8 +44,8 @@ class HotkeyConfig(BaseConfig):
         HotkeyConfig.navDown = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Down)
         HotkeyConfig.rename = QKeySequence(Qt.Key.Key_F2)
 
-    def reset():
-        HotkeyConfig.init()
+    def reset(wd: str):
+        HotkeyConfig.init(wd)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << HotkeyConfig.openProject

@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
 )
 
-from markupwriter.config import AppConfig
+from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 from . import DocumentEditorWidget
 
@@ -34,7 +34,7 @@ class PopupPreviewWidget(QWidget):
         self.textEdit.setMouseTracking(False)
         self.textEdit.setEnabled(True)
         self.textEdit.setReadOnly(True)
-        path = os.path.join(AppConfig.projectContentPath(), uuid)
+        path = os.path.join(ProjectConfig.contentPath(), uuid)
         self.textEdit.setPlainText(File.read(path))
         
         self.gLayout = QGridLayout(self)

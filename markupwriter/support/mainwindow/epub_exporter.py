@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
     QTreeWidgetItem,
 )
 
-from markupwriter.config import AppConfig
+from markupwriter.config import AppConfig, ProjectConfig
 from markupwriter.common.util import File
 from markupwriter.gui.widgets import ExportSelectWidget
 from markupwriter.gui.dialogs.modal import ErrorDialog
@@ -83,7 +83,7 @@ class EpubExporter(object):
         shutil.copyfile(src, dst)
 
     def _create(self, dtc: wcore.DocumentTreeController, item: QTreeWidgetItem):
-        contentPath = AppConfig.projectContentPath()
+        contentPath = ProjectConfig.contentPath()
         manifest = ""
         spine = ""
         count = 0

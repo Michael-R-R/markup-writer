@@ -36,8 +36,8 @@ class HighlighterConfig(BaseConfig):
         HighlighterConfig.tagsCol = QColor(217, 140, 179)
         HighlighterConfig.searchedCol = QColor(255, 153, 0)
 
-    def reset():
-        HighlighterConfig.init()
+    def reset(wd: str):
+        HighlighterConfig.init(wd)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << HighlighterConfig.parenCol

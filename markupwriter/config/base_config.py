@@ -2,8 +2,8 @@
 
 
 class BaseConfig:
-    def init():
+    def init(wd: str):
         raise NotImplementedError()
 
-    def reset():
+    def reset(wd: str):
         raise NotImplementedError()

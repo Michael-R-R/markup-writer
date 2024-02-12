@@ -24,7 +24,7 @@ from markupwriter.support.mainwindow import (
 )
 
 from markupwriter.config import (
-    AppConfig,
+    ProjectConfig,
 )
 
 from markupwriter.common.util import (
@@ -44,7 +44,7 @@ class MainWindowController(QObject):
         self.model.centralController.setup()
         self.model.statusBarController.setup()
 
-        self.view.updateWindowTitle()
+        self.view.updateWindowTitle(ProjectConfig.projectName)
         self.view.setMenuBar(self.model.menuBarController.view)
         self.view.setCentralWidget(self.model.centralController.view)
         self.view.setStatusBar(self.model.statusBarController.view)
@@ -72,8 +72,8 @@ class MainWindowController(QObject):
         self.view.show()
 
     def reset(self):
-        AppConfig.projectName = None
-        AppConfig.projectDir = None
+        ProjectConfig.projectName = None
+        ProjectConfig.dir = None
         self.model = MainWindow(self)
         self.setup()
 
@@ -86,8 +86,8 @@ class MainWindowController(QObject):
         if pair == (None, None):
             return
 
-        AppConfig.projectName = pair[0]
-        AppConfig.projectDir = pair[1]
+        ProjectConfig.projectName = pair[0]
+        ProjectConfig.dir = pair[1]
 
         self.model = MainWindow(self)
         self.setup()
@@ -117,10 +117,10 @@ class MainWindowController(QObject):
         if pair == (None, None):
             return
 
-        AppConfig.projectName = pair[0]
-        AppConfig.projectDir = pair[1]
+        ProjectConfig.projectName = pair[0]
+        ProjectConfig.dir = pair[1]
 
-        model: MainWindow = Serialize.read(MainWindow, AppConfig.projectFilePath())
+        model: MainWindow = Serialize.read(MainWindow, ProjectConfig.filePath())
         if model is None:
             self.reset()
             return
@@ -145,7 +145,7 @@ class MainWindowController(QObject):
         
     @pyqtSlot()
     def _onSaveDocument(self) -> bool:
-        if not AppConfig.hasActiveProject():
+        if not ProjectConfig.hasActiveProject():
             return False
         
         cc = self.model.centralController
@@ -159,9 +159,9 @@ class MainWindowController(QObject):
 
     @pyqtSlot()
     def _onSaveProject(self) -> bool:
-        if not AppConfig.hasActiveProject():
+        if not ProjectConfig.hasActiveProject():
             return False
-        if not Serialize.write(AppConfig.projectFilePath(), self.model):
+        if not Serialize.write(ProjectConfig.filePath(), self.model):
             return False
         self._onSaveDocument()
         self.view.showStatusMsg("Project saved...", 2000)
@@ -177,13 +177,13 @@ class MainWindowController(QObject):
             self.reset()
             return
 
-        AppConfig.projectName = pair[0]
-        AppConfig.projectDir = pair[1]
+        ProjectConfig.projectName = pair[0]
+        ProjectConfig.dir = pair[1]
         if not self._onSaveProject():
             self.reset()
             return
 
-        self.view.updateWindowTitle()
+        self.view.updateWindowTitle(ProjectConfig.projectName)
         
     @pyqtSlot()
     def _onExportProject(self):
@@ -195,7 +195,7 @@ class MainWindowController(QObject):
 
     @pyqtSlot()
     def _onCloseProject(self) -> bool:
-        if not AppConfig.hasActiveProject():
+        if not ProjectConfig.hasActiveProject():
             return True
 
         if not ProjectHelper.askToSaveClose(self.view):

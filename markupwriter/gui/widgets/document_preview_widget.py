@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
 )
 
-from markupwriter.config import AppConfig
+from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 from markupwriter.common.syntax import Highlighter
 from markupwriter.common.tokenizers import XHtmlTokenizer
@@ -25,7 +25,7 @@ class DocumentPreviewWidget(QWidget):
     def __init__(self, title: str, uuid: str, parent: QWidget | None) -> None:
         super().__init__(parent)
 
-        path = os.path.join(AppConfig.projectContentPath(), uuid)
+        path = os.path.join(ProjectConfig.contentPath(), uuid)
 
         self.title = title
         self.uuid = uuid
@@ -55,7 +55,7 @@ class DocumentPreviewWidget(QWidget):
         return title == self.title and uuid == self.uuid
 
     def _onRefreshButton(self):
-        path = os.path.join(AppConfig.projectContentPath(), self.uuid)
+        path = os.path.join(ProjectConfig.contentPath(), self.uuid)
         if not File.exists(path):
             self.close()
 

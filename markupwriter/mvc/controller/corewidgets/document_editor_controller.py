@@ -20,7 +20,7 @@ from markupwriter.mvc.model.corewidgets import DocumentEditor
 from markupwriter.mvc.view.corewidgets import DocumentEditorView
 from markupwriter.common.tokenizers import EditorTokenizer
 from markupwriter.common.syntax import BEHAVIOUR
-from markupwriter.config import AppConfig
+from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 from markupwriter.gui.widgets import PopupPreviewWidget
 
@@ -84,7 +84,7 @@ class DocumentEditorController(QObject):
         self.model.currDocPath = self._makePathStr(pathList)
         self.model.currDocUUID = uuid
 
-        info: (int, str) = self.readDoc(uuid)
+        info: tuple[int, str] = self.readDoc(uuid)
         if info == (None, None):
             self.onFileRemoved(uuid)
             return
@@ -127,7 +127,7 @@ class DocumentEditorController(QObject):
         if self._hasMatchingID(uuid):
             text = self.view.textEdit.toPlainText()
         else:
-            path = os.path.join(AppConfig.projectContentPath(), uuid)
+            path = os.path.join(ProjectConfig.contentPath(), uuid)
             text = File.read(path)
 
         tokenizer = EditorTokenizer(uuid, text, self)
@@ -146,7 +146,7 @@ class DocumentEditorController(QObject):
         if not self._hasDocument():
             return False
 
-        path = AppConfig.projectContentPath()
+        path = ProjectConfig.contentPath()
         if path is None:
             return False
 
@@ -162,11 +162,11 @@ class DocumentEditorController(QObject):
 
         return True
 
-    def readDoc(self, uuid: str) -> (int | None, str | None):
+    def readDoc(self, uuid: str) -> tuple[int | None, str | None]:
         if not self._hasDocument():
             return (None, None)
 
-        path = AppConfig.projectContentPath()
+        path = ProjectConfig.contentPath()
         if path is None:
             return (None, None)
 
