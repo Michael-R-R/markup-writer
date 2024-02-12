@@ -8,6 +8,7 @@ try:
     import PyQt6.QtCore
     import PyQt6.QtWidgets
     import PyQt6.QtGui
+    import enchant
 except Exception as e:
     print(str(e))
     sys.exit(1)

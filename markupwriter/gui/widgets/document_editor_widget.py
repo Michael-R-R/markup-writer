@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import re
+import enchant
 
 from PyQt6.QtCore import (
     Qt,
@@ -10,22 +11,24 @@ from PyQt6.QtCore import (
 )
 
 from PyQt6.QtGui import (
+    QContextMenuEvent,
     QKeyEvent,
     QMouseEvent,
     QResizeEvent,
     QTextOption,
     QTextCursor,
     QGuiApplication,
+    QAction,
 )
 
 from PyQt6.QtWidgets import (
     QPlainTextEdit,
     QWidget,
     QFrame,
+    QMenu,
 )
 
 from markupwriter.common.syntax import Highlighter
-from markupwriter.common.util import File
 
 import markupwriter.support.doceditor as de
 
@@ -38,8 +41,8 @@ class DocumentEditorWidget(QPlainTextEdit):
         super().__init__(parent)
 
         self.plainDocument = de.PlainDocument(self)
-        self.highlighter = Highlighter(self.plainDocument)
-
+        self.enchantDict = enchant.Dict("en_US")
+        self.highlighter = Highlighter(self.plainDocument, self.enchantDict)
         self.canResizeMargins = True
 
         self.setDocument(self.plainDocument)
@@ -104,6 +107,40 @@ class DocumentEditorWidget(QPlainTextEdit):
                 self.textCursor().insertText(imgTag)
         else:
             return super().insertFromMimeData(source)
+        
+    # TODO refactor this
+    def contextMenuEvent(self, e: QContextMenuEvent | None) -> None:
+        menu = self.createStandardContextMenu()
+        
+        cursor = self.cursorForPosition(e.pos())
+        cpos = cursor.positionInBlock()
+        textBlock = cursor.block().text()
+        if cpos > 0 or cpos < len(textBlock):
+            cursor.select(QTextCursor.SelectionType.WordUnderCursor)
+            self.setTextCursor(cursor)
+            word = self.textCursor().selectedText()
+            if not self.enchantDict.check(word):
+                spellingMenu = QMenu("Spelling suggestions")
+                slist = self.enchantDict.suggest(word)
+                count = 5 if len(slist) > 5 else len(slist)
+                for i in range(count):
+                    action = QAction(slist[i], spellingMenu)
+                    action.triggered.connect(lambda _, val=slist[i]: self.makeWordCorrection(val))
+                    spellingMenu.addAction(action)
+                if len(spellingMenu.actions()) > 0:
+                    menu.insertSeparator(menu.actions()[0])
+                    menu.insertMenu(menu.actions()[0], spellingMenu)
+        
+        menu.exec(e.globalPos())
+        
+    # TODO refactor this
+    def makeWordCorrection(self, word: str):
+        cursor = self.textCursor()
+        cursor.beginEditBlock()
+        cursor.removeSelectedText()
+        cursor.insertText(word)
+        cursor.endEditBlock()
+        self.setTextCursor(cursor)
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         self.resizeMargins()

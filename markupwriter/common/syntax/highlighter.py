@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from enum import auto, Enum
-import re
+import re, enchant
 
 from PyQt6.QtGui import (
     QSyntaxHighlighter,
@@ -29,10 +29,11 @@ class BEHAVIOUR(Enum):
     tags = auto()
     keyword = auto()
     searchText = auto()
+    spellCheck = auto()
 
 
 class Highlighter(QSyntaxHighlighter):
-    def __init__(self, document: QTextDocument | None):
+    def __init__(self, document: QTextDocument | None, enchantDict: enchant.Dict):
         super().__init__(document)
 
         parenRegex = r"\(|\)"
@@ -46,6 +47,13 @@ class Highlighter(QSyntaxHighlighter):
         headerRegex = r"^@(title|chapter|scene|section)"
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
+
+        self.addBehaviour(
+            BEHAVIOUR.spellCheck,
+            HighlightSpellBehaviour(
+                QColor(255, 255, 255), r"(?iu)[\w\']+", enchantDict
+            ),
+        )
 
         self.addBehaviour(
             BEHAVIOUR.paren,
@@ -90,9 +98,11 @@ class Highlighter(QSyntaxHighlighter):
         italBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, italRegex)
         italBehaviour.format.setFontItalic(True)
         self.addBehaviour(BEHAVIOUR.italize, italBehaviour)
-        
+
         # Bold+Italize behaviour
-        boldItalBehaviour = HighlightExprBehaviour(HighlighterConfig.boldCol, boldItalRegex)
+        boldItalBehaviour = HighlightExprBehaviour(
+            HighlighterConfig.boldCol, boldItalRegex
+        )
         boldItalBehaviour.format.setFontWeight(QFont.Weight.Bold)
         boldItalBehaviour.format.setFontItalic(True)
         self.addBehaviour(BEHAVIOUR.boldItal, boldItalBehaviour)
@@ -146,6 +156,25 @@ class HighlightBehaviour(object):
 
     def setExpression(self, expr: str):
         self._expr = re.compile(expr)
+
+
+class HighlightSpellBehaviour(HighlightBehaviour):
+    def __init__(self, color: QColor, expr: str, enchantDict: enchant.Dict):
+        super().__init__(color, expr)
+        self.format.setUnderlineColor(QColor(255, 0, 0))
+        self.format.setUnderlineStyle(
+            QTextCharFormat.UnderlineStyle.SpellCheckUnderline
+        )
+        self.enchantDict = enchantDict
+
+    def process(self, highlighter: Highlighter, text: str):
+        it = self._expr.finditer(text)
+        for found in it:
+            if self.enchantDict.check(found.group(0)):
+                continue
+            start = found.start()
+            end = found.end() - start
+            highlighter.setFormat(start, end, self.format)
 
 
 class HighlightWordBehaviour(HighlightBehaviour):
