@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.gui.menus.doctree import (
-    AddItemMenu,
+    ItemMenu,
 )
 
 from markupwriter.gui.contextmenus import (
@@ -17,11 +17,10 @@ class TreeContextMenu(BaseContextMenu):
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
 
-        self.addItemMenu = AddItemMenu(parent)
+        self.itemMenu = ItemMenu(parent)
+        self.itemMenu.setEnabled(False)
 
-        self._menu.addMenu(self.addItemMenu)
-        
-        self.addItemMenu.setEnabled(False)
+        self._menu.addMenu(self.itemMenu)
 
     def preprocess(self, args: list[object] | None):
         pass

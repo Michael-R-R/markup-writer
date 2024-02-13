@@ -42,7 +42,7 @@ class DocumentTreeController(QObject):
     def setup(self):
         # --- Tree bar signals --- #
         treebar = self.view.treebar
-        treebar.addItemAction.itemCreated.connect(self._onItemCreated)
+        treebar.itemMenuAction.itemCreated.connect(self._onItemCreated)
         treebar.navUpAction.triggered.connect(self._onItemNavUp)
         treebar.navDownAction.triggered.connect(self._onItemNavDown)
 
@@ -56,7 +56,7 @@ class DocumentTreeController(QObject):
 
         # --- Tree context menu signals --- #
         tcm = self.view.treewidget.treeContextMenu
-        tcm.addItemMenu.itemCreated.connect(self._onItemCreated)
+        tcm.itemMenu.itemCreated.connect(self._onItemCreated)
 
         # --- Item context menu signals --- #
         icm = self.view.treewidget.itemContextMenu
@@ -74,11 +74,11 @@ class DocumentTreeController(QObject):
         treeBar = self.view.treebar
         treeBar.navUpAction.setEnabled(isEnabled)
         treeBar.navDownAction.setEnabled(isEnabled)
-        treeBar.addItemAction.setEnabled(isEnabled)
+        treeBar.itemMenuAction.setEnabled(isEnabled)
 
     def setEnabledTreeActions(self, isEnabled: bool):
         tree = self.view.treewidget
-        tree.treeContextMenu.addItemMenu.setEnabled(isEnabled)
+        tree.treeContextMenu.itemMenu.setEnabled(isEnabled)
 
     def createRootFolders(self):
         tree = self.view.treewidget

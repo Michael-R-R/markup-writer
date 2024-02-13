@@ -13,7 +13,7 @@ from markupwriter.common.provider import (
 )
 
 from markupwriter.gui.menus.doctree import (
-    AddItemMenu,
+    ItemMenu,
 )
 
 from markupwriter.gui.contextmenus import (
@@ -25,7 +25,7 @@ class ItemContextMenu(BaseContextMenu):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
 
-        self.addItemMenu = AddItemMenu(parent)
+        self.addItemMenu = ItemMenu(parent)
         self._menu.addMenu(self.addItemMenu)
 
         self.previewAction = QAction("Preview", self)
