@@ -12,6 +12,7 @@ import markupwriter.mv.view as v
 
 class DocumentEditorDelegate(QObject):
     closeDocTriggered = pyqtSignal()
+    searchTriggered = pyqtSignal()
     popupRequested = pyqtSignal(str, int)
     previewRequested = pyqtSignal(str, int)
     searchChanged = pyqtSignal(str, bool)
@@ -29,6 +30,7 @@ class DocumentEditorDelegate(QObject):
         ed.closeAction.triggered.connect(lambda: self.closeDocTriggered.emit())
 
         te = self.view.textEdit
+        te.searchHotkey.triggered.connect(lambda: self.searchTriggered.emit())
         te.popupRequested.connect(lambda x, y: self.popupRequested.emit(x, y))
         te.previewRequested.connect(lambda x, y: self.previewRequested.emit(x, y))
         

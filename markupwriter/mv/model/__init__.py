@@ -3,3 +3,4 @@ from .main_menu_bar_model import MainMenuBarModel
 from .central_widget_model import CentralWidgetModel
 from .document_tree_model import DocumentTreeModel
 from .document_editor_model import DocumentEditorModel
+from .document_preview_model import DocumentPreviewModel
