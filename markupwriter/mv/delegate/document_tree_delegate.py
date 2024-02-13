@@ -30,9 +30,9 @@ class DocumentTreeDelegate(QObject):
         self.model = m.DocumentTreeModel(self)
         self.view = v.DocumentTreeView(None)
 
-        self._setupTreeWidgetConnections()
+        self._setupViewConnections()
 
-    def _setupTreeWidgetConnections(self):
+    def _setupViewConnections(self):
         tb = self.view.treeBar
         tb.navUpAction.triggered.connect(lambda: self.navUpTriggered.emit())
         tb.navDownAction.triggered.connect(lambda: self.navDownTriggered.emit())

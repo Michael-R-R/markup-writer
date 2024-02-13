@@ -18,6 +18,8 @@ from PyQt6.QtGui import (
     QTextOption,
     QTextCursor,
     QGuiApplication,
+    QAction,
+    QKeySequence,
 )
 
 from PyQt6.QtWidgets import (
@@ -33,8 +35,8 @@ import markupwriter.support.doceditor as de
 
 
 class DocumentEditorWidget(QPlainTextEdit):
-    tagPopupRequested = pyqtSignal(str, int)
-    tagPreviewRequested = pyqtSignal(str, int)
+    popupRequested = pyqtSignal(str, int)
+    previewRequested = pyqtSignal(str, int)
 
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
@@ -42,7 +44,11 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.plainDocument = de.PlainDocument(self)
         self.spellChecker = de.SpellCheck()
         self.highlighter = Highlighter(self.plainDocument, self.spellChecker.endict)
+        self.searchHotkey = QAction("search", self)
         self.canResizeMargins = True
+
+        shortcut = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F)
+        self.searchHotkey.setShortcut(shortcut)
 
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
@@ -140,13 +146,13 @@ class DocumentEditorWidget(QPlainTextEdit):
             if e.button() == button:
                 pair: tuple[str, int] = self._onTextBlockClicked(e.pos())
                 if pair != (None, None):
-                    self.tagPopupRequested.emit(pair[0], pair[1])
+                    self.popupRequested.emit(pair[0], pair[1])
                 return None
         elif e.modifiers() == (ctrl | alt):
             if e.button() == button:
                 pair: tuple[str, int] = self._onTextBlockClicked(e.pos())
                 if pair != (None, None):
-                    self.tagPreviewRequested.emit(pair[0], pair[1])
+                    self.previewRequested.emit(pair[0], pair[1])
                 return None
 
         return super().mousePressEvent(e)

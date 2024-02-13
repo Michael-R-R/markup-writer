@@ -13,6 +13,7 @@ class Core(QObject):
         self.mmbd = d.MainMenuBarDelegate(self)
         self.cwd = d.CentralWidgetDelegate(self)
         self.dtd = d.DocumentTreeDelegate(self)
+        self.ded = d.DocumentEditorDelegate(self)
         
         self._setup()
         
@@ -24,3 +25,4 @@ class Core(QObject):
         self.mwd.setCentralWidget(self.cwd.view)
         
         self.cwd.insertWidgetLHS(0, self.dtd.view)
+        self.cwd.insertWidgetRHS(0, self.ded.view)

@@ -2,3 +2,4 @@ from .main_window_delegate import MainWindowDelegate
 from .main_menu_bar_delegate import MainMenuBarDelegate
 from .central_widget_delegate import CentralWidgetDelegate
 from .document_tree_delegate import DocumentTreeDelegate
+from .document_editor_delegate import DocumentEditorDelegate

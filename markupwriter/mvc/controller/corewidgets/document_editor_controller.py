@@ -47,8 +47,8 @@ class DocumentEditorController(QObject):
 
         # --- Text edit signals --- #
         textEdit = self.view.textEdit
-        textEdit.tagPopupRequested.connect(self._onTagPopupRequested)
-        textEdit.tagPreviewRequested.connect(self._onTagPreviewRequested)
+        textEdit.popupRequested.connect(self._onTagPopupRequested)
+        textEdit.previewRequested.connect(self._onTagPreviewRequested)
 
         # --- Search box signals --- #
         searchBox = self.view.searchBox
