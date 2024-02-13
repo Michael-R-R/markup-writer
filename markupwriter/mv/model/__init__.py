@@ -1,2 +1,4 @@
 from .main_window_model import MainWindowModel
+from .main_menu_bar_model import MainMenuBarModel
 from .central_widget_model import CentralWidgetModel
+from .document_tree_model import DocumentTreeModel

@@ -3,10 +3,11 @@
 from PyQt6.QtCore import (
     QObject,
     QDataStream,
+    pyqtSignal,
 )
 
 
-class CentralWidgetModel(QObject):
+class MainMenuBarModel(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
         

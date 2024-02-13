@@ -6,7 +6,7 @@ from PyQt6.QtCore import (
 )
 
 
-class CentralWidgetModel(QObject):
+class DocumentTreeModel(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
         

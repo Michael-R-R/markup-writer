@@ -10,10 +10,17 @@ class Core(QObject):
         super().__init__(parent)
         
         self.mwd = d.MainWindowDelegate(self)
+        self.mmbd = d.MainMenuBarDelegate(self)
         self.cwd = d.CentralWidgetDelegate(self)
+        self.dtd = d.DocumentTreeDelegate(self)
+        
+        self._setup()
         
     def run(self):
         self.mwd.showMainView()
         
     def _setup(self):
+        self.mwd.setMenuBar(self.mmbd.view)
         self.mwd.setCentralWidget(self.cwd.view)
+        
+        self.cwd.insertWidgetLHS(0, self.dtd.view)

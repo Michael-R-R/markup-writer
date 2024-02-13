@@ -9,7 +9,10 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtWidgets import (
     QWidget,
+    QMenuBar,
 )
+
+from markupwriter.common.provider import Style
 
 import markupwriter.mv.model as m
 import markupwriter.mv.view as v
@@ -28,7 +31,11 @@ class MainWindowDelegate(QObject):
         self.view.resized.connect(lambda x: self.viewResized.emit(x))
         
     def showMainView(self):
+        self.view.setStyleSheet(Style.MAIN_WINDOW)
         self.view.show()
+        
+    def setMenuBar(self, menuBar: QMenuBar):
+        self.view.setMenuBar(menuBar)
         
     def setCentralWidget(self, widget: QWidget):
         self.view.setCentralWidget(widget)

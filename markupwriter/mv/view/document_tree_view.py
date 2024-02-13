@@ -1,45 +1,44 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
-    QDataStream,
     pyqtSignal,
+    QDataStream,
     QSize,
 )
 
 from PyQt6.QtGui import (
-    QCloseEvent, 
     QResizeEvent,
 )
 
 from PyQt6.QtWidgets import (
-    QMainWindow,
     QWidget,
+    QGridLayout,
 )
 
-from markupwriter.config import AppConfig
-from markupwriter.common.provider import Icon
+import markupwriter.gui.widgets as w
 
 
-class MainWindowView(QMainWindow):
-    closing = pyqtSignal()
+class DocumentTreeView(QWidget):
     resized = pyqtSignal(QSize)
     
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
-        self.setWindowIcon(Icon.BOOKS) # TODO get better app icon
-        self.resize(AppConfig.mainWindowSize)
+        self.treeBar = w.DocumentTreeBarWidget(self)
+        self.treeWidget = w.DocumentTreeWidget(self)
+        
+        self.gLayout = QGridLayout(self)
+        self.gLayout.addWidget(self.treeBar, 0, 0)
+        self.gLayout.addWidget(self.treeWidget, 1, 0)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         self.resized.emit(e.size())
         return super().resizeEvent(e)
-        
-    def closeEvent(self, e: QCloseEvent | None) -> None:
-        self.closing.emit()
-        return super().closeEvent(e)
-        
+    
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        sout << self.treeWidget
         return sout
     
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        sin >> self.treeWidget
         return sin
