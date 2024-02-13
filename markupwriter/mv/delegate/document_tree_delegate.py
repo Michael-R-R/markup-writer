@@ -8,6 +8,7 @@ from PyQt6.QtCore import (
 
 import markupwriter.mv.model as m
 import markupwriter.mv.view as v
+import markupwriter.support.doctree.item as dti
 
 
 # TODO rework signals for add item menu
@@ -31,6 +32,25 @@ class DocumentTreeDelegate(QObject):
         self.view = v.DocumentTreeView(None)
 
         self._setupViewConnections()
+        
+    def setEnabledTreeBarActions(self, isEnabled: bool):
+        tb = self.view.treeBar
+        tb.navUpAction.setEnabled(isEnabled)
+        tb.navDownAction.setEnabled(isEnabled)
+        tb.addItemAction.setEnabled(isEnabled)
+    
+    def setEnabledTreeActions(self, isEnabled: bool):
+        tcm = self.view.treeWidget.treeContextMenu
+        tcm.addItemMenu.setEnabled(isEnabled)
+    
+    def createRootFolders(self):
+        tw = self.view.treeWidget
+        tw.add(dti.PlotFolderItem())
+        tw.add(dti.TimelineFolderItem())
+        tw.add(dti.CharsFolderItem())
+        tw.add(dti.LocFolderItem())
+        tw.add(dti.ObjFolderItem())
+        tw.add(dti.TrashFolderItem())
 
     def _setupViewConnections(self):
         tb = self.view.treeBar

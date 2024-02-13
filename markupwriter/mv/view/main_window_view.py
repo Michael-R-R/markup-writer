@@ -28,6 +28,7 @@ class MainWindowView(QMainWindow):
         super().__init__(parent)
         
         self.setWindowIcon(Icon.BOOKS) # TODO get better app icon
+        self.setWindowTitle(AppConfig.APP_NAME)
         self.resize(AppConfig.mainWindowSize)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
