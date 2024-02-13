@@ -1,0 +1,2 @@
+from .main_window_delegate import MainWindowDelegate
+from .central_widget_delegate import CentralWidgetDelegate

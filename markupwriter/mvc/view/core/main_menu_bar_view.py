@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.gui.menus.mainmenubar import (
     FileMainMenu,
-    EditMainMenu,
 )
 
 
@@ -16,7 +15,5 @@ class MainMenuBarView(QMenuBar):
         super().__init__(parent)
 
         self.filemenu = FileMainMenu(self)
-        self.editmenu = EditMainMenu(self)
         
         self.addMenu(self.filemenu)
-        self.addMenu(self.editmenu)
