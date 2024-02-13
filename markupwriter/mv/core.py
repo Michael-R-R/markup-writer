@@ -68,20 +68,24 @@ class Core(QObject):
 
         self.mwd = d.MainWindowDelegate(self)
         self.data = None
-        
+        self.dtw = None
+
         self.setup(CoreData(self))
 
     def setup(self, data: CoreData):
         self.data = data
         self.data.setup(self.mwd)
-        
+
+        self.dtw = w.DocumentTreeWorker(self.data.dtd, self)
+
         self._setupCoreSlots()
-        
+        self._setupTreeWorkerSlots()
+
         self.setWindowTitle()
 
     def run(self):
         self.mwd.showMainView()
-        
+
     def reset(self):
         ProjectConfig.projectName = None
         ProjectConfig.dir = None
@@ -98,6 +102,15 @@ class Core(QObject):
         self.data.mmbd.fmSaveAsTriggered.connect(self._onSaveAsProject)
         self.data.mmbd.fmCloseTriggered.connect(self._onCloseProject)
         self.data.mmbd.fmExitTriggered.connect(self._onExit)
+
+    def _setupTreeWorkerSlots(self):
+        self.data.dtd.createdNovel.connect(self.dtw.onNovelFolderCreated)
+        self.data.dtd.createdMiscFolder.connect(self.dtw.onMiscFolderCreated)
+        self.data.dtd.createdTitle.connect(self.dtw.onTitleFileCreated)
+        self.data.dtd.createdChapter.connect(self.dtw.onChapterFileCreated)
+        self.data.dtd.createdScene.connect(self.dtw.onSceneFileCreated)
+        self.data.dtd.createdSection.connect(self.dtw.onSectionFileCreated)
+        self.data.dtd.createdMiscFile.connect(self.dtw.onMiscFileCreated)
 
     @pyqtSlot()
     def _onNewProject(self):
@@ -133,7 +146,7 @@ class Core(QObject):
         info = ProjectHelper.openProjectPath(self.mwd.view)
         if info == (None, None):
             return
-        
+
         ProjectConfig.projectName = info[0]
         ProjectConfig.dir = info[1]
 
@@ -151,7 +164,7 @@ class Core(QObject):
 
         data.dtd.setEnabledTreeBarActions(True)
         data.dtd.setEnabledTreeActions(True)
-        
+
         # TODO do startup parser
 
     @pyqtSlot()

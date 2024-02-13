@@ -60,7 +60,7 @@ class DocumentTreeController(QObject):
 
         # --- Item context menu signals --- #
         icm = self.view.treewidget.itemContextMenu
-        icm.addItemMenu.itemCreated.connect(self._onItemCreated)
+        icm.itemMenu.itemCreated.connect(self._onItemCreated)
         icm.previewAction.triggered.connect(self._onPreviewItem)
         icm.renameAction.triggered.connect(self._onItemRename)
         icm.toTrashAction.triggered.connect(self._onItemMoveToTrash)

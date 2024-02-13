@@ -8,6 +8,7 @@ from PyQt6.QtCore import (
 
 import markupwriter.mv.model as m
 import markupwriter.mv.view as v
+import markupwriter.gui.menus.doctree as dtm
 import markupwriter.support.doctree.item as dti
 
 
@@ -65,22 +66,31 @@ class DocumentTreeDelegate(QObject):
         tb.navUpAction.triggered.connect(lambda: self.navedUpItem.emit())
         tb.navDownAction.triggered.connect(lambda: self.navedDownItem.emit())
         
-        im = tb.itemMenuAction.itemMenu
-        im.novelAction.triggered.connect(lambda: self.createdNovel.emit())
-        im.miscFolderAction.triggered.connect(lambda: self.createdMiscFolder.emit())
-        im.titleAction.triggered.connect(lambda: self.createdTitle.emit())
-        im.chapterAction.triggered.connect(lambda: self.createdChapter.emit())
-        im.sceneAction.triggered.connect(lambda: self.createdScene.emit())
-        im.sectionAction.triggered.connect(lambda: self.createdSection.emit())
-        im.miscFileAction.triggered.connect(lambda: self.createdMiscFile.emit())
-
         tw = self.view.treeWidget
         tw.fileAdded.connect(lambda x: self.fileAdded.emit(x))
         tw.fileRemoved.connect(lambda x, y: self.fileRemoved.emit(x, y))
         tw.fileOpened.connect(lambda x, y: self.fileOpened.emit(x, y))
         tw.fileMoved.connect(lambda x, y: self.fileMoved.emit(x, y))
         
+        icm = tw.itemContextMenu
+        icm.previewAction.triggered.connect(lambda: self.previewedItem.emit())
+        icm.renameAction.triggered.connect(lambda: self.renamedItem.emit())
+        icm.toTrashAction.triggered.connect(lambda: self.trashedItem.emit())
+        icm.recoverAction.triggered.connect(lambda: self.recoveredItem.emit())
+        
+        tcm = tw.trashContextMenu
+        tcm.emptyAction.triggered.connect(lambda: self.emptiedTrash.emit())
+        
+        im = tb.itemMenuAction.itemMenu
+        self._setupItemMenuConnections(im)
+        
         im = tw.treeContextMenu.itemMenu
+        self._setupItemMenuConnections(im)
+        
+        im = icm.itemMenu
+        self._setupItemMenuConnections(im)
+        
+    def _setupItemMenuConnections(self, im: dtm.ItemMenu):
         im.novelAction.triggered.connect(lambda: self.createdNovel.emit())
         im.miscFolderAction.triggered.connect(lambda: self.createdMiscFolder.emit())
         im.titleAction.triggered.connect(lambda: self.createdTitle.emit())
@@ -88,15 +98,6 @@ class DocumentTreeDelegate(QObject):
         im.sceneAction.triggered.connect(lambda: self.createdScene.emit())
         im.sectionAction.triggered.connect(lambda: self.createdSection.emit())
         im.miscFileAction.triggered.connect(lambda: self.createdMiscFile.emit())
-
-        icm = tw.itemContextMenu
-        icm.previewAction.triggered.connect(lambda: self.previewedItem.emit())
-        icm.renameAction.triggered.connect(lambda: self.renamedItem.emit())
-        icm.toTrashAction.triggered.connect(lambda: self.trashedItem.emit())
-        icm.recoverAction.triggered.connect(lambda: self.recoveredItem.emit())
-
-        tcm = tw.trashContextMenu
-        tcm.emptyAction.triggered.connect(lambda: self.emptiedTrash.emit())
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.model
