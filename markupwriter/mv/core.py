@@ -31,23 +31,21 @@ class CoreData(QObject):
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
 
-        self.mwd = d.MainWindowDelegate(self)
         self.mmbd = d.MainMenuBarDelegate(self)
         self.cwd = d.CentralWidgetDelegate(self)
         self.dtd = d.DocumentTreeDelegate(self)
         self.ded = d.DocumentEditorDelegate(self)
         self.dpd = d.DocumentPreviewDelegate(self)
 
-    def setup(self):
-        self.mwd.setMenuBar(self.mmbd.view)
-        self.mwd.setCentralWidget(self.cwd.view)
+    def setup(self, mwd: d.MainWindowDelegate):
+        mwd.setMenuBar(self.mmbd.view)
+        mwd.setCentralWidget(self.cwd.view)
 
         self.cwd.insertWidgetLHS(0, self.dtd.view)
         self.cwd.insertWidgetRHS(0, self.ded.view)
         self.cwd.addWidgetRHS(self.dpd.view)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
-        sout << self.mwd
         sout << self.mmbd
         sout << self.cwd
         sout << self.dtd
@@ -56,7 +54,6 @@ class CoreData(QObject):
         return sout
 
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
-        sin >> self.mwd
         sin >> self.mmbd
         sin >> self.cwd
         sin >> self.dtd
@@ -69,14 +66,30 @@ class Core(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
 
-        self.data = CoreData(self)
+        self.mwd = d.MainWindowDelegate(self)
+        self.data = None
+        
+        self.setup(CoreData(self))
 
-    def setup(self):
-        self.data.setup()
+    def setup(self, data: CoreData):
+        self.data = data
+        self.data.setup(self.mwd)
+        
         self._setupCoreSlots()
+        
+        self.setWindowTitle()
 
     def run(self):
-        self.data.mwd.showMainView()
+        self.mwd.showMainView()
+        
+    def reset(self):
+        ProjectConfig.projectName = None
+        ProjectConfig.dir = None
+        self.setup(CoreData(self))
+
+    def setWindowTitle(self):
+        title = "{} - {}".format(AppConfig.APP_NAME, ProjectConfig.projectName)
+        self.mwd.setViewTitle(title)
 
     def _setupCoreSlots(self):
         self.data.mmbd.fmNewTriggered.connect(self._onNewProject)
@@ -86,28 +99,21 @@ class Core(QObject):
         self.data.mmbd.fmCloseTriggered.connect(self._onCloseProject)
         self.data.mmbd.fmExitTriggered.connect(self._onExit)
 
-    def _reset(self):
-        ProjectConfig.projectName = None
-        ProjectConfig.dir = None
-        self.data = CoreData(self)
-        self.setup()
-
     @pyqtSlot()
     def _onNewProject(self):
         if not self._onCloseProject():
             return
 
-        data = self.data
-
-        info = ProjectHelper.mkProjectDir(data.mwd.view)
+        info = ProjectHelper.mkProjectDir(self.mwd.view)
         if info == (None, None):
             return
 
         ProjectConfig.projectName = info[0]
         ProjectConfig.dir = info[1]
 
-        self.setup()
+        self.setup(CoreData(self))
 
+        data = self.data
         data.mmbd.setEnableSaveAction(True)
         data.mmbd.setEnableSaveAsAction(True)
         data.mmbd.setEnableExportAction(True)
@@ -124,20 +130,19 @@ class Core(QObject):
         if not self._onCloseProject():
             return
 
-        pair = ProjectHelper.openProjectPath(self.data.mwd.view)
-        if pair == (None, None):
+        info = ProjectHelper.openProjectPath(self.mwd.view)
+        if info == (None, None):
             return
-
-        ProjectConfig.projectName = pair[0]
-        ProjectConfig.dir = pair[1]
+        
+        ProjectConfig.projectName = info[0]
+        ProjectConfig.dir = info[1]
 
         data: CoreData = Serialize.read(CoreData, ProjectConfig.filePath())
         if data is None:
-            self._reset()
+            self.reset()
             return
 
-        self.data = data
-        self.setup()
+        self.setup(data)
 
         data.mmbd.setEnableSaveAction(True)
         data.mmbd.setEnableSaveAsAction(True)
@@ -146,7 +151,7 @@ class Core(QObject):
 
         data.dtd.setEnabledTreeBarActions(True)
         data.dtd.setEnabledTreeActions(True)
-
+        
         # TODO do startup parser
 
     @pyqtSlot()
@@ -160,39 +165,38 @@ class Core(QObject):
 
     @pyqtSlot()
     def _onSaveAsProject(self):
-        if ProjectHelper.askToSave(self.data.mwd.view):
+        if ProjectHelper.askToSave(self.mwd.view):
             self._onSaveProject()
 
-        pair = ProjectHelper.mkProjectDir(self.data.mwd.view)
+        pair = ProjectHelper.mkProjectDir(self.mwd.view)
         if pair == (None, None):
-            self._reset()
+            self.reset()
             return
 
         ProjectConfig.projectName = pair[0]
         ProjectConfig.dir = pair[1]
 
         if not self._onSaveProject():
-            self._reset()
+            self.reset()
             return
 
-        title = "{} - {}".format(AppConfig.APP_NAME, ProjectConfig.projectName)
-        self.data.mwd.setViewTitle(title)
+        self.setWindowTitle()
 
     @pyqtSlot()
     def _onCloseProject(self):
         if not ProjectConfig.hasActiveProject():
             return True
 
-        if not ProjectHelper.askToSaveClose(self.data.mwd.view):
+        if not ProjectHelper.askToSaveClose(self.mwd.view):
             return False
 
         self._onSaveProject()
-        self._reset()
+        self.reset()
 
         return True
 
     @pyqtSlot()
     def _onExit(self):
-        if ProjectHelper.askToExit(self.view):
+        if ProjectHelper.askToExit(self.mwd.view):
             self._onSaveProject()
             QApplication.quit()

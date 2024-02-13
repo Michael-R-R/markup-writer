@@ -37,7 +37,6 @@ class Application(object):
         app.setApplicationName(AppConfig.APP_NAME)
 
         core = mv.Core(app)
-        core.setup()
         core.run()
 
         Application.status = app.exec()
