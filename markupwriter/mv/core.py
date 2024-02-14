@@ -69,6 +69,7 @@ class Core(QObject):
         self.mwd = d.MainWindowDelegate(self)
         self.data = None
         self.dtw = None
+        self.dew = None
 
         self.setup(CoreData(self))
 
@@ -77,9 +78,11 @@ class Core(QObject):
         self.data.setup(self.mwd)
 
         self.dtw = w.DocumentTreeWorker(self.data.dtd, self)
+        self.dew = w.DocumentEditorWorker(self.data.ded, self)
 
         self._setupCoreSlots()
         self._setupTreeWorkerSlots()
+        self._setupEditorWorkerSlots()
 
         self.setWindowTitle()
 
@@ -118,6 +121,9 @@ class Core(QObject):
         self.data.dtd.createdScene.connect(self.dtw.onSceneFileCreated)
         self.data.dtd.createdSection.connect(self.dtw.onSectionFileCreated)
         self.data.dtd.createdMiscFile.connect(self.dtw.onMiscFileCreated)
+
+    def _setupEditorWorkerSlots(self):
+        pass
 
     @pyqtSlot()
     def _onNewProject(self):
