@@ -17,6 +17,8 @@ class DocumentTreeDelegate(QObject):
     fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
     fileMoved = pyqtSignal(str, list)
+    fileRenamed = pyqtSignal(str, str, str)
+    dragDropDone = pyqtSignal()
     
     navedUpItem = pyqtSignal()
     navedDownItem = pyqtSignal()
@@ -71,6 +73,8 @@ class DocumentTreeDelegate(QObject):
         tw.fileRemoved.connect(lambda x, y: self.fileRemoved.emit(x, y))
         tw.fileOpened.connect(lambda x, y: self.fileOpened.emit(x, y))
         tw.fileMoved.connect(lambda x, y: self.fileMoved.emit(x, y))
+        tw.fileRenamed.connect(lambda x, y, z: self.fileRenamed.emit(x, y, z))
+        tw.dragDropDone.connect(lambda: self.dragDropDone.emit())
         
         icm = tw.itemContextMenu
         icm.previewAction.triggered.connect(lambda: self.previewedItem.emit())

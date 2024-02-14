@@ -52,7 +52,7 @@ class DocumentTreeController(QObject):
         tree.fileRemoved.connect(self._onFileRemoved)
         tree.fileOpened.connect(self._onFileOpened)
         tree.fileMoved.connect(self._onFileMoved)
-        tree.dropComplete.connect(self._onDropComplete)
+        tree.dragDropDone.connect(self._onDropComplete)
 
         # --- Tree context menu signals --- #
         tcm = self.view.treewidget.treeContextMenu

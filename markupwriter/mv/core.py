@@ -104,6 +104,13 @@ class Core(QObject):
         self.data.mmbd.fmExitTriggered.connect(self._onExit)
 
     def _setupTreeWorkerSlots(self):
+        self.data.dtd.dragDropDone.connect(self.dtw.onDragDropDone)
+        self.data.dtd.navedUpItem.connect(self.dtw.onNavItemUp)
+        self.data.dtd.navedDownItem.connect(self.dtw.onNavItemDown)
+        self.data.dtd.renamedItem.connect(self.dtw.onRenamedItem)
+        self.data.dtd.trashedItem.connect(self.dtw.onTrashItem)
+        self.data.dtd.recoveredItem.connect(self.dtw.onRecoverItem)
+        self.data.dtd.emptiedTrash.connect(self.dtw.onEmptyTrash)
         self.data.dtd.createdNovel.connect(self.dtw.onNovelFolderCreated)
         self.data.dtd.createdMiscFolder.connect(self.dtw.onMiscFolderCreated)
         self.data.dtd.createdTitle.connect(self.dtw.onTitleFileCreated)

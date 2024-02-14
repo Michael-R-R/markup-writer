@@ -5,7 +5,10 @@ from PyQt6.QtCore import (
     pyqtSlot,
 )
 
-from markupwriter.gui.dialogs.modal import StrDialog
+from markupwriter.gui.dialogs.modal import (
+    StrDialog,
+    YesNoDialog,
+)
 
 import markupwriter.mv.delegate as d
 import markupwriter.support.doctree.item as ti
@@ -16,6 +19,69 @@ class DocumentTreeWorker(QObject):
         super().__init__(parent)
 
         self.dtd = dtd
+        
+    @pyqtSlot()
+    def onDragDropDone(self):
+        self.dtd.view.treeWidget.refreshAllWordCounts()
+        
+    @pyqtSlot()
+    def onNavItemUp(self):
+        self.dtd.view.treeWidget.translate(-1)
+    
+    @pyqtSlot()
+    def onNavItemDown(self):
+        self.dtd.view.treeWidget.translate(1)
+    
+    @pyqtSlot()
+    def onRenamedItem(self):
+        tw = self.dtd.view.treeWidget
+        item = tw.currentItem()
+        if item is None:
+            return
+        
+        name = StrDialog.run("Rename", "", self.dtd.view)
+        if name is None:
+            return
+        
+        tw.rename(item, name)
+    
+    @pyqtSlot()
+    def onTrashItem(self):
+        tw = self.dtd.view.treeWidget
+        item = tw.currentItem()
+        if item is None:
+            return
+        
+        if not YesNoDialog.run("Move to trash?", self.dtd.view):
+            return
+        
+        trash = tw.findTrash()
+        if trash is None:
+            return
+
+        tw.moveTo(item, trash)
+    
+    @pyqtSlot()
+    def onRecoverItem(self):
+        tw = self.dtd.view.treeWidget
+        item = tw.currentItem()
+        if item is None:
+            return
+
+        tw.moveTo(item, None)
+    
+    @pyqtSlot()
+    def onEmptyTrash(self):
+        tw = self.dtd.view.treeWidget
+        item = tw.currentItem()
+        if item is None:
+            return
+
+        if not YesNoDialog.run("Empty trash?", self.dtd.view):
+            return
+
+        for i in range(item.childCount() - 1, -1, -1):
+            tw.remove(item.child(i))
 
     @pyqtSlot()
     def onNovelFolderCreated(self):
