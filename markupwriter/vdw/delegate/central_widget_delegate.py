@@ -10,15 +10,13 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-import markupwriter.mv.model as m
-import markupwriter.mv.view as v
+import markupwriter.vdw.view as v
 
 
 class CentralWidgetDelegate(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
         
-        self.model = m.CentralWidgetModel(self)
         self.view = v.CentralWidgetView(None)
         
     def insertWidgetLHS(self, i: int, widget: QWidget):
@@ -40,11 +38,9 @@ class CentralWidgetDelegate(QObject):
         self.view.rhSplitter.setSizes(sizes)
         
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
-        sout << self.model
         sout << self.view
         return sout
     
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
-        sin >> self.model
         sin >> self.view
         return sin

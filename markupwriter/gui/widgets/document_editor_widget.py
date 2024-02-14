@@ -6,6 +6,7 @@ from PyQt6.QtCore import (
     Qt,
     pyqtSignal,
     QPoint,
+    QSize,
     QMimeData,
     QDataStream,
 )
@@ -17,7 +18,6 @@ from PyQt6.QtGui import (
     QResizeEvent,
     QTextOption,
     QTextCursor,
-    QGuiApplication,
     QAction,
     QKeySequence,
 )
@@ -35,8 +35,11 @@ import markupwriter.support.doceditor as de
 
 
 class DocumentEditorWidget(QPlainTextEdit):
+    statusChanged = pyqtSignal(bool)
     popupRequested = pyqtSignal(str, int)
     previewRequested = pyqtSignal(str, int)
+    wordCountChanged = pyqtSignal(str, int)
+    resized = pyqtSignal(QSize)
 
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
@@ -46,6 +49,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.highlighter = Highlighter(self.plainDocument, self.spellChecker.endict)
         self.searchHotkey = QAction("search", self)
         self.canResizeMargins = True
+        self.docUUID = ""
 
         shortcut = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F)
         self.searchHotkey.setShortcut(shortcut)
@@ -57,11 +61,12 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setTabStopDistance(20.0)
-        self.resizeMargins()
 
     def reset(self):
         self.clear()
         self.setEnabled(False)
+        self.docUUID = ""
+        self.statusChanged.emit(False)
 
     def cursorToEnd(self):
         cursor = self.textCursor()
@@ -74,25 +79,19 @@ class DocumentEditorWidget(QPlainTextEdit):
         cursor.setPosition(pos)
         self.setTextCursor(cursor)
         self.centerCursor()
-
-    def resizeMargins(self):
-        if not self.canResizeMargins:
+    
+    def runWordCount(self):
+        if not self.hasDocument():
             return
-
-        mSize = QGuiApplication.primaryScreen().size()
-        mW = mSize.width()
-
-        wW = self.width()
-        if wW > int(mW * 0.75):
-            wW = int(wW * 0.3)
-        elif wW > int(mW * 0.5):
-            wW = int(wW * 0.2)
-        else:
-            wW = int(wW * 0.1)
-
-        wH = int(self.height() * 0.1)
-
-        self.setViewportMargins(wW, wH, wW, wH)
+        
+        uuid = self.docUUID
+        text = self.toPlainText()
+        count = len(re.findall(r"[a-zA-Z'-]+", text))
+        
+        self.wordCountChanged.emit(uuid, count)
+    
+    def hasDocument(self) -> bool:
+        return self.docUUID != ""
 
     def canInsertFromMimeData(self, source: QMimeData | None) -> bool:
         hasUrls = source.hasUrls()
@@ -120,8 +119,8 @@ class DocumentEditorWidget(QPlainTextEdit):
         contextMenu.onShowMenu(e.globalPos())
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
-        self.resizeMargins()
-
+        self.resized.emit(e.size())
+        
         return super().resizeEvent(e)
 
     def keyPressEvent(self, e: QKeyEvent | None) -> None:

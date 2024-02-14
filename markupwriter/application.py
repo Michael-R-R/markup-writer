@@ -17,7 +17,7 @@ from markupwriter.common.provider import (
     Style
 )
 
-import markupwriter.mv as mv
+import markupwriter.vdw as vdw
 
 
 class Application(object):
@@ -36,7 +36,7 @@ class Application(object):
         app = QApplication(argv)
         app.setApplicationName(AppConfig.APP_NAME)
 
-        core = mv.Core(app)
+        core = vdw.Core(app)
         core.run()
 
         Application.status = app.exec()

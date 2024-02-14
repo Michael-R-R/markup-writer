@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import os
+
 from PyQt6.QtCore import (
     QObject,
     pyqtSlot,
@@ -10,7 +12,10 @@ from markupwriter.gui.dialogs.modal import (
     YesNoDialog,
 )
 
-import markupwriter.mv.delegate as d
+from markupwriter.config import ProjectConfig
+from markupwriter.common.util import File
+
+import markupwriter.vdw.delegate as d
 import markupwriter.support.doctree.item as ti
 
 
@@ -19,6 +24,25 @@ class DocumentTreeWorker(QObject):
         super().__init__(parent)
 
         self.dtd = dtd
+        
+    @pyqtSlot(str)
+    def onFileAdded(self, uuid: str):
+        path = ProjectConfig.contentPath()
+        if path is None:
+            return
+        path = os.path.join(path, uuid)
+        File.write(path, "")
+    
+    @pyqtSlot(str, str)
+    def onFileRemoved(self, title: str, uuid: str):
+        path = ProjectConfig.contentPath()
+        if path is None:
+            return
+        path = os.path.join(path, uuid)
+        File.remove(path)
+
+        tw = self.dtd.view.treeWidget
+        tw.refreshAllWordCounts()
         
     @pyqtSlot()
     def onDragDropDone(self):

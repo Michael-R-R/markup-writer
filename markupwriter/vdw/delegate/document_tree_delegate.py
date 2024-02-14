@@ -6,8 +6,7 @@ from PyQt6.QtCore import (
     pyqtSignal,
 )
 
-import markupwriter.mv.model as m
-import markupwriter.mv.view as v
+import markupwriter.vdw.view as v
 import markupwriter.gui.menus.doctree as dtm
 import markupwriter.support.doctree.item as dti
 
@@ -39,7 +38,6 @@ class DocumentTreeDelegate(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
 
-        self.model = m.DocumentTreeModel(self)
         self.view = v.DocumentTreeView(None)
 
         self._setupViewConnections()
@@ -104,11 +102,9 @@ class DocumentTreeDelegate(QObject):
         im.miscFileAction.triggered.connect(lambda: self.createdMiscFile.emit())
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
-        sout << self.model
         sout << self.view
         return sout
 
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
-        sin >> self.model
         sin >> self.view
         return sin

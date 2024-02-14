@@ -23,8 +23,8 @@ from markupwriter.common.util import (
     Serialize,
 )
 
-import markupwriter.mv.delegate as d
-import markupwriter.mv.worker as w
+import markupwriter.vdw.delegate as d
+import markupwriter.vdw.worker as w
 
 
 class CoreData(QObject):
@@ -107,6 +107,8 @@ class Core(QObject):
         self.data.mmbd.fmExitTriggered.connect(self._onExit)
 
     def _setupTreeWorkerSlots(self):
+        self.data.dtd.fileAdded.connect(self.dtw.onFileAdded)
+        self.data.dtd.fileRemoved.connect(self.dtw.onFileRemoved)
         self.data.dtd.dragDropDone.connect(self.dtw.onDragDropDone)
         self.data.dtd.navedUpItem.connect(self.dtw.onNavItemUp)
         self.data.dtd.navedDownItem.connect(self.dtw.onNavItemDown)
@@ -123,7 +125,15 @@ class Core(QObject):
         self.data.dtd.createdMiscFile.connect(self.dtw.onMiscFileCreated)
 
     def _setupEditorWorkerSlots(self):
-        pass
+        self.data.mmbd.fmSaveDocTriggered.connect(self.dew.onSaveDocument)
+        self.data.mmbd.fmSaveTriggered.connect(self.dew.onSaveDocument)
+        
+        self.data.dtd.fileOpened.connect(self.dew.onFileOpened)
+        self.data.dtd.fileRemoved.connect(self.dew.onFileRemoved)
+        self.data.dtd.fileMoved.connect(self.dew.onFileMoved)
+        self.data.dtd.fileRenamed.connect(self.dew.onFileRenamed)
+        
+        self.data.ded.closeDocClicked.connect(self.dew.onCloseDocument)
 
     @pyqtSlot()
     def _onNewProject(self):

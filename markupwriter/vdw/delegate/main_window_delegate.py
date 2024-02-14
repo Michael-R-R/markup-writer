@@ -14,8 +14,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.common.provider import Style
 
-import markupwriter.mv.model as m
-import markupwriter.mv.view as v
+import markupwriter.vdw.view as v
 
 
 class MainWindowDelegate(QObject):
@@ -24,7 +23,6 @@ class MainWindowDelegate(QObject):
     
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
-        self.model = m.MainWindowModel(self)
         self.view = v.MainWindowView(None)
         
         self.view.closing.connect(lambda: self.viewClosing.emit())
@@ -44,11 +42,9 @@ class MainWindowDelegate(QObject):
         self.view.setWindowTitle(title)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
-        sout << self.model
         sout << self.view
         return sout
     
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
-        sin >> self.model
         sin >> self.view
         return sin

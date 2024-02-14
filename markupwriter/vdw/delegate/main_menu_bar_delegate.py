@@ -6,8 +6,7 @@ from PyQt6.QtCore import (
     pyqtSignal,
 )
 
-import markupwriter.mv.model as m
-import markupwriter.mv.view as v
+import markupwriter.vdw.view as v
 
 
 class MainMenuBarDelegate(QObject):
@@ -23,7 +22,6 @@ class MainMenuBarDelegate(QObject):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
 
-        self.model = m.MainMenuBarModel(self)
         self.view = v.MainMenuBarView(None)
 
         self._setupFileMenuConnections()
@@ -55,11 +53,9 @@ class MainMenuBarDelegate(QObject):
         fm.exitAction.triggered.connect(lambda: self.fmExitTriggered.emit())
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
-        sout << self.model
         sout << self.view
         return sout
 
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
-        sin >> self.model
         sin >> self.view
         return sin
