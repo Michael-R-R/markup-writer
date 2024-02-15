@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
+from markupwriter.common.provider import Style
 
 import markupwriter.gui.widgets as w
 
@@ -31,6 +32,8 @@ class DocumentEditorView(QWidget):
         self.gLayout = QGridLayout(self)
         self.gLayout.addWidget(self.editorBar, 0, 0)
         self.gLayout.addWidget(self.textEdit, 1, 0)
+        
+        self.setStyleSheet(Style.EDITOR_VIEW)
         
     def adjustSearchBoxPos(self):
         vb = self.textEdit.verticalScrollBar()

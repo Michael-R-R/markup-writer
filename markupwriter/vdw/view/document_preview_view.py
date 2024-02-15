@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig
+from markupwriter.common.provider import Style
 
 import markupwriter.gui.widgets as w
 
@@ -26,6 +27,8 @@ class DocumentPreviewView(QWidget):
         
         self.gLayout = QGridLayout(self)
         self.gLayout.addWidget(self.tabWidget, 0, 0)
+        
+        self.setStyleSheet(Style.PREVIEW_VIEW)
     
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docPreviewSize = e.size()

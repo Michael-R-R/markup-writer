@@ -11,8 +11,6 @@ from PyQt6.QtWidgets import (
     QMenuBar,
 )
 
-from markupwriter.common.provider import Style
-
 import markupwriter.vdw.view as v
 
 
@@ -26,7 +24,6 @@ class MainWindowDelegate(QObject):
         self._setupViewConnections()
         
     def showMainView(self):
-        self.view.setStyleSheet(Style.MAIN_WINDOW)
         self.view.show()
         
     def setWindowTitle(self, title: str | None):

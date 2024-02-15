@@ -13,8 +13,8 @@ from PyQt6.QtWidgets import (
     QGridLayout,
 )
 
-
 from markupwriter.config import AppConfig
+from markupwriter.common.provider import Style
 
 import markupwriter.gui.widgets as w
 
@@ -29,6 +29,8 @@ class DocumentTreeView(QWidget):
         self.gLayout = QGridLayout(self)
         self.gLayout.addWidget(self.treeBar, 0, 0)
         self.gLayout.addWidget(self.treeWidget, 1, 0)
+        
+        self.setStyleSheet(Style.TREE_VIEW)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.docTreeSize = e.size()
