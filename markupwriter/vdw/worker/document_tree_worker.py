@@ -84,6 +84,16 @@ class DocumentTreeWorker(QObject):
         self.dtd.view.treeWidget.translate(1)
     
     @pyqtSlot()
+    def onPreviewItem(self):
+        tw = self.dtd.view.treeWidget
+        item = tw.currentItem()
+        if item is None:
+            return
+
+        widget: ti.BaseTreeItem = tw.itemWidget(item, 0)
+        self.dtd.previewRequested.emit(widget.title(), widget.UUID())
+    
+    @pyqtSlot()
     def onRenamedItem(self):
         tw = self.dtd.view.treeWidget
         item = tw.currentItem()

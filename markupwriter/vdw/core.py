@@ -120,19 +120,20 @@ class Core(QObject):
         self.data.dtd.fileAdded.connect(self.dtw.onFileAdded)
         self.data.dtd.fileRemoved.connect(self.dtw.onFileRemoved)
         self.data.dtd.dragDropDone.connect(self.dtw.onDragDropDone)
-        self.data.dtd.navedUpItem.connect(self.dtw.onNavItemUp)
-        self.data.dtd.navedDownItem.connect(self.dtw.onNavItemDown)
-        self.data.dtd.renamedItem.connect(self.dtw.onRenamedItem)
-        self.data.dtd.trashedItem.connect(self.dtw.onTrashItem)
-        self.data.dtd.recoveredItem.connect(self.dtw.onRecoverItem)
-        self.data.dtd.emptiedTrash.connect(self.dtw.onEmptyTrash)
-        self.data.dtd.createdNovel.connect(self.dtw.onNovelFolderCreated)
-        self.data.dtd.createdMiscFolder.connect(self.dtw.onMiscFolderCreated)
-        self.data.dtd.createdTitle.connect(self.dtw.onTitleFileCreated)
-        self.data.dtd.createdChapter.connect(self.dtw.onChapterFileCreated)
-        self.data.dtd.createdScene.connect(self.dtw.onSceneFileCreated)
-        self.data.dtd.createdSection.connect(self.dtw.onSectionFileCreated)
-        self.data.dtd.createdMiscFile.connect(self.dtw.onMiscFileCreated)
+        self.data.dtd.navUpClicked.connect(self.dtw.onNavItemUp)
+        self.data.dtd.navDownClicked.connect(self.dtw.onNavItemDown)
+        self.data.dtd.cmPreviewClicked.connect(self.dtw.onPreviewItem)
+        self.data.dtd.cmRenameClicked.connect(self.dtw.onRenamedItem)
+        self.data.dtd.cmToTrashClicked.connect(self.dtw.onTrashItem)
+        self.data.dtd.cmRecoverClicked.connect(self.dtw.onRecoverItem)
+        self.data.dtd.cmEmptyTrashClicked.connect(self.dtw.onEmptyTrash)
+        self.data.dtd.createNovelClicked.connect(self.dtw.onNovelFolderCreated)
+        self.data.dtd.createFolderClicked.connect(self.dtw.onMiscFolderCreated)
+        self.data.dtd.createTitleClicked.connect(self.dtw.onTitleFileCreated)
+        self.data.dtd.createChapterClicked.connect(self.dtw.onChapterFileCreated)
+        self.data.dtd.createSceneClicked.connect(self.dtw.onSceneFileCreated)
+        self.data.dtd.createSectionClicked.connect(self.dtw.onSectionFileCreated)
+        self.data.dtd.createFileClicked.connect(self.dtw.onMiscFileCreated)
 
     def _setupEditorWorkerSlots(self):
         self.data.dtd.fileOpened.connect(self.dew.onFileOpened)
@@ -143,7 +144,7 @@ class Core(QObject):
         self.data.ded.closeDocClicked.connect(self.dew.onCloseDocument)
         self.data.ded.popupRequested.connect(self.dew.onPopupRequested)
         self.data.ded.editorResized.connect(self.dew.onEditorResized)
-        
+
         self.data.ded.showSearchTriggered.connect(self.dew.onSearchTriggered)
         self.data.ded.searchChanged.connect(self.dew.onSearchChanged)
         self.data.ded.nextSearchClicked.connect(self.dew.onNextSearch)
@@ -153,7 +154,11 @@ class Core(QObject):
         self.data.ded.closeSearchClicked.connect(self.dew.onSearchTriggered)
 
     def _setupPreviewWorkerSlots(self):
-        pass
+        self.data.dtd.fileRemoved.connect(self.dpw.onFileRemoved)
+        self.data.dtd.fileRenamed.connect(self.dpw.onFileRenamed)
+        self.data.dtd.previewRequested.connect(self.dpw.onFilePreviewed)
+
+        self.data.dpd.closeTabRequested.connect(self.dpw.onCloseTabRequested)
 
     @pyqtSlot()
     def _onNewProject(self):

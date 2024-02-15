@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
+    pyqtSignal,
     pyqtSlot,
     QSize,
 )

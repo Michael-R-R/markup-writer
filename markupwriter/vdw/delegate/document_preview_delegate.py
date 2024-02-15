@@ -17,6 +17,8 @@ class DocumentPreviewDelegate(QObject):
         super().__init__(parent)
 
         self.view = v.DocumentPreviewView(None)
+        
+        self._setupViewConnections()
 
     def _setupViewConnections(self):
         tw = self.view.tabWidget
