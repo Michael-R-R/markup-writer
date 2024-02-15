@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (
     QApplication,
 )
 
-from markupwriter.support.mainwindow import (
+from markupwriter.support.core import (
     ProjectHelper,
     EpubExporter,
     StartupParser,
