@@ -17,6 +17,7 @@ class DocumentEditorDelegate(QObject):
     showSearchTriggered = pyqtSignal()
     refPopupTriggered = pyqtSignal(str)
     refPreviewTriggered = pyqtSignal(str)
+    wordCountChanged = pyqtSignal(str, int)
     editorResized = pyqtSignal(QSize)
 
     searchChanged = pyqtSignal(str, bool)
@@ -44,6 +45,7 @@ class DocumentEditorDelegate(QObject):
         te.searchHotkey.triggered.connect(lambda: self.showSearchTriggered.emit())
         te.refPopupTriggered.connect(lambda x: self.refPopupTriggered.emit(x))
         te.refPreviewTriggered.connect(lambda x: self.refPreviewTriggered.emit(x))
+        te.wordCountChanged.connect(lambda x, y: self.wordCountChanged.emit(x, y))
         te.resized.connect(lambda x: self.editorResized.emit(x))
 
         sb = self.view.searchBox

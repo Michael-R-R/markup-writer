@@ -138,6 +138,7 @@ class Core(QObject):
         self.data.dtd.createSectionClicked.connect(self.dtw.onSectionFileCreated)
         self.data.dtd.createFileClicked.connect(self.dtw.onMiscFileCreated)
 
+        self.data.ded.wordCountChanged.connect(self.dtw.onWordCountChanged)
         self.data.ded.docPreviewRequested.connect(self.dtw.onDocPreviewRequested)
 
     def _setupEditorWorkerSlots(self):

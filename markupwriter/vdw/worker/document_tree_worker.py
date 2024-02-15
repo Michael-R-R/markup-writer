@@ -207,6 +207,21 @@ class DocumentTreeWorker(QObject):
         item = ti.MiscFileItem(title, tw)
         tw.add(item)
         
+    @pyqtSlot(str, int)
+    def onWordCountChanged(self, uuid: str, count: int):
+        tw = self.dtd.view.treeWidget
+        widget = tw.findWidget(uuid)
+        if widget is None:
+            return
+
+        owc = widget.wordCount()
+        twc = widget.totalWordCount() - owc + count
+
+        widget.setWordCount(count)
+        widget.setTotalWordCount(twc)
+
+        tw.refreshWordCounts(widget.item.parent(), owc, count)
+        
     @pyqtSlot(str)
     def onDocPreviewRequested(self, uuid: str):
         tw = self.dtd.view.treeWidget
