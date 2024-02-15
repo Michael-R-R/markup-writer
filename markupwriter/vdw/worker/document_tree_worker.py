@@ -206,3 +206,11 @@ class DocumentTreeWorker(QObject):
         tw = self.dtd.view.treeWidget
         item = ti.MiscFileItem(title, tw)
         tw.add(item)
+        
+    @pyqtSlot(str)
+    def onDocPreviewRequested(self, uuid: str):
+        tw = self.dtd.view.treeWidget
+        widget: ti.BaseTreeItem = tw.findWidget(uuid)
+        if widget is None:
+            return
+        self.dtd.previewRequested.emit(widget.title(), uuid)

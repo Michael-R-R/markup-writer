@@ -93,15 +93,15 @@ class DocumentEditorWorker(QObject):
         eb.replaceInPath(old, new)
 
     @pyqtSlot(str)
-    def onPopupRequested(self, tag: str):
+    def onRefPopupTriggered(self, tag: str):
         uuid = self.refManager.findUUID(tag)
         if uuid is None:
             return
 
-        te = self.ded.view.textEdit
-        
         popup = w.PopupPreviewWidget(uuid, self.ded.view)
-        popup.previewButton.clicked.connect(lambda: te.previewRequested.emit(uuid))
+        popup.previewButton.clicked.connect(
+            lambda: self.ded.docPreviewRequested.emit(uuid)
+        )
 
         size = popup.sizeHint()
         cpos = QCursor.pos()
@@ -110,6 +110,13 @@ class DocumentEditorWorker(QObject):
 
         popup.move(QPoint(x, y))
         popup.show()
+
+    @pyqtSlot(str)
+    def onRefPreviewTriggered(self, tag: str):
+        uuid = self.refManager.findUUID(tag)
+        if uuid is None:
+            return
+        self.ded.docPreviewRequested.emit(uuid)
 
     @pyqtSlot(QSize)
     def onEditorResized(self, _: QSize):

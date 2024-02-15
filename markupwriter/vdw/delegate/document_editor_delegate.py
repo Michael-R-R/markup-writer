@@ -5,7 +5,6 @@ from PyQt6.QtCore import (
     QDataStream,
     pyqtSignal,
     QSize,
-    QPoint,
 )
 
 import markupwriter.vdw.view as v
@@ -16,8 +15,8 @@ class DocumentEditorDelegate(QObject):
 
     docStatusChanged = pyqtSignal(bool)
     showSearchTriggered = pyqtSignal()
-    popupRequested = pyqtSignal(str)
-    previewRequested = pyqtSignal(str)
+    refPopupTriggered = pyqtSignal(str)
+    refPreviewTriggered = pyqtSignal(str)
     editorResized = pyqtSignal(QSize)
 
     searchChanged = pyqtSignal(str, bool)
@@ -26,6 +25,8 @@ class DocumentEditorDelegate(QObject):
     replaceClicked = pyqtSignal()
     replaceAllClicked = pyqtSignal()
     closeSearchClicked = pyqtSignal()
+    
+    docPreviewRequested = pyqtSignal(str)
 
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
@@ -41,8 +42,8 @@ class DocumentEditorDelegate(QObject):
         te = self.view.textEdit
         te.docStatusChanged.connect(lambda x: self.docStatusChanged.emit(x))
         te.searchHotkey.triggered.connect(lambda: self.showSearchTriggered.emit())
-        te.popupRequested.connect(lambda x: self.popupRequested.emit(x))
-        te.previewRequested.connect(lambda x: self.previewRequested.emit(x))
+        te.refPopupTriggered.connect(lambda x: self.refPopupTriggered.emit(x))
+        te.refPreviewTriggered.connect(lambda x: self.refPreviewTriggered.emit(x))
         te.resized.connect(lambda x: self.editorResized.emit(x))
 
         sb = self.view.searchBox

@@ -36,8 +36,8 @@ import markupwriter.support.doceditor as de
 
 class DocumentEditorWidget(QPlainTextEdit):
     docStatusChanged = pyqtSignal(bool)
-    popupRequested = pyqtSignal(str)
-    previewRequested = pyqtSignal(str)
+    refPopupTriggered = pyqtSignal(str)
+    refPreviewTriggered = pyqtSignal(str)
     wordCountChanged = pyqtSignal(str, int)
     resized = pyqtSignal(QSize)
 
@@ -156,13 +156,13 @@ class DocumentEditorWidget(QPlainTextEdit):
             if e.button() == button:
                 tag: str = self._findTagAtPos(e.pos())
                 if tag is not None:
-                    self.popupRequested.emit(tag)
+                    self.refPopupTriggered.emit(tag)
                 return None
         elif e.modifiers() == (ctrl | alt):
             if e.button() == button:
                 tag: str = self._findTagAtPos(e.pos())
                 if tag is not None:
-                    self.previewRequested.emit(tag)
+                    self.refPreviewTriggered.emit(tag)
                 return None
 
         return super().mousePressEvent(e)

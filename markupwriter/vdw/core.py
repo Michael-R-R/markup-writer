@@ -135,6 +135,8 @@ class Core(QObject):
         self.data.dtd.createSectionClicked.connect(self.dtw.onSectionFileCreated)
         self.data.dtd.createFileClicked.connect(self.dtw.onMiscFileCreated)
 
+        self.data.ded.docPreviewRequested.connect(self.dtw.onDocPreviewRequested)
+
     def _setupEditorWorkerSlots(self):
         self.data.dtd.fileOpened.connect(self.dew.onFileOpened)
         self.data.dtd.fileRemoved.connect(self.dew.onFileRemoved)
@@ -142,9 +144,9 @@ class Core(QObject):
         self.data.dtd.fileRenamed.connect(self.dew.onFileRenamed)
 
         self.data.ded.closeDocClicked.connect(self.dew.onCloseDocument)
-        self.data.ded.popupRequested.connect(self.dew.onPopupRequested)
+        self.data.ded.refPopupTriggered.connect(self.dew.onRefPopupTriggered)
+        self.data.ded.refPreviewTriggered.connect(self.dew.onRefPreviewTriggered)
         self.data.ded.editorResized.connect(self.dew.onEditorResized)
-
         self.data.ded.showSearchTriggered.connect(self.dew.onSearchTriggered)
         self.data.ded.searchChanged.connect(self.dew.onSearchChanged)
         self.data.ded.nextSearchClicked.connect(self.dew.onNextSearch)
@@ -157,6 +159,8 @@ class Core(QObject):
         self.data.dtd.fileRemoved.connect(self.dpw.onFileRemoved)
         self.data.dtd.fileRenamed.connect(self.dpw.onFileRenamed)
         self.data.dtd.previewRequested.connect(self.dpw.onFilePreviewed)
+
+        # TODO somehow get text editor priview request
 
         self.data.dpd.closeTabRequested.connect(self.dpw.onCloseTabRequested)
 
