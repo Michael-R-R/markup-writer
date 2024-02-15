@@ -2,12 +2,13 @@
 
 import os, re
 
-from PyQt6.QtCore import QObject, pyqtSlot, QSize, QThreadPool
+from PyQt6.QtCore import QObject, pyqtSlot, QSize, QThreadPool, QPoint
 
 from PyQt6.QtGui import (
     QGuiApplication,
     QTextCursor,
     QTextDocument,
+    QCursor,
 )
 
 from markupwriter.config import ProjectConfig
@@ -18,6 +19,7 @@ from markupwriter.common.referencetag import RefTagManager
 from markupwriter.common.syntax import BEHAVIOUR
 
 import markupwriter.vdw.delegate as d
+import markupwriter.gui.widgets as w
 
 
 class DocumentEditorWorker(QObject):
@@ -89,6 +91,25 @@ class DocumentEditorWorker(QObject):
             return
         eb = self.ded.view.editorBar
         eb.replaceInPath(old, new)
+
+    @pyqtSlot(str)
+    def onPopupRequested(self, tag: str):
+        uuid = self.refManager.findUUID(tag)
+        if uuid is None:
+            return
+
+        te = self.ded.view.textEdit
+        
+        popup = w.PopupPreviewWidget(uuid, self.ded.view)
+        popup.previewButton.clicked.connect(lambda: te.previewRequested.emit(uuid))
+
+        size = popup.sizeHint()
+        cpos = QCursor.pos()
+        x = cpos.x() - int((size.width() / 2))
+        y = cpos.y() - int(size.height() / 1.25)
+
+        popup.move(QPoint(x, y))
+        popup.show()
 
     @pyqtSlot(QSize)
     def onEditorResized(self, _: QSize):
@@ -282,7 +303,7 @@ class DocumentEditorWorker(QObject):
         cursor.setPosition(found.start())
         cursor.setPosition(found.end(), QTextCursor.MoveMode.KeepAnchor)
         te.setTextCursor(cursor)
-        
+
         return True
 
     @pyqtSlot(str, dict)

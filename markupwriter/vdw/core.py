@@ -139,6 +139,7 @@ class Core(QObject):
         self.data.dtd.fileRenamed.connect(self.dew.onFileRenamed)
 
         self.data.ded.closeDocClicked.connect(self.dew.onCloseDocument)
+        self.data.ded.popupRequested.connect(self.dew.onPopupRequested)
         self.data.ded.editorResized.connect(self.dew.onEditorResized)
         
         self.data.ded.showSearchTriggered.connect(self.dew.onSearchTriggered)
