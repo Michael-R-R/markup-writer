@@ -4,7 +4,6 @@ from PyQt6.QtCore import (
     QObject,
     QDataStream,
     pyqtSignal,
-    QSize,
 )
 
 from PyQt6.QtWidgets import (

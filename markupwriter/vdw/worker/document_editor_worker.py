@@ -43,11 +43,14 @@ class DocumentEditorWorker(QObject):
         self._resetWidgets()
 
     @pyqtSlot()
-    def onSaveDocument(self):
+    def onSaveDocument(self) -> bool:
         status = self._writeToDisk()
         if not status:
-            return
+            return False
+        
         self._runTokenizer()
+        
+        return True
 
     @pyqtSlot(str, list)
     def onFileOpened(self, uuid: str, paths: list[str]):

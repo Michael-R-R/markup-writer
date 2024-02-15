@@ -86,6 +86,7 @@ class Core(QObject):
         self.data = data
         self.data.setup(self.mwd)
 
+        self.mww = w.MainWindowWorker(self.mwd, self)
         self.mmbw = w.MainMenuBarWorker(self.data.mmbd, self)
         self.dtw = w.DocumentTreeWorker(self.data.dtd, self)
         self.dew = w.DocumentEditorWorker(self.data.ded, self)
@@ -116,6 +117,7 @@ class Core(QObject):
 
         self.data.mmbd.fmNewTriggered.connect(self._onNewProject)
         self.data.mmbd.fmOpenTriggered.connect(self._onOpenProject)
+        self.data.mmbd.fmSaveDocTriggered.connect(self._onSaveDocument)
         self.data.mmbd.fmSaveTriggered.connect(self._onSaveProject)
         self.data.mmbd.fmSaveAsTriggered.connect(self._onSaveAsProject)
         self.data.mmbd.fmExportTriggered.connect(self._onExport)
@@ -148,8 +150,6 @@ class Core(QObject):
         self.data.ded.docPreviewRequested.connect(self.dtw.onDocPreviewRequested)
 
     def _setupEditorWorkerSlots(self):
-        self.data.mmbd.fmSaveDocTriggered.connect(self.dew.onSaveDocument)
-        
         self.data.dtd.fileOpened.connect(self.dew.onFileOpened)
         self.data.dtd.fileRemoved.connect(self.dew.onFileRemoved)
         self.data.dtd.fileMoved.connect(self.dew.onFileMoved)
@@ -217,10 +217,13 @@ class Core(QObject):
 
         refManager = self.dew.refManager
         StartupParser.run(refManager)
+        
+        self.mww.showStatusBarMsg("Project opened...", 1500)
 
     @pyqtSlot()
     def _onSaveDocument(self):
-        self.dew.onSaveDocument()
+        if self.dew.onSaveDocument():
+            self.mww.showStatusBarMsg("Document saved...", 1500)
 
     @pyqtSlot()
     def _onSaveProject(self):
@@ -229,7 +232,8 @@ class Core(QObject):
 
         self._onSaveDocument()
 
-        return Serialize.write(ProjectConfig.filePath(), self.data)
+        if Serialize.write(ProjectConfig.filePath(), self.data):
+            self.mww.showStatusBarMsg("Project saved...", 1500)
 
     @pyqtSlot()
     def _onSaveAsProject(self):
@@ -256,6 +260,8 @@ class Core(QObject):
         
         exporter = EpubExporter()
         exporter.export(tw, self.mwd.view)
+        
+        self.mww.showStatusBarMsg("Novel exported...", 1500)
 
     @pyqtSlot()
     def _onCloseProject(self):

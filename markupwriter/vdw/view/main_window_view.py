@@ -18,6 +18,8 @@ from PyQt6.QtWidgets import (
 from markupwriter.config import AppConfig
 from markupwriter.common.provider import Icon
 
+import markupwriter.gui.widgets as w
+
 
 class MainWindowView(QMainWindow):
     closing = pyqtSignal()
@@ -25,8 +27,11 @@ class MainWindowView(QMainWindow):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
+        self.statusBarWidget = w.StatusBarWidget(self)
+        
         self.setWindowIcon(Icon.BOOKS) # TODO get better app icon
         self.setWindowTitle(AppConfig.APP_NAME)
+        self.setStatusBar(self.statusBarWidget)
         self.resize(AppConfig.mainWindowSize)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
