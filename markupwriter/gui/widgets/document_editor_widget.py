@@ -121,6 +121,9 @@ class DocumentEditorWidget(QPlainTextEdit):
             return super().insertFromMimeData(source)
 
     def contextMenuEvent(self, e: QContextMenuEvent | None) -> None:
+        if self.isReadOnly():
+            return
+        
         contextMenu = EditorContextMenu(
             self, self.spellChecker, self.highlighter, e.pos(), self
         )

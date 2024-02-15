@@ -138,6 +138,8 @@ class Core(QObject):
         self.data.ded.docPreviewRequested.connect(self.dtw.onDocPreviewRequested)
 
     def _setupEditorWorkerSlots(self):
+        self.data.mmbd.fmSaveDocTriggered.connect(self.dew.onSaveDocument)
+        
         self.data.dtd.fileOpened.connect(self.dew.onFileOpened)
         self.data.dtd.fileRemoved.connect(self.dew.onFileRemoved)
         self.data.dtd.fileMoved.connect(self.dew.onFileMoved)
