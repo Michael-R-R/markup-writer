@@ -3,7 +3,6 @@
 from PyQt6.QtCore import (
     QDataStream,
     pyqtSignal,
-    QSize,
 )
 
 from PyQt6.QtGui import (
@@ -22,7 +21,6 @@ from markupwriter.common.provider import Icon
 
 class MainWindowView(QMainWindow):
     closing = pyqtSignal()
-    resized = pyqtSignal(QSize)
     
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
@@ -32,7 +30,8 @@ class MainWindowView(QMainWindow):
         self.resize(AppConfig.mainWindowSize)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
-        self.resized.emit(e.size())
+        AppConfig.mainWindowSize = e.size()
+        
         return super().resizeEvent(e)
         
     def closeEvent(self, e: QCloseEvent | None) -> None:

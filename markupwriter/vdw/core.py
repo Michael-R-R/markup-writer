@@ -46,6 +46,12 @@ class CoreData(QObject):
         self.cwd.insertWidgetLHS(0, self.dtd.view)
         self.cwd.insertWidgetRHS(0, self.ded.view)
         self.cwd.addWidgetRHS(self.dpd.view)
+        
+        dts = AppConfig.docTreeSize
+        des = AppConfig.docEditorSize
+        dps = AppConfig.docPreviewSize
+        self.cwd.setSizesLHS([dts.width(), des.width() + dps.width()])
+        self.cwd.setSizesRHS([des.width(), dps.width()])
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.mmbd
@@ -103,7 +109,7 @@ class Core(QObject):
 
     def setWindowTitle(self):
         title = "{} - {}".format(AppConfig.APP_NAME, ProjectConfig.projectName)
-        self.mwd.setViewTitle(title)
+        self.mwd.setWindowTitle(title)
 
     def _setupCoreSlots(self):
         self.mwd.viewClosing.connect(self._onAppClosing)
@@ -165,8 +171,6 @@ class Core(QObject):
         self.data.dtd.fileRemoved.connect(self.dpw.onFileRemoved)
         self.data.dtd.fileRenamed.connect(self.dpw.onFileRenamed)
         self.data.dtd.previewRequested.connect(self.dpw.onFilePreviewed)
-
-        # TODO somehow get text editor priview request
 
         self.data.dpd.closeTabRequested.connect(self.dpw.onCloseTabRequested)
 

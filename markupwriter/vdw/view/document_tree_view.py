@@ -1,9 +1,7 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
-    pyqtSignal,
     QDataStream,
-    QSize,
 )
 
 from PyQt6.QtGui import (
@@ -15,12 +13,13 @@ from PyQt6.QtWidgets import (
     QGridLayout,
 )
 
+
+from markupwriter.config import AppConfig
+
 import markupwriter.gui.widgets as w
 
 
 class DocumentTreeView(QWidget):
-    resized = pyqtSignal(QSize)
-    
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
@@ -32,7 +31,8 @@ class DocumentTreeView(QWidget):
         self.gLayout.addWidget(self.treeWidget, 1, 0)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
-        self.resized.emit(e.size())
+        AppConfig.docTreeSize = e.size()
+        
         return super().resizeEvent(e)
     
     def __rlshift__(self, sout: QDataStream) -> QDataStream:

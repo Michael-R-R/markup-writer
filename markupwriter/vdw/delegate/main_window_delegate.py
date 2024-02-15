@@ -19,18 +19,19 @@ import markupwriter.vdw.view as v
 
 class MainWindowDelegate(QObject):
     viewClosing = pyqtSignal()
-    viewResized = pyqtSignal(QSize)
     
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
         self.view = v.MainWindowView(None)
         
-        self.view.closing.connect(lambda: self.viewClosing.emit())
-        self.view.resized.connect(lambda x: self.viewResized.emit(x))
+        self._setupViewConnections()
         
     def showMainView(self):
         self.view.setStyleSheet(Style.MAIN_WINDOW)
         self.view.show()
+        
+    def setWindowTitle(self, title: str | None):
+        self.view.setWindowTitle(title)
         
     def setMenuBar(self, menuBar: QMenuBar):
         self.view.setMenuBar(menuBar)
@@ -38,8 +39,8 @@ class MainWindowDelegate(QObject):
     def setCentralWidget(self, widget: QWidget):
         self.view.setCentralWidget(widget)
         
-    def setViewTitle(self, title: str | None):
-        self.view.setWindowTitle(title)
+    def _setupViewConnections(self):
+        self.view.closing.connect(lambda: self.viewClosing.emit())
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.view

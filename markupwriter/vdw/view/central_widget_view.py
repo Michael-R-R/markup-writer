@@ -3,7 +3,6 @@
 from PyQt6.QtCore import (
     Qt,
     QDataStream,
-    pyqtSignal,
 )
 
 from PyQt6.QtWidgets import (

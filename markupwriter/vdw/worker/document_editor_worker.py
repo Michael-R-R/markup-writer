@@ -2,7 +2,13 @@
 
 import os, re
 
-from PyQt6.QtCore import QObject, pyqtSlot, QSize, QThreadPool, QPoint
+from PyQt6.QtCore import (
+    QObject,
+    pyqtSlot,
+    QSize,
+    QThreadPool,
+    QPoint,
+)
 
 from PyQt6.QtGui import (
     QGuiApplication,

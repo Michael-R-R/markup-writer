@@ -2,8 +2,6 @@
 
 from PyQt6.QtCore import (
     QDataStream,
-    pyqtSignal,
-    QSize,
 )
 
 from PyQt6.QtGui import (
@@ -15,13 +13,12 @@ from PyQt6.QtWidgets import (
     QGridLayout,
 )
 
+from markupwriter.config import AppConfig
 
 import markupwriter.gui.widgets as w
 
 
 class DocumentEditorView(QWidget):
-    resized = pyqtSignal(QSize)
-    
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
@@ -44,7 +41,8 @@ class DocumentEditorView(QWidget):
         self.searchBox.adjustPos(vbw, ww, fw)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
-        self.resized.emit(e.size())
+        AppConfig.docEditorSize = e.size()
+        
         return super().resizeEvent(e)
     
     def __rlshift__(self, sout: QDataStream) -> QDataStream:

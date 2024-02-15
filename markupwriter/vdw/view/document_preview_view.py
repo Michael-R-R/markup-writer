@@ -2,8 +2,6 @@
 
 from PyQt6.QtCore import (
     QDataStream,
-    pyqtSignal,
-    QSize,
 )
 
 from PyQt6.QtGui import (
@@ -15,12 +13,12 @@ from PyQt6.QtWidgets import (
     QGridLayout,
 )
 
+from markupwriter.config import AppConfig
+
 import markupwriter.gui.widgets as w
 
 
 class DocumentPreviewView(QWidget):
-    resized = pyqtSignal(QSize)
-    
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
@@ -30,7 +28,8 @@ class DocumentPreviewView(QWidget):
         self.gLayout.addWidget(self.tabWidget, 0, 0)
     
     def resizeEvent(self, e: QResizeEvent | None) -> None:
-        self.resized.emit(e.size())
+        AppConfig.docPreviewSize = e.size()
+        
         return super().resizeEvent(e)
     
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
