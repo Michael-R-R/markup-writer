@@ -17,14 +17,11 @@ from markupwriter.common.provider import (
     Style
 )
 
-from markupwriter.mvc.controller.core import (
-    MainWindowController,
-)
+import markupwriter.vdw as vdw
 
 
 class Application(object):
     status = -1
-    controller: MainWindowController = None
 
     def start(wd: str):
         AppConfig.init(wd)
@@ -39,9 +36,8 @@ class Application(object):
         app = QApplication(argv)
         app.setApplicationName(AppConfig.APP_NAME)
 
-        Application.controller = MainWindowController(None)
-        Application.controller.setup()
-        Application.controller.show()
+        core = vdw.Core(app)
+        core.run()
 
         Application.status = app.exec()
 

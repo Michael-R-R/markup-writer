@@ -11,7 +11,8 @@ from PyQt6.QtWidgets import (
     QToolBar,
 )
 
-import markupwriter.gui.actions.doctree as dt
+
+import markupwriter.gui.actions.doctree as a
 
 
 class DocumentTreeBarWidget(QWidget):
@@ -21,12 +22,12 @@ class DocumentTreeBarWidget(QWidget):
         self.titleLabel = QLabel("<b>Project Content<b>", self)
 
         self.toolbar = QToolBar(self)
-        self.navUpAction = dt.ItemNavUpAction(self.toolbar)
-        self.navDownAction = dt.ItemNavDownAction(self.toolbar)
-        self.addItemAction = dt.ItemAddAction(self.toolbar)
+        self.navUpAction = a.NavItemUpAction(self.toolbar)
+        self.navDownAction = a.NavItemDownAction(self.toolbar)
+        self.itemMenuAction = a.ItemMenuAction(self.toolbar)
         self.toolbar.addAction(self.navUpAction)
         self.toolbar.addAction(self.navDownAction)
-        self.toolbar.addAction(self.addItemAction)
+        self.toolbar.addAction(self.itemMenuAction)
         
         self.gLayout = QGridLayout(self)
         self.gLayout.addWidget(self.titleLabel, 0, 0, Qt.AlignmentFlag.AlignLeft)
@@ -34,4 +35,4 @@ class DocumentTreeBarWidget(QWidget):
         
         self.navUpAction.setEnabled(False)
         self.navDownAction.setEnabled(False)
-        self.addItemAction.setEnabled(False)
+        self.itemMenuAction.setEnabled(False)

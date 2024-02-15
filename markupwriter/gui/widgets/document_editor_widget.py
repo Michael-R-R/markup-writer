@@ -6,6 +6,7 @@ from PyQt6.QtCore import (
     Qt,
     pyqtSignal,
     QPoint,
+    QSize,
     QMimeData,
     QDataStream,
 )
@@ -17,7 +18,8 @@ from PyQt6.QtGui import (
     QResizeEvent,
     QTextOption,
     QTextCursor,
-    QGuiApplication,
+    QAction,
+    QKeySequence,
 )
 
 from PyQt6.QtWidgets import (
@@ -33,8 +35,11 @@ import markupwriter.support.doceditor as de
 
 
 class DocumentEditorWidget(QPlainTextEdit):
-    tagPopupRequested = pyqtSignal(str, int)
-    tagPreviewRequested = pyqtSignal(str, int)
+    docStatusChanged = pyqtSignal(bool)
+    refPopupTriggered = pyqtSignal(str)
+    refPreviewTriggered = pyqtSignal(str)
+    wordCountChanged = pyqtSignal(str, int)
+    resized = pyqtSignal(QSize)
 
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
@@ -42,7 +47,13 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.plainDocument = de.PlainDocument(self)
         self.spellChecker = de.SpellCheck()
         self.highlighter = Highlighter(self.plainDocument, self.spellChecker.endict)
+        self.searchHotkey = QAction("search", self)
         self.canResizeMargins = True
+        self.docUUID = ""
+
+        shortcut = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F)
+        self.searchHotkey.setShortcut(shortcut)
+        self.addAction(self.searchHotkey)
 
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
@@ -51,11 +62,12 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setTabStopDistance(20.0)
-        self.resizeMargins()
 
     def reset(self):
         self.clear()
         self.setEnabled(False)
+        self.docUUID = ""
+        self.docStatusChanged.emit(False)
 
     def cursorToEnd(self):
         cursor = self.textCursor()
@@ -68,25 +80,26 @@ class DocumentEditorWidget(QPlainTextEdit):
         cursor.setPosition(pos)
         self.setTextCursor(cursor)
         self.centerCursor()
-
-    def resizeMargins(self):
-        if not self.canResizeMargins:
+    
+    def runWordCount(self):
+        if not self.hasDocument():
             return
-
-        mSize = QGuiApplication.primaryScreen().size()
-        mW = mSize.width()
-
-        wW = self.width()
-        if wW > int(mW * 0.75):
-            wW = int(wW * 0.3)
-        elif wW > int(mW * 0.5):
-            wW = int(wW * 0.2)
-        else:
-            wW = int(wW * 0.1)
-
-        wH = int(self.height() * 0.1)
-
-        self.setViewportMargins(wW, wH, wW, wH)
+        
+        uuid = self.docUUID
+        text = self.toPlainText()
+        count = len(re.findall(r"[a-zA-Z'-]+", text))
+        
+        self.wordCountChanged.emit(uuid, count)
+        
+    def setDocumentText(self, uuid: str, text: str, cpos: int):
+        self.docUUID = uuid
+        self.setPlainText(text)
+        self.moveCursorTo(cpos)
+        self.setEnabled(True)
+        self.docStatusChanged.emit(True)
+    
+    def hasDocument(self) -> bool:
+        return self.docUUID != ""
 
     def canInsertFromMimeData(self, source: QMimeData | None) -> bool:
         hasUrls = source.hasUrls()
@@ -108,14 +121,20 @@ class DocumentEditorWidget(QPlainTextEdit):
             return super().insertFromMimeData(source)
 
     def contextMenuEvent(self, e: QContextMenuEvent | None) -> None:
+        if self.isReadOnly():
+            return
+        
         contextMenu = EditorContextMenu(
             self, self.spellChecker, self.highlighter, e.pos(), self
         )
         contextMenu.onShowMenu(e.globalPos())
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
-        self.resizeMargins()
-
+        if self.canResizeMargins:
+            self.canResizeMargins = False
+            self.resized.emit(e.size())
+            self.canResizeMargins = True
+        
         return super().resizeEvent(e)
 
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
@@ -138,15 +157,15 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         if e.modifiers() == ctrl:
             if e.button() == button:
-                pair: tuple[str, int] = self._onTextBlockClicked(e.pos())
-                if pair != (None, None):
-                    self.tagPopupRequested.emit(pair[0], pair[1])
+                tag: str = self._findTagAtPos(e.pos())
+                if tag is not None:
+                    self.refPopupTriggered.emit(tag)
                 return None
         elif e.modifiers() == (ctrl | alt):
             if e.button() == button:
-                pair: tuple[str, int] = self._onTextBlockClicked(e.pos())
-                if pair != (None, None):
-                    self.tagPreviewRequested.emit(pair[0], pair[1])
+                tag: str = self._findTagAtPos(e.pos())
+                if tag is not None:
+                    self.refPreviewTriggered.emit(tag)
                 return None
 
         return super().mousePressEvent(e)
@@ -156,14 +175,39 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         return super().mouseMoveEvent(e)
 
-    def _onTextBlockClicked(self, pos: QPoint) -> tuple[str | None, int | None]:
+    def _findTagAtPos(self, pos: QPoint) -> str | None:
         cursor = self.cursorForPosition(pos)
         cpos = cursor.positionInBlock()
         textBlock = cursor.block().text()
         if cpos <= 0 or cpos >= len(textBlock):
-            return (None, None)
+            return None
+        
+        found = re.search(r"^@(ref|pov|loc)(\(.*\))", textBlock)
+        if found is None:
+            return None
+        
+        rcomma = textBlock.rfind(",", 0, cpos)
+        fcomma = textBlock.find(",", cpos)
+        tag = None
+        
+        # single tag
+        if rcomma < 0 and fcomma < 0:
+            rindex = textBlock.rfind("(", 0, cpos)
+            lindex = textBlock.find(")", cpos)
+            tag = textBlock[rindex + 1 : lindex].strip()
+        # tag start
+        elif rcomma < 0 and fcomma > -1:
+            index = textBlock.rfind("(", 0, cpos)
+            tag = textBlock[index + 1 : fcomma].strip()
+        # tag middle
+        elif rcomma > -1 and fcomma > -1:
+            tag = textBlock[rcomma + 1 : fcomma].strip()
+        # tag end
+        elif rcomma > -1 and fcomma < 0:
+            index = textBlock.find(")", cpos)
+            tag = textBlock[rcomma + 1 : index].strip()
 
-        return (textBlock, cpos)
+        return tag
 
     def _onChangeCursorShape(self, mods: Qt.KeyboardModifier, vp: QWidget):
         ctrl = Qt.KeyboardModifier.ControlModifier

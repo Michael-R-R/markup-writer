@@ -30,7 +30,8 @@ class DocumentTreeWidget(QTreeWidget):
     fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
     fileMoved = pyqtSignal(str, list)
-    dropComplete = pyqtSignal()
+    fileRenamed = pyqtSignal(str, str, str)
+    dragDropDone = pyqtSignal()
 
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
@@ -69,11 +70,36 @@ class DocumentTreeWidget(QTreeWidget):
 
         self._emitAdded(widget)
 
+    def insertAt(
+        self, index: int, item: QTreeWidgetItem, target: QTreeWidgetItem | None
+    ):
+        widgetList = self.takeOut(item)
+        if target is None:  # insert to root
+            self.insertTopLevelItem(index, item)
+        else:  # insert to target
+            target.insertChild(index, item)
+
+        self.setWidgetList(widgetList)
+
+        self._emitMoved(widgetList)
+
+    def moveTo(self, item: QTreeWidgetItem, target: QTreeWidgetItem | None):
+        widgetList = self.takeOut(item)
+        if target is None:  # add to root
+            self.addTopLevelItem(item)
+        else:  # add to target
+            target.addChild(item)
+
+        self.setWidgetList(widgetList)
+        self.setCurrentItem(item)
+
+        self._emitMoved(widgetList)
+
     def remove(self, item: QTreeWidgetItem):
         for i in range(item.childCount() - 1, -1, -1):
             child = item.child(i)
             self.remove(child)
-            
+
         widget: dti.BaseTreeItem = self.itemWidget(item, 0)
 
         parent = item.parent()
@@ -86,9 +112,20 @@ class DocumentTreeWidget(QTreeWidget):
         self.removeItemWidget(item, 0)
         self.clearSelection()
         self.setCurrentItem(None)
-        
+
         self._emitRemoved(widget)
-        
+
+    def rename(self, item: QTreeWidgetItem, name: str):
+        widget: dti.BaseTreeItem = self.itemWidget(item, 0)
+        if widget is None:
+            return
+
+        oldName = widget.title()
+        widget.setTitle(name)
+
+        if widget.hasFlag(dti.ITEM_FLAG.file):
+            self.fileRenamed.emit(widget.UUID(), oldName, name)
+
     def translate(self, direction: int):
         selected = self.currentItem()
         if selected is None:
@@ -103,33 +140,8 @@ class DocumentTreeWidget(QTreeWidget):
             size = parent.childCount()
             index = parent.indexOfChild(selected)
             self.insertAt((index + direction) % size, selected, parent)
-            
+
         self.setCurrentItem(selected)
-
-    def moveTo(self, item: QTreeWidgetItem, target: QTreeWidgetItem | None):
-        widgetList = self.takeOut(item)
-        if target is None:  # add to root
-            self.addTopLevelItem(item)
-        else:  # add to target
-            target.addChild(item)
-
-        self.setWidgetList(widgetList)
-        self.setCurrentItem(item)
-
-        self._emitMoved(widgetList)
-
-    def insertAt(
-        self, index: int, item: QTreeWidgetItem, target: QTreeWidgetItem | None
-    ):
-        widgetList = self.takeOut(item)
-        if target is None:  # insert to root
-            self.insertTopLevelItem(index, item)
-        else:  # insert to target
-            target.insertChild(index, item)
-
-        self.setWidgetList(widgetList)
-
-        self._emitMoved(widgetList)
 
     def takeOut(self, item: QTreeWidgetItem) -> list[dti.BaseTreeItem]:
         widgetList = self.copyWidgets(item, list())
@@ -157,6 +169,54 @@ class DocumentTreeWidget(QTreeWidget):
 
         return result
 
+    def refreshWordCounts(self, item: QTreeWidgetItem, owc: int, wc: int):
+        while item is not None:
+            widget: dti.BaseTreeItem = self.itemWidget(item, 0)
+            twc = widget.totalWordCount() - owc + wc
+            widget.setTotalWordCount(twc)
+            item = item.parent()
+
+    def refreshAllWordCounts(self):
+
+        def helper(pitem: QTreeWidgetItem) -> int:
+            pw: dti.BaseTreeItem = self.itemWidget(pitem, 0)
+            twc = pw.wordCount()
+
+            for j in range(pitem.childCount()):
+                citem = pitem.child(j)
+                twc += helper(citem)
+
+            pw.setTotalWordCount(twc)
+
+            return twc
+
+        for i in range(self.topLevelItemCount()):
+            item = self.topLevelItem(i)
+            helper(item)
+
+    def buildExportList(self, root: QTreeWidgetItem) -> list[list[dti.BaseFileItem]]:
+
+        def helper(
+            pitem: QTreeWidgetItem, flist: list[dti.BaseFileItem]
+        ) -> list[dti.BaseFileItem]:
+            pw: dti.BaseTreeItem = self.itemWidget(pitem, 0)
+
+            if pw.hasFlag(dti.ITEM_FLAG.file):
+                flist.append(pw)
+
+            for i in range(pitem.childCount()):
+                citem = pitem.child(i)
+                flist = helper(citem, flist)
+
+            return flist
+
+        buildList: list[list[dti.BaseFileItem]] = list()
+        for i in range(root.childCount()):
+            pitem = root.child(i)
+            buildList.append(helper(pitem, list()))
+
+        return buildList
+
     def findTrash(self) -> QTreeWidgetItem | None:
         for i in range(self.topLevelItemCount() - 1, -1, -1):
             item = self.topLevelItem(i)
@@ -165,8 +225,9 @@ class DocumentTreeWidget(QTreeWidget):
                 return item
 
         return None
-    
+
     def findWidget(self, uuid: str) -> dti.BaseTreeItem | None:
+        
         def helper(item: QTreeWidgetItem) -> dti.BaseTreeItem | None:
             for i in range(item.childCount()):
                 child = item.child(i)
@@ -176,9 +237,9 @@ class DocumentTreeWidget(QTreeWidget):
                 widget = helper(child)
                 if widget is not None:
                     return widget
-            
+
             return None
-        
+
         for i in range(self.topLevelItemCount()):
             item = self.topLevelItem(i)
             widget: dti.BaseTreeItem = self.itemWidget(item, 0)
@@ -187,7 +248,7 @@ class DocumentTreeWidget(QTreeWidget):
             widget = helper(item)
             if widget is not None:
                 return widget
-        
+
         return None
 
     def isInTrash(self, item: QTreeWidgetItem) -> bool:
@@ -240,33 +301,33 @@ class DocumentTreeWidget(QTreeWidget):
         copyList: list[list[dti.BaseTreeItem]] = list()
         for s in self.draggedItems:
             copyList.append(self.copyWidgets(s, list()))
-        
+
         super().dropEvent(e)
-            
+
         for i in range(len(copyList)):
             clist = copyList[i]
             self.setWidgetList(clist)
-            
+
             item = self.draggedItems[i]
             item.setSelected(True)
             self.expandItem(item.parent())
-            
+
         for clist in copyList:
             self._emitMoved(clist)
-        
+
         self.draggedItems.clear()
-        self.dropComplete.emit()
-                
+        self.dragDropDone.emit()
+
     def _emitAdded(self, widget: dti.BaseTreeItem):
         if widget.hasFlag(dti.ITEM_FLAG.file):
             nameList = self.getParentNameList(widget.item)
             self.fileAdded.emit(widget.UUID())
-            self.fileOpened.emit(widget.UUID(), nameList)    
-            
+            self.fileOpened.emit(widget.UUID(), nameList)
+
     def _emitRemoved(self, widget: dti.BaseTreeItem):
         if widget.hasFlag(dti.ITEM_FLAG.file):
             self.fileRemoved.emit(widget.title(), widget.UUID())
-                
+
     def _emitMoved(self, widgetList: list[dti.BaseTreeItem]):
         for w in widgetList:
             if w.hasFlag(dti.ITEM_FLAG.file):
@@ -297,9 +358,9 @@ class DocumentTreeWidget(QTreeWidget):
         if widget.hasFlag(dti.ITEM_FLAG.file):
             nameList = self.getParentNameList(item)
             self.fileOpened.emit(widget.UUID(), nameList)
-            
+
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
-        
+
         # recursive helper
         def helper(sOut: QDataStream, iParent: QTreeWidgetItem):
             cCount = iParent.childCount()
@@ -311,7 +372,7 @@ class DocumentTreeWidget(QTreeWidget):
                 sOut.writeQString(wChild.__class__.__name__)
                 helper(sOut, iChild)
                 sOut << wChild
-        
+
         iCount = self.topLevelItemCount()
         sout.writeInt(iCount)
 
@@ -328,7 +389,7 @@ class DocumentTreeWidget(QTreeWidget):
         return sout
 
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
-        
+
         # recursive helper
         def helper(sIn: QDataStream, iParent: QTreeWidgetItem):
             cCount = sIn.readInt()
@@ -341,9 +402,9 @@ class DocumentTreeWidget(QTreeWidget):
 
                 iParent.addChild(cwidget.item)
                 self.setItemWidget(cwidget.item, 0, cwidget)
-                
+
                 self.fileAdded.emit(cwidget.UUID())
-        
+
         iCount = sin.readInt()
 
         # Top level items
@@ -357,7 +418,7 @@ class DocumentTreeWidget(QTreeWidget):
 
             self.addTopLevelItem(pwidget.item)
             self.setItemWidget(pwidget.item, 0, pwidget)
-            
+
             self.fileAdded.emit(pwidget.UUID())
 
         return sin
