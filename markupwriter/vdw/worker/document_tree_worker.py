@@ -25,6 +25,33 @@ class DocumentTreeWorker(QObject):
 
         self.dtd = dtd
         
+    def onNewProject(self):
+        tb = self.dtd.view.treeBar
+        tb.navUpAction.setEnabled(True)
+        tb.navDownAction.setEnabled(True)
+        tb.itemMenuAction.setEnabled(True)
+        
+        tw = self.dtd.view.treeWidget
+        tcm = tw.treeContextMenu
+        tcm.itemMenu.setEnabled(True)
+        
+        tw.add(ti.PlotFolderItem())
+        tw.add(ti.TimelineFolderItem())
+        tw.add(ti.CharsFolderItem())
+        tw.add(ti.LocFolderItem())
+        tw.add(ti.ObjFolderItem())
+        tw.add(ti.TrashFolderItem())
+        
+    def onOpenProject(self):
+        tb = self.dtd.view.treeBar
+        tb.navUpAction.setEnabled(True)
+        tb.navDownAction.setEnabled(True)
+        tb.itemMenuAction.setEnabled(True)
+        
+        tw = self.dtd.view.treeWidget
+        tcm = tw.treeContextMenu
+        tcm.itemMenu.setEnabled(True)
+        
     @pyqtSlot(str)
     def onFileAdded(self, uuid: str):
         path = ProjectConfig.contentPath()

@@ -92,6 +92,10 @@ class DocumentEditorWorker(QObject):
         eb = self.ded.view.editorBar
         eb.replaceInPath(old, new)
     
+    @pyqtSlot(QSize)
+    def onEditorResized(self, _: QSize):
+        self._resizeMargins()
+    
     def _resetWidgets(self):
         eb = self.ded.view.editorBar
         te = self.ded.view.textEdit
@@ -117,11 +121,7 @@ class DocumentEditorWorker(QObject):
             cpos = int(found.group(0)[5:])
             content = content[found.end() + 1 :]
             
-        te.docUUID = uuid
-        te.setPlainText(content)
-        te.moveCursorTo(cpos)
-        te.setEnabled(True)
-        te.statusChanged.emit(True)
+        te.setDocumentText(uuid, content, cpos)
         
         return True
     
@@ -145,15 +145,13 @@ class DocumentEditorWorker(QObject):
 
         return True
     
-    def _resizeMargins(self, size: QSize):
+    def _resizeMargins(self):
         te = self.ded.view.textEdit
-        if not te.canResizeMargins:
-            return
-
+        
         mSize = QGuiApplication.primaryScreen().size()
         mW = mSize.width()
 
-        wW = size.width()
+        wW = te.width()
         if wW > int(mW * 0.75):
             wW = int(wW * 0.3)
         elif wW > int(mW * 0.5):
@@ -161,7 +159,7 @@ class DocumentEditorWorker(QObject):
         else:
             wW = int(wW * 0.1)
 
-        wH = int(size.height() * 0.1)
+        wH = int(te.height() * 0.1)
 
         te.setViewportMargins(wW, wH, wW, wH)
     

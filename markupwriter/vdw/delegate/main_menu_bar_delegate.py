@@ -26,21 +26,6 @@ class MainMenuBarDelegate(QObject):
 
         self._setupFileMenuConnections()
 
-    def setEnableSaveDocAction(self, isEnabled: bool):
-        self.view.fileMenu.saveDocAction.setEnabled(isEnabled)
-
-    def setEnableSaveAction(self, isEnabled: bool):
-        self.view.fileMenu.saveProjAction.setEnabled(isEnabled)
-
-    def setEnableSaveAsAction(self, isEnabled: bool):
-        self.view.fileMenu.saveProjAsAction.setEnabled(isEnabled)
-
-    def setEnableExportAction(self, isEnabled: bool):
-        self.view.fileMenu.exportAction.setEnabled(isEnabled)
-
-    def setEnableCloseAction(self, isEnabled: bool):
-        self.view.fileMenu.closeProjAction.setEnabled(isEnabled)
-
     def _setupFileMenuConnections(self):
         fm = self.view.fileMenu
         fm.newProjAction.triggered.connect(lambda: self.fmNewTriggered.emit())

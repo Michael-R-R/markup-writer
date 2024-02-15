@@ -35,7 +35,7 @@ import markupwriter.support.doceditor as de
 
 
 class DocumentEditorWidget(QPlainTextEdit):
-    statusChanged = pyqtSignal(bool)
+    docStatusChanged = pyqtSignal(bool)
     popupRequested = pyqtSignal(str, int)
     previewRequested = pyqtSignal(str, int)
     wordCountChanged = pyqtSignal(str, int)
@@ -66,7 +66,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.clear()
         self.setEnabled(False)
         self.docUUID = ""
-        self.statusChanged.emit(False)
+        self.docStatusChanged.emit(False)
 
     def cursorToEnd(self):
         cursor = self.textCursor()
@@ -89,6 +89,13 @@ class DocumentEditorWidget(QPlainTextEdit):
         count = len(re.findall(r"[a-zA-Z'-]+", text))
         
         self.wordCountChanged.emit(uuid, count)
+        
+    def setDocumentText(self, uuid: str, text: str, cpos: int):
+        self.docUUID = uuid
+        self.setPlainText(text)
+        self.moveCursorTo(cpos)
+        self.setEnabled(True)
+        self.docStatusChanged.emit(True)
     
     def hasDocument(self) -> bool:
         return self.docUUID != ""
@@ -119,7 +126,10 @@ class DocumentEditorWidget(QPlainTextEdit):
         contextMenu.onShowMenu(e.globalPos())
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
-        self.resized.emit(e.size())
+        if self.canResizeMargins:
+            self.canResizeMargins = False
+            self.resized.emit(e.size())
+            self.canResizeMargins = True
         
         return super().resizeEvent(e)
 

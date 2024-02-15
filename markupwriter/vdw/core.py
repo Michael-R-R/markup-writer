@@ -68,6 +68,7 @@ class Core(QObject):
 
         self.mwd = d.MainWindowDelegate(self)
         self.data = None
+        self.mmbw = None
         self.dtw = None
         self.dew = None
 
@@ -77,10 +78,12 @@ class Core(QObject):
         self.data = data
         self.data.setup(self.mwd)
 
+        self.mmbw = w.MainMenuBarWorker(self.data.mmbd, self)
         self.dtw = w.DocumentTreeWorker(self.data.dtd, self)
         self.dew = w.DocumentEditorWorker(self.data.ded, self)
 
         self._setupCoreSlots()
+        self._setupMenuBarWorkerSlots()
         self._setupTreeWorkerSlots()
         self._setupEditorWorkerSlots()
 
@@ -99,12 +102,17 @@ class Core(QObject):
         self.mwd.setViewTitle(title)
 
     def _setupCoreSlots(self):
+        self.mwd.viewClosing.connect(self._onAppClosing)
+
         self.data.mmbd.fmNewTriggered.connect(self._onNewProject)
         self.data.mmbd.fmOpenTriggered.connect(self._onOpenProject)
         self.data.mmbd.fmSaveTriggered.connect(self._onSaveProject)
         self.data.mmbd.fmSaveAsTriggered.connect(self._onSaveAsProject)
         self.data.mmbd.fmCloseTriggered.connect(self._onCloseProject)
         self.data.mmbd.fmExitTriggered.connect(self._onExit)
+
+    def _setupMenuBarWorkerSlots(self):
+        self.data.ded.docStatusChanged.connect(self.mmbw.onDocumentStatusChanged)
 
     def _setupTreeWorkerSlots(self):
         self.data.dtd.fileAdded.connect(self.dtw.onFileAdded)
@@ -125,15 +133,13 @@ class Core(QObject):
         self.data.dtd.createdMiscFile.connect(self.dtw.onMiscFileCreated)
 
     def _setupEditorWorkerSlots(self):
-        self.data.mmbd.fmSaveDocTriggered.connect(self.dew.onSaveDocument)
-        self.data.mmbd.fmSaveTriggered.connect(self.dew.onSaveDocument)
-        
         self.data.dtd.fileOpened.connect(self.dew.onFileOpened)
         self.data.dtd.fileRemoved.connect(self.dew.onFileRemoved)
         self.data.dtd.fileMoved.connect(self.dew.onFileMoved)
         self.data.dtd.fileRenamed.connect(self.dew.onFileRenamed)
-        
+
         self.data.ded.closeDocClicked.connect(self.dew.onCloseDocument)
+        self.data.ded.editorResized.connect(self.dew.onEditorResized)
 
     @pyqtSlot()
     def _onNewProject(self):
@@ -149,15 +155,8 @@ class Core(QObject):
 
         self.setup(CoreData(self))
 
-        data = self.data
-        data.mmbd.setEnableSaveAction(True)
-        data.mmbd.setEnableSaveAsAction(True)
-        data.mmbd.setEnableExportAction(True)
-        data.mmbd.setEnableCloseAction(True)
-
-        data.dtd.setEnabledTreeBarActions(True)
-        data.dtd.setEnabledTreeActions(True)
-        data.dtd.createRootFolders()
+        self.mmbw.onNewProject()
+        self.dtw.onNewProject()
 
         self._onSaveProject()
 
@@ -180,22 +179,21 @@ class Core(QObject):
 
         self.setup(data)
 
-        data.mmbd.setEnableSaveAction(True)
-        data.mmbd.setEnableSaveAsAction(True)
-        data.mmbd.setEnableExportAction(True)
-        data.mmbd.setEnableCloseAction(True)
-
-        data.dtd.setEnabledTreeBarActions(True)
-        data.dtd.setEnabledTreeActions(True)
+        self.mmbw.onOpenProject()
+        self.dtw.onOpenProject()
 
         # TODO do startup parser
+
+    @pyqtSlot()
+    def _onSaveDocument(self):
+        self.dew.onSaveDocument()
 
     @pyqtSlot()
     def _onSaveProject(self):
         if not ProjectConfig.hasActiveProject():
             return False
 
-        # TODO save opened document
+        self._onSaveDocument()
 
         return Serialize.write(ProjectConfig.filePath(), self.data)
 
@@ -236,3 +234,7 @@ class Core(QObject):
         if ProjectHelper.askToExit(self.mwd.view):
             self._onSaveProject()
             QApplication.quit()
+
+    @pyqtSlot()
+    def _onAppClosing(self):
+        self._onSaveProject()

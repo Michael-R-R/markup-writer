@@ -8,7 +8,6 @@ from PyQt6.QtCore import (
 
 import markupwriter.vdw.view as v
 import markupwriter.gui.menus.doctree as dtm
-import markupwriter.support.doctree.item as dti
 
 
 class DocumentTreeDelegate(QObject):
@@ -41,25 +40,6 @@ class DocumentTreeDelegate(QObject):
         self.view = v.DocumentTreeView(None)
 
         self._setupViewConnections()
-        
-    def setEnabledTreeBarActions(self, isEnabled: bool):
-        tb = self.view.treeBar
-        tb.navUpAction.setEnabled(isEnabled)
-        tb.navDownAction.setEnabled(isEnabled)
-        tb.itemMenuAction.setEnabled(isEnabled)
-    
-    def setEnabledTreeActions(self, isEnabled: bool):
-        tcm = self.view.treeWidget.treeContextMenu
-        tcm.itemMenu.setEnabled(isEnabled)
-    
-    def createRootFolders(self):
-        tw = self.view.treeWidget
-        tw.add(dti.PlotFolderItem())
-        tw.add(dti.TimelineFolderItem())
-        tw.add(dti.CharsFolderItem())
-        tw.add(dti.LocFolderItem())
-        tw.add(dti.ObjFolderItem())
-        tw.add(dti.TrashFolderItem())
 
     def _setupViewConnections(self):
         tb = self.view.treeBar
