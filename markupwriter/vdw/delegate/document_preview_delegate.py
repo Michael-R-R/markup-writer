@@ -10,6 +10,7 @@ import markupwriter.vdw.view as v
 
 
 class DocumentPreviewDelegate(QObject):
+    showViewRequested = pyqtSignal()
     closeTabRequested = pyqtSignal(int)
 
     def __init__(self, parent: QObject | None) -> None:

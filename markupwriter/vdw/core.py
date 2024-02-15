@@ -81,11 +81,13 @@ class Core(QObject):
         self.mmbw = w.MainMenuBarWorker(self.data.mmbd, self)
         self.dtw = w.DocumentTreeWorker(self.data.dtd, self)
         self.dew = w.DocumentEditorWorker(self.data.ded, self)
+        self.dpw = w.DocumentPreviewWorker(self.data.dpd, self)
 
         self._setupCoreSlots()
         self._setupMenuBarWorkerSlots()
         self._setupTreeWorkerSlots()
         self._setupEditorWorkerSlots()
+        self._setupPreviewWorkerSlots()
 
         self.setWindowTitle()
 
@@ -149,6 +151,9 @@ class Core(QObject):
         self.data.ded.replaceClicked.connect(self.dew.onReplaceSearch)
         self.data.ded.replaceAllClicked.connect(self.dew.onReplaceAllSearch)
         self.data.ded.closeSearchClicked.connect(self.dew.onSearchTriggered)
+
+    def _setupPreviewWorkerSlots(self):
+        pass
 
     @pyqtSlot()
     def _onNewProject(self):
