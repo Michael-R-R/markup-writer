@@ -24,7 +24,7 @@ from PyQt6.QtWidgets import (
 from markupwriter.common.provider import Icon
 
 
-class SearchReplaceWidget(QFrame):
+class SearchBoxWidget(QFrame):
     searchChanged = pyqtSignal(str, bool)
 
     def __init__(self, parent: QWidget | None) -> None:

@@ -26,7 +26,7 @@ class DocumentEditorView(QWidget):
 
         self.editorBar = mw.DocumentEditorBarWidget(self)
         self.textEdit = mw.DocumentEditorWidget(self)
-        self.searchBox = mw.SearchReplaceWidget(self.textEdit)
+        self.searchBox = mw.SearchBoxWidget(self.textEdit)
         self.searchAction = QAction("search", self)
 
         self.gLayout = QGridLayout(self)

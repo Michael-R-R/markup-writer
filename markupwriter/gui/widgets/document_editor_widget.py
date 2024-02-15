@@ -53,6 +53,7 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         shortcut = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F)
         self.searchHotkey.setShortcut(shortcut)
+        self.addAction(self.searchHotkey)
 
         self.setDocument(self.plainDocument)
         self.setEnabled(False)

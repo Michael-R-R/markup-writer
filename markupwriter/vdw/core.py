@@ -140,6 +140,14 @@ class Core(QObject):
 
         self.data.ded.closeDocClicked.connect(self.dew.onCloseDocument)
         self.data.ded.editorResized.connect(self.dew.onEditorResized)
+        
+        self.data.ded.showSearchTriggered.connect(self.dew.onSearchTriggered)
+        self.data.ded.searchChanged.connect(self.dew.onSearchChanged)
+        self.data.ded.nextSearchClicked.connect(self.dew.onNextSearch)
+        self.data.ded.prevSearchCliced.connect(self.dew.onPrevSearch)
+        self.data.ded.replaceClicked.connect(self.dew.onReplaceSearch)
+        self.data.ded.replaceAllClicked.connect(self.dew.onReplaceAllSearch)
+        self.data.ded.closeSearchClicked.connect(self.dew.onSearchTriggered)
 
     @pyqtSlot()
     def _onNewProject(self):

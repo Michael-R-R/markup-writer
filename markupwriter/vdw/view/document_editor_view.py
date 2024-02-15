@@ -27,13 +27,21 @@ class DocumentEditorView(QWidget):
         
         self.editorBar = w.DocumentEditorBarWidget(self)
         self.textEdit = w.DocumentEditorWidget(self)
-        self.searchBox = w.SearchReplaceWidget(self.textEdit)
+        self.searchBox = w.SearchBoxWidget(self.textEdit)
         
         self.searchBox.hide()
 
         self.gLayout = QGridLayout(self)
         self.gLayout.addWidget(self.editorBar, 0, 0)
         self.gLayout.addWidget(self.textEdit, 1, 0)
+        
+    def adjustSearchBoxPos(self):
+        vb = self.textEdit.verticalScrollBar()
+        vbw = vb.width() if vb.isVisible() else 0
+        ww = self.textEdit.width()
+        fw = self.textEdit.frameWidth()
+        
+        self.searchBox.adjustPos(vbw, ww, fw)
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         self.resized.emit(e.size())

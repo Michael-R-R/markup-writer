@@ -12,18 +12,25 @@ import markupwriter.vdw.view as v
 
 class DocumentEditorDelegate(QObject):
     closeDocClicked = pyqtSignal()
+
     docStatusChanged = pyqtSignal(bool)
-    searchTriggered = pyqtSignal()
+    showSearchTriggered = pyqtSignal()
     popupRequested = pyqtSignal(str, int)
     previewRequested = pyqtSignal(str, int)
-    searchChanged = pyqtSignal(str, bool)
     editorResized = pyqtSignal(QSize)
+
+    searchChanged = pyqtSignal(str, bool)
+    nextSearchClicked = pyqtSignal()
+    prevSearchCliced = pyqtSignal()
+    replaceClicked = pyqtSignal()
+    replaceAllClicked = pyqtSignal()
+    closeSearchClicked = pyqtSignal()
 
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
 
         self.view = v.DocumentEditorView(None)
-        
+
         self._setupViewConnections()
 
     def _setupViewConnections(self):
@@ -32,13 +39,18 @@ class DocumentEditorDelegate(QObject):
 
         te = self.view.textEdit
         te.docStatusChanged.connect(lambda x: self.docStatusChanged.emit(x))
-        te.searchHotkey.triggered.connect(lambda: self.searchTriggered.emit())
+        te.searchHotkey.triggered.connect(lambda: self.showSearchTriggered.emit())
         te.popupRequested.connect(lambda x, y: self.popupRequested.emit(x, y))
         te.previewRequested.connect(lambda x, y: self.previewRequested.emit(x, y))
         te.resized.connect(lambda x: self.editorResized.emit(x))
-        
+
         sb = self.view.searchBox
         sb.searchChanged.connect(lambda x, y: self.searchChanged.emit(x, y))
+        sb.nextAction.triggered.connect(lambda: self.nextSearchClicked.emit())
+        sb.prevAction.triggered.connect(lambda: self.prevSearchCliced.emit())
+        sb.replaceAction.triggered.connect(lambda: self.replaceClicked.emit())
+        sb.replaceAllAction.triggered.connect(lambda: self.replaceAllClicked.emit())
+        sb.closeAction.triggered.connect(lambda: self.closeSearchClicked.emit())
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.view
