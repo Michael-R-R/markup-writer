@@ -18,7 +18,7 @@ from markupwriter.gui.dialogs.modal import ErrorDialog
 from markupwriter.common.tokenizers import XHtmlTokenizer
 from markupwriter.common.parsers import XHtmlParser
 
-import markupwriter.mvc.controller.corewidgets as wcore
+import markupwriter.gui.widgets as w
 
 
 class EpubExporter(object):
@@ -31,8 +31,8 @@ class EpubExporter(object):
         self.fontsPath = ""
         self.imgPath = ""
 
-    def export(self, dtc: wcore.DocumentTreeController, parent: QWidget | None):
-        widget = ExportSelectWidget(dtc.view.treewidget, parent)
+    def export(self, tw: w.DocumentTreeWidget, parent: QWidget | None):
+        widget = ExportSelectWidget(tw, parent)
         if widget.exec() != 1:
             return
 
@@ -45,7 +45,7 @@ class EpubExporter(object):
         self._setupPaths(exportDir)
         self._mkDirectories()
         self._mkFiles()
-        self._create(dtc, item)
+        self._create(tw, item)
 
     def _setupPaths(self, rootDir: str):
         self.wd = AppConfig.WORKING_DIR
@@ -82,13 +82,13 @@ class EpubExporter(object):
         dst = os.path.join(self.cssPath, "base.css")
         shutil.copyfile(src, dst)
 
-    def _create(self, dtc: wcore.DocumentTreeController, item: QTreeWidgetItem):
+    def _create(self, tw: w.DocumentTreeWidget, item: QTreeWidgetItem):
         contentPath = ProjectConfig.contentPath()
         manifest = ""
         spine = ""
         count = 0
 
-        buildList = dtc.buildExportList(item)
+        buildList = tw.buildExportList(item)
         for c in buildList:
             # Make xhtml body
             cbody = ""
