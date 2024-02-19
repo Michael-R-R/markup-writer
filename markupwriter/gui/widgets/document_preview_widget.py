@@ -31,14 +31,13 @@ class DocumentPreviewWidget(QWidget):
         self.uuid = uuid
         self.plainText = File.read(path)
         self.html = ""
-        self.isPlainText = True
+        self.isPlainText = False
         self.threadPool = QThreadPool(parent)
 
         self.textedit = QTextEdit(self)
         self.highlighter = Highlighter(self.textedit.document(), None)
         self.textedit.setReadOnly(True)
         self.textedit.setTabStopDistance(20.0)
-        self.textedit.setPlainText(self.plainText)
 
         self.refreshButton = QPushButton("Refresh", self)
         self.refreshButton.clicked.connect(self._onRefreshButton)
@@ -50,6 +49,8 @@ class DocumentPreviewWidget(QWidget):
         self.mLayout.addWidget(self.textedit, 0, 0, 1, 2)
         self.mLayout.addWidget(self.refreshButton, 1, 0)
         self.mLayout.addWidget(self.toggleButton, 1, 1)
+        
+        self._runHtmlTokenizer()
 
     def checkForMatch(self, title: str, uuid: str) -> bool:
         return title == self.title and uuid == self.uuid
