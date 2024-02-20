@@ -17,6 +17,7 @@ class Icon(object):
     DOWN_ARROW: QIcon = None
     ADD_ITEM: QIcon = None
     MORE_OPTIONS: QIcon = None
+    FILTER: QIcon = None
 
     # Folders
     NOVEL_FOLDER: QIcon = None
@@ -48,6 +49,7 @@ class Icon(object):
         Icon.DOWN_ARROW = QIcon(os.path.join(dir, "common/down_arrow.svg"))
         Icon.ADD_ITEM = QIcon(os.path.join(dir, "common/add_item.svg"))
         Icon.MORE_OPTIONS = QIcon(os.path.join(dir, "common/more_options.svg"))
+        Icon.FILTER = QIcon(os.path.join(dir, "common/filter.svg"))
 
         # Folders
         Icon.NOVEL_FOLDER = QIcon(os.path.join(dir, "folder/novel.svg"))

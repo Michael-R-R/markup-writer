@@ -11,6 +11,10 @@ import markupwriter.gui.menus.doctree as dtm
 
 
 class DocumentTreeDelegate(QObject):
+    navUpClicked = pyqtSignal()
+    navDownClicked = pyqtSignal()
+    filterChanged = pyqtSignal(str)
+    
     fileAdded = pyqtSignal(str)
     fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
@@ -18,9 +22,6 @@ class DocumentTreeDelegate(QObject):
     fileRenamed = pyqtSignal(str, str, str)
     previewRequested = pyqtSignal(str, str)
     dragDropDone = pyqtSignal()
-
-    navUpClicked = pyqtSignal()
-    navDownClicked = pyqtSignal()
 
     cmPreviewClicked = pyqtSignal()
     cmRenameClicked = pyqtSignal()
@@ -47,6 +48,7 @@ class DocumentTreeDelegate(QObject):
         tb = self.view.treeBar
         tb.navUpAction.triggered.connect(lambda: self.navUpClicked.emit())
         tb.navDownAction.triggered.connect(lambda: self.navDownClicked.emit())
+        tb.filterLineEdit.textChanged.connect(lambda x: self.filterChanged.emit(x))
 
         tw = self.view.treeWidget
         tw.fileAdded.connect(lambda x: self.fileAdded.emit(x))

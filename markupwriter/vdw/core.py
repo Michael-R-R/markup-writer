@@ -115,64 +115,73 @@ class Core(QObject):
     def _setupCoreSlots(self):
         self.mwd.viewClosing.connect(self._onAppClosing)
 
-        self.data.mmbd.fmNewTriggered.connect(self._onNewProject)
-        self.data.mmbd.fmOpenTriggered.connect(self._onOpenProject)
-        self.data.mmbd.fmSaveDocTriggered.connect(self._onSaveDocument)
-        self.data.mmbd.fmSaveTriggered.connect(self._onSaveProject)
-        self.data.mmbd.fmSaveAsTriggered.connect(self._onSaveAsProject)
-        self.data.mmbd.fmExportTriggered.connect(self._onExport)
-        self.data.mmbd.fmCloseTriggered.connect(self._onCloseProject)
-        self.data.mmbd.fmExitTriggered.connect(self._onExit)
+        mmbd = self.data.mmbd
+        mmbd.fmNewTriggered.connect(self._onNewProject)
+        mmbd.fmOpenTriggered.connect(self._onOpenProject)
+        mmbd.fmSaveDocTriggered.connect(self._onSaveDocument)
+        mmbd.fmSaveTriggered.connect(self._onSaveProject)
+        mmbd.fmSaveAsTriggered.connect(self._onSaveAsProject)
+        mmbd.fmExportTriggered.connect(self._onExport)
+        mmbd.fmCloseTriggered.connect(self._onCloseProject)
+        mmbd.fmExitTriggered.connect(self._onExit)
 
     def _setupMenuBarWorkerSlots(self):
-        self.data.ded.docStatusChanged.connect(self.mmbw.onDocumentStatusChanged)
+        ded = self.data.ded
+        ded.docStatusChanged.connect(self.mmbw.onDocumentStatusChanged)
 
     def _setupTreeWorkerSlots(self):
-        self.data.dtd.fileAdded.connect(self.dtw.onFileAdded)
-        self.data.dtd.fileRemoved.connect(self.dtw.onFileRemoved)
-        self.data.dtd.dragDropDone.connect(self.dtw.onDragDropDone)
-        self.data.dtd.navUpClicked.connect(self.dtw.onNavItemUp)
-        self.data.dtd.navDownClicked.connect(self.dtw.onNavItemDown)
-        self.data.dtd.cmPreviewClicked.connect(self.dtw.onPreviewItem)
-        self.data.dtd.cmRenameClicked.connect(self.dtw.onRenamedItem)
-        self.data.dtd.cmToTrashClicked.connect(self.dtw.onTrashItem)
-        self.data.dtd.cmRecoverClicked.connect(self.dtw.onRecoverItem)
-        self.data.dtd.cmEmptyTrashClicked.connect(self.dtw.onEmptyTrash)
-        self.data.dtd.createNovelClicked.connect(self.dtw.onNovelFolderCreated)
-        self.data.dtd.createFolderClicked.connect(self.dtw.onMiscFolderCreated)
-        self.data.dtd.createTitleClicked.connect(self.dtw.onTitleFileCreated)
-        self.data.dtd.createChapterClicked.connect(self.dtw.onChapterFileCreated)
-        self.data.dtd.createSceneClicked.connect(self.dtw.onSceneFileCreated)
-        self.data.dtd.createSectionClicked.connect(self.dtw.onSectionFileCreated)
-        self.data.dtd.createFileClicked.connect(self.dtw.onMiscFileCreated)
+        dtd = self.data.dtd
+        dtd.fileAdded.connect(self.dtw.onFileAdded)
+        dtd.fileRemoved.connect(self.dtw.onFileRemoved)
+        dtd.dragDropDone.connect(self.dtw.onDragDropDone)
+        dtd.navUpClicked.connect(self.dtw.onNavItemUp)
+        dtd.navDownClicked.connect(self.dtw.onNavItemDown)
+        dtd.filterChanged.connect(self.dtw.onFilterTextChanged)
+        dtd.cmPreviewClicked.connect(self.dtw.onPreviewItem)
+        dtd.cmRenameClicked.connect(self.dtw.onRenamedItem)
+        dtd.cmToTrashClicked.connect(self.dtw.onTrashItem)
+        dtd.cmRecoverClicked.connect(self.dtw.onRecoverItem)
+        dtd.cmEmptyTrashClicked.connect(self.dtw.onEmptyTrash)
+        dtd.createNovelClicked.connect(self.dtw.onNovelFolderCreated)
+        dtd.createFolderClicked.connect(self.dtw.onMiscFolderCreated)
+        dtd.createTitleClicked.connect(self.dtw.onTitleFileCreated)
+        dtd.createChapterClicked.connect(self.dtw.onChapterFileCreated)
+        dtd.createSceneClicked.connect(self.dtw.onSceneFileCreated)
+        dtd.createSectionClicked.connect(self.dtw.onSectionFileCreated)
+        dtd.createFileClicked.connect(self.dtw.onMiscFileCreated)
 
-        self.data.ded.wordCountChanged.connect(self.dtw.onWordCountChanged)
-        self.data.ded.docPreviewRequested.connect(self.dtw.onDocPreviewRequested)
+        ded = self.data.ded
+        ded.wordCountChanged.connect(self.dtw.onWordCountChanged)
+        ded.docPreviewRequested.connect(self.dtw.onDocPreviewRequested)
 
     def _setupEditorWorkerSlots(self):
-        self.data.dtd.fileOpened.connect(self.dew.onFileOpened)
-        self.data.dtd.fileRemoved.connect(self.dew.onFileRemoved)
-        self.data.dtd.fileMoved.connect(self.dew.onFileMoved)
-        self.data.dtd.fileRenamed.connect(self.dew.onFileRenamed)
+        dtd = self.data.dtd
+        dtd.fileOpened.connect(self.dew.onFileOpened)
+        dtd.fileRemoved.connect(self.dew.onFileRemoved)
+        dtd.fileMoved.connect(self.dew.onFileMoved)
+        dtd.fileRenamed.connect(self.dew.onFileRenamed)
 
-        self.data.ded.closeDocClicked.connect(self.dew.onCloseDocument)
-        self.data.ded.refPopupTriggered.connect(self.dew.onRefPopupTriggered)
-        self.data.ded.refPreviewTriggered.connect(self.dew.onRefPreviewTriggered)
-        self.data.ded.editorResized.connect(self.dew.onEditorResized)
-        self.data.ded.showSearchTriggered.connect(self.dew.onSearchTriggered)
-        self.data.ded.searchChanged.connect(self.dew.onSearchChanged)
-        self.data.ded.nextSearchClicked.connect(self.dew.onNextSearch)
-        self.data.ded.prevSearchCliced.connect(self.dew.onPrevSearch)
-        self.data.ded.replaceClicked.connect(self.dew.onReplaceSearch)
-        self.data.ded.replaceAllClicked.connect(self.dew.onReplaceAllSearch)
-        self.data.ded.closeSearchClicked.connect(self.dew.onSearchTriggered)
+        ded = self.data.ded
+        ded.closeDocClicked.connect(self.dew.onCloseDocument)
+        ded.refPopupTriggered.connect(self.dew.onRefPopupTriggered)
+        ded.refPreviewTriggered.connect(self.dew.onRefPreviewTriggered)
+        ded.editorResized.connect(self.dew.onEditorResized)
+        ded.showSearchTriggered.connect(self.dew.onSearchTriggered)
+        ded.searchChanged.connect(self.dew.onSearchChanged)
+        ded.nextSearchClicked.connect(self.dew.onNextSearch)
+        ded.prevSearchCliced.connect(self.dew.onPrevSearch)
+        ded.replaceClicked.connect(self.dew.onReplaceSearch)
+        ded.replaceAllClicked.connect(self.dew.onReplaceAllSearch)
+        ded.closeSearchClicked.connect(self.dew.onSearchTriggered)
 
     def _setupPreviewWorkerSlots(self):
-        self.data.dtd.fileRemoved.connect(self.dpw.onFileRemoved)
-        self.data.dtd.fileRenamed.connect(self.dpw.onFileRenamed)
-        self.data.dtd.previewRequested.connect(self.dpw.onFilePreviewed)
+        dtd = self.data.dtd
+        dtd.fileRemoved.connect(self.dpw.onFileRemoved)
+        dtd.fileRenamed.connect(self.dpw.onFileRenamed)
+        dtd.previewRequested.connect(self.dpw.onFilePreviewed)
 
-        self.data.dpd.closeTabRequested.connect(self.dpw.onCloseTabRequested)
+        dpd = self.data.dpd
+        dpd.closeTabRequested.connect(self.dpw.onCloseTabRequested)
 
     @pyqtSlot()
     def _onNewProject(self):

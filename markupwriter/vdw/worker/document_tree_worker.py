@@ -30,6 +30,7 @@ class DocumentTreeWorker(QObject):
         tb.navUpAction.setEnabled(True)
         tb.navDownAction.setEnabled(True)
         tb.itemMenuAction.setEnabled(True)
+        tb.filterAction.setEnabled(True)
         
         tw = self.dtd.view.treeWidget
         tcm = tw.treeContextMenu
@@ -47,6 +48,7 @@ class DocumentTreeWorker(QObject):
         tb.navUpAction.setEnabled(True)
         tb.navDownAction.setEnabled(True)
         tb.itemMenuAction.setEnabled(True)
+        tb.filterAction.setEnabled(True)
         
         tw = self.dtd.view.treeWidget
         tcm = tw.treeContextMenu
@@ -82,6 +84,10 @@ class DocumentTreeWorker(QObject):
     @pyqtSlot()
     def onNavItemDown(self):
         self.dtd.view.treeWidget.translate(1)
+        
+    @pyqtSlot(str)
+    def onFilterTextChanged(self, text: str):
+        print(text)
     
     @pyqtSlot()
     def onPreviewItem(self):
