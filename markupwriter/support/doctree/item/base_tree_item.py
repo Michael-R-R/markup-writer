@@ -10,11 +10,11 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtGui import (
     QIcon,
+    QStandardItem,
 )
 
 from PyQt6.QtWidgets import (
     QWidget,
-    QTreeWidgetItem,
     QHBoxLayout,
     QLabel,
 )
@@ -41,7 +41,7 @@ class BaseTreeItem(QWidget):
     def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(parent)
 
-        self.item = QTreeWidgetItem()
+        self.item = QStandardItem()
         self.flags = ITEM_FLAG.none
 
         self._uuid = str(uuid.uuid1())
