@@ -50,7 +50,7 @@ class DocumentTreeDelegate(QObject):
         tb.navDownAction.triggered.connect(lambda: self.navDownClicked.emit())
         tb.filterLineEdit.textChanged.connect(lambda x: self.filterChanged.emit(x))
 
-        bt = self.view.treeWidget.baseTree
+        bt = self.view.treeWidget
         bt.fileAdded.connect(lambda x: self.fileAdded.emit(x))
         bt.fileRemoved.connect(lambda x, y: self.fileRemoved.emit(x, y))
         bt.fileOpened.connect(lambda x, y: self.fileOpened.emit(x, y))

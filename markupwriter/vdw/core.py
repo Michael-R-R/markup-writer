@@ -214,7 +214,7 @@ class Core(QObject):
         ProjectConfig.projectName = info[0]
         ProjectConfig.dir = info[1]
 
-        data: CoreData = Serialize.read(CoreData, ProjectConfig.filePath())
+        data: CoreData = Serialize.readFromFile(CoreData, ProjectConfig.filePath())
         if data is None:
             self.reset()
             return
@@ -241,7 +241,7 @@ class Core(QObject):
 
         self._onSaveDocument()
 
-        if Serialize.write(ProjectConfig.filePath(), self.data):
+        if Serialize.writeToFile(ProjectConfig.filePath(), self.data):
             self.mww.showStatusBarMsg("Project saved...", 1500)
 
     @pyqtSlot()

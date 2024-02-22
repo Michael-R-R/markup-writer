@@ -8,11 +8,11 @@ from .hotkey_config import HotkeyConfig
 
 class SerializeConfig(object):
     def read():
-        Serialize.read(AppConfig, AppConfig.INI_PATH)
-        Serialize.read(HighlighterConfig, HighlighterConfig.INI_PATH)
-        Serialize.read(HotkeyConfig, HotkeyConfig.INI_PATH)
+        Serialize.readFromFile(AppConfig, AppConfig.INI_PATH)
+        Serialize.readFromFile(HighlighterConfig, HighlighterConfig.INI_PATH)
+        Serialize.readFromFile(HotkeyConfig, HotkeyConfig.INI_PATH)
 
     def write():
-        Serialize.write(AppConfig.INI_PATH, AppConfig())
-        Serialize.write(HighlighterConfig.INI_PATH, HighlighterConfig())
-        Serialize.write(HotkeyConfig.INI_PATH, HotkeyConfig())
+        Serialize.writeToFile(AppConfig.INI_PATH, AppConfig())
+        Serialize.writeToFile(HighlighterConfig.INI_PATH, HighlighterConfig())
+        Serialize.writeToFile(HotkeyConfig.INI_PATH, HotkeyConfig())
