@@ -22,8 +22,8 @@ class CharsFolderItem(BaseFolderItem):
         self.flags -= ITEM_FLAG.draggable
         self.flags -= ITEM_FLAG.mutable
 
-    def shallowcopy(self, other=None):
-        other: CharsFolderItem = super().shallowcopy(CharsFolderItem())
+    def deepcopy(self, other=None):
+        other: CharsFolderItem = super().deepcopy(CharsFolderItem())
         other.applyChanges()
         return other
 

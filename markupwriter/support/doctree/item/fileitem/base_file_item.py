@@ -24,8 +24,8 @@ class BaseFileItem(BaseTreeItem):
         self.flags += ITEM_FLAG.draggable
         self.flags += ITEM_FLAG.mutable
 
-    def shallowcopy(self, other=None):
-        other: BaseFileItem = super().shallowcopy(other)
+    def deepcopy(self, other=None):
+        other: BaseFileItem = super().deepcopy(other)
         return other
 
     def applyIcon(self):

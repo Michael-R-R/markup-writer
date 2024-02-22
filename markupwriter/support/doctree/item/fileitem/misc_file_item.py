@@ -21,8 +21,8 @@ class MiscFileItem(BaseFileItem):
     def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(title, parent)
 
-    def shallowcopy(self, other=None):
-        other: MiscFileItem = super().shallowcopy(MiscFileItem())
+    def deepcopy(self, other=None):
+        other: MiscFileItem = super().deepcopy(MiscFileItem())
         other.applyChanges()
         return other
 

@@ -21,8 +21,8 @@ class SceneFileItem(BaseFileItem):
     def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(title, parent)
 
-    def shallowcopy(self, other=None):
-        other: SceneFileItem = super().shallowcopy(SceneFileItem())
+    def deepcopy(self, other=None):
+        other: SceneFileItem = super().deepcopy(SceneFileItem())
         other.applyChanges()
         return other
 

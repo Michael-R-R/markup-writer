@@ -23,8 +23,8 @@ class MiscFolderItem(BaseFolderItem):
     ):
         super().__init__(title, parent)
 
-    def shallowcopy(self, other=None):
-        other: MiscFolderItem = super().shallowcopy(MiscFolderItem())
+    def deepcopy(self, other=None):
+        other: MiscFolderItem = super().deepcopy(MiscFolderItem())
         other.applyChanges()
         return other
 

@@ -32,7 +32,7 @@ class DocumentTreeWorker(QObject):
         tb.itemMenuAction.setEnabled(True)
         tb.filterAction.setEnabled(True)
         
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         tcm = tw.treeContextMenu
         tcm.itemMenu.setEnabled(True)
         
@@ -50,7 +50,7 @@ class DocumentTreeWorker(QObject):
         tb.itemMenuAction.setEnabled(True)
         tb.filterAction.setEnabled(True)
         
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         tcm = tw.treeContextMenu
         tcm.itemMenu.setEnabled(True)
         
@@ -70,30 +70,28 @@ class DocumentTreeWorker(QObject):
         path = os.path.join(path, uuid)
         File.remove(path)
 
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         tw.refreshAllWordCounts()
         
     @pyqtSlot()
     def onDragDropDone(self):
-        self.dtd.view.treeWidget.refreshAllWordCounts()
+        self.dtd.view.treeWidget.baseTree.refreshAllWordCounts()
         
     @pyqtSlot()
     def onNavItemUp(self):
-        self.dtd.view.treeWidget.translate(-1)
+        self.dtd.view.treeWidget.baseTree.translate(-1)
     
     @pyqtSlot()
     def onNavItemDown(self):
-        self.dtd.view.treeWidget.translate(1)
+        self.dtd.view.treeWidget.baseTree.translate(1)
         
     @pyqtSlot(str)
     def onFilterTextChanged(self, text: str):
-        # TODO implement
-        tw = self.dtd.view.treeWidget
-        tw.filter(text)
+        self.dtd.view.treeWidget.filterItems(text)
     
     @pyqtSlot()
     def onPreviewItem(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         index = tw.currentIndex()
         if index is None:
             return
@@ -103,7 +101,7 @@ class DocumentTreeWorker(QObject):
     
     @pyqtSlot()
     def onRenamedItem(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         index = tw.currentIndex()
         if index is None:
             return
@@ -112,12 +110,12 @@ class DocumentTreeWorker(QObject):
         if name is None:
             return
         
-        item = tw.dataModel.itemFromIndex(index)
+        item = tw.itemFromIndex(index)
         tw.rename(item, name)
     
     @pyqtSlot()
     def onTrashItem(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         index = tw.currentIndex()
         if index is None:
             return
@@ -129,22 +127,22 @@ class DocumentTreeWorker(QObject):
         if trash is None:
             return
 
-        item = tw.dataModel.itemFromIndex(index)
-        tw.appendMove(item, trash)
+        item = tw.itemFromIndex(index)
+        tw.moveAppend(item, trash)
     
     @pyqtSlot()
     def onRecoverItem(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         index = tw.currentIndex()
         if index is None:
             return
 
-        item = tw.dataModel.itemFromIndex(index)
-        tw.appendMove(item, None)
+        item = tw.itemFromIndex(index)
+        tw.moveAppend(item, None)
     
     @pyqtSlot()
     def onEmptyTrash(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         index = tw.currentIndex()
         if index is None:
             return
@@ -152,8 +150,8 @@ class DocumentTreeWorker(QObject):
         if not YesNoDialog.run("Empty trash?", self.dtd.view):
             return
 
-        item = tw.dataModel.itemFromIndex(index)
-        for i in range(item.rowCount() - 1, -1, -1):
+        item = tw.itemFromIndex(index)
+        for i in range(item.childCount() - 1, -1, -1):
             tw.remove(item.child(i))
 
     @pyqtSlot()
@@ -161,7 +159,7 @@ class DocumentTreeWorker(QObject):
         title = StrDialog.run("Novel Name", "Novel", self.dtd.view)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         widget = ti.NovelFolderItem(title, tw)
         tw.add(widget)
 
@@ -170,7 +168,7 @@ class DocumentTreeWorker(QObject):
         title = StrDialog.run("Folder Name", "Folder", self.dtd.view)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         widget = ti.MiscFolderItem(title, tw)
         tw.add(widget)
 
@@ -179,7 +177,7 @@ class DocumentTreeWorker(QObject):
         title = StrDialog.run("Title Name", "Title", self.dtd.view)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         widget = ti.TitleFileItem(title, tw)
         tw.add(widget)
 
@@ -188,7 +186,7 @@ class DocumentTreeWorker(QObject):
         title = StrDialog.run("Chapter Name", "Chapter", self.dtd.view)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         widget = ti.ChapterFileItem(title, tw)
         tw.add(widget)
 
@@ -197,7 +195,7 @@ class DocumentTreeWorker(QObject):
         title = StrDialog.run("Scene Name", "Scene", self.dtd.view)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         widget = ti.SceneFileItem(title, tw)
         tw.add(widget)
 
@@ -206,7 +204,7 @@ class DocumentTreeWorker(QObject):
         title = StrDialog.run("Section Name", "Section", self.dtd.view)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         widget = ti.SectionFileItem(title, tw)
         tw.add(widget)
 
@@ -215,16 +213,18 @@ class DocumentTreeWorker(QObject):
         title = StrDialog.run("Misc. Name", "Misc.", self.dtd.view)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtd.view.treeWidget.baseTree
         widget = ti.MiscFileItem(title, tw)
         tw.add(widget)
         
     @pyqtSlot(str, int)
     def onWordCountChanged(self, uuid: str, count: int):
-        tw = self.dtd.view.treeWidget
-        widget = tw.findWidget(uuid)
-        if widget is None:
+        tw = self.dtd.view.treeWidget.baseTree
+        item = tw.findItem(uuid)
+        if item is None:
             return
+
+        widget: ti.BaseTreeItem = tw.itemWidget(item, 0)
 
         owc = widget.wordCount()
         twc = widget.totalWordCount() - owc + count
@@ -232,12 +232,14 @@ class DocumentTreeWorker(QObject):
         widget.setWordCount(count)
         widget.setTotalWordCount(twc)
 
-        tw.refreshWordCounts(widget.item.parent(), owc, count)
+        tw.refreshWordCounts(item.parent(), owc, count)
         
     @pyqtSlot(str)
     def onDocPreviewRequested(self, uuid: str):
-        tw = self.dtd.view.treeWidget
-        widget: ti.BaseTreeItem = tw.findWidget(uuid)
-        if widget is None:
+        tw = self.dtd.view.treeWidget.baseTree
+        item = tw.findItem(uuid)
+        if item is None:
             return
+        
+        widget: ti.BaseTreeItem = tw.itemWidget(item, 0)
         self.dtd.previewRequested.emit(widget.title(), uuid)

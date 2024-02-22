@@ -50,27 +50,27 @@ class DocumentTreeDelegate(QObject):
         tb.navDownAction.triggered.connect(lambda: self.navDownClicked.emit())
         tb.filterLineEdit.textChanged.connect(lambda x: self.filterChanged.emit(x))
 
-        tw = self.view.treeWidget
-        tw.fileAdded.connect(lambda x: self.fileAdded.emit(x))
-        tw.fileRemoved.connect(lambda x, y: self.fileRemoved.emit(x, y))
-        tw.fileOpened.connect(lambda x, y: self.fileOpened.emit(x, y))
-        tw.fileMoved.connect(lambda x, y: self.fileMoved.emit(x, y))
-        tw.fileRenamed.connect(lambda x, y, z: self.fileRenamed.emit(x, y, z))
-        tw.dragDropDone.connect(lambda: self.dragDropDone.emit())
+        bt = self.view.treeWidget.baseTree
+        bt.fileAdded.connect(lambda x: self.fileAdded.emit(x))
+        bt.fileRemoved.connect(lambda x, y: self.fileRemoved.emit(x, y))
+        bt.fileOpened.connect(lambda x, y: self.fileOpened.emit(x, y))
+        bt.fileMoved.connect(lambda x, y: self.fileMoved.emit(x, y))
+        bt.fileRenamed.connect(lambda x, y, z: self.fileRenamed.emit(x, y, z))
+        bt.dragDropDone.connect(lambda: self.dragDropDone.emit())
 
-        icm = tw.itemContextMenu
+        icm = bt.itemContextMenu
         icm.previewAction.triggered.connect(lambda: self.cmPreviewClicked.emit())
         icm.renameAction.triggered.connect(lambda: self.cmRenameClicked.emit())
         icm.toTrashAction.triggered.connect(lambda: self.cmToTrashClicked.emit())
         icm.recoverAction.triggered.connect(lambda: self.cmRecoverClicked.emit())
 
-        tcm = tw.trashContextMenu
+        tcm = bt.trashContextMenu
         tcm.emptyAction.triggered.connect(lambda: self.cmEmptyTrashClicked.emit())
 
         im = tb.itemMenuAction.itemMenu
         self._setupItemMenuConnections(im)
 
-        im = tw.treeContextMenu.itemMenu
+        im = bt.treeContextMenu.itemMenu
         self._setupItemMenuConnections(im)
 
         im = icm.itemMenu

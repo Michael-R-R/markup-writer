@@ -21,8 +21,8 @@ class SectionFileItem(BaseFileItem):
     def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(title, parent)
 
-    def shallowcopy(self, other=None):
-        other: SectionFileItem = super().shallowcopy(SectionFileItem())
+    def deepcopy(self, other=None):
+        other: SectionFileItem = super().deepcopy(SectionFileItem())
         other.applyChanges()
         return other
 

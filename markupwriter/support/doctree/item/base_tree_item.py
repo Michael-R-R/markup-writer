@@ -10,7 +10,6 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtGui import (
     QIcon,
-    QStandardItem,
 )
 
 from PyQt6.QtWidgets import (
@@ -41,7 +40,6 @@ class BaseTreeItem(QWidget):
     def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(parent)
 
-        self.item = QStandardItem()
         self.flags = ITEM_FLAG.none
 
         self._uuid = str(uuid.uuid1())
@@ -58,8 +56,7 @@ class BaseTreeItem(QWidget):
 
         self.applyChanges()
 
-    def shallowcopy(self, other=None):
-        other.item = self.item
+    def deepcopy(self, other=None):
         other.flags = self.flags
         other._uuid = self._uuid
         other._title = self._title

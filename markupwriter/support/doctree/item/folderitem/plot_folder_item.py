@@ -24,8 +24,8 @@ class PlotFolderItem(BaseFolderItem):
         self.flags -= ITEM_FLAG.draggable
         self.flags -= ITEM_FLAG.mutable
 
-    def shallowcopy(self, other=None):
-        other: PlotFolderItem = super().shallowcopy(PlotFolderItem())
+    def deepcopy(self, other=None):
+        other: PlotFolderItem = super().deepcopy(PlotFolderItem())
         other.applyChanges()
         return other
 
