@@ -29,7 +29,6 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.common.syntax import Highlighter
-from markupwriter.gui.contextmenus.doceditor import EditorContextMenu
 
 import markupwriter.support.doceditor as de
 
@@ -61,6 +60,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setTabStopDistance(20.0)
 
     def reset(self):
@@ -82,7 +82,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.centerCursor()
     
     def runWordCount(self):
-        if not self.hasDocument():
+        if not self.hasOpenDocument():
             return
         
         uuid = self.docUUID
@@ -92,13 +92,17 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.wordCountChanged.emit(uuid, count)
         
     def setDocumentText(self, uuid: str, text: str, cpos: int):
+        if uuid == "":
+            self.reset()
+            return
+        
         self.docUUID = uuid
         self.setPlainText(text)
         self.moveCursorTo(cpos)
         self.setEnabled(True)
         self.docStatusChanged.emit(True)
     
-    def hasDocument(self) -> bool:
+    def hasOpenDocument(self) -> bool:
         return self.docUUID != ""
 
     def canInsertFromMimeData(self, source: QMimeData | None) -> bool:
@@ -119,15 +123,6 @@ class DocumentEditorWidget(QPlainTextEdit):
                 self.textCursor().insertText(imgTag)
         else:
             return super().insertFromMimeData(source)
-
-    def contextMenuEvent(self, e: QContextMenuEvent | None) -> None:
-        if self.isReadOnly():
-            return
-        
-        contextMenu = EditorContextMenu(
-            self, self.spellChecker, self.highlighter, e.pos(), self
-        )
-        contextMenu.onShowMenu(e.globalPos())
 
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         if self.canResizeMargins:

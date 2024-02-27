@@ -167,6 +167,7 @@ class Core(QObject):
         ded.refPopupTriggered.connect(self.dew.onRefPopupTriggered)
         ded.refPreviewTriggered.connect(self.dew.onRefPreviewTriggered)
         ded.editorResized.connect(self.dew.onEditorResized)
+        ded.contextMenuRequested.connect(self.dew.onContxtMenuRequested)
         ded.showSearchTriggered.connect(self.dew.onSearchTriggered)
         ded.searchChanged.connect(self.dew.onSearchChanged)
         ded.nextSearchClicked.connect(self.dew.onNextSearch)

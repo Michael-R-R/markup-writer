@@ -5,6 +5,7 @@ from PyQt6.QtCore import (
     QDataStream,
     pyqtSignal,
     QSize,
+    QPoint,
 )
 
 import markupwriter.vdw.view as v
@@ -19,6 +20,7 @@ class DocumentEditorDelegate(QObject):
     refPreviewTriggered = pyqtSignal(str)
     wordCountChanged = pyqtSignal(str, int)
     editorResized = pyqtSignal(QSize)
+    contextMenuRequested = pyqtSignal(QPoint)
 
     searchChanged = pyqtSignal(str, bool)
     nextSearchClicked = pyqtSignal()
@@ -26,7 +28,7 @@ class DocumentEditorDelegate(QObject):
     replaceClicked = pyqtSignal()
     replaceAllClicked = pyqtSignal()
     closeSearchClicked = pyqtSignal()
-    
+
     docPreviewRequested = pyqtSignal(str)
 
     def __init__(self, parent: QObject | None) -> None:
@@ -47,6 +49,9 @@ class DocumentEditorDelegate(QObject):
         te.refPreviewTriggered.connect(lambda x: self.refPreviewTriggered.emit(x))
         te.wordCountChanged.connect(lambda x, y: self.wordCountChanged.emit(x, y))
         te.resized.connect(lambda x: self.editorResized.emit(x))
+        te.customContextMenuRequested.connect(
+            lambda x: self.contextMenuRequested.emit(x)
+        )
 
         sb = self.view.searchBox
         sb.searchChanged.connect(lambda x, y: self.searchChanged.emit(x, y))

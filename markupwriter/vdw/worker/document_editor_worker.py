@@ -23,6 +23,7 @@ from markupwriter.common.tokenizers import EditorTokenizer
 from markupwriter.common.parsers import EditorParser
 from markupwriter.common.referencetag import RefTagManager
 from markupwriter.common.syntax import BEHAVIOUR
+from markupwriter.gui.contextmenus.doceditor import EditorContextMenu
 
 import markupwriter.vdw.delegate as d
 import markupwriter.gui.widgets as w
@@ -47,9 +48,9 @@ class DocumentEditorWorker(QObject):
         status = self._writeToDisk()
         if not status:
             return False
-        
+
         self._runTokenizer()
-        
+
         return True
 
     @pyqtSlot(str, list)
@@ -131,10 +132,22 @@ class DocumentEditorWorker(QObject):
     def onEditorResized(self, _: QSize):
         self._resizeMargins()
 
+    @pyqtSlot(QPoint)
+    def onContxtMenuRequested(self, pos: QPoint):
+        te = self.ded.view.textEdit
+        if te.isReadOnly():
+            return
+
+        sc = te.spellChecker
+        h = te.highlighter
+        contextMenu = EditorContextMenu(te, sc, h, pos, te)
+
+        contextMenu.onShowMenu(te.mapToGlobal(pos))
+
     @pyqtSlot()
     def onSearchTriggered(self):
         te = self.ded.view.textEdit
-        if not te.hasDocument():
+        if not te.hasOpenDocument():
             return
 
         sb = self.ded.view.searchBox
@@ -258,7 +271,7 @@ class DocumentEditorWorker(QObject):
 
     def _writeToDisk(self) -> bool:
         te = self.ded.view.textEdit
-        if not te.hasDocument():
+        if not te.hasOpenDocument():
             return False
 
         path = ProjectConfig.contentPath()
@@ -296,7 +309,7 @@ class DocumentEditorWorker(QObject):
 
     def _runTokenizer(self):
         te = self.ded.view.textEdit
-        if not te.hasDocument():
+        if not te.hasOpenDocument():
             return
 
         uuid = te.docUUID
