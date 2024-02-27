@@ -83,6 +83,14 @@ class DocumentEditorWorker(QObject):
             tag = textBlock[rcomma + 1 : index].strip()
 
         return tag
+    
+    @pyqtSlot(bool)
+    def onSpellToggled(self, isToggled: bool):
+        te = self.ded.view.textEdit
+        highlighter = te.highlighter
+        
+        highlighter.setBehaviourEnable(BEHAVIOUR.spellCheck, isToggled)
+        highlighter.rehighlight()
 
     @pyqtSlot()
     def onCloseDocument(self):

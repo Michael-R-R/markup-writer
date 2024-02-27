@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.gui.menus.mainmenubar import (
     FileMainMenu,
+    DocMainMenu,
 )
 
 class MainMenuBarView(QMenuBar):
@@ -18,7 +19,10 @@ class MainMenuBarView(QMenuBar):
         super().__init__(parent)
 
         self.fileMenu = FileMainMenu(self)
+        self.docMenu = DocMainMenu(self)
+        
         self.addMenu(self.fileMenu)
+        self.addMenu(self.docMenu)
         
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         return sout

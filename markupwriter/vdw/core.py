@@ -156,6 +156,9 @@ class Core(QObject):
         ded.refPreviewRequested.connect(self.dtw.onRefPreviewRequested)
 
     def _setupEditorWorkerSlots(self):
+        mmbd = self.data.mmbd
+        mmbd.dmSpellToggled.connect(self.dew.onSpellToggled)
+        
         dtd = self.data.dtd
         dtd.fileOpened.connect(self.dew.onFileOpened)
         dtd.fileRemoved.connect(self.dew.onFileRemoved)

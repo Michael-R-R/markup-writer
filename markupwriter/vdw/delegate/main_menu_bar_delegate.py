@@ -18,6 +18,8 @@ class MainMenuBarDelegate(QObject):
     fmExportTriggered = pyqtSignal()
     fmCloseTriggered = pyqtSignal()
     fmExitTriggered = pyqtSignal()
+    
+    dmSpellToggled = pyqtSignal(bool)
 
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
@@ -36,6 +38,9 @@ class MainMenuBarDelegate(QObject):
         fm.exportAction.triggered.connect(lambda: self.fmExportTriggered.emit())
         fm.closeProjAction.triggered.connect(lambda: self.fmCloseTriggered.emit())
         fm.exitAction.triggered.connect(lambda: self.fmExitTriggered.emit())
+        
+        dm = self.view.docMenu
+        dm.toggleSpell.toggled.connect(lambda x: self.dmSpellToggled.emit(x))
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.view
