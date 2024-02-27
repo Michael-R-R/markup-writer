@@ -12,7 +12,6 @@ from PyQt6.QtCore import (
 )
 
 from PyQt6.QtGui import (
-    QContextMenuEvent,
     QKeyEvent,
     QMouseEvent,
     QResizeEvent,
@@ -35,8 +34,8 @@ import markupwriter.support.doceditor as de
 
 class DocumentEditorWidget(QPlainTextEdit):
     docStatusChanged = pyqtSignal(bool)
-    refPopupTriggered = pyqtSignal(str)
-    refPreviewTriggered = pyqtSignal(str)
+    showRefPopupClicked = pyqtSignal(QPoint)
+    showRefPreviewClicked = pyqtSignal(QPoint)
     wordCountChanged = pyqtSignal(str, int)
     resized = pyqtSignal(QSize)
 
@@ -80,16 +79,6 @@ class DocumentEditorWidget(QPlainTextEdit):
         cursor.setPosition(pos)
         self.setTextCursor(cursor)
         self.centerCursor()
-    
-    def runWordCount(self):
-        if not self.hasOpenDocument():
-            return
-        
-        uuid = self.docUUID
-        text = self.toPlainText()
-        count = len(re.findall(r"[a-zA-Z'-]+", text))
-        
-        self.wordCountChanged.emit(uuid, count)
         
     def setDocumentText(self, uuid: str, text: str, cpos: int):
         if uuid == "":
@@ -152,15 +141,11 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         if e.modifiers() == ctrl:
             if e.button() == button:
-                tag: str = self._findTagAtPos(e.pos())
-                if tag is not None:
-                    self.refPopupTriggered.emit(tag)
+                self.showRefPopupClicked.emit(e.pos())
                 return None
         elif e.modifiers() == (ctrl | alt):
             if e.button() == button:
-                tag: str = self._findTagAtPos(e.pos())
-                if tag is not None:
-                    self.refPreviewTriggered.emit(tag)
+                self.showRefPreviewClicked.emit(e.pos())
                 return None
 
         return super().mousePressEvent(e)
@@ -169,40 +154,6 @@ class DocumentEditorWidget(QPlainTextEdit):
         self._onChangeCursorShape(e.modifiers(), self.viewport())
 
         return super().mouseMoveEvent(e)
-
-    def _findTagAtPos(self, pos: QPoint) -> str | None:
-        cursor = self.cursorForPosition(pos)
-        cpos = cursor.positionInBlock()
-        textBlock = cursor.block().text()
-        if cpos <= 0 or cpos >= len(textBlock):
-            return None
-        
-        found = re.search(r"^@(ref|pov|loc)(\(.*\))", textBlock)
-        if found is None:
-            return None
-        
-        rcomma = textBlock.rfind(",", 0, cpos)
-        fcomma = textBlock.find(",", cpos)
-        tag = None
-        
-        # single tag
-        if rcomma < 0 and fcomma < 0:
-            rindex = textBlock.rfind("(", 0, cpos)
-            lindex = textBlock.find(")", cpos)
-            tag = textBlock[rindex + 1 : lindex].strip()
-        # tag start
-        elif rcomma < 0 and fcomma > -1:
-            index = textBlock.rfind("(", 0, cpos)
-            tag = textBlock[index + 1 : fcomma].strip()
-        # tag middle
-        elif rcomma > -1 and fcomma > -1:
-            tag = textBlock[rcomma + 1 : fcomma].strip()
-        # tag end
-        elif rcomma > -1 and fcomma < 0:
-            index = textBlock.find(")", cpos)
-            tag = textBlock[rcomma + 1 : index].strip()
-
-        return tag
 
     def _onChangeCursorShape(self, mods: Qt.KeyboardModifier, vp: QWidget):
         ctrl = Qt.KeyboardModifier.ControlModifier

@@ -153,7 +153,7 @@ class Core(QObject):
 
         ded = self.data.ded
         ded.wordCountChanged.connect(self.dtw.onWordCountChanged)
-        ded.docPreviewRequested.connect(self.dtw.onDocPreviewRequested)
+        ded.refPreviewRequested.connect(self.dtw.onRefPreviewRequested)
 
     def _setupEditorWorkerSlots(self):
         dtd = self.data.dtd
@@ -164,8 +164,8 @@ class Core(QObject):
 
         ded = self.data.ded
         ded.closeDocClicked.connect(self.dew.onCloseDocument)
-        ded.refPopupTriggered.connect(self.dew.onRefPopupTriggered)
-        ded.refPreviewTriggered.connect(self.dew.onRefPreviewTriggered)
+        ded.showRefPopupClicked.connect(self.dew.onShowRefPopupClicked)
+        ded.showRefPreviewClicked.connect(self.dew.onShowRefPreviewClicked)
         ded.editorResized.connect(self.dew.onEditorResized)
         ded.contextMenuRequested.connect(self.dew.onContxtMenuRequested)
         ded.showSearchTriggered.connect(self.dew.onSearchTriggered)

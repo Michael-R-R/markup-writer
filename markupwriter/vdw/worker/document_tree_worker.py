@@ -298,7 +298,7 @@ class DocumentTreeWorker(QObject):
         self.refreshParentWordCounts(widget.item, owc, count)
         
     @pyqtSlot(str)
-    def onDocPreviewRequested(self, uuid: str):
+    def onRefPreviewRequested(self, uuid: str):
         tw = self.dtd.view.treeWidget
         widget: ti.BaseTreeItem = tw.findWidget(uuid)
         if widget is None:

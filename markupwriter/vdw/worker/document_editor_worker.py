@@ -38,6 +38,52 @@ class DocumentEditorWorker(QObject):
         self.parser = EditorParser()
         self.threadPool = QThreadPool(self)
 
+    def runWordCount(self, te: w.DocumentEditorWidget):
+        if not te.hasOpenDocument():
+            return
+
+        uuid = te.docUUID
+        text = te.toPlainText()
+        count = len(re.findall(r"[a-zA-Z'-]+", text))
+
+        te.wordCountChanged.emit(uuid, count)
+
+    def findTagAtPos(self, pos: QPoint):
+        te = self.ded.view.textEdit
+
+        cursor = te.cursorForPosition(pos)
+        cpos = cursor.positionInBlock()
+        textBlock = cursor.block().text()
+        if cpos <= 0 or cpos >= len(textBlock):
+            return None
+
+        found = re.search(r"^@(ref|pov|loc)(\(.*\))", textBlock)
+        if found is None:
+            return None
+
+        rcomma = textBlock.rfind(",", 0, cpos)
+        fcomma = textBlock.find(",", cpos)
+        tag = None
+
+        # single tag
+        if rcomma < 0 and fcomma < 0:
+            rindex = textBlock.rfind("(", 0, cpos)
+            lindex = textBlock.find(")", cpos)
+            tag = textBlock[rindex + 1 : lindex].strip()
+        # tag start
+        elif rcomma < 0 and fcomma > -1:
+            index = textBlock.rfind("(", 0, cpos)
+            tag = textBlock[index + 1 : fcomma].strip()
+        # tag middle
+        elif rcomma > -1 and fcomma > -1:
+            tag = textBlock[rcomma + 1 : fcomma].strip()
+        # tag end
+        elif rcomma > -1 and fcomma < 0:
+            index = textBlock.find(")", cpos)
+            tag = textBlock[rcomma + 1 : index].strip()
+
+        return tag
+
     @pyqtSlot()
     def onCloseDocument(self):
         self.onSaveDocument()
@@ -102,15 +148,19 @@ class DocumentEditorWorker(QObject):
         eb = self.ded.view.editorBar
         eb.replaceInPath(old, new)
 
-    @pyqtSlot(str)
-    def onRefPopupTriggered(self, tag: str):
+    @pyqtSlot(QPoint)
+    def onShowRefPopupClicked(self, pos: QPoint):
+        tag = self.findTagAtPos(pos)
+        if tag is None:
+            return
+
         uuid = self.refManager.findUUID(tag)
         if uuid is None:
             return
 
         popup = w.PopupPreviewWidget(uuid, self.ded.view)
         popup.previewButton.clicked.connect(
-            lambda: self.ded.docPreviewRequested.emit(uuid)
+            lambda: self.ded.refPreviewRequested.emit(uuid)
         )
 
         size = popup.sizeHint()
@@ -121,12 +171,17 @@ class DocumentEditorWorker(QObject):
         popup.move(QPoint(x, y))
         popup.show()
 
-    @pyqtSlot(str)
-    def onRefPreviewTriggered(self, tag: str):
+    @pyqtSlot(QPoint)
+    def onShowRefPreviewClicked(self, pos: QPoint):
+        tag = self.findTagAtPos(pos)
+        if tag is None:
+            return
+
         uuid = self.refManager.findUUID(tag)
         if uuid is None:
             return
-        self.ded.docPreviewRequested.emit(uuid)
+
+        self.ded.refPreviewRequested.emit(uuid)
 
     @pyqtSlot(QSize)
     def onEditorResized(self, _: QSize):
@@ -285,7 +340,7 @@ class DocumentEditorWorker(QObject):
         if not File.write(path, content):
             return False
 
-        te.runWordCount()
+        self.runWordCount(te)
 
         return True
 

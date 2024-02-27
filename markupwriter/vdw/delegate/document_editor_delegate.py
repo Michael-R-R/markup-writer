@@ -16,8 +16,8 @@ class DocumentEditorDelegate(QObject):
 
     docStatusChanged = pyqtSignal(bool)
     showSearchTriggered = pyqtSignal()
-    refPopupTriggered = pyqtSignal(str)
-    refPreviewTriggered = pyqtSignal(str)
+    showRefPopupClicked = pyqtSignal(QPoint)
+    showRefPreviewClicked = pyqtSignal(QPoint)
     wordCountChanged = pyqtSignal(str, int)
     editorResized = pyqtSignal(QSize)
     contextMenuRequested = pyqtSignal(QPoint)
@@ -29,7 +29,7 @@ class DocumentEditorDelegate(QObject):
     replaceAllClicked = pyqtSignal()
     closeSearchClicked = pyqtSignal()
 
-    docPreviewRequested = pyqtSignal(str)
+    refPreviewRequested = pyqtSignal(str)
 
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
@@ -45,8 +45,8 @@ class DocumentEditorDelegate(QObject):
         te = self.view.textEdit
         te.docStatusChanged.connect(lambda x: self.docStatusChanged.emit(x))
         te.searchHotkey.triggered.connect(lambda: self.showSearchTriggered.emit())
-        te.refPopupTriggered.connect(lambda x: self.refPopupTriggered.emit(x))
-        te.refPreviewTriggered.connect(lambda x: self.refPreviewTriggered.emit(x))
+        te.showRefPopupClicked.connect(lambda x: self.showRefPopupClicked.emit(x))
+        te.showRefPreviewClicked.connect(lambda x: self.showRefPreviewClicked.emit(x))
         te.wordCountChanged.connect(lambda x, y: self.wordCountChanged.emit(x, y))
         te.resized.connect(lambda x: self.editorResized.emit(x))
         te.customContextMenuRequested.connect(
