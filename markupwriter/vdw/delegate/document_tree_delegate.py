@@ -4,6 +4,7 @@ from PyQt6.QtCore import (
     QObject,
     QDataStream,
     pyqtSignal,
+    QPoint,
 )
 
 import markupwriter.vdw.view as v
@@ -18,6 +19,7 @@ class DocumentTreeDelegate(QObject):
     fileRenamed = pyqtSignal(str, str, str)
     previewRequested = pyqtSignal(str, str)
     dragDropDone = pyqtSignal()
+    contextMenuRequested = pyqtSignal(QPoint)
 
     navUpClicked = pyqtSignal()
     navDownClicked = pyqtSignal()
@@ -55,6 +57,9 @@ class DocumentTreeDelegate(QObject):
         tw.fileMoved.connect(lambda x, y: self.fileMoved.emit(x, y))
         tw.fileRenamed.connect(lambda x, y, z: self.fileRenamed.emit(x, y, z))
         tw.dragDropDone.connect(lambda: self.dragDropDone.emit())
+        tw.customContextMenuRequested.connect(
+            lambda x: self.contextMenuRequested.emit(x)
+        )
 
         icm = tw.itemContextMenu
         icm.previewAction.triggered.connect(lambda: self.cmPreviewClicked.emit())

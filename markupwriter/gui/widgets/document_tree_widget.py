@@ -5,7 +5,6 @@ from PyQt6.QtCore import (
     pyqtSlot,
     pyqtSignal,
     QDataStream,
-    QPoint,
 )
 from PyQt6.QtGui import (
     QDragEnterEvent,
@@ -52,7 +51,6 @@ class DocumentTreeWidget(QTreeWidget):
         self.itemContextMenu = dt.ItemContextMenu(self)
         self.trashContextMenu = dt.TrashContextMenu(self)
 
-        self.customContextMenuRequested.connect(self._onCustomContextMenu)
         self.itemDoubleClicked.connect(self._onItemDoubleClicked)
 
     def add(self, widget: dti.BaseTreeItem):
@@ -169,33 +167,7 @@ class DocumentTreeWidget(QTreeWidget):
 
         return result
 
-    def refreshWordCounts(self, item: QTreeWidgetItem, owc: int, wc: int):
-        while item is not None:
-            widget: dti.BaseTreeItem = self.itemWidget(item, 0)
-            twc = widget.totalWordCount() - owc + wc
-            widget.setTotalWordCount(twc)
-            item = item.parent()
-
-    def refreshAllWordCounts(self):
-
-        def helper(pitem: QTreeWidgetItem) -> int:
-            pw: dti.BaseTreeItem = self.itemWidget(pitem, 0)
-            twc = pw.wordCount()
-
-            for j in range(pitem.childCount()):
-                citem = pitem.child(j)
-                twc += helper(citem)
-
-            pw.setTotalWordCount(twc)
-
-            return twc
-
-        for i in range(self.topLevelItemCount()):
-            item = self.topLevelItem(i)
-            helper(item)
-
     def buildExportList(self, root: QTreeWidgetItem) -> list[list[dti.BaseFileItem]]:
-
         def helper(
             pitem: QTreeWidgetItem, flist: list[dti.BaseFileItem]
         ) -> list[dti.BaseFileItem]:
@@ -210,6 +182,8 @@ class DocumentTreeWidget(QTreeWidget):
 
             return flist
 
+        # End helper
+
         buildList: list[list[dti.BaseFileItem]] = list()
         for i in range(root.childCount()):
             pitem = root.child(i)
@@ -217,17 +191,7 @@ class DocumentTreeWidget(QTreeWidget):
 
         return buildList
 
-    def findTrash(self) -> QTreeWidgetItem | None:
-        for i in range(self.topLevelItemCount() - 1, -1, -1):
-            item = self.topLevelItem(i)
-            widget = self.itemWidget(item, 0)
-            if isinstance(widget, dti.TrashFolderItem):
-                return item
-
-        return None
-
     def findWidget(self, uuid: str) -> dti.BaseTreeItem | None:
-        
         def helper(item: QTreeWidgetItem) -> dti.BaseTreeItem | None:
             for i in range(item.childCount()):
                 child = item.child(i)
@@ -239,6 +203,8 @@ class DocumentTreeWidget(QTreeWidget):
                     return widget
 
             return None
+        
+        # End helper
 
         for i in range(self.topLevelItemCount()):
             item = self.topLevelItem(i)
@@ -251,18 +217,7 @@ class DocumentTreeWidget(QTreeWidget):
 
         return None
 
-    def isInTrash(self, item: QTreeWidgetItem) -> bool:
-        trash = self.findTrash()
-
-        prev = None
-        curr = item.parent()
-        while curr is not None:
-            prev = curr
-            curr = curr.parent()
-
-        return prev == trash
-
-    def getParentNameList(self, item: QTreeWidgetItem) -> list[str]:
+    def getNamesList(self, item: QTreeWidgetItem) -> list[str]:
         nameList: list[str] = list()
         iTemp = item
         while iTemp is not None:
@@ -320,7 +275,7 @@ class DocumentTreeWidget(QTreeWidget):
 
     def _emitAdded(self, widget: dti.BaseTreeItem):
         if widget.hasFlag(dti.ITEM_FLAG.file):
-            nameList = self.getParentNameList(widget.item)
+            nameList = self.getNamesList(widget.item)
             self.fileAdded.emit(widget.UUID())
             self.fileOpened.emit(widget.UUID(), nameList)
 
@@ -331,32 +286,14 @@ class DocumentTreeWidget(QTreeWidget):
     def _emitMoved(self, widgetList: list[dti.BaseTreeItem]):
         for w in widgetList:
             if w.hasFlag(dti.ITEM_FLAG.file):
-                nameList = self.getParentNameList(w.item)
+                nameList = self.getNamesList(w.item)
                 self.fileMoved.emit(w.UUID(), nameList)
-
-    @pyqtSlot(QPoint)
-    def _onCustomContextMenu(self, pos: QPoint):
-        item = self.itemAt(pos)
-        widget: dti.BaseTreeItem = self.itemWidget(item, 0)
-        pos = self.mapToGlobal(pos)
-        if item is None:
-            self.treeContextMenu.onShowMenu(pos)
-        elif isinstance(widget, dti.TrashFolderItem):
-            isEmpty = item.childCount() < 1
-            args = [isEmpty]
-            self.trashContextMenu.onShowMenu(pos, args)
-        else:
-            isFile = widget.hasFlag(dti.ITEM_FLAG.file)
-            inTrash = self.isInTrash(item)
-            isMutable = widget.hasFlag(dti.ITEM_FLAG.mutable)
-            args = [isFile, inTrash, isMutable]
-            self.itemContextMenu.onShowMenu(pos, args)
 
     @pyqtSlot(QTreeWidgetItem, int)
     def _onItemDoubleClicked(self, item: QTreeWidgetItem, col: int):
         widget: dti.BaseTreeItem = self.itemWidget(item, col)
         if widget.hasFlag(dti.ITEM_FLAG.file):
-            nameList = self.getParentNameList(item)
+            nameList = self.getNamesList(item)
             self.fileOpened.emit(widget.UUID(), nameList)
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
@@ -372,6 +309,8 @@ class DocumentTreeWidget(QTreeWidget):
                 sOut.writeQString(wChild.__class__.__name__)
                 helper(sOut, iChild)
                 sOut << wChild
+                
+        # End helper
 
         iCount = self.topLevelItemCount()
         sout.writeInt(iCount)
@@ -404,11 +343,13 @@ class DocumentTreeWidget(QTreeWidget):
                 self.setItemWidget(cwidget.item, 0, cwidget)
 
                 self.fileAdded.emit(cwidget.UUID())
+                
+        # End helper
 
         iCount = sin.readInt()
 
         # Top level items
-        for i in range(iCount):
+        for _ in range(iCount):
             type = sin.readQString()
             pwidget: dti.BaseTreeItem = TreeItemFactory.make(type)
             sin >> pwidget
