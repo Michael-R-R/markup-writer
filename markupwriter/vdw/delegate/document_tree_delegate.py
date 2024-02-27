@@ -11,10 +11,6 @@ import markupwriter.gui.menus.doctree as dtm
 
 
 class DocumentTreeDelegate(QObject):
-    navUpClicked = pyqtSignal()
-    navDownClicked = pyqtSignal()
-    filterChanged = pyqtSignal(str)
-    
     fileAdded = pyqtSignal(str)
     fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
@@ -22,6 +18,9 @@ class DocumentTreeDelegate(QObject):
     fileRenamed = pyqtSignal(str, str, str)
     previewRequested = pyqtSignal(str, str)
     dragDropDone = pyqtSignal()
+
+    navUpClicked = pyqtSignal()
+    navDownClicked = pyqtSignal()
 
     cmPreviewClicked = pyqtSignal()
     cmRenameClicked = pyqtSignal()
@@ -48,29 +47,28 @@ class DocumentTreeDelegate(QObject):
         tb = self.view.treeBar
         tb.navUpAction.triggered.connect(lambda: self.navUpClicked.emit())
         tb.navDownAction.triggered.connect(lambda: self.navDownClicked.emit())
-        tb.filterLineEdit.textChanged.connect(lambda x: self.filterChanged.emit(x))
 
-        bt = self.view.treeWidget
-        bt.fileAdded.connect(lambda x: self.fileAdded.emit(x))
-        bt.fileRemoved.connect(lambda x, y: self.fileRemoved.emit(x, y))
-        bt.fileOpened.connect(lambda x, y: self.fileOpened.emit(x, y))
-        bt.fileMoved.connect(lambda x, y: self.fileMoved.emit(x, y))
-        bt.fileRenamed.connect(lambda x, y, z: self.fileRenamed.emit(x, y, z))
-        bt.dragDropDone.connect(lambda: self.dragDropDone.emit())
+        tw = self.view.treeWidget
+        tw.fileAdded.connect(lambda x: self.fileAdded.emit(x))
+        tw.fileRemoved.connect(lambda x, y: self.fileRemoved.emit(x, y))
+        tw.fileOpened.connect(lambda x, y: self.fileOpened.emit(x, y))
+        tw.fileMoved.connect(lambda x, y: self.fileMoved.emit(x, y))
+        tw.fileRenamed.connect(lambda x, y, z: self.fileRenamed.emit(x, y, z))
+        tw.dragDropDone.connect(lambda: self.dragDropDone.emit())
 
-        icm = bt.itemContextMenu
+        icm = tw.itemContextMenu
         icm.previewAction.triggered.connect(lambda: self.cmPreviewClicked.emit())
         icm.renameAction.triggered.connect(lambda: self.cmRenameClicked.emit())
         icm.toTrashAction.triggered.connect(lambda: self.cmToTrashClicked.emit())
         icm.recoverAction.triggered.connect(lambda: self.cmRecoverClicked.emit())
 
-        tcm = bt.trashContextMenu
+        tcm = tw.trashContextMenu
         tcm.emptyAction.triggered.connect(lambda: self.cmEmptyTrashClicked.emit())
 
         im = tb.itemMenuAction.itemMenu
         self._setupItemMenuConnections(im)
 
-        im = bt.treeContextMenu.itemMenu
+        im = tw.treeContextMenu.itemMenu
         self._setupItemMenuConnections(im)
 
         im = icm.itemMenu

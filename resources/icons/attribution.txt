@@ -24,4 +24,3 @@ Up arrow: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 Down arrow: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 More options: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
 Add Item: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
-Filter: UIcons by <a href="https://www.flaticon.com/uicons">Flaticon</a>

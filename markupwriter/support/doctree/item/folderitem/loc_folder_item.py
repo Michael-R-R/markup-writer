@@ -25,8 +25,8 @@ class LocFolderItem(BaseFolderItem):
         self.flags -= ITEM_FLAG.draggable
         self.flags -= ITEM_FLAG.mutable
 
-    def deepcopy(self, other=None):
-        other: LocFolderItem = super().deepcopy(LocFolderItem())
+    def shallowcopy(self, other=None):
+        other: LocFolderItem = super().shallowcopy(LocFolderItem())
         other.applyChanges()
         return other
 

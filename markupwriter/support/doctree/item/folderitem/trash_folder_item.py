@@ -24,8 +24,8 @@ class TrashFolderItem(BaseFolderItem):
         self.flags -= ITEM_FLAG.draggable
         self.flags -= ITEM_FLAG.mutable
 
-    def deepcopy(self, other=None):
-        other: TrashFolderItem = super().deepcopy(TrashFolderItem())
+    def shallowcopy(self, other=None):
+        other: TrashFolderItem = super().shallowcopy(TrashFolderItem())
         other.applyChanges()
         return other
 

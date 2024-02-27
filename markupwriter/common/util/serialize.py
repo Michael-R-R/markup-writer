@@ -19,7 +19,7 @@ class Serialize(object):
     _masterFormat = 0x00000001
     _masterVersion = 1
 
-    def readFromFile(type: Type[T], path: str) -> T | None:
+    def read(type: Type[T], path: str) -> T | None:
         inFile = QFile(path)
         if not inFile.open(QIODevice.OpenModeFlag.ReadOnly):
             return None
@@ -45,7 +45,7 @@ class Serialize(object):
 
         return obj
 
-    def writeToFile(path: str, data) -> bool:
+    def write(path: str, data) -> bool:
         outFile = QFile(path)
         if not outFile.open(QIODevice.OpenModeFlag.WriteOnly):
             return False

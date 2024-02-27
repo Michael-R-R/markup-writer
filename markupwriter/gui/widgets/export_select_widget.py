@@ -70,7 +70,7 @@ class ExportSelectWidget(QDialog):
             widget: dti.BaseTreeItem = self._tree.itemWidget(item, 0)
 
             if isinstance(widget, dti.NovelFolderItem):
-                wtemp = widget.deepcopy()
+                wtemp = widget.shallowcopy()
                 selectButton = QPushButton("Select", self)
                 self.gLayout.addWidget(wtemp, row, 0)
                 self.gLayout.addWidget(selectButton, row, 1)

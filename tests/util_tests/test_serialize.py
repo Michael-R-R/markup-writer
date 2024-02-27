@@ -24,13 +24,13 @@ def testSerialize_write():
     s = TestSquare()
     s.w = 10
     s.h = 10
-    assert(Serialize.writeToFile("./resources/.tests/testSerialize.bin", s))
+    assert(Serialize.write("./resources/.tests/testSerialize.bin", s))
 
 def testSerialize_read():
-    s = Serialize.readFromFile(TestSquare, "")
+    s = Serialize.read(TestSquare, "")
     assert(s == None)
 
-    s = Serialize.readFromFile(TestSquare, "./resources/.tests/testSerialize.bin")
+    s = Serialize.read(TestSquare, "./resources/.tests/testSerialize.bin")
     assert(s != None)
     assert(s.w == 10)
     assert(s.h == 10)

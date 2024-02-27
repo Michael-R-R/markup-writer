@@ -24,8 +24,8 @@ class TimelineFolderItem(BaseFolderItem):
         self.flags -= ITEM_FLAG.draggable
         self.flags -= ITEM_FLAG.mutable
 
-    def deepcopy(self, other=None):
-        other: TimelineFolderItem = super().deepcopy(TimelineFolderItem())
+    def shallowcopy(self, other=None):
+        other: TimelineFolderItem = super().shallowcopy(TimelineFolderItem())
         other.applyChanges()
         return other
 

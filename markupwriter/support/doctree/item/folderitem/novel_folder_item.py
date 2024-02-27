@@ -29,8 +29,8 @@ class NovelFolderItem(BaseFolderItem):
         font.setUnderline(True)
         label.setFont(font)
 
-    def deepcopy(self, other=None):
-        other: NovelFolderItem = super().deepcopy(NovelFolderItem())
+    def shallowcopy(self, other=None):
+        other: NovelFolderItem = super().shallowcopy(NovelFolderItem())
         other.applyChanges()
         return other
 
