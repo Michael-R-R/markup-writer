@@ -72,24 +72,6 @@ class EditorContextMenu(BaseContextMenu):
         actions = self._menu.actions()
         self._menu.insertAction(actions[0], action)
 
-    def _addWord(self, word: str):
-        self._spellCheck.addWord(word)
-        self._highlighter.rehighlight()
-
-    def _setupForgetWord(self, word: str):
-        if not self._spellCheck.hasWord(word):
-            return
-
-        action = QAction("Forget word", self._menu)
-        action.triggered.connect(lambda _, val=word: self._forgetWord(val))
-        
-        actions = self._menu.actions()
-        self._menu.insertAction(actions[0], action)
-
-    def _forgetWord(self, word: str):
-        self._spellCheck.removeWord(word)
-        self._highlighter.rehighlight()
-
     def _setupSuggestions(self, word: str):
         spellingMenu = QMenu("Spelling suggestions", self._menu)
 
@@ -106,6 +88,20 @@ class EditorContextMenu(BaseContextMenu):
             actions = self._menu.actions()
             self._menu.insertMenu(actions[0], spellingMenu)
 
+    def _setupForgetWord(self, word: str):
+        if not self._spellCheck.hasWord(word):
+            return
+
+        action = QAction("Forget word", self._menu)
+        action.triggered.connect(lambda _, val=word: self._forgetWord(val))
+        
+        actions = self._menu.actions()
+        self._menu.insertAction(actions[0], action)
+            
+    def _addWord(self, word: str):
+        self._spellCheck.addWord(word)
+        self._highlighter.rehighlight()
+        
     def _correctWord(self, word: str):
         cursor = self._textEdit.textCursor()
         if not cursor.hasSelection():
@@ -117,3 +113,7 @@ class EditorContextMenu(BaseContextMenu):
         cursor.endEditBlock()
 
         self._textEdit.setTextCursor(cursor)
+
+    def _forgetWord(self, word: str):
+        self._spellCheck.removeWord(word)
+        self._highlighter.rehighlight()

@@ -102,6 +102,11 @@ class Highlighter(QSyntaxHighlighter):
             return False
         self._behaviours.pop(type)
         return True
+    
+    def setBehaviourEnable(self, type: BEHAVIOUR, val: bool):
+        if not type in self._behaviours:
+            return
+        self._behaviours[type].isEnabled = val
 
     def getBehaviour(
         self, type: BEHAVIOUR
@@ -120,6 +125,7 @@ class Highlighter(QSyntaxHighlighter):
 class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
         self._expr = re.compile(expr)
+        self.isEnabled = True
 
         self.format = QTextCharFormat()
         self.format.setForeground(QBrush(color))
@@ -147,6 +153,9 @@ class HighlightSpellBehaviour(HighlightBehaviour):
         self.excludeRegex = re.compile(r"@({})\(.*?\)".format(exclude))
 
     def process(self, highlighter: Highlighter, text: str):
+        if not self.isEnabled:
+            return
+        
         check = self.excludeRegex.search(text)
         if check is not None:
             return
@@ -166,6 +175,9 @@ class HighlightWordBehaviour(HighlightBehaviour):
         self._wordSet = wordSet
 
     def process(self, highlighter: Highlighter, text: str):
+        if not self.isEnabled:
+            return
+        
         for word in self._wordSet:
             it = re.finditer(word, text)
             for found in it:
@@ -197,6 +209,9 @@ class HighlightExprBehaviour(HighlightBehaviour):
         super().__init__(color, expr)
 
     def process(self, highlighter: Highlighter, text: str):
+        if not self.isEnabled:
+            return
+        
         it = self._expr.finditer(text)
         for w in it:
             start = w.start()
@@ -211,6 +226,9 @@ class HighlightMultiExprBehaviour(HighlightBehaviour):
         self._endExpr = re.compile(end)
 
     def process(self, highlighter: Highlighter, text: str):
+        if not self.isEnabled:
+            return
+        
         highlighter.setCurrentBlockState(0)
 
         startIndex = 0
