@@ -1,11 +1,13 @@
-![Screenshot from 2024-02-27 21-20-56](https://github.com/Michael-R-R/markup-writer/assets/54217603/3ccf7070-9162-48bf-a62c-ca7c6dc382a2)
-
 # Description
 In-development plain-text with rich-text previewing support novel writing application. Aims to deliver 
 a distraction free presentation with easy to use in-text markup language, fast document switching, and a set of tools
 to support large novel organization needs.
 
 Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a> and <a href="https://github.com/vkbo/novelWriter">novelWriter</a>.
+
+# Showcase
+<p align=center><img align=center src="https://github.com/Michael-R-R/markup-writer/assets/54217603/c0eccbbd-4697-44ec-bd22-a5801ee004b7"></p>
+<p align=center><img align=center src="https://github.com/Michael-R-R/markup-writer/assets/54217603/fc7a7e4f-5310-4907-b62a-956d4af5922c"></p>
 
 ## Supports
 + Open source
