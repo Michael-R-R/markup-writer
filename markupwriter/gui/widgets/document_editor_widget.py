@@ -108,7 +108,7 @@ class DocumentEditorWidget(QPlainTextEdit):
                 found = extRegex.search(imgPath)
                 if found is None:
                     continue
-                imgTag = "@img({})\n".format(imgPath)
+                imgTag = "@img({})".format(imgPath)
                 self.textCursor().insertText(imgTag)
         else:
             return super().insertFromMimeData(source)

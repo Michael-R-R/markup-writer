@@ -87,7 +87,9 @@ class Core(QObject):
         self.data.setup(self.mwd)
 
         self.mww = w.MainWindowWorker(self.mwd, self)
-        self.mmbw = w.MainMenuBarWorker(self.data.mmbd, self)
+        self.mmbw = w.MainMenuBarWorker(
+            self.data.mmbd, self.data.dtd, self.data.ded, self
+        )
         self.dtw = w.DocumentTreeWorker(self.data.dtd, self)
         self.dew = w.DocumentEditorWorker(self.data.ded, self)
         self.dpw = w.DocumentPreviewWorker(self.data.dpd, self)
@@ -125,6 +127,7 @@ class Core(QObject):
         mmbd.fmExportTriggered.connect(self._onExport)
         mmbd.fmCloseTriggered.connect(self._onCloseProject)
         mmbd.fmExitTriggered.connect(self._onExit)
+        mmbd.vmTelescopeTriggered.connect(self.mmbw.onTelescopeTriggered)
 
     def _setupMenuBarWorkerSlots(self):
         ded = self.data.ded
@@ -158,7 +161,7 @@ class Core(QObject):
     def _setupEditorWorkerSlots(self):
         mmbd = self.data.mmbd
         mmbd.dmSpellToggled.connect(self.dew.onSpellToggled)
-        
+
         dtd = self.data.dtd
         dtd.fileOpened.connect(self.dew.onFileOpened)
         dtd.fileRemoved.connect(self.dew.onFileRemoved)

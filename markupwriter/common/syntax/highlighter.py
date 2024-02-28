@@ -38,11 +38,11 @@ class Highlighter(QSyntaxHighlighter):
         parenRegex = r"\(|\)"
         commentRegex = r"%(.*)"
         multiComRegex = [r"<#", r"#>"]
-        keywordRegex = r"@(tag|ref|pov|loc|img|vspace|newPage|alignL|alignC|alignR)"
-        formattingRegex = r"@(bold|ital)"
+        keywordRegex = r"@(tag|ref|pov|loc|img|vspace|newpage|alignl|alignc|alignr)"
+        formattingRegex = r"@\b(b|i)\b"
         headerRegex = r"^@(title|chapter|scene|section)"
         mdHeadersRegex = r"^#{1,4}"
-        mdListsRegex = r"^(-|\*|\+)"
+        mdListsRegex = r"^(-|\+)"
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
 

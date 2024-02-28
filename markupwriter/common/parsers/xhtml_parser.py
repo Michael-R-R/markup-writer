@@ -35,11 +35,11 @@ class XHtmlParser(QRunnable):
             r"@chapter": self._processChapter,
             r"@scene": self._processScene,
             r"@section": self._processSection,
-            r"@alignL": self._processAlignL,
-            r"@alignC": self._processAlignC,
-            r"@alignR": self._processAlignR,
+            r"@alignl": self._processAlignL,
+            r"@alignc": self._processAlignC,
+            r"@alignr": self._processAlignR,
             r"@vspace": self._processVSpace,
-            r"@newPage": self._processNewPage,
+            r"@newpage": self._processNewPage,
             r"@img": self._processImg,
         }
 

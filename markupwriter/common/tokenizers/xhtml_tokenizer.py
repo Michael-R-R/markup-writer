@@ -19,37 +19,33 @@ class WorkerSignal(QObject):
 class XHtmlTokenizer(QRunnable):
     def __init__(self, text: str, parent: QObject | None) -> None:
         super().__init__()
-        
+
         self.text = text
-        self.tokens: list[(str, str)] = list() # tag, text
+        self.tokens: list[(str, str)] = list()  # tag, text
         self.signals = WorkerSignal(parent)
 
         self.parenRegex = re.compile(r"(?<=\().*?(?=\))")
         self.nlParenRegex = re.compile(r"(?<=\()(\n|.)*?(?=\))")
         self.keywordRegex = re.compile(r"^@.*(?=\()")
+        
+        self.ignoreSet = set()
 
         self.replaceDict = {
-            r"@bold\((\n|.)*?\)": self._preprocessBold,
-            r"@ital\((\n|.)*?\)": self._preprocessItal,
-            r"@boldItal\((\n|.)*?\)": self._preprocessBoldItal,
+            r"@b\((\n|.)*?\)": self._replaceBold,
+            r"@i\((\n|.)*?\)": self._replaceItal,
         }
 
-        self.removeDict = {
-            r"^cpos:.*": self._preprocessRemove,
-            r"^@(tag|ref|pov|loc)(\(.*\))": self._preprocessRemove,
-            r"%.*": self._preprocessRemove,
-            r"<#(\n|.)*?#>": self._preprocessRemove,
-        }
+        self.removeDict = dict()
 
     @pyqtSlot()
     def run(self):
         try:
             self._preprocess()
             self._process()
-            
+
         except Exception as e:
             self.signals.error.emit(str(e))
-            
+
         else:
             self.signals.finished.emit()
             self.signals.result.emit(self.tokens)
@@ -57,48 +53,105 @@ class XHtmlTokenizer(QRunnable):
     def _preprocess(self):
         for tag in self.replaceDict:
             self.replaceDict[tag](tag)
-            
+
         for tag in self.removeDict:
             self.removeDict[tag](tag)
 
-    def _preprocessBold(self, tag: str):
-        self._preprocessFormat(tag, "<b>?</b>")
+        self.text = self.text.strip("\r\n ")
 
-    def _preprocessItal(self, tag: str):
-        self._preprocessFormat(tag, "<i>?</i>")
+    def _process(self):
+        raise NotImplementedError()
 
-    def _preprocessBoldItal(self, tag: str):
-        self._preprocessFormat(tag, "<b><i>?</i></b>")
+    def _replaceBold(self, tag: str):
+        self._replaceFormat(tag, "<b>?</b>")
 
-    def _preprocessFormat(self, tag: str, htmlTag: str):
+    def _replaceItal(self, tag: str):
+        self._replaceFormat(tag, "<i>?</i>")
+
+    def _replaceFormat(self, tag: str, htmlTag: str):
         it = re.finditer(tag, self.text, re.MULTILINE)
         for found in it:
             found = found.group(0)
             text = self.nlParenRegex.search(found)
             if text is None:
                 continue
-            
+
             lines = text.group(0).splitlines()
             size = len(lines)
             if size <= 0:
                 return
-            
+
             htmlText = ""
-            for i in range(size-1):
+            for i in range(size - 1):
                 if lines[i] == "":
                     continue
                 htmlText += htmlTag.replace("?", lines[i]) + "\n"
-                
-            htmlText += htmlTag.replace("?", lines[size-1])
-                
+
+            htmlText += htmlTag.replace("?", lines[size - 1])
+
             self.text = self.text.replace(found, htmlText)
 
-    def _preprocessRemove(self, tag: str):
+    def _processRemove(self, tag: str):
         it = re.finditer(tag, self.text, re.MULTILINE)
         for found in it:
             if found is None:
                 continue
             self.text = self.text.replace(found.group(0), "")
+
+    def _processKeyword(self, line: str) -> tuple[str, str]:
+        keyword = self.keywordRegex.search(line)
+        if keyword is None:
+            return ("", "")
+        keyword = keyword.group(0)
+        
+        if keyword in self.ignoreSet:
+            return ("p", line)
+
+        text = self.parenRegex.search(line)
+        if text is None:
+            return ("", "")
+        text = text.group(0)
+
+        return (keyword, text)
+
+
+class XHtmlPreviewTokenizer(XHtmlTokenizer):
+    def __init__(self, text: str, parent: QObject | None) -> None:
+        super().__init__(text, parent)
+        
+        self.ignoreSet = {
+            "@tag",
+            "@ref",
+            "@pov",
+            "@loc",
+        }
+
+        self.removeDict = {
+            r"^cpos:.*": self._processRemove,
+        }
+
+    def _process(self):
+        lines = self.text.splitlines()
+        for line in lines:
+            if line == "":
+                self.tokens.append(("p", "&nbsp;"))
+            elif line.startswith("@"):
+                token: tuple[str, str] = self._processKeyword(line)
+                self.tokens.append(token)
+            else:
+                self.tokens.append(("p", line))
+
+
+class XHtmlExportTokenizer(XHtmlTokenizer):
+    def __init__(self, text: str, parent: QObject | None) -> None:
+        super().__init__(text, parent)
+
+        self.removeDict = {
+            r"^cpos:.*": self._processRemove,
+            r"^@(tag|ref|pov|loc)(\(.*\))": self._processRemove,
+            r"%.*": self._processRemove,
+            r"<#(\n|.)*?#>": self._processRemove,
+        }
 
     def _process(self):
         lines = self.text.splitlines()
@@ -111,16 +164,3 @@ class XHtmlTokenizer(QRunnable):
                 self.tokens.append(token)
             else:
                 self.tokens.append(("p", line))
-                
-    def _processKeyword(self, line: str) -> tuple[str, str]:
-        keyword = self.keywordRegex.search(line)
-        if keyword is None:
-            return ("", "")
-        keyword = keyword.group(0)
-        
-        text = self.parenRegex.search(line)
-        if text is None:
-            return ("", "")
-        text = text.group(0)
-        
-        return (keyword, text)
