@@ -22,6 +22,7 @@ class HotkeyConfig(BaseConfig):
     saveAsProject: QKeySequence = None
     closeProject: QKeySequence = None
     exitApplication: QKeySequence = None
+    telescope: QKeySequence = None
     navUp: QKeySequence = None
     navDown: QKeySequence = None
     rename: QKeySequence = None
@@ -40,6 +41,7 @@ class HotkeyConfig(BaseConfig):
             Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_O
         )
         HotkeyConfig.exitApplication = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Q)
+        HotkeyConfig.telescope = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_P)
         HotkeyConfig.navUp = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Up)
         HotkeyConfig.navDown = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Down)
         HotkeyConfig.rename = QKeySequence(Qt.Key.Key_F2)
@@ -54,6 +56,7 @@ class HotkeyConfig(BaseConfig):
         sOut << HotkeyConfig.saveAsProject
         sOut << HotkeyConfig.closeProject
         sOut << HotkeyConfig.exitApplication
+        sOut << HotkeyConfig.telescope
         sOut << HotkeyConfig.navUp
         sOut << HotkeyConfig.navDown
         sOut << HotkeyConfig.rename
@@ -66,6 +69,7 @@ class HotkeyConfig(BaseConfig):
         sIn >> HotkeyConfig.saveAsProject
         sIn >> HotkeyConfig.closeProject
         sIn >> HotkeyConfig.exitApplication
+        sIn >> HotkeyConfig.telescope
         sIn >> HotkeyConfig.navUp
         sIn >> HotkeyConfig.navDown
         sIn >> HotkeyConfig.rename
