@@ -27,11 +27,12 @@ class XHtmlTokenizer(QRunnable):
         self.parenRegex = re.compile(r"(?<=\().*?(?=\))")
         self.nlParenRegex = re.compile(r"(?<=\()(\n|.)*?(?=\))")
         self.keywordRegex = re.compile(r"^@.*(?=\()")
+        
+        self.ignoreSet = set()
 
         self.replaceDict = {
-            r"@bold\((\n|.)*?\)": self._preprocessBold,
-            r"@ital\((\n|.)*?\)": self._preprocessItal,
-            r"@boldItal\((\n|.)*?\)": self._preprocessBoldItal,
+            r"@b\((\n|.)*?\)": self._replaceBold,
+            r"@i\((\n|.)*?\)": self._replaceItal,
         }
 
         self.removeDict = dict()
@@ -61,16 +62,13 @@ class XHtmlTokenizer(QRunnable):
     def _process(self):
         raise NotImplementedError()
 
-    def _preprocessBold(self, tag: str):
-        self._preprocessFormat(tag, "<b>?</b>")
+    def _replaceBold(self, tag: str):
+        self._replaceFormat(tag, "<b>?</b>")
 
-    def _preprocessItal(self, tag: str):
-        self._preprocessFormat(tag, "<i>?</i>")
+    def _replaceItal(self, tag: str):
+        self._replaceFormat(tag, "<i>?</i>")
 
-    def _preprocessBoldItal(self, tag: str):
-        self._preprocessFormat(tag, "<b><i>?</i></b>")
-
-    def _preprocessFormat(self, tag: str, htmlTag: str):
+    def _replaceFormat(self, tag: str, htmlTag: str):
         it = re.finditer(tag, self.text, re.MULTILINE)
         for found in it:
             found = found.group(0)
@@ -93,7 +91,7 @@ class XHtmlTokenizer(QRunnable):
 
             self.text = self.text.replace(found, htmlText)
 
-    def _preprocessRemove(self, tag: str):
+    def _processRemove(self, tag: str):
         it = re.finditer(tag, self.text, re.MULTILINE)
         for found in it:
             if found is None:
@@ -105,6 +103,9 @@ class XHtmlTokenizer(QRunnable):
         if keyword is None:
             return ("", "")
         keyword = keyword.group(0)
+        
+        if keyword in self.ignoreSet:
+            return ("p", line)
 
         text = self.parenRegex.search(line)
         if text is None:
@@ -117,10 +118,16 @@ class XHtmlTokenizer(QRunnable):
 class XHtmlPreviewTokenizer(XHtmlTokenizer):
     def __init__(self, text: str, parent: QObject | None) -> None:
         super().__init__(text, parent)
+        
+        self.ignoreSet = {
+            "@tag",
+            "@ref",
+            "@pov",
+            "@loc",
+        }
 
         self.removeDict = {
-            r"^cpos:.*": self._preprocessRemove,
-            r"^@(tag|ref|pov|loc)(\(.*\))": self._preprocessRemove,
+            r"^cpos:.*": self._processRemove,
         }
 
     def _process(self):
@@ -140,10 +147,10 @@ class XHtmlExportTokenizer(XHtmlTokenizer):
         super().__init__(text, parent)
 
         self.removeDict = {
-            r"^cpos:.*": self._preprocessRemove,
-            r"^@(tag|ref|pov|loc)(\(.*\))": self._preprocessRemove,
-            r"%.*": self._preprocessRemove,
-            r"<#(\n|.)*?#>": self._preprocessRemove,
+            r"^cpos:.*": self._processRemove,
+            r"^@(tag|ref|pov|loc)(\(.*\))": self._processRemove,
+            r"%.*": self._processRemove,
+            r"<#(\n|.)*?#>": self._processRemove,
         }
 
     def _process(self):
