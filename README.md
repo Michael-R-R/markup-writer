@@ -10,15 +10,18 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a> and <a 
 <p align=center><img align=center src="https://github.com/Michael-R-R/markup-writer/assets/54217603/c0eccbbd-4697-44ec-bd22-a5801ee004b7"></p>
 <p align=center><img align=center src="https://github.com/Michael-R-R/markup-writer/assets/54217603/fc7a7e4f-5310-4907-b62a-956d4af5922c"></p>
 
-## Supports
+## Features
 + Open source
 + Free forever
 + Fast document opening/saving
-+ In-text markup language
-+ Reference tag popup preview functionality
-+ Multi-document tab preview with support to view either plain/html text
++ Fast navigation between widgets
++ Custom markup language
++ Document reference tags
++ Multi-tab preview with support to view either plain/html text
 + Flexible document tree
-+ Document search and replace functionality
++ Text search and replace functionality
++ Telescope functionality (search project files)
++ Spell correct
 + epub3 exporter
 + Plus more to come...
 
