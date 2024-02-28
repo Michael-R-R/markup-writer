@@ -21,6 +21,7 @@ from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 
 import markupwriter.vdw.delegate as d
+import markupwriter.gui.widgets as w
 import markupwriter.support.doctree.item as ti
 
 
@@ -107,6 +108,12 @@ class DocumentTreeWorker(QObject):
             curr = curr.parent()
 
         return prev == trash
+    
+    @pyqtSlot()
+    def onFocusTreeTriggered(self):
+        tw = self.dtd.view.treeWidget
+        tw.setFocus()
+        tw.setExpanded(tw.currentIndex(), True)
         
     @pyqtSlot(str)
     def onFileAdded(self, uuid: str):
@@ -304,3 +311,12 @@ class DocumentTreeWorker(QObject):
         if widget is None:
             return
         self.dtd.previewRequested.emit(widget.title(), uuid)
+        
+    @pyqtSlot()
+    def onTelescopeTriggered(self):
+        tw = self.dtd.view.treeWidget
+        parent = self.dtd.view
+        telescope = w.TelescopeWidget(tw, parent)
+        telescope.resize(800, 400)
+        telescope.show()
+        telescope.move(parent.rect().center())

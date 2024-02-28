@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
-    pyqtSignal,
+    Qt,
     pyqtSlot,
     QSize,
 )
+from PyQt6.QtGui import QKeyEvent
 
 from PyQt6.QtWidgets import (
     QWidget,
@@ -26,6 +27,7 @@ class PreviewTabWidget(QTabWidget):
         self.setMovable(True)
         self.setContentsMargins(0, 0, 0, 0)
         self.setMouseTracking(True)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.currentChanged.connect(self._onCurrentChanged)
         
@@ -61,3 +63,21 @@ class PreviewTabWidget(QTabWidget):
     def _onCloseButtonClicked(self):
         index = self.currentIndex()
         self.tabCloseRequested.emit(index)
+        
+    def navigateTabs(self, direction: int):
+        count = self.count()
+        if count < 1:
+            return
+        
+        index = self.currentIndex()
+        index = (index + direction) % count
+        
+        self.setCurrentIndex(index)
+        
+    def keyPressEvent(self, e: QKeyEvent | None) -> None:
+        match e.key():
+            case Qt.Key.Key_A:
+                self.navigateTabs(-1)
+            case Qt.Key.Key_D:
+                self.navigateTabs(1)
+            case _: return super().keyPressEvent(e)

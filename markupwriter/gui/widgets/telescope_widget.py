@@ -52,7 +52,7 @@ class TelescopeWidget(QWidget):
 
         self.searchLine.textChanged.connect(self._filterSearch)
         self.resultList.currentItemChanged.connect(self._onCurrentItemChanged)
-        self.resultList.itemDoubleClicked.connect(self._onItemSelected)
+        self.resultList.itemDoubleClicked.connect(self._onFileOpened)
 
         self._buildCollection(tree)
         
@@ -93,6 +93,8 @@ class TelescopeWidget(QWidget):
             item = QListWidgetItem()
             item.setText(key)
             self.resultList.insertItem(0, item)
+        
+        self.resultList.setCurrentRow(0)
 
     @pyqtSlot(QListWidgetItem, QListWidgetItem)
     def _onCurrentItemChanged(self, curr: QListWidgetItem, prev: QListWidgetItem):
@@ -114,7 +116,7 @@ class TelescopeWidget(QWidget):
         self.preview.setPlainText(content)
 
     @pyqtSlot(QListWidgetItem)
-    def _onItemSelected(self, item: QListWidgetItem):
+    def _onFileOpened(self, item: QListWidgetItem):
         if item is None:
             return
         
@@ -126,9 +128,33 @@ class TelescopeWidget(QWidget):
         self.tree.fileOpened.emit(widget.UUID(), key[1:].split("/"))
         
         self.close()
+        
+    @pyqtSlot(QListWidgetItem)
+    def _onFilePreviewed(self, item: QListWidgetItem):
+        if item is None:
+            return
+        
+        key = item.text()
+        if not key in self.collection:
+            return
+        
+        widget: ti.BaseTreeItem = self.collection[key]
+        self.tree.filePreviewed.emit(widget.title(), widget.UUID())
+        
+        self.close()
+        
+    def _toggleSearchFocus(self):
+        if self.searchLine.hasFocus():
+            self.searchLine.clearFocus()
+            self._navigateList(0)
+        else:
+            self.searchLine.setFocus()
     
     def _navigateList(self, direction: int):
         count = self.resultList.count()
+        if count < 1:
+            return
+        
         row = self.resultList.currentRow()
         row = (row + direction) % count
         
@@ -138,11 +164,15 @@ class TelescopeWidget(QWidget):
         match e.key():
             case Qt.Key.Key_Escape:
                 self.close()
-            case Qt.Key.Key_Up:
-                self._navigateList(-1)
-            case Qt.Key.Key_Down:
-                self._navigateList(1)
             case Qt.Key.Key_Return:
-                self._onItemSelected(self.resultList.currentItem())
-
-        return super().keyPressEvent(e)
+                self._toggleSearchFocus()
+            case Qt.Key.Key_W:
+                self._navigateList(-1)
+            case Qt.Key.Key_S:
+                self._navigateList(1)
+            case Qt.Key.Key_O:
+                self._onFileOpened(self.resultList.currentItem())
+            case Qt.Key.Key_P:
+                self._onFilePreviewed(self.resultList.currentItem())
+            case _:
+                return super().keyPressEvent(e)

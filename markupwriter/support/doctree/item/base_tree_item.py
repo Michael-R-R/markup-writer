@@ -5,6 +5,7 @@ import uuid
 from enum import IntEnum
 
 from PyQt6.QtCore import (
+    Qt,
     QDataStream,
 )
 
