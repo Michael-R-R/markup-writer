@@ -93,6 +93,8 @@ class TelescopeWidget(QWidget):
             item = QListWidgetItem()
             item.setText(key)
             self.resultList.insertItem(0, item)
+        
+        self.resultList.setCurrentRow(0)
 
     @pyqtSlot(QListWidgetItem, QListWidgetItem)
     def _onCurrentItemChanged(self, curr: QListWidgetItem, prev: QListWidgetItem):
@@ -140,11 +142,19 @@ class TelescopeWidget(QWidget):
         self.tree.filePreviewed.emit(widget.title(), widget.UUID())
         
         self.close()
+        
+    def _toggleSearchFocus(self):
+        if self.searchLine.hasFocus():
+            self.searchLine.clearFocus()
+            self._navigateList(0)
+        else:
+            self.searchLine.setFocus()
     
     def _navigateList(self, direction: int):
-        self.searchLine.clearFocus()
-        
         count = self.resultList.count()
+        if count < 1:
+            return
+        
         row = self.resultList.currentRow()
         row = (row + direction) % count
         
@@ -154,14 +164,15 @@ class TelescopeWidget(QWidget):
         match e.key():
             case Qt.Key.Key_Escape:
                 self.close()
-            case Qt.Key.Key_Up:
+            case Qt.Key.Key_Return:
+                self._toggleSearchFocus()
+            case Qt.Key.Key_W:
                 self._navigateList(-1)
-            case Qt.Key.Key_Down:
+            case Qt.Key.Key_S:
                 self._navigateList(1)
             case Qt.Key.Key_O:
                 self._onFileOpened(self.resultList.currentItem())
             case Qt.Key.Key_P:
                 self._onFilePreviewed(self.resultList.currentItem())
             case _:
-                self.searchLine.setFocus()
                 return super().keyPressEvent(e)
