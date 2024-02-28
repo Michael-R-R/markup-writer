@@ -27,6 +27,8 @@ class BEHAVIOUR(Enum):
     header = auto()
     searchText = auto()
     spellCheck = auto()
+    mdHeaders = auto()
+    mdLists = auto()
 
 
 class Highlighter(QSyntaxHighlighter):
@@ -39,6 +41,8 @@ class Highlighter(QSyntaxHighlighter):
         keywordRegex = r"@(tag|ref|pov|loc|img|vspace|newPage|alignL|alignC|alignR)"
         formattingRegex = r"@(bold|ital)"
         headerRegex = r"^@(title|chapter|scene|section)"
+        mdHeadersRegex = r"^#{1,4}"
+        mdListsRegex = r"^(-|\*|\+)"
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
 
@@ -75,6 +79,16 @@ class Highlighter(QSyntaxHighlighter):
             HighlightExprBehaviour(HighlighterConfig.formattingCol, formattingRegex),
         )
 
+        self.addBehaviour(
+            BEHAVIOUR.mdHeaders,
+            HighlightExprBehaviour(HighlighterConfig.mdHeadersCol, mdHeadersRegex),
+        )
+
+        self.addBehaviour(
+            BEHAVIOUR.mdLists,
+            HighlightExprBehaviour(HighlighterConfig.mdListsCol, mdListsRegex),
+        )
+
         # Headers
         headerBehaviour = HighlightExprBehaviour(
             HighlighterConfig.headerCol, headerRegex
@@ -102,7 +116,7 @@ class Highlighter(QSyntaxHighlighter):
             return False
         self._behaviours.pop(type)
         return True
-    
+
     def setBehaviourEnable(self, type: BEHAVIOUR, val: bool):
         if not type in self._behaviours:
             return
@@ -155,7 +169,7 @@ class HighlightSpellBehaviour(HighlightBehaviour):
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
             return
-        
+
         check = self.excludeRegex.search(text)
         if check is not None:
             return
@@ -177,7 +191,7 @@ class HighlightWordBehaviour(HighlightBehaviour):
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
             return
-        
+
         for word in self._wordSet:
             it = re.finditer(word, text)
             for found in it:
@@ -211,7 +225,7 @@ class HighlightExprBehaviour(HighlightBehaviour):
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
             return
-        
+
         it = self._expr.finditer(text)
         for w in it:
             start = w.start()
@@ -228,7 +242,7 @@ class HighlightMultiExprBehaviour(HighlightBehaviour):
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
             return
-        
+
         highlighter.setCurrentBlockState(0)
 
         startIndex = 0
