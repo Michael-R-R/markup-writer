@@ -15,7 +15,7 @@ from markupwriter.config import AppConfig, ProjectConfig
 from markupwriter.common.util import File
 from markupwriter.gui.widgets import ExportSelectWidget
 from markupwriter.gui.dialogs.modal import ErrorDialog
-from markupwriter.common.tokenizers import XHtmlTokenizer
+from markupwriter.common.tokenizers import XHtmlExportTokenizer
 from markupwriter.common.parsers import XHtmlParser
 
 import markupwriter.gui.widgets as w
@@ -98,7 +98,7 @@ class EpubExporter(object):
                 if text is None:
                     continue
 
-                tokenizer = XHtmlTokenizer(text, None)
+                tokenizer = XHtmlExportTokenizer(text, None)
                 tokenizer.run()
 
                 parser = XHtmlParser(tokenizer.tokens, None)
