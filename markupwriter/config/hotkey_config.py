@@ -22,10 +22,12 @@ class HotkeyConfig(BaseConfig):
     saveAsProject: QKeySequence = None
     closeProject: QKeySequence = None
     exitApplication: QKeySequence = None
-    telescope: QKeySequence = None
+    viewTelescope: QKeySequence = None
+    viewDocTree: QKeySequence = None
+    viewDocEditor: QKeySequence = None
+    viewDocPreview: QKeySequence = None
     navUp: QKeySequence = None
     navDown: QKeySequence = None
-    rename: QKeySequence = None
 
     def init(wd: str):
         HotkeyConfig.INI_PATH = os.path.join(wd, "resources/configs/hotkey.ini")
@@ -41,10 +43,12 @@ class HotkeyConfig(BaseConfig):
             Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_O
         )
         HotkeyConfig.exitApplication = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Q)
-        HotkeyConfig.telescope = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_P)
+        HotkeyConfig.viewTelescope = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_P)
+        HotkeyConfig.viewDocTree = QKeySequence(Qt.Key.Key_F1)
+        HotkeyConfig.viewDocEditor = QKeySequence(Qt.Key.Key_F2)
+        HotkeyConfig.viewDocPreview = QKeySequence(Qt.Key.Key_F3)
         HotkeyConfig.navUp = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Up)
         HotkeyConfig.navDown = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Down)
-        HotkeyConfig.rename = QKeySequence(Qt.Key.Key_F2)
 
     def reset(wd: str):
         HotkeyConfig.init(wd)
@@ -56,10 +60,12 @@ class HotkeyConfig(BaseConfig):
         sOut << HotkeyConfig.saveAsProject
         sOut << HotkeyConfig.closeProject
         sOut << HotkeyConfig.exitApplication
-        sOut << HotkeyConfig.telescope
+        sOut << HotkeyConfig.viewTelescope
+        sOut << HotkeyConfig.viewDocTree
+        sOut << HotkeyConfig.viewDocEditor
+        sOut << HotkeyConfig.viewDocPreview
         sOut << HotkeyConfig.navUp
         sOut << HotkeyConfig.navDown
-        sOut << HotkeyConfig.rename
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
@@ -69,8 +75,10 @@ class HotkeyConfig(BaseConfig):
         sIn >> HotkeyConfig.saveAsProject
         sIn >> HotkeyConfig.closeProject
         sIn >> HotkeyConfig.exitApplication
-        sIn >> HotkeyConfig.telescope
+        sIn >> HotkeyConfig.viewTelescope
+        sIn >> HotkeyConfig.viewDocTree
+        sIn >> HotkeyConfig.viewDocEditor
+        sIn >> HotkeyConfig.viewDocPreview
         sIn >> HotkeyConfig.navUp
         sIn >> HotkeyConfig.navDown
-        sIn >> HotkeyConfig.rename
         return sIn

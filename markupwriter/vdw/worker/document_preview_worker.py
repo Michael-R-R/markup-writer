@@ -11,6 +11,11 @@ class DocumentPreviewWorker(QObject):
         
         self.dpd = dpd
         
+    @pyqtSlot()
+    def onFocusPreviewTriggered(self):
+        tw = self.dpd.view.tabWidget
+        tw.setFocus()
+        
     @pyqtSlot(int)
     def onCloseTabRequested(self, index: int):
         tw = self.dpd.view.tabWidget

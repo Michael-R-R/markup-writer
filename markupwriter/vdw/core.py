@@ -87,9 +87,7 @@ class Core(QObject):
         self.data.setup(self.mwd)
 
         self.mww = w.MainWindowWorker(self.mwd, self)
-        self.mmbw = w.MainMenuBarWorker(
-            self.data.mmbd, self.data.dtd, self.data.ded, self
-        )
+        self.mmbw = w.MainMenuBarWorker(self.data.mmbd, self)
         self.dtw = w.DocumentTreeWorker(self.data.dtd, self)
         self.dew = w.DocumentEditorWorker(self.data.ded, self)
         self.dpw = w.DocumentPreviewWorker(self.data.dpd, self)
@@ -127,13 +125,16 @@ class Core(QObject):
         mmbd.fmExportTriggered.connect(self._onExport)
         mmbd.fmCloseTriggered.connect(self._onCloseProject)
         mmbd.fmExitTriggered.connect(self._onExit)
-        mmbd.vmTelescopeTriggered.connect(self.mmbw.onTelescopeTriggered)
 
     def _setupMenuBarWorkerSlots(self):
         ded = self.data.ded
         ded.docStatusChanged.connect(self.mmbw.onDocumentStatusChanged)
 
     def _setupTreeWorkerSlots(self):
+        mmbd = self.data.mmbd
+        mmbd.vmDocTreeTriggered.connect(self.dtw.onFocusTreeTriggered)
+        mmbd.vmTelescopeTriggered.connect(self.dtw.onTelescopeTriggered)
+
         dtd = self.data.dtd
         dtd.fileAdded.connect(self.dtw.onFileAdded)
         dtd.fileRemoved.connect(self.dtw.onFileRemoved)
@@ -161,6 +162,7 @@ class Core(QObject):
     def _setupEditorWorkerSlots(self):
         mmbd = self.data.mmbd
         mmbd.dmSpellToggled.connect(self.dew.onSpellToggled)
+        mmbd.vmDocEditorTriggered.connect(self.dew.onFocusEditorTriggered)
 
         dtd = self.data.dtd
         dtd.fileOpened.connect(self.dew.onFileOpened)
@@ -183,6 +185,9 @@ class Core(QObject):
         ded.closeSearchClicked.connect(self.dew.onSearchTriggered)
 
     def _setupPreviewWorkerSlots(self):
+        mmbd = self.data.mmbd
+        mmbd.vmDocPreviewTriggered.connect(self.dpw.onFocusPreviewTriggered)
+
         dtd = self.data.dtd
         dtd.fileRemoved.connect(self.dpw.onFileRemoved)
         dtd.fileRenamed.connect(self.dpw.onFileRenamed)

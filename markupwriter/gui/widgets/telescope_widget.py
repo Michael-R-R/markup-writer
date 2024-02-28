@@ -52,7 +52,7 @@ class TelescopeWidget(QWidget):
 
         self.searchLine.textChanged.connect(self._filterSearch)
         self.resultList.currentItemChanged.connect(self._onCurrentItemChanged)
-        self.resultList.itemDoubleClicked.connect(self._onItemSelected)
+        self.resultList.itemDoubleClicked.connect(self._onFileOpened)
 
         self._buildCollection(tree)
         
@@ -114,7 +114,7 @@ class TelescopeWidget(QWidget):
         self.preview.setPlainText(content)
 
     @pyqtSlot(QListWidgetItem)
-    def _onItemSelected(self, item: QListWidgetItem):
+    def _onFileOpened(self, item: QListWidgetItem):
         if item is None:
             return
         
@@ -126,8 +126,24 @@ class TelescopeWidget(QWidget):
         self.tree.fileOpened.emit(widget.UUID(), key[1:].split("/"))
         
         self.close()
+        
+    @pyqtSlot(QListWidgetItem)
+    def _onFilePreviewed(self, item: QListWidgetItem):
+        if item is None:
+            return
+        
+        key = item.text()
+        if not key in self.collection:
+            return
+        
+        widget: ti.BaseTreeItem = self.collection[key]
+        self.tree.filePreviewed.emit(widget.title(), widget.UUID())
+        
+        self.close()
     
     def _navigateList(self, direction: int):
+        self.searchLine.clearFocus()
+        
         count = self.resultList.count()
         row = self.resultList.currentRow()
         row = (row + direction) % count
@@ -142,7 +158,10 @@ class TelescopeWidget(QWidget):
                 self._navigateList(-1)
             case Qt.Key.Key_Down:
                 self._navigateList(1)
-            case Qt.Key.Key_Return:
-                self._onItemSelected(self.resultList.currentItem())
-
-        return super().keyPressEvent(e)
+            case Qt.Key.Key_O:
+                self._onFileOpened(self.resultList.currentItem())
+            case Qt.Key.Key_P:
+                self._onFilePreviewed(self.resultList.currentItem())
+            case _:
+                self.searchLine.setFocus()
+                return super().keyPressEvent(e)

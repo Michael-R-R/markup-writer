@@ -56,6 +56,7 @@ class DocumentTreeDelegate(QObject):
         tw.fileOpened.connect(lambda x, y: self.fileOpened.emit(x, y))
         tw.fileMoved.connect(lambda x, y: self.fileMoved.emit(x, y))
         tw.fileRenamed.connect(lambda x, y, z: self.fileRenamed.emit(x, y, z))
+        tw.filePreviewed.connect(lambda x, y: self.previewRequested.emit(x, y))
         tw.dragDropDone.connect(lambda: self.dragDropDone.emit())
         tw.customContextMenuRequested.connect(
             lambda x: self.contextMenuRequested.emit(x)

@@ -9,6 +9,7 @@ from PyQt6.QtCore import (
 from PyQt6.QtGui import (
     QDragEnterEvent,
     QDropEvent,
+    QKeyEvent,
     QMouseEvent,
 )
 
@@ -28,6 +29,7 @@ class DocumentTreeWidget(QTreeWidget):
     fileAdded = pyqtSignal(str)
     fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
+    filePreviewed = pyqtSignal(str, str)
     fileMoved = pyqtSignal(str, list)
     fileRenamed = pyqtSignal(str, str, str)
     dragDropDone = pyqtSignal()
@@ -51,7 +53,7 @@ class DocumentTreeWidget(QTreeWidget):
         self.itemContextMenu = dt.ItemContextMenu(self)
         self.trashContextMenu = dt.TrashContextMenu(self)
 
-        self.itemDoubleClicked.connect(self._onItemDoubleClicked)
+        self.itemDoubleClicked.connect(self.onItemDoubleClicked)
 
     def add(self, widget: dti.BaseTreeItem):
         selected = self.currentItem()
@@ -230,12 +232,39 @@ class DocumentTreeWidget(QTreeWidget):
         for i in items:
             self.setItemWidget(i.item, 0, i)
 
+    def navigateTree(self, direction: int):
+        index = self.currentIndex()
+        
+        selected = None
+        if direction < 0:
+            selected = self.indexAbove(index)
+        elif direction > 0:
+            selected = self.indexBelow(index)
+        
+        if selected == self.rootIndex():
+            return
+        
+        self.setCurrentIndex(selected)
+        self.setExpanded(selected, True)
+
+    def keyPressEvent(self, e: QKeyEvent | None) -> None:
+        match e.key():
+            case Qt.Key.Key_W:
+                self.navigateTree(-1)
+            case Qt.Key.Key_S:
+                self.navigateTree(1)
+            case Qt.Key.Key_O:
+                self._emitOpened(self.currentItem())
+            case Qt.Key.Key_P:
+                self._emitPreviewed(self.currentItem())
+            case _:
+                return super().keyPressEvent(e)
+
     def mousePressEvent(self, e: QMouseEvent | None) -> None:
         index = self.indexAt(e.pos())
         super().mousePressEvent(e)
         if not index.isValid():
             self.clearSelection()
-            self.setCurrentItem(None)
 
     def dragEnterEvent(self, e: QDragEnterEvent | None) -> None:
         self.draggedItems.clear()
@@ -273,6 +302,13 @@ class DocumentTreeWidget(QTreeWidget):
         self.draggedItems.clear()
         self.dragDropDone.emit()
 
+    @pyqtSlot(QTreeWidgetItem, int)
+    def onItemDoubleClicked(self, item: QTreeWidgetItem, _: int):
+        if item is None:
+            return
+        
+        self._emitOpened(item)
+
     def _emitAdded(self, widget: dti.BaseTreeItem):
         if widget.hasFlag(dti.ITEM_FLAG.file):
             nameList = self.getNamesList(widget.item)
@@ -289,12 +325,21 @@ class DocumentTreeWidget(QTreeWidget):
                 nameList = self.getNamesList(w.item)
                 self.fileMoved.emit(w.UUID(), nameList)
 
-    @pyqtSlot(QTreeWidgetItem, int)
-    def _onItemDoubleClicked(self, item: QTreeWidgetItem, col: int):
-        widget: dti.BaseTreeItem = self.itemWidget(item, col)
+    def _emitOpened(self, item: QTreeWidgetItem):
+        widget: dti.BaseTreeItem = self.itemWidget(item, 0)
         if widget.hasFlag(dti.ITEM_FLAG.file):
             nameList = self.getNamesList(item)
             self.fileOpened.emit(widget.UUID(), nameList)
+
+    def _emitPreviewed(self, item: QTreeWidgetItem):
+        widget: dti.BaseTreeItem = self.itemWidget(item, 0)
+        if widget is None:
+            return
+        
+        if not widget.hasFlag(dti.ITEM_FLAG.file):
+            return
+        
+        self.filePreviewed.emit(widget.title(), widget.UUID())
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
 

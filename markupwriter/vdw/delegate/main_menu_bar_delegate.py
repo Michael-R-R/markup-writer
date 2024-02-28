@@ -21,6 +21,9 @@ class MainMenuBarDelegate(QObject):
 
     dmSpellToggled = pyqtSignal(bool)
 
+    vmDocTreeTriggered = pyqtSignal()
+    vmDocEditorTriggered = pyqtSignal()
+    vmDocPreviewTriggered = pyqtSignal()
     vmTelescopeTriggered = pyqtSignal()
 
     def __init__(self, parent: QObject | None) -> None:
@@ -45,6 +48,9 @@ class MainMenuBarDelegate(QObject):
         dm.toggleSpell.toggled.connect(lambda x: self.dmSpellToggled.emit(x))
 
         vm = self.view.viewMenu
+        vm.treeAction.triggered.connect(lambda: self.vmDocTreeTriggered.emit())
+        vm.editorAction.triggered.connect(lambda: self.vmDocEditorTriggered.emit())
+        vm.previewAction.triggered.connect(lambda: self.vmDocPreviewTriggered.emit())
         vm.telecopeAction.triggered.connect(lambda: self.vmTelescopeTriggered.emit())
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:

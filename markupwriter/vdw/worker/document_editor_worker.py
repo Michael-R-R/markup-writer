@@ -84,6 +84,11 @@ class DocumentEditorWorker(QObject):
 
         return tag
     
+    @pyqtSlot()
+    def onFocusEditorTriggered(self):
+        te = self.ded.view.textEdit
+        te.setFocus()
+    
     @pyqtSlot(bool)
     def onSpellToggled(self, isToggled: bool):
         te = self.ded.view.textEdit
@@ -124,7 +129,6 @@ class DocumentEditorWorker(QObject):
         eb.addPath(paths)
         eb.addCloseAction()
 
-        te.setFocus()
         self._runTokenizer()
 
         sb = self.ded.view.searchBox
