@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import re
+import re, os
 
 from PyQt6.QtCore import (
     QObject,
@@ -60,6 +60,8 @@ class XHtmlTokenizer(QRunnable):
             
         for tag in self.removeDict:
             self.removeDict[tag](tag)
+            
+        self.text = self.text.strip()
 
     def _preprocessBold(self, tag: str):
         self._preprocessFormat(tag, "<b>?</b>")
@@ -105,7 +107,7 @@ class XHtmlTokenizer(QRunnable):
         for line in lines:
             if line == "":
                 continue
-
+            
             if line.startswith("@"):
                 token: tuple[str, str] = self._processKeyword(line)
                 self.tokens.append(token)
