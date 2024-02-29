@@ -58,13 +58,13 @@ class DocumentTreeWorker(QObject):
         tcm = tw.treeContextMenu
         tcm.itemMenu.setEnabled(True)
         
-    def refreshParentWordCounts(self, child: QTreeWidgetItem, owc: int, twc: int):
+    def refreshParentWordCounts(self, child: QTreeWidgetItem, owc: int, wc: int):
         tw = self.dtd.view.treeWidget
         
         item = child.parent()
         while item is not None:
             widget: ti.BaseTreeItem = tw.itemWidget(item, 0)
-            twc = widget.totalWordCount() - owc + twc
+            twc = widget.totalWordCount() - owc + wc
             widget.setTotalWordCount(twc)
             item = item.parent()
         
