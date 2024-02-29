@@ -129,6 +129,9 @@ class Core(QObject):
     def _setupMenuBarWorkerSlots(self):
         ded = self.data.ded
         ded.docStatusChanged.connect(self.mmbw.onDocumentStatusChanged)
+        
+        dpd = self.data.dpd
+        dpd.tabCountChanged.connect(self.mmbw.onTabCountChanged)
 
     def _setupTreeWorkerSlots(self):
         mmbd = self.data.mmbd

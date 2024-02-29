@@ -12,6 +12,7 @@ import markupwriter.vdw.view as v
 class DocumentPreviewDelegate(QObject):
     showViewRequested = pyqtSignal()
     closeTabRequested = pyqtSignal(int)
+    tabCountChanged = pyqtSignal(int)
 
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
@@ -23,6 +24,7 @@ class DocumentPreviewDelegate(QObject):
     def _setupViewConnections(self):
         tw = self.view.tabWidget
         tw.tabCloseRequested.connect(lambda x: self.closeTabRequested.emit(x))
+        tw.countChanged.connect(lambda x: self.tabCountChanged.emit(x))
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.view

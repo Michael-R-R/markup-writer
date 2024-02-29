@@ -36,3 +36,11 @@ class MainMenuBarWorker(QObject):
     def onDocumentStatusChanged(self, status: bool):
         fm = self.mmbd.view.fileMenu
         fm.saveDocAction.setEnabled(status)
+        
+    @pyqtSlot(int)
+    def onTabCountChanged(self, count: int):
+        dm = self.mmbd.view.docMenu
+        
+        status = count > 0
+        dm.refreshPreview.setEnabled(status)
+        dm.togglePreview.setEnabled(status)

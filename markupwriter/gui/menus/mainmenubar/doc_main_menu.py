@@ -22,9 +22,11 @@ class DocMainMenu(QMenu):
 
         self.refreshPreview = QAction("Refresh Preview", self)
         self.refreshPreview.setShortcut(HotkeyConfig.refreshPreview)
+        self.refreshPreview.setEnabled(False)
         
         self.togglePreview = QAction("Toggle Preview", self)
         self.togglePreview.setShortcut(HotkeyConfig.togglePreview)
+        self.togglePreview.setEnabled(False)
 
         self.addAction(self.toggleSpell)
         self.addSeparator()

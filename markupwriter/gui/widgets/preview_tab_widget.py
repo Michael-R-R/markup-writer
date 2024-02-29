@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     Qt,
+    pyqtSignal,
     pyqtSlot,
     QSize,
 )
@@ -18,6 +19,8 @@ from markupwriter.common.provider import Icon
 
 
 class PreviewTabWidget(QTabWidget):
+    countChanged = pyqtSignal(int)
+    
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
 
@@ -31,6 +34,11 @@ class PreviewTabWidget(QTabWidget):
 
         self.currentChanged.connect(self._onCurrentChanged)
         
+    def addTab(self, widget: QWidget, title: str) -> None:
+        super().addTab(widget, title)
+        
+        self.countChanged.emit(self.count())
+        
     def tabInserted(self, index: int) -> None:
         super().tabInserted(index)
         
@@ -39,6 +47,13 @@ class PreviewTabWidget(QTabWidget):
         closeButton.setIcon(Icon.UNCHECK)
         closeButton.clicked.connect(self._onCloseButtonClicked)
         tabBar.setTabButton(index, QTabBar.ButtonPosition.RightSide, closeButton)
+        
+        self.countChanged.emit(self.count())
+        
+    def tabRemoved(self, index: int) -> None:
+        super().tabRemoved(index)
+        
+        self.countChanged.emit(self.count())
     
     @pyqtSlot(int)
     def _onCurrentChanged(self, index: int):
