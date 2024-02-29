@@ -10,6 +10,7 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtWidgets import (
     QTreeWidgetItem,
+    QApplication,
 )
 
 from markupwriter.gui.dialogs.modal import (
@@ -315,8 +316,9 @@ class DocumentTreeWorker(QObject):
     @pyqtSlot()
     def onTelescopeTriggered(self):
         tw = self.dtd.view.treeWidget
-        parent = self.dtd.view
-        telescope = w.TelescopeWidget(tw, parent)
+        telescope = w.TelescopeWidget(tw, tw)
         telescope.resize(800, 400)
         telescope.show()
-        telescope.move(parent.rect().center())
+        
+        center = QApplication.primaryScreen().availableGeometry().center() / 2
+        telescope.move(center)
