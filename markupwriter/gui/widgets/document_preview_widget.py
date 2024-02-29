@@ -40,10 +40,10 @@ class DocumentPreviewWidget(QWidget):
         self.textedit.setTabStopDistance(20.0)
 
         self.refreshButton = QPushButton("Refresh", self)
-        self.refreshButton.clicked.connect(self._onRefreshButton)
+        self.refreshButton.clicked.connect(self.refreshContent)
 
         self.toggleButton = QPushButton("Plain", self)
-        self.toggleButton.clicked.connect(self._onToggleButton)
+        self.toggleButton.clicked.connect(self.toggleView)
 
         self.mLayout = QGridLayout(self)
         self.mLayout.addWidget(self.textedit, 0, 0, 1, 2)
@@ -55,7 +55,8 @@ class DocumentPreviewWidget(QWidget):
     def checkForMatch(self, title: str, uuid: str) -> bool:
         return title == self.title and uuid == self.uuid
 
-    def _onRefreshButton(self):
+    @pyqtSlot()
+    def refreshContent(self):
         path = os.path.join(ProjectConfig.contentPath(), self.uuid)
         if not File.exists(path):
             self.close()
@@ -72,7 +73,8 @@ class DocumentPreviewWidget(QWidget):
 
         self.textedit.verticalScrollBar().setValue(vbValue)
 
-    def _onToggleButton(self):
+    @pyqtSlot()
+    def toggleView(self):
         self.isPlainText = not self.isPlainText
 
         if self.isPlainText:

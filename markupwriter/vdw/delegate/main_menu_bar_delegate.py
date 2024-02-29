@@ -20,6 +20,8 @@ class MainMenuBarDelegate(QObject):
     fmExitTriggered = pyqtSignal()
 
     dmSpellToggled = pyqtSignal(bool)
+    dmRefreshPreview = pyqtSignal()
+    dmTogglePreview = pyqtSignal()
 
     vmDocTreeTriggered = pyqtSignal()
     vmDocEditorTriggered = pyqtSignal()
@@ -46,6 +48,8 @@ class MainMenuBarDelegate(QObject):
 
         dm = self.view.docMenu
         dm.toggleSpell.toggled.connect(lambda x: self.dmSpellToggled.emit(x))
+        dm.refreshPreview.triggered.connect(lambda: self.dmRefreshPreview.emit())
+        dm.togglePreview.triggered.connect(lambda: self.dmTogglePreview.emit())
 
         vm = self.view.viewMenu
         vm.treeAction.triggered.connect(lambda: self.vmDocTreeTriggered.emit())

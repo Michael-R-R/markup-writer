@@ -16,6 +16,26 @@ class DocumentPreviewWorker(QObject):
         tw = self.dpd.view.tabWidget
         tw.setFocus()
         
+    @pyqtSlot()
+    def onRefreshTriggered(self):
+        tw = self.dpd.view.tabWidget
+        index = tw.currentIndex()
+        widget: w.DocumentPreviewWidget = tw.widget(index)
+        if widget is None:
+            return
+        
+        widget.refreshContent()
+    
+    @pyqtSlot()
+    def onToggleTriggered(self):
+        tw = self.dpd.view.tabWidget
+        index = tw.currentIndex()
+        widget: w.DocumentPreviewWidget = tw.widget(index)
+        if widget is None:
+            return
+        
+        widget.toggleView()
+        
     @pyqtSlot(int)
     def onCloseTabRequested(self, index: int):
         tw = self.dpd.view.tabWidget

@@ -187,6 +187,8 @@ class Core(QObject):
     def _setupPreviewWorkerSlots(self):
         mmbd = self.data.mmbd
         mmbd.vmDocPreviewTriggered.connect(self.dpw.onFocusPreviewTriggered)
+        mmbd.dmRefreshPreview.connect(self.dpw.onRefreshTriggered)
+        mmbd.dmTogglePreview.connect(self.dpw.onToggleTriggered)
 
         dtd = self.data.dtd
         dtd.fileRemoved.connect(self.dpw.onFileRemoved)

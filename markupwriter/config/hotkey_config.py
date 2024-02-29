@@ -22,10 +22,15 @@ class HotkeyConfig(BaseConfig):
     saveAsProject: QKeySequence = None
     closeProject: QKeySequence = None
     exitApplication: QKeySequence = None
+    
+    refreshPreview: QKeySequence = None
+    togglePreview: QKeySequence = None
+    
     viewTelescope: QKeySequence = None
     viewDocTree: QKeySequence = None
     viewDocEditor: QKeySequence = None
     viewDocPreview: QKeySequence = None
+    
     navUp: QKeySequence = None
     navDown: QKeySequence = None
 
@@ -43,10 +48,15 @@ class HotkeyConfig(BaseConfig):
             Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_O
         )
         HotkeyConfig.exitApplication = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Q)
+        
+        HotkeyConfig.refreshPreview = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_R)
+        HotkeyConfig.togglePreview = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_T)
+        
         HotkeyConfig.viewTelescope = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_P)
         HotkeyConfig.viewDocTree = QKeySequence(Qt.Key.Key_F1)
         HotkeyConfig.viewDocEditor = QKeySequence(Qt.Key.Key_F2)
         HotkeyConfig.viewDocPreview = QKeySequence(Qt.Key.Key_F3)
+        
         HotkeyConfig.navUp = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Up)
         HotkeyConfig.navDown = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Down)
 
