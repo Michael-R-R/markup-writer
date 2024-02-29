@@ -41,6 +41,8 @@ class BaseTreeItem(QWidget):
 
     def __init__(self, title: str = None, parent: QWidget = None):
         super().__init__(parent)
+        
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.item = QTreeWidgetItem()
         self.flags = ITEM_FLAG.none
