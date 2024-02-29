@@ -3,7 +3,7 @@ In-development plain-text with rich-text previewing support novel writing applic
 a distraction free presentation with easy to use in-text markup language, fast document switching, and a set of tools
 to support large novel organization needs.
 
-Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a> and <a href="https://github.com/vkbo/novelWriter">novelWriter</a>.
+Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a href="https://github.com/vkbo/novelWriter">novelWriter</a>, and <a href="https://github.com/NvChad/NvChad">NvChad</a>
 
 # Showcase
 <video src="https://github.com/Michael-R-R/markup-writer/assets/54217603/a6d5950c-af11-4f22-b1bc-2011abc55a86" width="320" height="200" controls preload></video>
