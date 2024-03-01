@@ -38,5 +38,5 @@ class BaseEditorState(QObject):
     def exit(self):
         raise NotImplementedError()
     
-    def process(self, e: QKeyEvent):
+    def process(self, e: QKeyEvent) -> bool:
         raise NotImplementedError()

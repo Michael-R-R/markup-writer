@@ -26,5 +26,5 @@ class VisualEditorState(s.BaseEditorState):
     def exit(self):
         pass
     
-    def process(self, e: QKeyEvent):
+    def process(self, e: QKeyEvent) -> bool:
         pass

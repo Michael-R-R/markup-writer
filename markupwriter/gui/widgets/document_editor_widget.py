@@ -148,7 +148,8 @@ class DocumentEditorWidget(QPlainTextEdit):
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         self._onChangeCursorShape(e.modifiers(), self.viewport())
 
-        self.state.process(e)
+        if not self.state.process(e):
+            super().keyPressEvent(e)
 
     def keyReleaseEvent(self, e: QKeyEvent | None) -> None:
         self._onChangeCursorShape(e.modifiers(), self.viewport())

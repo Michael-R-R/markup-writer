@@ -30,12 +30,12 @@ class NormalEditorState(s.BaseEditorState):
     def exit(self):
         pass
     
-    def process(self, e: QKeyEvent):
+    def process(self, e: QKeyEvent) -> bool:
         key = e.key()
-        if not key in self.actionDict:
-            return
+        if key in self.actionDict:
+            self.actionDict[key]()
         
-        self.actionDict[key]()
+        return True
         
     def _enterInsert(self):
         self.changedState.emit(s.STATE.insert)
