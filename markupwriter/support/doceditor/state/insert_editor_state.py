@@ -14,7 +14,6 @@ from PyQt6.QtWidgets import (
     QPlainTextEdit,
 )
 
-import markupwriter.support.doceditor as de
 import markupwriter.support.doceditor.state as s
 
 
