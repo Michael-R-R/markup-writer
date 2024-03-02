@@ -64,6 +64,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setCursorWidth(10)
         self.setTabStopDistance(20.0)
         
         self.setState(s.NormalEditorState(self, self))
@@ -117,6 +118,9 @@ class DocumentEditorWidget(QPlainTextEdit):
                 self.stateChanged.emit("-- NORMAL -- ")
             case s.STATE.insert:
                 self.setState(s.InsertEditorState(self, self))
+                self.stateChanged.emit("-- INSERT --")
+            case s.STATE.append:
+                self.setState(s.InsertEditorState(self, self, True))
                 self.stateChanged.emit("-- INSERT --")
             case s.STATE.visual:
                 self.setState(s.VisualEditorState(self, self))

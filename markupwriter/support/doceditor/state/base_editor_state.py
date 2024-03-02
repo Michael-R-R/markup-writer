@@ -20,6 +20,7 @@ from PyQt6.QtWidgets import (
 class STATE(Enum):
     normal = auto(),
     insert = auto(),
+    append = auto(),
     visual = auto(),
 
 

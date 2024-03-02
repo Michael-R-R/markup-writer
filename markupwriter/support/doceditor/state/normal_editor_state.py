@@ -28,6 +28,8 @@ class NormalEditorState(s.BaseEditorState):
             Qt.Key.Key_J: self._handleJKey,
             Qt.Key.Key_K: self._handleKKey,
             Qt.Key.Key_L: self._handleLKey,
+            Qt.Key.Key_X: self._handleXKey,
+            Qt.Key.Key_A: self._handleAKey,
         }
         
     def enter(self):
@@ -68,3 +70,11 @@ class NormalEditorState(s.BaseEditorState):
         cursor = self.editor.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.Right)
         self.editor.setTextCursor(cursor)
+        
+    def _handleXKey(self):
+        cursor = self.editor.textCursor()
+        cursor.deleteChar()
+        self.editor.setTextCursor(cursor)
+        
+    def _handleAKey(self):
+        self.changedState.emit(s.STATE.append)
