@@ -96,6 +96,11 @@ class DocumentEditorWorker(QObject):
         
         highlighter.setBehaviourEnable(BEHAVIOUR.spellCheck, isToggled)
         highlighter.rehighlight()
+        
+    @pyqtSlot(str)
+    def onStateChanged(self, text: str):
+        eb = self.ded.view.editorBar
+        eb.stateLabel.setText(text)
 
     @pyqtSlot()
     def onCloseDocument(self):

@@ -35,6 +35,7 @@ import markupwriter.support.doceditor.state as s
 
 
 class DocumentEditorWidget(QPlainTextEdit):
+    stateChanged = pyqtSignal(str)
     docStatusChanged = pyqtSignal(bool)
     showRefPopupClicked = pyqtSignal(QPoint)
     showRefPreviewClicked = pyqtSignal(QPoint)
@@ -113,10 +114,13 @@ class DocumentEditorWidget(QPlainTextEdit):
         match state:
             case s.STATE.normal:
                 self.setState(s.NormalEditorState(self, self))
+                self.stateChanged.emit("-- NORMAL -- ")
             case s.STATE.insert:
                 self.setState(s.InsertEditorState(self, self))
+                self.stateChanged.emit("-- INSERT --")
             case s.STATE.visual:
                 self.setState(s.VisualEditorState(self, self))
+                self.stateChanged.emit("-- VISUAL --")
 
     def canInsertFromMimeData(self, source: QMimeData | None) -> bool:
         hasUrls = source.hasUrls()

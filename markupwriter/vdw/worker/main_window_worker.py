@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     QObject,
+    pyqtSlot,
 )
 
 import markupwriter.vdw.delegate as d
@@ -16,3 +17,8 @@ class MainWindowWorker(QObject):
     def showStatusBarMsg(self, msg: str, msecs: int):
         sb = self.mwd.view.statusBar()
         sb.showMessage(msg, msecs)
+        
+    @pyqtSlot(str)
+    def onShowPermMsg(self, msg: str):
+        sb = self.mwd.view.statusBarWidget
+        sb.permLabel.setText(msg)

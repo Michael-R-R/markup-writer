@@ -93,6 +93,7 @@ class Core(QObject):
         self.dpw = w.DocumentPreviewWorker(self.data.dpd, self)
 
         self._setupCoreSlots()
+        self._setupMainWindowWorkerSlots()
         self._setupMenuBarWorkerSlots()
         self._setupTreeWorkerSlots()
         self._setupEditorWorkerSlots()
@@ -125,6 +126,9 @@ class Core(QObject):
         mmbd.fmExportTriggered.connect(self._onExport)
         mmbd.fmCloseTriggered.connect(self._onCloseProject)
         mmbd.fmExitTriggered.connect(self._onExit)
+        
+    def _setupMainWindowWorkerSlots(self):
+        pass
 
     def _setupMenuBarWorkerSlots(self):
         ded = self.data.ded
@@ -174,6 +178,7 @@ class Core(QObject):
         dtd.fileRenamed.connect(self.dew.onFileRenamed)
 
         ded = self.data.ded
+        ded.stateChanged.connect(self.dew.onStateChanged)
         ded.closeDocClicked.connect(self.dew.onCloseDocument)
         ded.showRefPopupClicked.connect(self.dew.onShowRefPopupClicked)
         ded.showRefPreviewClicked.connect(self.dew.onShowRefPreviewClicked)

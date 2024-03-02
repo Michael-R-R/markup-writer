@@ -14,6 +14,7 @@ import markupwriter.vdw.view as v
 class DocumentEditorDelegate(QObject):
     closeDocClicked = pyqtSignal()
 
+    stateChanged = pyqtSignal(str)
     docStatusChanged = pyqtSignal(bool)
     showSearchTriggered = pyqtSignal()
     showRefPopupClicked = pyqtSignal(QPoint)
@@ -43,6 +44,7 @@ class DocumentEditorDelegate(QObject):
         ed.closeAction.triggered.connect(lambda: self.closeDocClicked.emit())
 
         te = self.view.textEdit
+        te.stateChanged.connect(lambda x: self.stateChanged.emit(x))
         te.docStatusChanged.connect(lambda x: self.docStatusChanged.emit(x))
         te.searchHotkey.triggered.connect(lambda: self.showSearchTriggered.emit())
         te.showRefPopupClicked.connect(lambda x: self.showRefPopupClicked.emit(x))
