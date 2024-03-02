@@ -7,6 +7,7 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtGui import (
     QKeyEvent,
+    QTextCursor,
 )
 
 from PyQt6.QtWidgets import (
@@ -21,7 +22,12 @@ class NormalEditorState(s.BaseEditorState):
         super().__init__(editor, parent)
         
         self.actionDict = {
-            Qt.Key.Key_I: self._enterInsert,
+            Qt.Key.Key_I: self._handleIKey,
+            Qt.Key.Key_V: self._handleVKey,
+            Qt.Key.Key_H: self._handleHKey,
+            Qt.Key.Key_J: self._handleJKey,
+            Qt.Key.Key_K: self._handleKKey,
+            Qt.Key.Key_L: self._handleLKey,
         }
         
     def enter(self):
@@ -37,5 +43,28 @@ class NormalEditorState(s.BaseEditorState):
         
         return True
         
-    def _enterInsert(self):
+    def _handleIKey(self):
         self.changedState.emit(s.STATE.insert)
+        
+    def _handleVKey(self):
+        self.changedState.emit(s.STATE.visual)
+    
+    def _handleHKey(self):
+        cursor = self.editor.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.Left)
+        self.editor.setTextCursor(cursor)
+    
+    def _handleJKey(self):
+        cursor = self.editor.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.Down)
+        self.editor.setTextCursor(cursor)
+    
+    def _handleKKey(self):
+        cursor = self.editor.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.Up)
+        self.editor.setTextCursor(cursor)
+    
+    def _handleLKey(self):
+        cursor = self.editor.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.Right)
+        self.editor.setTextCursor(cursor)

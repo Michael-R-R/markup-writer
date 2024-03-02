@@ -22,7 +22,7 @@ class InsertEditorState(s.BaseEditorState):
         super().__init__(editor, parent)
         
         self.actionDict = {
-            Qt.Key.Key_Escape: self._enterNormal,
+            Qt.Key.Key_Escape: self.handleEscape,
             Qt.Key.Key_ParenLeft: self._handleLeftParen,
         }
         
@@ -39,7 +39,7 @@ class InsertEditorState(s.BaseEditorState):
         
         return False
     
-    def _enterNormal(self) -> bool:
+    def handleEscape(self) -> bool:
         self.changedState.emit(s.STATE.normal)
         
         return True
