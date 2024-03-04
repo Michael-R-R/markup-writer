@@ -31,6 +31,7 @@ class BaseEditorState(QObject):
         super().__init__(parent)
         
         self.editor = editor
+        self.buffer: list[Qt.Key] = list()
         self.actionDict: dict[Qt.Key, function] = dict()
         
     def enter(self):
@@ -40,4 +41,7 @@ class BaseEditorState(QObject):
         raise NotImplementedError()
     
     def process(self, e: QKeyEvent) -> bool:
-        raise NotImplementedError()
+        if len(self.buffer) > 0:
+            self.buffer.pop()
+            
+        self.buffer.append(e.key())

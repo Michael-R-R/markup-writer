@@ -42,6 +42,8 @@ class NormalEditorState(s.BaseEditorState):
         key = e.key()
         if key in self.actionDict:
             self.actionDict[key]()
+            
+        super().process(e)
         
         return True
         

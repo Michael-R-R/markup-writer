@@ -40,11 +40,15 @@ class InsertEditorState(s.BaseEditorState):
         pass
 
     def process(self, e: QKeyEvent) -> bool:
+        status = False
+        
         key = e.key()
         if key in self.actionDict:
-            return self.actionDict[key]()
+            status = self.actionDict[key]()
+        
+        super().process(e)
 
-        return False
+        return status
 
     def handleEscape(self) -> bool:
         self.changedState.emit(s.STATE.normal)
