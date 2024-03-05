@@ -20,14 +20,6 @@ import markupwriter.support.doceditor.state as s
 class VisualEditorState(s.BaseEditorState):
     def __init__(self, editor: QPlainTextEdit, parent: QObject | None) -> None:
         super().__init__(editor, parent)
-        
-        self.actionDict = {
-            Qt.Key.Key_Escape: self._handleEscape,
-            Qt.Key.Key_H: self._handleHKey,
-            Qt.Key.Key_J: self._handleJKey,
-            Qt.Key.Key_K: self._handleKKey,
-            Qt.Key.Key_L: self._handleLKey,
-        }
 
     def enter(self):
         pass
@@ -38,13 +30,7 @@ class VisualEditorState(s.BaseEditorState):
         self.editor.setTextCursor(cursor)
 
     def process(self, e: QKeyEvent) -> bool:
-        key = e.key()
-        if key in self.actionDict:
-            self.actionDict[key]()
-            
-        super().process(e)
-
-        return True
+        pass
 
     def _handleEscape(self):
         self.changedState.emit(s.STATE.normal)

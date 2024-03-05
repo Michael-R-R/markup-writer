@@ -28,11 +28,6 @@ class InsertEditorState(s.BaseEditorState):
             cursor.movePosition(QTextCursor.MoveOperation.Right)
             self.editor.setTextCursor(cursor)
 
-        self.actionDict = {
-            Qt.Key.Key_Escape: self.handleEscape,
-            Qt.Key.Key_ParenLeft: self._handleLeftParen,
-        }
-
     def enter(self):
         pass
 
@@ -40,15 +35,7 @@ class InsertEditorState(s.BaseEditorState):
         pass
 
     def process(self, e: QKeyEvent) -> bool:
-        status = False
-        
-        key = e.key()
-        if key in self.actionDict:
-            status = self.actionDict[key]()
-        
-        super().process(e)
-
-        return status
+        pass
 
     def handleEscape(self) -> bool:
         self.changedState.emit(s.STATE.normal)
