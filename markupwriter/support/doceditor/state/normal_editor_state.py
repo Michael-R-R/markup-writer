@@ -28,7 +28,7 @@ class NormalEditorState(s.BaseEditorState):
         prefixes = r"g"
         operators = r"d"
         motions = r"dd|gg|h|j|k|l|w|0|\$"
-        commands = r"i|u|v|x|" + motions
+        commands = r"a|i|u|v|x|" + motions
 
         self.countRegex = re.compile(r"[1-9]+")
         self.prefixRegex = re.compile(prefixes)
@@ -42,6 +42,7 @@ class NormalEditorState(s.BaseEditorState):
         self.moveMode = QTextCursor.MoveMode.MoveAnchor
 
         self.funcDict = {
+            "a": self._a,
             "dd": self._dd,
             "gg": self._gg,
             "h": self._h,
