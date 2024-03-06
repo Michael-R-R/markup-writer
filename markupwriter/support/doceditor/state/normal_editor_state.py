@@ -16,6 +16,8 @@ from PyQt6.QtWidgets import (
     QPlainTextEdit,
 )
 
+from markupwriter.common.provider import Key
+
 import markupwriter.support.doceditor.state as s
 
 
@@ -23,22 +25,30 @@ class NormalEditorState(s.BaseEditorState):
     def __init__(self, editor: QPlainTextEdit, parent: QObject | None) -> None:
         super().__init__(editor, parent)
 
-        self.countRegex = re.compile(r"[0-9]+")
-        self.opRegex = re.compile(r"d")
-        self.motionRegex = re.compile(r"(h|j|k|l|d)")
-        self.commandRegex = re.compile(r"(h|j|k|l|d|u)")
+        operators = r"d"
+        motions = r"h|j|k|l|d|0|\$"
+        commands = r"i|v|u|" + motions
+
+        self.countRegex = re.compile(r"[1-9]+")
+        self.opRegex = re.compile(operators)
+        self.motionRegex = re.compile(motions)
+        self.commandRegex = re.compile(commands)
 
         self.buffer = ""
         self.hasOp = False
         self.moveMode = QTextCursor.MoveMode.MoveAnchor
         
         self.funcDict = {
+            "i": self._i,
+            "v": self._v,
             "h": self._h,
             "j": self._j,
             "k": self._k,
             "l": self._l,
             "d": self._d,
             "u": self._u,
+            "0": self._0,
+            "$": self._dollar,
         }
         
         self.opDict = {
@@ -68,24 +78,30 @@ class NormalEditorState(s.BaseEditorState):
         self.moveMode = QTextCursor.MoveMode.MoveAnchor
 
     def build(self, e: QKeyEvent) -> bool:
-        ckey = self.fetchKey(e.modifiers(), e.key())
+        ckey: str = Key.get(e.modifiers(), e.key())
+        if ckey is None:
+            return False
+        
         self.buffer += ckey
 
-        if ckey.isnumeric():
+        countFound = self.countRegex.search(ckey)
+        if countFound is not None:
             return False
 
         if self.hasOp:
             return True
 
-        found = self.opRegex.search(ckey)
-        self.hasOp = found is not None
-        if self.hasOp:
+        opFound = self.opRegex.search(ckey)
+        if opFound is not None:
+            self.hasOp = True
             return False
 
-        found = self.commandRegex.search(ckey)
-        isCommand = found is not None
-
-        return isCommand
+        cmdFound = self.commandRegex.search(ckey)
+        if cmdFound is None:
+            self.reset()
+            return False
+        
+        return True
 
     def evaluate(self):
         count = 1
@@ -121,17 +137,26 @@ class NormalEditorState(s.BaseEditorState):
         if op is not None:
             self.opDict[op]()
 
-    def _i(self):
-        self.changedState.emit(s.STATE.insert)
-
-    def _v(self):
-        self.changedState.emit(s.STATE.visual)
-
+    def _a(self):
+        self.changedState.emit(s.STATE.append)
+        
+    def _d(self):
+        cursor = self.editor.textCursor()
+        cursor.select(QTextCursor.SelectionType.LineUnderCursor)
+        cursor.beginEditBlock()
+        cursor.removeSelectedText()
+        cursor.deleteChar()
+        cursor.endEditBlock()
+        self.editor.setTextCursor(cursor)
+        
     def _h(self):
         cursor = self.editor.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.Left, self.moveMode)
         self.editor.setTextCursor(cursor)
-
+        
+    def _i(self):
+        self.changedState.emit(s.STATE.insert)
+        
     def _j(self):
         cursor = self.editor.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.Down, self.moveMode)
@@ -147,29 +172,20 @@ class NormalEditorState(s.BaseEditorState):
         cursor.movePosition(QTextCursor.MoveOperation.Right, self.moveMode)
         self.editor.setTextCursor(cursor)
 
-    def _d(self):
-        cursor = self.editor.textCursor()
-        cursor.select(QTextCursor.SelectionType.LineUnderCursor)
-        cursor.beginEditBlock()
-        cursor.removeSelectedText()
-        cursor.deleteChar()
-        cursor.endEditBlock()
-        self.editor.setTextCursor(cursor)
-
-    def _x(self):
-        cursor = self.editor.textCursor()
-        cursor.deleteChar()
-        self.editor.setTextCursor(cursor)
-
-    def _a(self):
-        self.changedState.emit(s.STATE.append)
-
     def _u(self):
         self.editor.undo()
+        
+    def _v(self):
+        self.changedState.emit(s.STATE.visual)
 
     def _w(self):
         cursor = self.editor.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.NextWord, self.moveMode)
+        self.editor.setTextCursor(cursor)
+        
+    def _x(self):
+        cursor = self.editor.textCursor()
+        cursor.deleteChar()
         self.editor.setTextCursor(cursor)
 
     def _0(self):
