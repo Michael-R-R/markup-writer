@@ -28,27 +28,21 @@ class STATE(Enum):
 
 class BaseEditorState(QObject):
     changedState = pyqtSignal(STATE)
-    
+
     def __init__(self, editor: QPlainTextEdit, parent: QObject | None) -> None:
         super().__init__(parent)
-        
+
         self.editor = editor
-        
-        self.buffer: str = ""
-        
-        self.operators: dict[str, function] = dict()
-        self.commands: dict[str, function] = dict()
-        
-        self.countRegex = re.compile(r"[0-9]+")
-        self.commandRegex = re.compile(r"h|j|k|l|dd")
-        self.operatorRegex = re.compile(r"d|")
-        
+
+        self.funcDict: dict[str, function] = dict()
+
         self.nConvertDict: dict[Qt.Key, str] = {
             Qt.Key.Key_H: "h",
             Qt.Key.Key_J: "j",
             Qt.Key.Key_K: "k",
             Qt.Key.Key_L: "l",
             Qt.Key.Key_D: "d",
+            Qt.Key.Key_U: "u",
             Qt.Key.Key_0: "0",
             Qt.Key.Key_1: "1",
             Qt.Key.Key_2: "2",
@@ -60,62 +54,36 @@ class BaseEditorState(QObject):
             Qt.Key.Key_8: "8",
             Qt.Key.Key_9: "9",
         }
-        
+
         self.sConvertDict: dict[Qt.Key, str] = {
             Qt.Key.Key_F: "F",
         }
-        
+
         self.cConvertDict: dict[Qt.Key, str] = {
             Qt.Key.Key_U: "C-U",
         }
-        
+
     def enter(self):
         raise NotImplementedError()
-    
+
     def exit(self):
         raise NotImplementedError()
-    
+
     def process(self, e: QKeyEvent) -> bool:
-        pass
-    
-    def reset(self):
-        self.buffer: str = ""
-        
-    def hasCommand(self):
-        found = self.commandRegex.search(self.buffer)
-        return found is not None
-    
-    def evalCount(self) -> int:
-        count = 1
-        
-        it = self.countRegex.finditer(self.buffer)
-        for found in it:
-            num = int(found.group(0))
-            count *= num
-            self.buffer = self.buffer[found.end():]
-        
-        return count
-    
-    def evalCommand(self) -> str:
-        command = ""
-        
-        found = self.commandRegex.search(self.buffer)
-        if found is None:
-            return command
-        
-        command = found.group(0)
-        self.buffer = self.buffer[found.end():]
-        
-        return command
-    
-    def evalOperator(self):
-        operator = ""
-        
-        found = self.operatorRegex.search(self.buffer)
-        if found is None:
-            return operator
-        
-        operator = found.group(0)
-        self.buffer = self.buffer[found.end():]
-        
-        return operator
+        raise NotImplementedError()
+
+    def fetchKey(self, mod: Qt.KeyboardModifier, key: Qt.Key) -> str:
+        ckey = ""
+
+        match mod:
+            case Qt.KeyboardModifier.NoModifier:
+                if key in self.nConvertDict:
+                    ckey = self.nConvertDict[key]
+            case Qt.KeyboardModifier.ShiftModifier:
+                if key in self.sConvertDict:
+                    ckey = self.sConvertDict[key]
+            case Qt.KeyboardModifier.ControlModifier:
+                if key in self.cConvertDict:
+                    ckey = self.cConvertDict[key]
+
+        return ckey
