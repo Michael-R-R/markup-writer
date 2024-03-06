@@ -9,6 +9,7 @@ class Key(object):
     _normDict: dict[Qt.Key, str] = {
         Qt.Key.Key_A: "a",
         Qt.Key.Key_D: "d",
+        Qt.Key.Key_G: "g",
         Qt.Key.Key_H: "h",
         Qt.Key.Key_I: "i",
         Qt.Key.Key_J: "j",
@@ -28,10 +29,13 @@ class Key(object):
         Qt.Key.Key_7: "7",
         Qt.Key.Key_8: "8",
         Qt.Key.Key_9: "9",
+        Qt.Key.Key_Escape: "esc",
     }
 
     _shiftDict: dict[Qt.Key, str] = {
         Qt.Key.Key_F: "F",
+        Qt.Key.Key_U: "U",
+        Qt.Key.Key_ParenLeft: "(",
         Qt.Key.Key_Dollar: "$",
     }
 
