@@ -64,7 +64,6 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.setCursorWidth(10)
         self.setTabStopDistance(20.0)
         
         self.setState(s.NormalEditorState(self, self))

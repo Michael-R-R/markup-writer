@@ -27,8 +27,8 @@ class NormalEditorState(s.BaseEditorState):
 
         prefixes = r"g"
         operators = r"d"
-        motions = r"dd|gg|h|j|k|l|0|\$"
-        commands = r"i|u|v|" + motions
+        motions = r"dd|gg|h|j|k|l|w|0|\$"
+        commands = r"i|u|v|x|" + motions
 
         self.countRegex = re.compile(r"[1-9]+")
         self.prefixRegex = re.compile(prefixes)
