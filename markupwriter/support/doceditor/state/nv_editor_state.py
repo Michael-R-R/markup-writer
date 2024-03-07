@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 
 from PyQt6.QtCore import (
+    Qt,
     QObject,
 )
 
@@ -51,7 +52,7 @@ class InitBufferState(BaseBufferState):
         # Operator
         elif self.state.opRegex.search(ckey) is not None:
             self.state.setBufferState(OperatorBufferState(self.state))
-        # Command
+        # Execute
         elif self.state.commandRegex.search(ckey) is not None:
             self.state.setBufferState(ExecuteBufferState(self.state))
 
@@ -66,7 +67,7 @@ class CountBufferState(BaseBufferState):
     def process(self, ckey: str):
         # Count
         if ckey.isnumeric():
-            self.state.buffer += ckey
+            self.state.setBufferState(CountBufferState(self.state))
         # Prefix
         elif self.state.prefixRegex.search(ckey) is not None:
             self.state.setBufferState(PrefixBufferState(self.state))
@@ -90,7 +91,7 @@ class PrefixBufferState(BaseBufferState):
 
     def process(self, ckey: str):
         sequence = self.state.prevCKey + ckey
-        
+
         # Operator
         if self.state.opRegex.search(sequence) is not None:
             self.state.setBufferState(OperatorBufferState(self.state))
@@ -116,37 +117,78 @@ class OperatorBufferState(BaseBufferState):
         # Validation passed
         else:
             self.state.buffer += ckey
-    
+
     def process(self, ckey: str):
         # Count
         if self.state.countRegex.search(ckey) is not None:
             self.state.setBufferState(CountBufferState(self.state))
+        # Prefix
+        elif self.state.prefixRegex.search(ckey) is not None:
+            self.state.setBufferState(PrefixBufferState(self.state))
         # Operator
         elif self.state.opRegex.search(ckey) is not None:
             self.state.setBufferState(OperatorBufferState(self.state))
-        # Command
-        elif self.state.commandRegex.search(ckey) is not None:
+        # Execute
+        elif self.state.motionRegex.search(ckey) is not None:
             self.state.setBufferState(ExecuteBufferState(self.state))
         # Invalid
         else:
             self.state.setBufferState(InitBufferState(self.state))
-    
-    
+
+
 class ExecuteBufferState(BaseBufferState):
     def __init__(self, state: NvEditorState) -> None:
         super().__init__(state)
-        
+
     def enter(self, ckey: str):
-        self.state.buffer += ckey
+        state = self.state
+        state.buffer += ckey
+
+        # --- Validate sequence --- #
+
+        # Parse count
+        count = 1
+        it = state.countRegex.finditer(state.buffer)
+        for found in it:
+            num = int(found.group(0))
+            count *= num
+            state.buffer = state.buffer.replace(found.group(0), "", 1)
+            
+        # Parse operator
+        operator = None
+        found = state.opRegex.search(state.buffer)
+        if found is not None:
+            operator = found.group(0)
+            state.buffer = state.buffer.replace(operator, "", 1)
+            
+        # Parse command
+        cmd = None
+        found = state.commandRegex.search(state.buffer)
+        if found is not None:
+            cmd = found.group(0)
+            state.buffer = state.buffer.replace(cmd, "", 1)
+            
+        hasOp = operator is not None
+        hasCmd = cmd is not None
         
-        # Validate sequence
-        print("Complete:", self.state.buffer)
-        
+        # Run cmd with operator
+        if hasOp and hasCmd:
+            state.moveMode = QTextCursor.MoveMode.KeepAnchor
+            
+            for _ in range(count):
+                state.funcDict[cmd]()
+                
+            state.opDict[operator]()
+        # Run cmd
+        elif hasCmd:
+            for _ in range(count):
+                state.funcDict[cmd]()
+
         self.state.setBufferState(InitBufferState(self.state))
-    
+
     def process(self, ckey: str):
         raise NotImplementedError()
-    
+
 
 class NvEditorState(s.BaseEditorState):
     def __init__(
@@ -183,8 +225,19 @@ class NvEditorState(s.BaseEditorState):
         self.currCKey = ""
 
     def process(self, e: QKeyEvent) -> bool:
+        # Ignore modifier keys
+        isShift = Qt.Key.Key_Shift == e.key()
+        isCtrl = Qt.Key.Key_Control == e.key()
+        isAlt = Qt.Key.Key_Alt == e.key()
+        if isShift or isCtrl or isAlt:
+            return True
+        
+        key = Key.get(e.modifiers(), e.key())
+        if key is None:
+            return True
+        
         self.prevCKey = self.currCKey
-        self.currCKey = Key.get(e.modifiers(), e.key())
+        self.currCKey = key
         self.bufferState.process(self.currCKey)
         print("IP:", self.buffer)
 

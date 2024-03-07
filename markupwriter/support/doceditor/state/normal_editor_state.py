@@ -25,18 +25,19 @@ class NormalEditorState(s.NvEditorState):
 
         prefixes = r"g"
         operators = r"d"
-        motions = r"b|dd|e|ge|gg|h|j|k|l|w|0|\$"
-        commands = r"\b(a|i|u|v|x|C-D|C-U|" + motions + r")\b"
+        specialMotion = r"\$"
+        motions = r"b|d|e|ge|gg|h|j|k|l|w|0"
+        commands = r"a|i|u|v|x|C-D|C-U|" + motions
 
         self.prefixRegex = re.compile(prefixes)
         self.opRegex = re.compile(operators)
-        self.motionRegex = re.compile(motions)
-        self.commandRegex = re.compile(commands)
+        self.motionRegex = re.compile("\\b({})\\b|\\B({})\\B".format(motions, specialMotion))
+        self.commandRegex = re.compile("\\b({})\\b|\\B({})\\B".format(commands, specialMotion))
 
         self.funcDict = {
             "a": self._a,
             "b": self._b,
-            "dd": self._dd,
+            "d": self._d,
             "e": self._e,
             "ge": self._ge,
             "gg": self._gg,
@@ -75,7 +76,7 @@ class NormalEditorState(s.NvEditorState):
     def _a(self):
         self.changedState.emit(s.STATE.append)
 
-    def _dd(self):
+    def _d(self):
         cursor = self.editor.textCursor()
         cursor.select(QTextCursor.SelectionType.LineUnderCursor)
         cursor.beginEditBlock()
@@ -86,7 +87,6 @@ class NormalEditorState(s.NvEditorState):
 
     def _gg(self):
         cursor = self.editor.textCursor()
-        cursor.movePosition(QTextCursor.MoveOperation.End)
         cursor.movePosition(QTextCursor.MoveOperation.Start, self.moveMode)
         self.editor.setTextCursor(cursor)
         

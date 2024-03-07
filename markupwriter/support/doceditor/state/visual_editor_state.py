@@ -24,13 +24,13 @@ class VisualEditorState(s.NvEditorState):
         super().__init__(QTextCursor.MoveMode.KeepAnchor, editor, parent)
 
         prefixes = r"g"
-        motions = r"b|e|ge|gg|h|j|k|l|w|0|\$"
-        commands = r"\b(d|esc|C-D|C-U|" + motions + r")\b"
+        specialMotion = r"\$"
+        motions = r"b|e|ge|gg|h|j|k|l|w|0"
+        commands = r"d|esc|C-D|C-U|" + motions
 
-        self.countRegex = re.compile(r"[1-9]+")
         self.prefixRegex = re.compile(prefixes)
-        self.motionRegex = re.compile(motions)
-        self.commandRegex = re.compile(commands)
+        self.motionRegex = re.compile("\\b({})\\b|\\B({})\\B".format(motions, specialMotion))
+        self.commandRegex = re.compile("\\b({})\\b|\\B({})\\B".format(commands, specialMotion))
 
         self.funcDict = {
             "b": self._b,
