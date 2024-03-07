@@ -25,7 +25,7 @@ class VisualEditorState(s.NvEditorState):
 
         prefixes = r"g"
         motions = r"b|e|ge|gg|h|j|k|l|w|0|\$"
-        commands = r"d|esc|C-D|C-U|" + motions
+        commands = r"\b(d|esc|C-D|C-U|" + motions + r")\b"
 
         self.countRegex = re.compile(r"[1-9]+")
         self.prefixRegex = re.compile(prefixes)

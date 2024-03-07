@@ -26,7 +26,7 @@ class NormalEditorState(s.NvEditorState):
         prefixes = r"g"
         operators = r"d"
         motions = r"b|dd|e|ge|gg|h|j|k|l|w|0|\$"
-        commands = r"a|i|u|v|x|C-D|C-U|" + motions
+        commands = r"\b(a|i|u|v|x|C-D|C-U|" + motions + r")\b"
 
         self.prefixRegex = re.compile(prefixes)
         self.opRegex = re.compile(operators)

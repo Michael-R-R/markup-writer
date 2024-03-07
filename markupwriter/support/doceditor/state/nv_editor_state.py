@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 
 from PyQt6.QtCore import (
-    Qt,
     QObject,
 )
 
@@ -39,7 +38,7 @@ class InitBufferState(BaseBufferState):
     def __init__(self, state: NvEditorState) -> None:
         super().__init__(state)
 
-    def enter(self):
+    def enter(self, ckey: str):
         self.state.reset()
 
     def process(self, ckey: str):
@@ -54,7 +53,7 @@ class InitBufferState(BaseBufferState):
             self.state.setBufferState(OperatorBufferState(self.state))
         # Command
         elif self.state.commandRegex.search(ckey) is not None:
-            self.state.setBufferState(CommandBufferState(self.state))
+            self.state.setBufferState(ExecuteBufferState(self.state))
 
 
 class CountBufferState(BaseBufferState):
@@ -74,6 +73,12 @@ class CountBufferState(BaseBufferState):
         # Operator
         elif self.state.opRegex.search(ckey) is not None:
             self.state.setBufferState(OperatorBufferState(self.state))
+        # Execute
+        elif self.state.commandRegex.search(ckey) is not None:
+            self.state.setBufferState(ExecuteBufferState(self.state))
+        # Invalid
+        else:
+            self.state.setBufferState(InitBufferState(self.state))
 
 
 class PrefixBufferState(BaseBufferState):
@@ -81,7 +86,7 @@ class PrefixBufferState(BaseBufferState):
         super().__init__(state)
 
     def enter(self, ckey: str):
-        pass
+        self.state.buffer += ckey
 
     def process(self, ckey: str):
         sequence = self.state.prevCKey + ckey
@@ -89,6 +94,9 @@ class PrefixBufferState(BaseBufferState):
         # Operator
         if self.state.opRegex.search(sequence) is not None:
             self.state.setBufferState(OperatorBufferState(self.state))
+        # Command
+        elif self.state.commandRegex.search(sequence) is not None:
+            self.state.setBufferState(ExecuteBufferState(self.state))
         # Invalid
         else:
             self.state.setBufferState(InitBufferState(self.state))
@@ -99,21 +107,45 @@ class OperatorBufferState(BaseBufferState):
         super().__init__(state)
 
     def enter(self, ckey: str):
-        pass
+        # Validate if has existing operator
+        if self.state.opRegex.search(self.state.buffer) is not None:
+            if ckey == "d":
+                self.state.setBufferState(ExecuteBufferState(self.state))
+            else:
+                self.state.setBufferState(InitBufferState(self.state))
+        # Validation passed
+        else:
+            self.state.buffer += ckey
     
     def process(self, ckey: str):
-        pass
+        # Count
+        if self.state.countRegex.search(ckey) is not None:
+            self.state.setBufferState(CountBufferState(self.state))
+        # Operator
+        elif self.state.opRegex.search(ckey) is not None:
+            self.state.setBufferState(OperatorBufferState(self.state))
+        # Command
+        elif self.state.commandRegex.search(ckey) is not None:
+            self.state.setBufferState(ExecuteBufferState(self.state))
+        # Invalid
+        else:
+            self.state.setBufferState(InitBufferState(self.state))
     
     
-class CommandBufferState(BaseBufferState):
+class ExecuteBufferState(BaseBufferState):
     def __init__(self, state: NvEditorState) -> None:
         super().__init__(state)
         
     def enter(self, ckey: str):
-        pass
+        self.state.buffer += ckey
+        
+        # Validate sequence
+        print("Complete:", self.state.buffer)
+        
+        self.state.setBufferState(InitBufferState(self.state))
     
     def process(self, ckey: str):
-        pass
+        raise NotImplementedError()
     
 
 class NvEditorState(s.BaseEditorState):
@@ -154,7 +186,7 @@ class NvEditorState(s.BaseEditorState):
         self.prevCKey = self.currCKey
         self.currCKey = Key.get(e.modifiers(), e.key())
         self.bufferState.process(self.currCKey)
-        print(self.buffer)
+        print("IP:", self.buffer)
 
         return True
 
