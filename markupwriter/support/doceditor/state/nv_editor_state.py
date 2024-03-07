@@ -281,6 +281,11 @@ class NvEditorState(s.BaseEditorState):
 
         self.editor.setTextCursor(cursor)
 
+    def _gg(self):
+        cursor = self.editor.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.Start, self.moveMode)
+        self.editor.setTextCursor(cursor)
+
     def _h(self):
         cursor = self.editor.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.Left, self.moveMode)

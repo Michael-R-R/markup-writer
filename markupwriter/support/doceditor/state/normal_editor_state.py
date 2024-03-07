@@ -84,11 +84,6 @@ class NormalEditorState(s.NvEditorState):
         cursor.deleteChar()
         cursor.endEditBlock()
         self.editor.setTextCursor(cursor)
-
-    def _gg(self):
-        cursor = self.editor.textCursor()
-        cursor.movePosition(QTextCursor.MoveOperation.Start, self.moveMode)
-        self.editor.setTextCursor(cursor)
         
     def _i(self):
         self.changedState.emit(s.STATE.insert)

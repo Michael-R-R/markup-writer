@@ -78,10 +78,5 @@ class VisualEditorState(s.NvEditorState):
         self.editor.setTextCursor(cursor)
         self.changedState.emit(s.STATE.normal)
 
-    def _gg(self):
-        cursor = self.editor.textCursor()
-        cursor.movePosition(QTextCursor.MoveOperation.Start, self.moveMode)
-        self.editor.setTextCursor(cursor)
-
     def _esc(self):
         self.changedState.emit(s.STATE.normal)
