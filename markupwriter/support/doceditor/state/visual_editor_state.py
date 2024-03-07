@@ -24,7 +24,7 @@ class VisualEditorState(s.NvEditorState):
         super().__init__(QTextCursor.MoveMode.KeepAnchor, editor, parent)
 
         prefixes = r"g"
-        motions = r"gg|h|j|k|l|w|0|\$"
+        motions = r"b|e|ge|gg|h|j|k|l|w|0|\$"
         commands = r"d|esc|C-D|C-U|" + motions
 
         self.countRegex = re.compile(r"[1-9]+")
@@ -33,7 +33,10 @@ class VisualEditorState(s.NvEditorState):
         self.commandRegex = re.compile(commands)
 
         self.funcDict = {
+            "b": self._b,
             "d": self._d,
+            "e": self._e,
+            "ge": self._ge,
             "gg": self._gg,
             "h": self._h,
             "j": self._j,

@@ -10,6 +10,7 @@ from PyQt6.QtCore import (
 from PyQt6.QtGui import (
     QKeyEvent,
     QTextCursor,
+    QTextDocument,
 )
 
 from PyQt6.QtWidgets import (
@@ -165,6 +166,40 @@ class NvEditorState(s.BaseEditorState):
         if op is not None:
             self.opDict[op]()
 
+    def _b(self):
+        doc = self.editor.document()
+        cursor = self.editor.textCursor()
+        flag = QTextDocument.FindFlag.FindBackward
+        cursor.movePosition(QTextCursor.MoveOperation.Left, self.moveMode)
+        
+        newCursor = doc.find(" ", cursor.position(), flag)
+        newCursor.movePosition(QTextCursor.MoveOperation.Right)
+        cursor.setPosition(newCursor.position(), self.moveMode)
+        
+        self.editor.setTextCursor(cursor)
+
+    def _e(self):
+        doc = self.editor.document()
+        cursor = self.editor.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.Right, self.moveMode)
+        
+        newCursor = doc.find(" ", cursor.position())
+        newCursor.movePosition(QTextCursor.MoveOperation.Left)
+        cursor.setPosition(newCursor.position(), self.moveMode)
+        
+        self.editor.setTextCursor(cursor)
+
+    def _ge(self):
+        doc = self.editor.document()
+        cursor = self.editor.textCursor()
+        flag = QTextDocument.FindFlag.FindBackward
+        
+        newCursor = doc.find(" ", cursor.position(), flag)
+        newCursor.movePosition(QTextCursor.MoveOperation.Left)
+        cursor.setPosition(newCursor.position(), self.moveMode)
+            
+        self.editor.setTextCursor(cursor)
+
     def _h(self):
         cursor = self.editor.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.Left, self.moveMode)
@@ -186,8 +221,13 @@ class NvEditorState(s.BaseEditorState):
         self.editor.setTextCursor(cursor)
         
     def _w(self):
+        doc = self.editor.document()
         cursor = self.editor.textCursor()
-        cursor.movePosition(QTextCursor.MoveOperation.NextWord, self.moveMode)
+        
+        newCursor = doc.find(" ", cursor.position())
+        newCursor.movePosition(QTextCursor.MoveOperation.Right)
+        cursor.setPosition(newCursor.position(), self.moveMode)
+        
         self.editor.setTextCursor(cursor)
         
     def _x(self):

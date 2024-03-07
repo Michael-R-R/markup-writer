@@ -8,7 +8,9 @@ from PyQt6.QtCore import (
 class Key(object):
     _normDict: dict[Qt.Key, str] = {
         Qt.Key.Key_A: "a",
+        Qt.Key.Key_B: "b",
         Qt.Key.Key_D: "d",
+        Qt.Key.Key_E: "e",
         Qt.Key.Key_G: "g",
         Qt.Key.Key_H: "h",
         Qt.Key.Key_I: "i",

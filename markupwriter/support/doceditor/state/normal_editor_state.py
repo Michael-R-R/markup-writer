@@ -25,7 +25,7 @@ class NormalEditorState(s.NvEditorState):
 
         prefixes = r"g"
         operators = r"d"
-        motions = r"dd|gg|h|j|k|l|w|0|\$"
+        motions = r"b|dd|e|ge|gg|h|j|k|l|w|0|\$"
         commands = r"a|i|u|v|x|C-D|C-U|" + motions
 
         self.prefixRegex = re.compile(prefixes)
@@ -35,7 +35,10 @@ class NormalEditorState(s.NvEditorState):
 
         self.funcDict = {
             "a": self._a,
+            "b": self._b,
             "dd": self._dd,
+            "e": self._e,
+            "ge": self._ge,
             "gg": self._gg,
             "h": self._h,
             "i": self._i,
