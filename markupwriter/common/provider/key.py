@@ -40,6 +40,7 @@ class Key(object):
     }
 
     _ctrlDict: dict[Qt.Key, str] = {
+        Qt.Key.Key_D: "C-D",
         Qt.Key.Key_U: "C-U",
     }
     
