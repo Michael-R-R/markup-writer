@@ -3,7 +3,6 @@
 import re
 
 from PyQt6.QtCore import (
-    Qt,
     QObject,
 )
 
@@ -23,16 +22,20 @@ class NormalEditorState(s.NvEditorState):
     def __init__(self, editor: QPlainTextEdit, parent: QObject | None) -> None:
         super().__init__(QTextCursor.MoveMode.MoveAnchor, editor, parent)
 
-        prefixes = r"g"
+        leaders = r"g"
         operators = r"d"
         specialMotion = r"\$"
         motions = r"b|d|e|ge|gg|h|j|k|l|w|0"
         commands = r"a|i|u|v|x|C-D|C-U|" + motions
 
-        self.prefixRegex = re.compile(prefixes)
-        self.opRegex = re.compile(operators)
-        self.motionRegex = re.compile("\\b({})\\b|\\B({})\\B".format(motions, specialMotion))
-        self.commandRegex = re.compile("\\b({})\\b|\\B({})\\B".format(commands, specialMotion))
+        self.leaderRegex = re.compile(leaders)
+        self.operRegex = re.compile(operators)
+        self.motionRegex = re.compile(
+            "\\b({})\\b|\\B({})\\B".format(motions, specialMotion)
+        )
+        self.commandRegex = re.compile(
+            "\\b({})\\b|\\B({})\\B".format(commands, specialMotion)
+        )
 
         self.funcDict = {
             "a": self._a,
@@ -56,7 +59,7 @@ class NormalEditorState(s.NvEditorState):
             "C-U": self._C_U,
         }
 
-        self.opDict = {
+        self.operDict = {
             "d": self._d_op,
         }
 
@@ -69,7 +72,7 @@ class NormalEditorState(s.NvEditorState):
     def reset(self):
         super().reset()
         self.moveMode = QTextCursor.MoveMode.MoveAnchor
-        
+
     def process(self, e: QKeyEvent) -> bool:
         return super().process(e)
 
@@ -84,7 +87,7 @@ class NormalEditorState(s.NvEditorState):
         cursor.deleteChar()
         cursor.endEditBlock()
         self.editor.setTextCursor(cursor)
-        
+
     def _i(self):
         self.changedState.emit(s.STATE.insert)
 

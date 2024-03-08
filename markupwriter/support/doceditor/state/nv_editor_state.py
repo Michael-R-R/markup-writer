@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 
 from PyQt6.QtCore import (
-    Qt,
     QObject,
 )
 
@@ -28,10 +27,10 @@ class BaseBufferState(object):
     def __init__(self, state: NvEditorState) -> None:
         self.state = state
 
-    def enter(self, ckey: str):
+    def enter(self, key: str):
         raise NotImplementedError()
 
-    def process(self, ckey: str):
+    def process(self, key: str):
         raise NotImplementedError()
 
 
@@ -39,21 +38,21 @@ class InitBufferState(BaseBufferState):
     def __init__(self, state: NvEditorState) -> None:
         super().__init__(state)
 
-    def enter(self, ckey: str):
+    def enter(self, key: str):
         self.state.reset()
 
-    def process(self, ckey: str):
+    def process(self, key: str):
         # Count
-        if self.state.countRegex.search(ckey) is not None:
+        if self.state.countRegex.search(key) is not None:
             self.state.setBufferState(CountBufferState(self.state))
-        # Prefix
-        elif self.state.prefixRegex.search(ckey) is not None:
-            self.state.setBufferState(PrefixBufferState(self.state))
+        # Leader
+        elif self.state.leaderRegex.search(key) is not None:
+            self.state.setBufferState(LeaderBufferState(self.state))
         # Operator
-        elif self.state.opRegex.search(ckey) is not None:
+        elif self.state.operRegex.search(key) is not None:
             self.state.setBufferState(OperatorBufferState(self.state))
         # Execute
-        elif self.state.commandRegex.search(ckey) is not None:
+        elif self.state.commandRegex.search(key) is not None:
             self.state.setBufferState(ExecuteBufferState(self.state))
 
 
@@ -61,41 +60,41 @@ class CountBufferState(BaseBufferState):
     def __init__(self, state: NvEditorState) -> None:
         super().__init__(state)
 
-    def enter(self, ckey: str):
-        self.state.buffer += ckey
+    def enter(self, key: str):
+        self.state.buffer += key
 
-    def process(self, ckey: str):
+    def process(self, key: str):
         # Count
-        if ckey.isnumeric():
-            self.state.setBufferState(CountBufferState(self.state))
-        # Prefix
-        elif self.state.prefixRegex.search(ckey) is not None:
-            self.state.setBufferState(PrefixBufferState(self.state))
+        if key.isnumeric():
+            self.state.buffer += key
+        # Leader
+        elif self.state.leaderRegex.search(key) is not None:
+            self.state.setBufferState(LeaderBufferState(self.state))
         # Operator
-        elif self.state.opRegex.search(ckey) is not None:
+        elif self.state.operRegex.search(key) is not None:
             self.state.setBufferState(OperatorBufferState(self.state))
         # Execute
-        elif self.state.commandRegex.search(ckey) is not None:
+        elif self.state.commandRegex.search(key) is not None:
             self.state.setBufferState(ExecuteBufferState(self.state))
         # Invalid
         else:
             self.state.setBufferState(InitBufferState(self.state))
 
 
-class PrefixBufferState(BaseBufferState):
+class LeaderBufferState(BaseBufferState):
     def __init__(self, state: NvEditorState) -> None:
         super().__init__(state)
 
-    def enter(self, ckey: str):
-        self.state.buffer += ckey
+    def enter(self, key: str):
+        self.state.buffer += key
 
-    def process(self, ckey: str):
-        sequence = self.state.prevCKey + ckey
+    def process(self, key: str):
+        sequence = self.state.prevKey + key
 
         # Operator
-        if self.state.opRegex.search(sequence) is not None:
+        if self.state.operRegex.search(sequence) is not None:
             self.state.setBufferState(OperatorBufferState(self.state))
-        # Command
+        # Execute
         elif self.state.commandRegex.search(sequence) is not None:
             self.state.setBufferState(ExecuteBufferState(self.state))
         # Invalid
@@ -107,29 +106,29 @@ class OperatorBufferState(BaseBufferState):
     def __init__(self, state: NvEditorState) -> None:
         super().__init__(state)
 
-    def enter(self, ckey: str):
+    def enter(self, key: str):
         # Validate if has existing operator
-        if self.state.opRegex.search(self.state.buffer) is not None:
-            if ckey == "d":
+        if self.state.operRegex.search(self.state.buffer) is not None:
+            if key == "d":
                 self.state.setBufferState(ExecuteBufferState(self.state))
             else:
                 self.state.setBufferState(InitBufferState(self.state))
         # Validation passed
         else:
-            self.state.buffer += ckey
+            self.state.buffer += key
 
-    def process(self, ckey: str):
+    def process(self, key: str):
         # Count
-        if self.state.countRegex.search(ckey) is not None:
+        if self.state.countRegex.search(key) is not None:
             self.state.setBufferState(CountBufferState(self.state))
-        # Prefix
-        elif self.state.prefixRegex.search(ckey) is not None:
-            self.state.setBufferState(PrefixBufferState(self.state))
+        # Leader
+        elif self.state.leaderRegex.search(key) is not None:
+            self.state.setBufferState(LeaderBufferState(self.state))
         # Operator
-        elif self.state.opRegex.search(ckey) is not None:
+        elif self.state.operRegex.search(key) is not None:
             self.state.setBufferState(OperatorBufferState(self.state))
         # Execute
-        elif self.state.motionRegex.search(ckey) is not None:
+        elif self.state.motionRegex.search(key) is not None:
             self.state.setBufferState(ExecuteBufferState(self.state))
         # Invalid
         else:
@@ -140,33 +139,33 @@ class ExecuteBufferState(BaseBufferState):
     def __init__(self, state: NvEditorState) -> None:
         super().__init__(state)
 
-    def enter(self, ckey: str):
+    def enter(self, key: str):
         state = self.state
-        state.buffer += ckey
+        buffer = state.buffer + key
 
-        # --- Validate sequence --- #
+        # --- Validate buffer --- #
 
         # Parse count
         count = 1
-        it = state.countRegex.finditer(state.buffer)
+        it = state.countRegex.finditer(buffer)
         for found in it:
             num = int(found.group(0))
             count *= num
-            state.buffer = state.buffer.replace(found.group(0), "", 1)
+            buffer = buffer.replace(found.group(0), "", 1)
             
         # Parse operator
         operator = None
-        found = state.opRegex.search(state.buffer)
+        found = state.operRegex.search(buffer)
         if found is not None:
             operator = found.group(0)
-            state.buffer = state.buffer.replace(operator, "", 1)
+            buffer = buffer.replace(operator, "", 1)
             
         # Parse command
         cmd = None
-        found = state.commandRegex.search(state.buffer)
+        found = state.commandRegex.search(buffer)
         if found is not None:
             cmd = found.group(0)
-            state.buffer = state.buffer.replace(cmd, "", 1)
+            buffer = buffer.replace(cmd, "", 1)
             
         hasOp = operator is not None
         hasCmd = cmd is not None
@@ -178,15 +177,15 @@ class ExecuteBufferState(BaseBufferState):
             for _ in range(count):
                 state.funcDict[cmd]()
                 
-            state.opDict[operator]()
+            state.operDict[operator]()
         # Run cmd
         elif hasCmd:
             for _ in range(count):
                 state.funcDict[cmd]()
 
-        self.state.setBufferState(InitBufferState(self.state))
+        state.setBufferState(InitBufferState(state))
 
-    def process(self, ckey: str):
+    def process(self, key: str):
         raise NotImplementedError()
 
 
@@ -200,18 +199,18 @@ class NvEditorState(s.BaseEditorState):
         super().__init__(editor, parent)
 
         self.buffer = ""
-        self.prevCKey = ""
-        self.currCKey = ""
+        self.prevKey = ""
+        self.currKey = ""
         self.moveMode = moveMode
         self.bufferState: BaseBufferState = InitBufferState(self)
 
         self.countRegex = re.compile(r"[1-9][0-9]*")
-        self.prefixRegex = re.compile(r"\bnone\b")
-        self.opRegex = re.compile(r"\bnone\b")
+        self.leaderRegex = re.compile(r"\bnone\b")
+        self.operRegex = re.compile(r"\bnone\b")
         self.motionRegex = re.compile(r"\bnone\b")
         self.commandRegex = re.compile(r"\bnone\b")
 
-        self.opDict: dict[str, function] = dict()
+        self.operDict: dict[str, function] = dict()
 
     def enter(self):
         raise NotImplementedError()
@@ -221,31 +220,23 @@ class NvEditorState(s.BaseEditorState):
 
     def reset(self):
         self.buffer = ""
-        self.prevCKey = ""
-        self.currCKey = ""
+        self.prevKey = ""
+        self.currKey = ""
 
     def process(self, e: QKeyEvent) -> bool:
-        # Ignore modifier keys
-        isShift = Qt.Key.Key_Shift == e.key()
-        isCtrl = Qt.Key.Key_Control == e.key()
-        isAlt = Qt.Key.Key_Alt == e.key()
-        if isShift or isCtrl or isAlt:
-            return True
-        
         key = Key.get(e.modifiers(), e.key())
         if key is None:
             return True
         
-        self.prevCKey = self.currCKey
-        self.currCKey = key
-        self.bufferState.process(self.currCKey)
-        print("IP:", self.buffer)
+        self.prevKey = self.currKey
+        self.currKey = key
+        self.bufferState.process(self.currKey)
 
         return True
 
     def setBufferState(self, state: BaseBufferState):
         self.bufferState = state
-        self.bufferState.enter(self.currCKey)
+        self.bufferState.enter(self.currKey)
 
     def _b(self):
         doc = self.editor.document()

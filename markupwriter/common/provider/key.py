@@ -31,6 +31,7 @@ class Key(object):
         Qt.Key.Key_7: "7",
         Qt.Key.Key_8: "8",
         Qt.Key.Key_9: "9",
+        Qt.Key.Key_Space: "spc",
         Qt.Key.Key_Escape: "esc",
     }
 

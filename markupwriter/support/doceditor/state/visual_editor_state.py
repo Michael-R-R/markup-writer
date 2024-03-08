@@ -3,7 +3,6 @@
 import re
 
 from PyQt6.QtCore import (
-    Qt,
     QObject,
 )
 
@@ -23,14 +22,18 @@ class VisualEditorState(s.NvEditorState):
     def __init__(self, editor: QPlainTextEdit, parent: QObject | None) -> None:
         super().__init__(QTextCursor.MoveMode.KeepAnchor, editor, parent)
 
-        prefixes = r"g"
+        leaders = r"g"
         specialMotion = r"\$"
         motions = r"b|e|ge|gg|h|j|k|l|w|0"
         commands = r"d|esc|C-D|C-U|" + motions
 
-        self.prefixRegex = re.compile(prefixes)
-        self.motionRegex = re.compile("\\b({})\\b|\\B({})\\B".format(motions, specialMotion))
-        self.commandRegex = re.compile("\\b({})\\b|\\B({})\\B".format(commands, specialMotion))
+        self.leaderRegex = re.compile(leaders)
+        self.motionRegex = re.compile(
+            "\\b({})\\b|\\B({})\\B".format(motions, specialMotion)
+        )
+        self.commandRegex = re.compile(
+            "\\b({})\\b|\\B({})\\B".format(commands, specialMotion)
+        )
 
         self.funcDict = {
             "b": self._b,
@@ -61,7 +64,7 @@ class VisualEditorState(s.NvEditorState):
     def reset(self):
         super().reset()
         self.moveMode = QTextCursor.MoveMode.KeepAnchor
-        
+
     def process(self, e: QKeyEvent) -> bool:
         return super().process(e)
 
