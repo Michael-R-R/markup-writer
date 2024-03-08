@@ -24,7 +24,7 @@ import markupwriter.support.doceditor.state as s
 
 
 class BaseBufferState(object):
-    def __init__(self, state: NvEditorState) -> None:
+    def __init__(self, state: BaseNvEditorState) -> None:
         self.state = state
 
     def enter(self, key: str):
@@ -35,7 +35,7 @@ class BaseBufferState(object):
 
 
 class InitBufferState(BaseBufferState):
-    def __init__(self, state: NvEditorState) -> None:
+    def __init__(self, state: BaseNvEditorState) -> None:
         super().__init__(state)
 
     def enter(self, key: str):
@@ -57,7 +57,7 @@ class InitBufferState(BaseBufferState):
 
 
 class CountBufferState(BaseBufferState):
-    def __init__(self, state: NvEditorState) -> None:
+    def __init__(self, state: BaseNvEditorState) -> None:
         super().__init__(state)
 
     def enter(self, key: str):
@@ -82,7 +82,7 @@ class CountBufferState(BaseBufferState):
 
 
 class LeaderBufferState(BaseBufferState):
-    def __init__(self, state: NvEditorState) -> None:
+    def __init__(self, state: BaseNvEditorState) -> None:
         super().__init__(state)
 
     def enter(self, key: str):
@@ -103,7 +103,7 @@ class LeaderBufferState(BaseBufferState):
 
 
 class OperatorBufferState(BaseBufferState):
-    def __init__(self, state: NvEditorState) -> None:
+    def __init__(self, state: BaseNvEditorState) -> None:
         super().__init__(state)
 
     def enter(self, key: str):
@@ -136,7 +136,7 @@ class OperatorBufferState(BaseBufferState):
 
 
 class ExecuteBufferState(BaseBufferState):
-    def __init__(self, state: NvEditorState) -> None:
+    def __init__(self, state: BaseNvEditorState) -> None:
         super().__init__(state)
 
     def enter(self, key: str):
@@ -189,7 +189,7 @@ class ExecuteBufferState(BaseBufferState):
         raise NotImplementedError()
 
 
-class NvEditorState(s.BaseEditorState):
+class BaseNvEditorState(s.BaseEditorState):
     def __init__(
         self,
         moveMode: QTextCursor.MoveMode,

@@ -18,7 +18,7 @@ from PyQt6.QtWidgets import (
 import markupwriter.support.doceditor.state as s
 
 
-class VisualEditorState(s.NvEditorState):
+class VisualEditorState(s.BaseNvEditorState):
     def __init__(self, editor: QPlainTextEdit, parent: QObject | None) -> None:
         super().__init__(QTextCursor.MoveMode.KeepAnchor, editor, parent)
 
