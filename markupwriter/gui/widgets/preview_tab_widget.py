@@ -6,7 +6,10 @@ from PyQt6.QtCore import (
     pyqtSlot,
     QSize,
 )
-from PyQt6.QtGui import QKeyEvent
+
+from PyQt6.QtGui import (
+    QKeyEvent,
+)
 
 from PyQt6.QtWidgets import (
     QWidget,
@@ -16,6 +19,8 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.common.provider import Icon
+
+import markupwriter.gui.widgets as w
 
 
 class PreviewTabWidget(QTabWidget):
@@ -34,7 +39,7 @@ class PreviewTabWidget(QTabWidget):
 
         self.currentChanged.connect(self._onCurrentChanged)
         
-    def addTab(self, widget: QWidget, title: str) -> None:
+    def addTab(self, widget: w.DocumentPreviewWidget, title: str) -> None:
         super().addTab(widget, title)
         
         self.countChanged.emit(self.count())
@@ -89,10 +94,21 @@ class PreviewTabWidget(QTabWidget):
         
         self.setCurrentIndex(index)
         
+    def scrollContentY(self, direction: int):
+        i = self.currentIndex()
+        widget: w.DocumentPreviewWidget = self.widget(i)
+        if widget is None:
+            return
+        widget.scrollContentY(direction)
+        
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         match e.key():
-            case Qt.Key.Key_A:
+            case Qt.Key.Key_H:
                 self.navigateTabs(-1)
-            case Qt.Key.Key_D:
+            case Qt.Key.Key_L:
                 self.navigateTabs(1)
+            case Qt.Key.Key_K:
+                self.scrollContentY(-1)
+            case Qt.Key.Key_J:
+                self.scrollContentY(1)
             case _: return super().keyPressEvent(e)
