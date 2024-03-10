@@ -94,6 +94,13 @@ class PreviewTabWidget(QTabWidget):
         
         self.setCurrentIndex(index)
         
+    def scrollContentX(self, direction: int):
+        i = self.currentIndex()
+        widget: w.DocumentPreviewWidget = self.widget(i)
+        if widget is None:
+            return
+        widget.scrollContentX(direction)
+        
     def scrollContentY(self, direction: int):
         i = self.currentIndex()
         widget: w.DocumentPreviewWidget = self.widget(i)
@@ -103,12 +110,16 @@ class PreviewTabWidget(QTabWidget):
         
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         match e.key():
-            case Qt.Key.Key_H:
+            case Qt.Key.Key_A:
                 self.navigateTabs(-1)
-            case Qt.Key.Key_L:
+            case Qt.Key.Key_D:
                 self.navigateTabs(1)
-            case Qt.Key.Key_K:
-                self.scrollContentY(-1)
+            case Qt.Key.Key_H:
+                self.scrollContentX(-1)
             case Qt.Key.Key_J:
                 self.scrollContentY(1)
+            case Qt.Key.Key_K:
+                self.scrollContentY(-1)
+            case Qt.Key.Key_L:
+                self.scrollContentX(1)
             case _: return super().keyPressEvent(e)
