@@ -14,7 +14,8 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a hre
 + Open source
 + Free forever
 + Fast document opening/saving
-+ Fast navigation between widgets
++ Fast navigation
++ Vim-like editor
 + Custom markup language
 + Document reference tags
 + Multi-tab preview with support to view either plain/html text
