@@ -249,9 +249,9 @@ class DocumentTreeWidget(QTreeWidget):
 
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         match e.key():
-            case Qt.Key.Key_K:
+            case Qt.Key.Key_W:
                 self.navigateTree(-1)
-            case Qt.Key.Key_J:
+            case Qt.Key.Key_S:
                 self.navigateTree(1)
             case Qt.Key.Key_O:
                 self._emitOpened(self.currentItem())
