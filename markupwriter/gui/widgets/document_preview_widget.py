@@ -56,8 +56,17 @@ class DocumentPreviewWidget(QWidget):
     def checkForMatch(self, title: str, uuid: str) -> bool:
         return title == self.title and uuid == self.uuid
     
+    def scrollContentX(self, direction: int):
+        hb = self.textedit.horizontalScrollBar()
+        if hb is None:
+            return
+        val = hb.value()
+        hb.setValue(val + (16 * direction))
+    
     def scrollContentY(self, direction: int):
         vb = self.textedit.verticalScrollBar()
+        if vb is None:
+            return
         val = vb.value()
         vb.setValue(val + (16 * direction))
 
