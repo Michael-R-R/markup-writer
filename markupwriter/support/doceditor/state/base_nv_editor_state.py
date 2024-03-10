@@ -198,7 +198,6 @@ class BaseNvEditorState(s.BaseEditorState):
     ) -> None:
         super().__init__(editor, parent)
 
-        self.buffer = ""
         self.prevKey = ""
         self.currKey = ""
         self.moveMode = moveMode

@@ -179,6 +179,7 @@ class Core(QObject):
 
         ded = self.data.ded
         ded.stateChanged.connect(self.dew.onStateChanged)
+        ded.stateBufferChanged.connect(self.dew.onStateBufferChanged)
         ded.closeDocClicked.connect(self.dew.onCloseDocument)
         ded.showRefPopupClicked.connect(self.dew.onShowRefPopupClicked)
         ded.showRefPreviewClicked.connect(self.dew.onShowRefPreviewClicked)

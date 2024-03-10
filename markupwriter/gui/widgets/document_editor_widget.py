@@ -36,6 +36,7 @@ import markupwriter.support.doceditor.state as s
 
 class DocumentEditorWidget(QPlainTextEdit):
     stateChanged = pyqtSignal(str)
+    stateBufferChanged = pyqtSignal(str)
     docStatusChanged = pyqtSignal(bool)
     showRefPopupClicked = pyqtSignal(QPoint)
     showRefPreviewClicked = pyqtSignal(QPoint)
@@ -155,7 +156,9 @@ class DocumentEditorWidget(QPlainTextEdit):
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         self._onChangeCursorShape(e.modifiers(), self.viewport())
 
-        if not self.state.process(e):
+        if self.state.process(e):
+            self.stateBufferChanged.emit(self.state.buffer)
+        else:
             super().keyPressEvent(e)
 
     def keyReleaseEvent(self, e: QKeyEvent | None) -> None:

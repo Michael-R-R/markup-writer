@@ -30,6 +30,7 @@ class BaseEditorState(QObject):
         super().__init__(parent)
 
         self.editor = editor
+        self.buffer = ""
         
         self.funcDict: dict[str, function] = dict()
 

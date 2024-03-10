@@ -8,9 +8,11 @@ from PyQt6.QtWidgets import (
 
 
 class StatusBarWidget(QStatusBar):
-    def __init__(self, msg: str, parent: QWidget | None) -> None:
+    def __init__(self, normMsg: str, permMsg: str, parent: QWidget | None) -> None:
         super().__init__(parent)
         
-        self.permLabel = QLabel(msg, self)
+        self.normLabel = QLabel(normMsg, self)
+        self.permLabel = QLabel(permMsg, self)
         
-        self.addWidget(self.permLabel)
+        self.addWidget(self.normLabel)
+        self.addPermanentWidget(self.permLabel)

@@ -21,4 +21,4 @@ class MainWindowWorker(QObject):
     @pyqtSlot(str)
     def onShowPermMsg(self, msg: str):
         sb = self.mwd.view.statusBarWidget
-        sb.permLabel.setText(msg)
+        sb.normLabel.setText(msg)
