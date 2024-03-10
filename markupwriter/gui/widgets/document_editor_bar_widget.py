@@ -25,7 +25,6 @@ class DocumentEditorBarWidget(QWidget):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
 
-        self.stateLabel = QLabel("-- NORMAL --", self)
         self.pathLabel = QLabel("", self)
 
         self.toolBar = QToolBar(self)
@@ -38,11 +37,10 @@ class DocumentEditorBarWidget(QWidget):
         rhSpacer = QSpacerItem(0, 0, wpolicy, hpolicy)
 
         self.gLayout = QGridLayout(self)
-        self.gLayout.addWidget(self.stateLabel, 0, 0, Qt.AlignmentFlag.AlignLeft)
-        self.gLayout.addItem(lhSpacer, 0, 1)
-        self.gLayout.addWidget(self.pathLabel, 0, 2)
-        self.gLayout.addItem(rhSpacer, 0, 3)
-        self.gLayout.addWidget(self.toolBar, 0, 4, Qt.AlignmentFlag.AlignRight)
+        self.gLayout.addItem(lhSpacer, 0, 0)
+        self.gLayout.addWidget(self.pathLabel, 0, 1)
+        self.gLayout.addItem(rhSpacer, 0, 2)
+        self.gLayout.addWidget(self.toolBar, 0, 3, Qt.AlignmentFlag.AlignRight)
 
     def reset(self):
         self.pathLabel.clear()

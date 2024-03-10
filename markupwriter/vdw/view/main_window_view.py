@@ -27,7 +27,7 @@ class MainWindowView(QMainWindow):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
-        self.statusBarWidget = w.StatusBarWidget(self)
+        self.statusBarWidget = w.StatusBarWidget("", self)
         
         self.setWindowIcon(Icon.BOOKS) # TODO get better app icon
         self.setWindowTitle(AppConfig.APP_NAME)

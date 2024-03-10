@@ -99,8 +99,8 @@ class DocumentEditorWorker(QObject):
         
     @pyqtSlot(str)
     def onStateChanged(self, text: str):
-        eb = self.ded.view.editorBar
-        eb.stateLabel.setText(text)
+        sb = self.ded.view.statusBar
+        sb.permLabel.setText(text)
 
     @pyqtSlot()
     def onCloseDocument(self):
