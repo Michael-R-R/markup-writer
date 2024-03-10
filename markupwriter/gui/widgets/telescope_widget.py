@@ -159,6 +159,13 @@ class TelescopeWidget(QWidget):
         row = (row + direction) % count
         
         self.resultList.setCurrentRow(row)
+        
+    def _scrollPreviewY(self, direction: int):
+        vb = self.preview.verticalScrollBar()
+        if vb is None:
+            return
+        val = vb.value()
+        vb.setValue(val + (16 * direction))
 
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         match e.key():
@@ -170,6 +177,10 @@ class TelescopeWidget(QWidget):
                 self._navigateList(-1)
             case Qt.Key.Key_S:
                 self._navigateList(1)
+            case Qt.Key.Key_K:
+                self._scrollPreviewY(-1)
+            case Qt.Key.Key_J:
+                self._scrollPreviewY(1)
             case Qt.Key.Key_O:
                 self._onFileOpened(self.resultList.currentItem())
             case Qt.Key.Key_P:
