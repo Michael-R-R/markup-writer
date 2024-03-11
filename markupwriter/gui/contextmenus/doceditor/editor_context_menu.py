@@ -45,11 +45,16 @@ class EditorContextMenu(BaseContextMenu):
         pass
 
     def _setup(self, pos: QPoint):
+        cursor = self._textEdit.textCursor()
+        if cursor.hasSelection():
+            return
+        
         cursor = self._textEdit.cursorForPosition(pos)
+        
         cpos = cursor.positionInBlock()
         block = cursor.block()
         text = block.text()
-
+        
         if cpos > 0 or cpos < len(text):
             cursor.select(QTextCursor.SelectionType.WordUnderCursor)
             self._textEdit.setTextCursor(cursor)
