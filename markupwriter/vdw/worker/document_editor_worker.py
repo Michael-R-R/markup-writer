@@ -57,7 +57,7 @@ class DocumentEditorWorker(QObject):
         if cpos <= 0 or cpos >= len(textBlock):
             return None
 
-        found = re.search(r"^@(ref|pov|loc)(\(.*\))", textBlock)
+        found = re.search(r"@(ref|pov|loc)(\(.*\))", textBlock)
         if found is None:
             return None
 
