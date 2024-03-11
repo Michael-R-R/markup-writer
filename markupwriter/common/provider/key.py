@@ -17,10 +17,12 @@ class Key(object):
         Qt.Key.Key_J: "j",
         Qt.Key.Key_K: "k",
         Qt.Key.Key_L: "l",
+        Qt.Key.Key_P: "p",
         Qt.Key.Key_U: "u",
         Qt.Key.Key_V: "v",
         Qt.Key.Key_W: "w",
         Qt.Key.Key_X: "x",
+        Qt.Key.Key_Y: "y",
         Qt.Key.Key_0: "0",
         Qt.Key.Key_1: "1",
         Qt.Key.Key_2: "2",
@@ -44,6 +46,7 @@ class Key(object):
 
     _ctrlDict: dict[Qt.Key, str] = {
         Qt.Key.Key_D: "C-D",
+        Qt.Key.Key_R: "C-R",
         Qt.Key.Key_U: "C-U",
     }
     

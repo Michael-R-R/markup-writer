@@ -296,6 +296,10 @@ class BaseNvEditorState(s.BaseEditorState):
         cursor.movePosition(QTextCursor.MoveOperation.Right, self.moveMode)
         self.editor.setTextCursor(cursor)
 
+    def _p(self):
+        self.editor.paste()
+        self.changedState.emit(s.STATE.normal)
+
     def _w(self):
         doc = self.editor.document()
         cursor = self.editor.textCursor()
@@ -310,6 +314,13 @@ class BaseNvEditorState(s.BaseEditorState):
         cursor = self.editor.textCursor()
         cursor.deleteChar()
         self.editor.setTextCursor(cursor)
+
+    def _y(self):
+        self.editor.copy()
+        cursor = self.editor.textCursor()
+        cursor.clearSelection()
+        self.editor.setTextCursor(cursor)
+        self.changedState.emit(s.STATE.normal)
 
     def _0(self):
         cursor = self.editor.textCursor()

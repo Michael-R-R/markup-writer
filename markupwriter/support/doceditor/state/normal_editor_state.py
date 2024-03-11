@@ -26,7 +26,7 @@ class NormalEditorState(s.BaseNvEditorState):
         operators = r"d"
         specialMotion = r"\$"
         motions = r"b|d|e|ge|gg|h|j|k|l|w|0"
-        commands = r"a|i|u|v|x|C-D|C-U|" + motions
+        commands = r"a|i|p|u|v|x|y|C-D|C-R|C-U|" + motions
 
         self.leaderRegex = re.compile(leaders)
         self.operRegex = re.compile(operators)
@@ -49,13 +49,16 @@ class NormalEditorState(s.BaseNvEditorState):
             "j": self._j,
             "k": self._k,
             "l": self._l,
+            "p": self._p,
             "u": self._u,
             "v": self._v,
             "w": self._w,
             "x": self._x,
+            "y": self._y,
             "0": self._0,
             "$": self._dollar,
             "C-D": self._C_D,
+            "C-R": self._C_R,
             "C-U": self._C_U,
         }
 
@@ -96,6 +99,9 @@ class NormalEditorState(s.BaseNvEditorState):
 
     def _v(self):
         self.changedState.emit(s.STATE.visual)
+        
+    def _C_R(self):
+        self.editor.redo()
 
     def _d_op(self):
         cursor = self.editor.textCursor()

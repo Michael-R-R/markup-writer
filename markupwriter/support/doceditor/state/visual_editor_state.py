@@ -25,7 +25,7 @@ class VisualEditorState(s.BaseNvEditorState):
         leaders = r"g"
         specialMotion = r"\$"
         motions = r"b|e|ge|gg|h|j|k|l|w|0"
-        commands = r"d|esc|C-D|C-U|" + motions
+        commands = r"d|p|y|esc|C-D|C-U|" + motions
 
         self.leaderRegex = re.compile(leaders)
         self.motionRegex = re.compile(
@@ -45,7 +45,9 @@ class VisualEditorState(s.BaseNvEditorState):
             "j": self._j,
             "k": self._k,
             "l": self._l,
+            "p": self._p,
             "w": self._w,
+            "y": self._y,
             "0": self._0,
             "$": self._dollar,
             "esc": self._esc,
@@ -69,6 +71,8 @@ class VisualEditorState(s.BaseNvEditorState):
         return super().process(e)
 
     def _d(self):
+        self.editor.copy()
+        
         cursor = self.editor.textCursor()
 
         cursor.beginEditBlock()
