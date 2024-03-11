@@ -22,6 +22,7 @@ from markupwriter.config import (
 )
 
 from markupwriter.common.util import (
+    File,
     Serialize,
 )
 
@@ -265,8 +266,12 @@ class Core(QObject):
 
         self._onSaveDocument()
 
-        if Serialize.write(ProjectConfig.filePath(), self.data):
-            self.mww.showStatusBarMsg("Project saved...", 1500)
+        if not Serialize.write(ProjectConfig.filePath(), self.data):
+            return False
+            
+        self.mww.showStatusBarMsg("Project saved...", 1500)
+            
+        return True
 
     @pyqtSlot()
     def _onSaveAsProject(self):
@@ -277,11 +282,21 @@ class Core(QObject):
         if pair == (None, None):
             self.reset()
             return
+        
+        srcContentPath = ProjectConfig.contentPath()
+        if srcContentPath is None:
+            self.reset()
+            return
 
         ProjectConfig.projectName = pair[0]
         ProjectConfig.dir = pair[1]
 
         if not self._onSaveProject():
+            self.reset()
+            return
+        
+        dstContentPath = ProjectConfig.contentPath()
+        if not File.cpdir(srcContentPath, dstContentPath):
             self.reset()
             return
 
