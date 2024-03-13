@@ -22,6 +22,7 @@ class MainMenuBarWorker(QObject):
         fm = self.mmbd.view.fileMenu
         fm.saveProjAction.setEnabled(True)
         fm.saveProjAsAction.setEnabled(True)
+        fm.importMenu.setEnabled(True)
         fm.exportAction.setEnabled(True)
         fm.closeProjAction.setEnabled(True)
 
@@ -29,6 +30,7 @@ class MainMenuBarWorker(QObject):
         fm = self.mmbd.view.fileMenu
         fm.saveProjAction.setEnabled(True)
         fm.saveProjAsAction.setEnabled(True)
+        fm.importMenu.setEnabled(True)
         fm.exportAction.setEnabled(True)
         fm.closeProjAction.setEnabled(True)
 

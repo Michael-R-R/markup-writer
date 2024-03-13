@@ -6,6 +6,5 @@ from .document_preview_widget import DocumentPreviewWidget
 from .popup_preview_widget import PopupPreviewWidget
 from .search_box_widget import SearchBoxWidget
 from .preview_tab_widget import PreviewTabWidget
-from .export_select_widget import ExportSelectWidget
 from .status_bar_widget import StatusBarWidget
 from .telescope_widget import TelescopeWidget

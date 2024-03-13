@@ -140,6 +140,7 @@ class Core(QObject):
 
     def _setupTreeWorkerSlots(self):
         mmbd = self.data.mmbd
+        mmbd.fmImportTxtTriggered.connect(self.dtw.onImportTxtFile)
         mmbd.vmDocTreeTriggered.connect(self.dtw.onFocusTreeTriggered)
         mmbd.vmTelescopeTriggered.connect(self.dtw.onTelescopeTriggered)
 

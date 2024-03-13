@@ -13,8 +13,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import AppConfig, ProjectConfig
 from markupwriter.common.util import File
-from markupwriter.gui.widgets import ExportSelectWidget
-from markupwriter.gui.dialogs.modal import ErrorDialog
+from markupwriter.gui.dialogs.modal import ExportDialog, ErrorDialog
 from markupwriter.common.tokenizers import XHtmlExportTokenizer
 from markupwriter.common.parsers import XHtmlParser
 
@@ -32,7 +31,7 @@ class EpubExporter(object):
         self.imgPath = ""
 
     def export(self, tw: w.DocumentTreeWidget, parent: QWidget | None):
-        widget = ExportSelectWidget(tw, parent)
+        widget = ExportDialog(tw, parent)
         if widget.exec() != 1:
             return
 

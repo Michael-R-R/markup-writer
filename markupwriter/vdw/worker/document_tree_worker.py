@@ -22,6 +22,7 @@ from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 
 import markupwriter.vdw.delegate as d
+import markupwriter.gui.dialogs.modal as dm
 import markupwriter.gui.widgets as w
 import markupwriter.support.doctree.item as ti
 
@@ -109,6 +110,14 @@ class DocumentTreeWorker(QObject):
             curr = curr.parent()
 
         return prev == trash
+    
+    @pyqtSlot()
+    def onImportTxtFile(self):
+        dialog = dm.ImportDialog(self.dtd.view)
+        if dialog.exec() != 1:
+            return
+        
+        # TODO implement
     
     @pyqtSlot()
     def onFocusTreeTriggered(self):

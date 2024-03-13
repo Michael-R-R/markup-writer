@@ -20,10 +20,10 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.common.provider import Icon
 
-import markupwriter.support.doctree.item as dti
+import markupwriter.support.doctree.item as ti
 
 
-class ExportSelectWidget(QDialog):
+class ExportDialog(QDialog):
     def __init__(self, tree: QTreeWidget, parent: QWidget | None) -> None:
         super().__init__(parent)
 
@@ -67,9 +67,9 @@ class ExportSelectWidget(QDialog):
         row = 2
         for i in range(self._tree.topLevelItemCount()):
             item = self._tree.topLevelItem(i)
-            widget: dti.BaseTreeItem = self._tree.itemWidget(item, 0)
+            widget: ti.BaseTreeItem = self._tree.itemWidget(item, 0)
 
-            if isinstance(widget, dti.NovelFolderItem):
+            if isinstance(widget, ti.NovelFolderItem):
                 wtemp = widget.shallowcopy()
                 selectButton = QPushButton("Select", self)
                 self.gLayout.addWidget(wtemp, row, 0)

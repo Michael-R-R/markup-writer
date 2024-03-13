@@ -22,7 +22,7 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.common.factory import TreeItemFactory
 import markupwriter.gui.contextmenus.doctree as dt
-import markupwriter.support.doctree.item as dti
+import markupwriter.support.doctree.item as ti
 
 
 class DocumentTreeWidget(QTreeWidget):
@@ -55,11 +55,11 @@ class DocumentTreeWidget(QTreeWidget):
 
         self.itemDoubleClicked.connect(self.onItemDoubleClicked)
 
-    def add(self, widget: dti.BaseTreeItem):
+    def add(self, widget: ti.BaseTreeItem):
         selected = self.currentItem()
         if selected is None:
             self.addTopLevelItem(widget.item)
-        elif not widget.hasFlag(dti.ITEM_FLAG.draggable):
+        elif not widget.hasFlag(ti.ITEM_FLAG.draggable):
             self.addTopLevelItem(widget.item)
         else:
             selected.addChild(widget.item)
@@ -100,7 +100,7 @@ class DocumentTreeWidget(QTreeWidget):
             child = item.child(i)
             self.remove(child)
 
-        widget: dti.BaseTreeItem = self.itemWidget(item, 0)
+        widget: ti.BaseTreeItem = self.itemWidget(item, 0)
 
         parent = item.parent()
         if parent is None:
@@ -116,14 +116,14 @@ class DocumentTreeWidget(QTreeWidget):
         self._emitRemoved(widget)
 
     def rename(self, item: QTreeWidgetItem, name: str):
-        widget: dti.BaseTreeItem = self.itemWidget(item, 0)
+        widget: ti.BaseTreeItem = self.itemWidget(item, 0)
         if widget is None:
             return
 
         oldName = widget.title()
         widget.setTitle(name)
 
-        if widget.hasFlag(dti.ITEM_FLAG.file):
+        if widget.hasFlag(ti.ITEM_FLAG.file):
             self.fileRenamed.emit(widget.UUID(), oldName, name)
 
     def translate(self, direction: int):
@@ -143,7 +143,7 @@ class DocumentTreeWidget(QTreeWidget):
 
         self.setCurrentItem(selected)
 
-    def takeOut(self, item: QTreeWidgetItem) -> list[dti.BaseTreeItem]:
+    def takeOut(self, item: QTreeWidgetItem) -> list[ti.BaseTreeItem]:
         widgetList = self.copyWidgets(item, list())
         parent = item.parent()
         if parent is None:  # is root item
@@ -156,26 +156,26 @@ class DocumentTreeWidget(QTreeWidget):
         return widgetList
 
     def copyWidgets(
-        self, pItem: QTreeWidgetItem, itemList: list[dti.BaseTreeItem]
-    ) -> list[dti.BaseTreeItem]:
+        self, pItem: QTreeWidgetItem, itemList: list[ti.BaseTreeItem]
+    ) -> list[ti.BaseTreeItem]:
         result = itemList
 
         for i in range(pItem.childCount()):
             cItem = pItem.child(i)
             result = self.copyWidgets(cItem, result)
 
-        widget: dti.BaseTreeItem = self.itemWidget(pItem, 0)
+        widget: ti.BaseTreeItem = self.itemWidget(pItem, 0)
         result.append(widget.shallowcopy())
 
         return result
 
-    def buildExportList(self, root: QTreeWidgetItem) -> list[list[dti.BaseFileItem]]:
+    def buildExportList(self, root: QTreeWidgetItem) -> list[list[ti.BaseFileItem]]:
         def helper(
-            pitem: QTreeWidgetItem, flist: list[dti.BaseFileItem]
-        ) -> list[dti.BaseFileItem]:
-            pw: dti.BaseTreeItem = self.itemWidget(pitem, 0)
+            pitem: QTreeWidgetItem, flist: list[ti.BaseFileItem]
+        ) -> list[ti.BaseFileItem]:
+            pw: ti.BaseTreeItem = self.itemWidget(pitem, 0)
 
-            if pw.hasFlag(dti.ITEM_FLAG.file):
+            if pw.hasFlag(ti.ITEM_FLAG.file):
                 flist.append(pw)
 
             for i in range(pitem.childCount()):
@@ -186,18 +186,18 @@ class DocumentTreeWidget(QTreeWidget):
 
         # End helper
 
-        buildList: list[list[dti.BaseFileItem]] = list()
+        buildList: list[list[ti.BaseFileItem]] = list()
         for i in range(root.childCount()):
             pitem = root.child(i)
             buildList.append(helper(pitem, list()))
 
         return buildList
 
-    def findWidget(self, uuid: str) -> dti.BaseTreeItem | None:
-        def helper(item: QTreeWidgetItem) -> dti.BaseTreeItem | None:
+    def findWidget(self, uuid: str) -> ti.BaseTreeItem | None:
+        def helper(item: QTreeWidgetItem) -> ti.BaseTreeItem | None:
             for i in range(item.childCount()):
                 child = item.child(i)
-                widget: dti.BaseTreeItem = self.itemWidget(child, 0)
+                widget: ti.BaseTreeItem = self.itemWidget(child, 0)
                 if widget.UUID() == uuid:
                     return widget
                 widget = helper(child)
@@ -210,7 +210,7 @@ class DocumentTreeWidget(QTreeWidget):
 
         for i in range(self.topLevelItemCount()):
             item = self.topLevelItem(i)
-            widget: dti.BaseTreeItem = self.itemWidget(item, 0)
+            widget: ti.BaseTreeItem = self.itemWidget(item, 0)
             if widget.UUID() == uuid:
                 return widget
             widget = helper(item)
@@ -223,12 +223,12 @@ class DocumentTreeWidget(QTreeWidget):
         nameList: list[str] = list()
         iTemp = item
         while iTemp is not None:
-            wTemp: dti.BaseTreeItem = self.itemWidget(iTemp, 0)
+            wTemp: ti.BaseTreeItem = self.itemWidget(iTemp, 0)
             nameList.insert(0, wTemp.title())
             iTemp = iTemp.parent()
         return nameList
 
-    def setWidgetList(self, items: list[dti.BaseTreeItem]):
+    def setWidgetList(self, items: list[ti.BaseTreeItem]):
         for i in items:
             self.setItemWidget(i.item, 0, i)
 
@@ -270,8 +270,8 @@ class DocumentTreeWidget(QTreeWidget):
         self.draggedItems.clear()
         sList = self.selectedItems()
         for s in sList:
-            widget: dti.BaseTreeItem = self.itemWidget(s, 0)
-            if not widget.hasFlag(dti.ITEM_FLAG.draggable):
+            widget: ti.BaseTreeItem = self.itemWidget(s, 0)
+            if not widget.hasFlag(ti.ITEM_FLAG.draggable):
                 self.draggedItems.clear()
                 return
             self.draggedItems.append(s)
@@ -282,7 +282,7 @@ class DocumentTreeWidget(QTreeWidget):
         if not self.currentIndex().isValid():
             return
 
-        copyList: list[list[dti.BaseTreeItem]] = list()
+        copyList: list[list[ti.BaseTreeItem]] = list()
         for s in self.draggedItems:
             copyList.append(self.copyWidgets(s, list()))
 
@@ -309,34 +309,34 @@ class DocumentTreeWidget(QTreeWidget):
         
         self._emitOpened(item)
 
-    def _emitAdded(self, widget: dti.BaseTreeItem):
-        if widget.hasFlag(dti.ITEM_FLAG.file):
+    def _emitAdded(self, widget: ti.BaseTreeItem):
+        if widget.hasFlag(ti.ITEM_FLAG.file):
             nameList = self.getNamesList(widget.item)
             self.fileAdded.emit(widget.UUID())
             self.fileOpened.emit(widget.UUID(), nameList)
 
-    def _emitRemoved(self, widget: dti.BaseTreeItem):
-        if widget.hasFlag(dti.ITEM_FLAG.file):
+    def _emitRemoved(self, widget: ti.BaseTreeItem):
+        if widget.hasFlag(ti.ITEM_FLAG.file):
             self.fileRemoved.emit(widget.title(), widget.UUID())
 
-    def _emitMoved(self, widgetList: list[dti.BaseTreeItem]):
+    def _emitMoved(self, widgetList: list[ti.BaseTreeItem]):
         for w in widgetList:
-            if w.hasFlag(dti.ITEM_FLAG.file):
+            if w.hasFlag(ti.ITEM_FLAG.file):
                 nameList = self.getNamesList(w.item)
                 self.fileMoved.emit(w.UUID(), nameList)
 
     def _emitOpened(self, item: QTreeWidgetItem):
-        widget: dti.BaseTreeItem = self.itemWidget(item, 0)
-        if widget.hasFlag(dti.ITEM_FLAG.file):
+        widget: ti.BaseTreeItem = self.itemWidget(item, 0)
+        if widget.hasFlag(ti.ITEM_FLAG.file):
             nameList = self.getNamesList(item)
             self.fileOpened.emit(widget.UUID(), nameList)
 
     def _emitPreviewed(self, item: QTreeWidgetItem):
-        widget: dti.BaseTreeItem = self.itemWidget(item, 0)
+        widget: ti.BaseTreeItem = self.itemWidget(item, 0)
         if widget is None:
             return
         
-        if not widget.hasFlag(dti.ITEM_FLAG.file):
+        if not widget.hasFlag(ti.ITEM_FLAG.file):
             return
         
         self.filePreviewed.emit(widget.title(), widget.UUID())
@@ -350,7 +350,7 @@ class DocumentTreeWidget(QTreeWidget):
 
             for i in range(cCount):
                 iChild = iParent.child(i)
-                wChild: dti.BaseTreeItem = self.itemWidget(iChild, 0)
+                wChild: ti.BaseTreeItem = self.itemWidget(iChild, 0)
                 sOut.writeQString(wChild.__class__.__name__)
                 helper(sOut, iChild)
                 sOut << wChild
@@ -363,7 +363,7 @@ class DocumentTreeWidget(QTreeWidget):
         # Top level items
         for i in range(iCount):
             iParent = self.topLevelItem(i)
-            wParent: dti.BaseTreeItem = self.itemWidget(iParent, 0)
+            wParent: ti.BaseTreeItem = self.itemWidget(iParent, 0)
             sout.writeQString(wParent.__class__.__name__)
             sout << wParent
 
@@ -380,7 +380,7 @@ class DocumentTreeWidget(QTreeWidget):
 
             for _ in range(cCount):
                 type = sIn.readQString()
-                cwidget: dti.BaseTreeItem = TreeItemFactory.make(type)
+                cwidget: ti.BaseTreeItem = TreeItemFactory.make(type)
                 helper(sIn, cwidget.item)
                 sIn >> cwidget
 
@@ -396,7 +396,7 @@ class DocumentTreeWidget(QTreeWidget):
         # Top level items
         for _ in range(iCount):
             type = sin.readQString()
-            pwidget: dti.BaseTreeItem = TreeItemFactory.make(type)
+            pwidget: ti.BaseTreeItem = TreeItemFactory.make(type)
             sin >> pwidget
 
             # Child level items
