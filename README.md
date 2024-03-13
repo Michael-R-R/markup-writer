@@ -14,7 +14,8 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a hre
 + Open source
 + Free forever
 + Fast document opening/saving
-+ Fast navigation between widgets
++ Fast navigation
++ Vim-like editor
 + Custom markup language
 + Document reference tags
 + Multi-tab preview with support to view either plain/html text
@@ -29,3 +30,46 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a hre
 + PyQt6 6.6.1
 + pyenchant 3.2.2
 + Python >=3.6.1
+
+# Navigation
+
+## Document Tree
+| Mappings       | Action                                                    |
+| -------------- | --------------------------------------------------------- |
+| `F1`           | Focus in                                                  |
+| `w`            | Previous item                                             |
+| `s`            | Next item                                                 |
+| `o`            | Open item                                                 |
+| `p`            | Preview item                                              |
+
+
+## Document Editor
+| Mappings       | Action                                                    |
+| -------------- | --------------------------------------------------------- |
+| `F2`           | Focus in                                                  |
+| `Coming soon`  | To be added                                               |
+
+## Preview Tab
+| Mappings       | Action                                                    |
+| -------------- | --------------------------------------------------------- |
+| `F3`           | Focus in                                                  |
+| `a`            | Previous item                                             |
+| `d`            | Next item                                                 |
+| `h`            | Scroll content left                                       |
+| `j`            | Scroll content down                                       |
+| `k`            | Scroll content up                                         |
+| `l`            | Scroll content right                                      |
+
+
+## Telescope
+| Mappings       | Action                                                    |
+| -------------- | --------------------------------------------------------- |
+| `Ctrl + p`     | Open telescope                                            |
+| `esc`          | Close telescope                                           |
+| `enter`        | Toggle search/select mode                                 |
+| `w`            | Previous item (select mode)                               |
+| `s`            | Next item (select mode)                                   |
+| `j`            | Scroll preview down (select mode)                         |
+| `k`            | Scroll preview up (select mode)                           |
+| `o`            | Open file (select mode)                                   |
+| `p`            | Preview file (select mode)                                |

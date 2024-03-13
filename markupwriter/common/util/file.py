@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from distutils.dir_util import copy_tree
+
 from PyQt6.QtCore import (
     QFile,
     QFileInfo,
@@ -29,6 +31,15 @@ class File(object):
     def mkdir(path: str) -> bool:
         dir = QDir()
         return dir.mkdir(path)
+    
+    def cpdir(src: str, dst: str) -> bool:
+        try:
+            copy_tree(src, dst)
+        except Exception as e:
+            print(str(e))
+            return False
+        finally:
+            return True
     
     def findAllFiles(path: str) -> list[str]:
         info = QFileInfo(path)

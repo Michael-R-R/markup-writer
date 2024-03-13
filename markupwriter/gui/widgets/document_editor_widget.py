@@ -5,6 +5,7 @@ import re
 from PyQt6.QtCore import (
     Qt,
     pyqtSignal,
+    pyqtSlot,
     QPoint,
     QSize,
     QMimeData,
@@ -30,9 +31,12 @@ from PyQt6.QtWidgets import (
 from markupwriter.common.syntax import Highlighter
 
 import markupwriter.support.doceditor as de
+import markupwriter.support.doceditor.state as s
 
 
 class DocumentEditorWidget(QPlainTextEdit):
+    stateChanged = pyqtSignal(str)
+    stateBufferChanged = pyqtSignal(str)
     docStatusChanged = pyqtSignal(bool)
     showRefPopupClicked = pyqtSignal(QPoint)
     showRefPreviewClicked = pyqtSignal(QPoint)
@@ -42,6 +46,7 @@ class DocumentEditorWidget(QPlainTextEdit):
     def __init__(self, parent: QWidget | None):
         super().__init__(parent)
 
+        self.state: s.BaseEditorState = None
         self.plainDocument = de.PlainDocument(self)
         self.spellChecker = de.SpellCheck()
         self.highlighter = Highlighter(self.plainDocument, self.spellChecker.endict)
@@ -61,6 +66,8 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setTabStopDistance(20.0)
+        
+        self.setState(s.NormalEditorState(self, self))
 
     def reset(self):
         self.clear()
@@ -93,6 +100,31 @@ class DocumentEditorWidget(QPlainTextEdit):
     
     def hasOpenDocument(self) -> bool:
         return self.docUUID != ""
+    
+    def setState(self, state: s.BaseEditorState):
+        if self.state is not None:
+            self.state.exit()
+        
+        self.state = state
+        self.state.enter()
+        
+        self.state.changedState.connect(self.onChangedState)
+    
+    @pyqtSlot(s.STATE)
+    def onChangedState(self, state: s.STATE):
+        match state:
+            case s.STATE.normal:
+                self.setState(s.NormalEditorState(self, self))
+                self.stateChanged.emit("-- NORMAL -- ")
+            case s.STATE.insert:
+                self.setState(s.InsertEditorState(self, self))
+                self.stateChanged.emit("-- INSERT --")
+            case s.STATE.append:
+                self.setState(s.InsertEditorState(self, self, True))
+                self.stateChanged.emit("-- INSERT --")
+            case s.STATE.visual:
+                self.setState(s.VisualEditorState(self, self))
+                self.stateChanged.emit("-- VISUAL --")
 
     def canInsertFromMimeData(self, source: QMimeData | None) -> bool:
         hasUrls = source.hasUrls()
@@ -124,10 +156,10 @@ class DocumentEditorWidget(QPlainTextEdit):
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         self._onChangeCursorShape(e.modifiers(), self.viewport())
 
-        cursor = de.KeyProcessor.process(self.textCursor(), e.key())
-        self.setTextCursor(cursor)
-
-        return super().keyPressEvent(e)
+        if self.state.process(e):
+            self.stateBufferChanged.emit(self.state.buffer)
+        else:
+            super().keyPressEvent(e)
 
     def keyReleaseEvent(self, e: QKeyEvent | None) -> None:
         self._onChangeCursorShape(e.modifiers(), self.viewport())

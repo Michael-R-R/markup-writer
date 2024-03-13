@@ -57,7 +57,7 @@ class DocumentEditorWorker(QObject):
         if cpos <= 0 or cpos >= len(textBlock):
             return None
 
-        found = re.search(r"^@(ref|pov|loc)(\(.*\))", textBlock)
+        found = re.search(r"@(ref|pov|loc)(\(.*\))", textBlock)
         if found is None:
             return None
 
@@ -96,6 +96,16 @@ class DocumentEditorWorker(QObject):
         
         highlighter.setBehaviourEnable(BEHAVIOUR.spellCheck, isToggled)
         highlighter.rehighlight()
+        
+    @pyqtSlot(str)
+    def onStateChanged(self, text: str):
+        sb = self.ded.view.statusBar
+        sb.normLabel.setText(text)
+        
+    @pyqtSlot(str)
+    def onStateBufferChanged(self, text: str):
+        sb = self.ded.view.statusBar
+        sb.permLabel.setText(text)
 
     @pyqtSlot()
     def onCloseDocument(self):

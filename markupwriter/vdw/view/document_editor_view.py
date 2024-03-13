@@ -25,6 +25,7 @@ class DocumentEditorView(QWidget):
         
         self.editorBar = w.DocumentEditorBarWidget(self)
         self.textEdit = w.DocumentEditorWidget(self)
+        self.statusBar = w.StatusBarWidget("-- NORMAL --", "", self)
         self.searchBox = w.SearchBoxWidget(self.textEdit)
         
         self.searchBox.hide()
@@ -32,6 +33,7 @@ class DocumentEditorView(QWidget):
         self.gLayout = QGridLayout(self)
         self.gLayout.addWidget(self.editorBar, 0, 0)
         self.gLayout.addWidget(self.textEdit, 1, 0)
+        self.gLayout.addWidget(self.statusBar, 2, 0)
         
         self.setStyleSheet(Style.EDITOR_VIEW)
         

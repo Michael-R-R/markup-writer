@@ -38,7 +38,7 @@ class DocumentEditorBarWidget(QWidget):
 
         self.gLayout = QGridLayout(self)
         self.gLayout.addItem(lhSpacer, 0, 0)
-        self.gLayout.addWidget(self.pathLabel, 0, 1, Qt.AlignmentFlag.AlignHCenter)
+        self.gLayout.addWidget(self.pathLabel, 0, 1)
         self.gLayout.addItem(rhSpacer, 0, 2)
         self.gLayout.addWidget(self.toolBar, 0, 3, Qt.AlignmentFlag.AlignRight)
 

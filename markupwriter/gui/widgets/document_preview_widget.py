@@ -32,6 +32,7 @@ class DocumentPreviewWidget(QWidget):
         self.plainText = File.read(path)
         self.html = ""
         self.isPlainText = False
+        self.prevVal = 0
         self.threadPool = QThreadPool(parent)
 
         self.textedit = QTextEdit(self)
@@ -54,6 +55,20 @@ class DocumentPreviewWidget(QWidget):
 
     def checkForMatch(self, title: str, uuid: str) -> bool:
         return title == self.title and uuid == self.uuid
+    
+    def scrollContentX(self, direction: int):
+        hb = self.textedit.horizontalScrollBar()
+        if hb is None:
+            return
+        val = hb.value()
+        hb.setValue(val + (16 * direction))
+    
+    def scrollContentY(self, direction: int):
+        vb = self.textedit.verticalScrollBar()
+        if vb is None:
+            return
+        val = vb.value()
+        vb.setValue(val + (16 * direction))
 
     @pyqtSlot()
     def refreshContent(self):
@@ -75,6 +90,7 @@ class DocumentPreviewWidget(QWidget):
 
     @pyqtSlot()
     def toggleView(self):
+        self.prevVal = self.textedit.verticalScrollBar().value()
         self.isPlainText = not self.isPlainText
 
         if self.isPlainText:
@@ -86,6 +102,7 @@ class DocumentPreviewWidget(QWidget):
         self.plainText = text
         self.toggleButton.setText("Plain")
         self.textedit.setPlainText(text)
+        self.textedit.verticalScrollBar().setValue(self.prevVal)
 
     def _runHtmlTokenizer(self):
         if self.html == "":
@@ -100,6 +117,7 @@ class DocumentPreviewWidget(QWidget):
         else:
             self.toggleButton.setText("HTML")
             self.textedit.setHtml(self.html)
+            self.textedit.verticalScrollBar().setValue(self.prevVal)
 
     @pyqtSlot(list)
     def _onTokenizerFinished(self, tokens: list[(str, str)]):
@@ -117,6 +135,7 @@ class DocumentPreviewWidget(QWidget):
         self.toggleButton.setText("HTML")
         self.html = html
         self.textedit.setHtml(html)
+        self.textedit.verticalScrollBar().setValue(self.prevVal)
         
     @pyqtSlot(str)
     def _onProgressUpdate(self, status: str):
@@ -129,4 +148,5 @@ class DocumentPreviewWidget(QWidget):
         self.toggleButton.setText("HTML")
         
         self.html = ""
+        self.prevVal = 0
         self.textedit.setPlainText("ERROR: {}".format(e))
