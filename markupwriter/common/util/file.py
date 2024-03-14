@@ -12,11 +12,15 @@ from PyQt6.QtCore import (
 
 class File(object):
     def read(path: str) -> str | None:
-        info = QFile(path)
-        if not info.open(QIODevice.OpenModeFlag.ReadOnly):
-            return None
+        try:
+            info = QFile(path)
+            if not info.open(QIODevice.OpenModeFlag.ReadOnly):
+                return None
 
-        return str(info.readAll(), "utf-8")
+            return str(info.readAll(), "utf-8")
+        except Exception as e:
+            print(str(e))
+            return None
 
     def write(path: str, content: str) -> bool:
         info = QFile(path)

@@ -23,7 +23,7 @@ class FileMainMenu(QMenu):
         self.saveDocAction = QAction("Save Document", self)
         self.saveProjAction = QAction("Save Project", self)
         self.saveProjAsAction = QAction("Save Project As...", self)
-        self.importTxtAction = QAction(".txt", self)
+        self.importTxtAction = QAction("Text", self)
         self.exportAction = QAction("Export...", self)
         self.closeProjAction = QAction("Close Project", self)
         self.exitAction = QAction("Exit", self)

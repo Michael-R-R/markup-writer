@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
 from markupwriter.gui.dialogs.modal import (
     StrDialog,
     YesNoDialog,
+    ErrorDialog,
 )
 
 from markupwriter.config import ProjectConfig
@@ -113,11 +114,24 @@ class DocumentTreeWorker(QObject):
     
     @pyqtSlot()
     def onImportTxtFile(self):
-        dialog = dm.ImportDialog(self.dtd.view)
+        dialog = dm.ImportDialog("", self.dtd.view)
         if dialog.exec() != 1:
             return
         
-        # TODO implement
+        content = File.read(dialog.path)
+        if content is None:
+            ErrorDialog.run("ERROR: cannot read file contents", None)
+            return
+        
+        path = os.path.join(ProjectConfig.contentPath(), dialog.value.UUID())
+        if not File.write(path, content):
+            ErrorDialog.run("ERROR: cannot write file contents", None)
+            return
+        
+        tw = self.dtd.view.treeWidget
+        tw.blockSignals(True)
+        tw.add(dialog.value)
+        tw.blockSignals(False)
     
     @pyqtSlot()
     def onFocusTreeTriggered(self):

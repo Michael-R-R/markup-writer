@@ -44,7 +44,7 @@ class DocumentEditorWorker(QObject):
 
         uuid = te.docUUID
         text = te.toPlainText()
-        count = len(re.findall(r"[a-zA-Z'-]+", text))
+        count = len(re.findall(r"\b[\w-]+\b", text))
 
         te.wordCountChanged.emit(uuid, count)
 

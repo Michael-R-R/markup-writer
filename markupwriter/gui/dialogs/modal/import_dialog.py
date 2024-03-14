@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from PyQt6.QtCore import (
-    Qt,
     pyqtSlot,
 )
 
@@ -10,13 +9,14 @@ from PyQt6.QtWidgets import (
     QWidget,
     QLayout,
     QHBoxLayout,
-    QGridLayout,
+    QVBoxLayout,
     QGroupBox,
     QRadioButton,
     QLineEdit,
     QPushButton,
     QToolButton,
     QFileDialog,
+    QSizePolicy,
 )
 
 from markupwriter.common.provider import Icon
@@ -25,73 +25,87 @@ import markupwriter.support.doctree.item as ti
 
 
 class ImportDialog(QDialog):
-    def __init__(self, parent: QWidget | None) -> None:
+    def __init__(self, filter: str, parent: QWidget | None) -> None:
         super().__init__(parent)
         
         self.setWindowTitle("Create Item")
+        self.setSizePolicy(QSizePolicy.Policy.Expanding,
+                           QSizePolicy.Policy.Expanding)
         
         self.path: str = None
         self.value: ti.BaseFileItem = None
+        self._filter = filter
+        self._isBuilt = False
         
-        self.pathLineEdit = QLineEdit("", self)
-        self.pathLineEdit.setReadOnly(True)
-        self.pathLineEdit.setPlaceholderText("Select file...")
+        self._pathLineEdit = QLineEdit("", self)
+        self._pathLineEdit.setReadOnly(True)
+        self._pathLineEdit.setPlaceholderText("Select file...")
         
-        self.dirButton = QToolButton(self)
-        self.dirButton.setIcon(Icon.MISC_FOLDER)
-        self.dirButton.clicked.connect(self._onDirButtonClicked)
+        self._dirButton = QToolButton(self)
+        self._dirButton.setIcon(Icon.MISC_FOLDER)
+        self._dirButton.clicked.connect(self._onDirButtonClicked)
         
-        self.gLayout = QGridLayout(self)
-        self.gLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
-        self.gLayout.addWidget(self.pathLineEdit, 0, 0)
-        self.gLayout.addWidget(self.dirButton, 0, 1, Qt.AlignmentFlag.AlignRight)
+        self._titleButton = QRadioButton("Title")
+        self._chapterButton = QRadioButton("Chapter")
+        self._sceneButton = QRadioButton("Scene")
+        self._sectionButton = QRadioButton("Section")
+        self._miscButton = QRadioButton("Misc")
+        self._rbGroupBox = QGroupBox()
+        self._nameLineEdit = QLineEdit("Default")
+        self._cancelButton = QPushButton("Cancel")
+        self._okButton = QPushButton("Ok")
+        
+        hLayout = QHBoxLayout()
+        hLayout.addWidget(self._pathLineEdit)
+        hLayout.addWidget(self._dirButton)
+        
+        self._vLayout = QVBoxLayout(self)
+        self._vLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self._vLayout.addLayout(hLayout)
+        
+        self._cancelButton.clicked.connect(self.onCancelClicked)
+        self._okButton.clicked.connect(self.onOkClicked)
         
     @pyqtSlot()
     def _onDirButtonClicked(self):
         path = QFileDialog.getOpenFileName(
             self,
             "Import File",
-            "/home"
+            "/home",
+            self._filter
         )
         
         if path[0] == "":
             return
         
         self.path = path[0]
-        self.pathLineEdit.setText(path[0])
+        self._pathLineEdit.setText(path[0])
         
         self._build()
         
     def _build(self):
-        self.titleButton = QRadioButton("Title", self)
-        self.chapterButton = QRadioButton("Chapter", self)
-        self.sceneButton = QRadioButton("Scene", self)
-        self.sectionButton = QRadioButton("Section", self)
-        self.miscButton = QRadioButton("Misc", self)
-        self.miscButton.setChecked(True)
+        if self._isBuilt:
+            return
         
-        self.hLayout = QHBoxLayout()
-        self.hLayout.addWidget(self.titleButton)
-        self.hLayout.addWidget(self.chapterButton)
-        self.hLayout.addWidget(self.sceneButton)
-        self.hLayout.addWidget(self.sectionButton)
-        self.hLayout.addWidget(self.miscButton)
+        rbLayout = QHBoxLayout()
+        rbLayout.addWidget(self._titleButton)
+        rbLayout.addWidget(self._chapterButton)
+        rbLayout.addWidget(self._sceneButton)
+        rbLayout.addWidget(self._sectionButton)
+        rbLayout.addWidget(self._miscButton)
         
-        self.groupBox = QGroupBox(self)
-        self.groupBox.setLayout(self.hLayout)
+        self._rbGroupBox.setLayout(rbLayout)
+        self._miscButton.setChecked(True)
         
-        self.nameLineEdit = QLineEdit("Default", self)
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self._cancelButton)
+        buttonLayout.addWidget(self._okButton)
         
-        self.cancelButton = QPushButton("Cancel", self)
-        self.okButton = QPushButton("Ok", self)
+        self._vLayout.addWidget(self._rbGroupBox)
+        self._vLayout.addWidget(self._nameLineEdit)
+        self._vLayout.addLayout(buttonLayout)
         
-        self.gLayout.addWidget(self.groupBox, 1, 0, 2, 2)
-        self.gLayout.addWidget(self.nameLineEdit, 3, 0, 4, 2)
-        self.gLayout.addWidget(self.cancelButton, 5, 0)
-        self.gLayout.addWidget(self.okButton, 5, 1)
-        
-        self.cancelButton.clicked.connect(self.onCancelClicked)
-        self.okButton.clicked.connect(self.onOkClicked)
+        self._isBuilt = True
 
     @pyqtSlot()
     def onCancelClicked(self):
@@ -99,20 +113,20 @@ class ImportDialog(QDialog):
         
     @pyqtSlot()
     def onOkClicked(self):
-        name = self.nameLineEdit.text()
+        name = self._nameLineEdit.text()
         if name == "":
             self.reject()
             return
         
-        if self.titleButton.isChecked():
+        if self._titleButton.isChecked():
             self.value = ti.TitleFileItem(name)
-        elif self.chapterButton.isChecked():
+        elif self._chapterButton.isChecked():
             self.value = ti.ChapterFileItem(name)
-        elif self.sceneButton.isChecked():
+        elif self._sceneButton.isChecked():
             self.value = ti.SceneFileItem(name)
-        elif self.sectionButton.isChecked():
+        elif self._sectionButton.isChecked():
             self.value = ti.SectionFileItem(name)
-        elif self.miscButton.isChecked():
+        elif self._miscButton.isChecked():
             self.value = ti.MiscFileItem(name)
         
         self.accept()
