@@ -21,7 +21,7 @@ from markupwriter.common.tokenizers import XHtmlPreviewTokenizer
 from markupwriter.common.parsers import XHtmlParser
 
 
-class DocumentPreviewWidget(QWidget):
+class PreviewWidget(QWidget):
     def __init__(self, title: str, uuid: str, parent: QWidget | None) -> None:
         super().__init__(parent)
 

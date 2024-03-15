@@ -20,7 +20,7 @@ class DocumentPreviewWorker(QObject):
     def onRefreshTriggered(self):
         tw = self.dpd.view.tabWidget
         index = tw.currentIndex()
-        widget: w.DocumentPreviewWidget = tw.widget(index)
+        widget: w.PreviewWidget = tw.widget(index)
         if widget is None:
             return
         
@@ -30,7 +30,7 @@ class DocumentPreviewWorker(QObject):
     def onToggleTriggered(self):
         tw = self.dpd.view.tabWidget
         index = tw.currentIndex()
-        widget: w.DocumentPreviewWidget = tw.widget(index)
+        widget: w.PreviewWidget = tw.widget(index)
         if widget is None:
             return
         
@@ -55,7 +55,7 @@ class DocumentPreviewWorker(QObject):
         if index < 0:
             return
         tw = self.dpd.view.tabWidget
-        widget: w.DocumentPreviewWidget = tw.widget(index)
+        widget: w.PreviewWidget = tw.widget(index)
         widget.title = new
         tw.setTabText(index, new)
     
@@ -65,7 +65,7 @@ class DocumentPreviewWorker(QObject):
         if width <= 0:
             self.dpd.showViewRequested.emit()
 
-        widget = w.DocumentPreviewWidget(title, uuid, self.dpd.view)
+        widget = w.PreviewWidget(title, uuid, self.dpd.view)
         self._addTabPage(title, uuid, widget)
     
     def _addTabPage(self, title: str, uuid: str, widget: QWidget):
@@ -81,7 +81,7 @@ class DocumentPreviewWorker(QObject):
     def _findPageIndex(self, title: str, uuid: str) -> int:
         tw = self.dpd.view.tabWidget
         for i in range(tw.count()):
-            widget: w.DocumentPreviewWidget = tw.widget(i)
+            widget: w.PreviewWidget = tw.widget(i)
             if widget is None:
                 continue
 

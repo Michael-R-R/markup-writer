@@ -86,6 +86,9 @@ class DocumentEditorWidget(QPlainTextEdit):
         cursor.setPosition(pos)
         self.setTextCursor(cursor)
         self.centerCursor()
+    
+    def hasOpenDocument(self) -> bool:
+        return self.docUUID != ""
         
     def setDocumentText(self, uuid: str, text: str, cpos: int):
         if uuid == "":
@@ -97,9 +100,6 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.moveCursorTo(cpos)
         self.setEnabled(True)
         self.docStatusChanged.emit(True)
-    
-    def hasOpenDocument(self) -> bool:
-        return self.docUUID != ""
     
     def setState(self, state: s.BaseEditorState):
         if self.state is not None:

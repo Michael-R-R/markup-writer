@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     Qt,
+    QDataStream,
     pyqtSignal,
     pyqtSlot,
     QSize,
@@ -39,7 +40,7 @@ class PreviewTabWidget(QTabWidget):
 
         self.currentChanged.connect(self._onCurrentChanged)
         
-    def addTab(self, widget: w.DocumentPreviewWidget, title: str) -> None:
+    def addTab(self, widget: w.PreviewWidget, title: str) -> None:
         super().addTab(widget, title)
         
         self.countChanged.emit(self.count())
@@ -96,14 +97,14 @@ class PreviewTabWidget(QTabWidget):
         
     def scrollContentX(self, direction: int):
         i = self.currentIndex()
-        widget: w.DocumentPreviewWidget = self.widget(i)
+        widget: w.PreviewWidget = self.widget(i)
         if widget is None:
             return
         widget.scrollContentX(direction)
         
     def scrollContentY(self, direction: int):
         i = self.currentIndex()
-        widget: w.DocumentPreviewWidget = self.widget(i)
+        widget: w.PreviewWidget = self.widget(i)
         if widget is None:
             return
         widget.scrollContentY(direction)
@@ -123,3 +124,25 @@ class PreviewTabWidget(QTabWidget):
             case Qt.Key.Key_L:
                 self.scrollContentX(1)
             case _: return super().keyPressEvent(e)
+            
+    def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        count = self.count()
+        sout.writeInt(count)
+        
+        for i in range(count):
+            widget: w.PreviewWidget = self.widget(i)
+            sout.writeQString(widget.title)
+            sout.writeQString(widget.uuid)
+        
+        return sout
+    
+    def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        count = sin.readInt()
+        
+        for _ in range(count):
+            title = sin.readQString()
+            uuid = sin.readQString()
+            widget = w.PreviewWidget(title, uuid, self)
+            self.addTab(widget, title)
+        
+        return sin

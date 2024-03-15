@@ -36,7 +36,9 @@ class DocumentPreviewView(QWidget):
         return super().resizeEvent(e)
     
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        sout << self.tabWidget
         return sout
     
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        sin >> self.tabWidget
         return sin
