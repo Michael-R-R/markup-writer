@@ -27,7 +27,6 @@ from markupwriter.common.util import (
 )
 
 import markupwriter.vdw.delegate as d
-import markupwriter.vdw.worker as w
 
 
 class CoreData(QObject):
@@ -77,21 +76,12 @@ class Core(QObject):
 
         self.mwd = d.MainWindowDelegate(self)
         self.data = None
-        self.mmbw = None
-        self.dtw = None
-        self.dew = None
 
         self.setup(CoreData(self))
 
     def setup(self, data: CoreData):
         self.data = data
         self.data.setup(self.mwd)
-
-        self.mww = w.MainWindowWorker(self.mwd, self)
-        self.mmbw = w.MainMenuBarWorker(self.data.mmbd, self)
-        self.dtw = w.DocumentTreeWorker(self.data.dtd, self)
-        self.dew = w.DocumentEditorWorker(self.data.ded, self)
-        self.dpw = w.DocumentPreviewWorker(self.data.dpd, self)
 
         self._setupCoreSlots()
         self._setupMainWindowWorkerSlots()
@@ -132,82 +122,90 @@ class Core(QObject):
         pass
 
     def _setupMenuBarWorkerSlots(self):
+        worker = self.data.mmbd.worker
+        
         ded = self.data.ded
-        ded.docStatusChanged.connect(self.mmbw.onDocumentStatusChanged)
+        ded.docStatusChanged.connect(worker.onDocumentStatusChanged)
         
         dpd = self.data.dpd
-        dpd.tabCountChanged.connect(self.mmbw.onTabCountChanged)
+        dpd.tabCountChanged.connect(worker.onTabCountChanged)
 
     def _setupTreeWorkerSlots(self):
+        worker = self.data.dtd.worker
+        
         mmbd = self.data.mmbd
-        mmbd.fmImportTxtTriggered.connect(self.dtw.onImportTxtFile)
-        mmbd.vmDocTreeTriggered.connect(self.dtw.onFocusTreeTriggered)
-        mmbd.vmTelescopeTriggered.connect(self.dtw.onTelescopeTriggered)
+        mmbd.fmImportTxtTriggered.connect(worker.onImportTxtFile)
+        mmbd.vmDocTreeTriggered.connect(worker.onFocusTreeTriggered)
+        mmbd.vmTelescopeTriggered.connect(worker.onTelescopeTriggered)
 
         dtd = self.data.dtd
-        dtd.fileAdded.connect(self.dtw.onFileAdded)
-        dtd.fileRemoved.connect(self.dtw.onFileRemoved)
-        dtd.dragDropDone.connect(self.dtw.onDragDropDone)
-        dtd.contextMenuRequested.connect(self.dtw.onContextMenuRequested)
-        dtd.navUpClicked.connect(self.dtw.onNavItemUp)
-        dtd.navDownClicked.connect(self.dtw.onNavItemDown)
-        dtd.cmPreviewClicked.connect(self.dtw.onPreviewItem)
-        dtd.cmRenameClicked.connect(self.dtw.onRenamedItem)
-        dtd.cmToTrashClicked.connect(self.dtw.onTrashItem)
-        dtd.cmRecoverClicked.connect(self.dtw.onRecoverItem)
-        dtd.cmEmptyTrashClicked.connect(self.dtw.onEmptyTrash)
-        dtd.createNovelClicked.connect(self.dtw.onNovelFolderCreated)
-        dtd.createFolderClicked.connect(self.dtw.onMiscFolderCreated)
-        dtd.createTitleClicked.connect(self.dtw.onTitleFileCreated)
-        dtd.createChapterClicked.connect(self.dtw.onChapterFileCreated)
-        dtd.createSceneClicked.connect(self.dtw.onSceneFileCreated)
-        dtd.createSectionClicked.connect(self.dtw.onSectionFileCreated)
-        dtd.createFileClicked.connect(self.dtw.onMiscFileCreated)
+        dtd.fileAdded.connect(worker.onFileAdded)
+        dtd.fileRemoved.connect(worker.onFileRemoved)
+        dtd.dragDropDone.connect(worker.onDragDropDone)
+        dtd.contextMenuRequested.connect(worker.onContextMenuRequested)
+        dtd.navUpClicked.connect(worker.onNavItemUp)
+        dtd.navDownClicked.connect(worker.onNavItemDown)
+        dtd.cmPreviewClicked.connect(worker.onPreviewItem)
+        dtd.cmRenameClicked.connect(worker.onRenamedItem)
+        dtd.cmToTrashClicked.connect(worker.onTrashItem)
+        dtd.cmRecoverClicked.connect(worker.onRecoverItem)
+        dtd.cmEmptyTrashClicked.connect(worker.onEmptyTrash)
+        dtd.createNovelClicked.connect(worker.onNovelFolderCreated)
+        dtd.createFolderClicked.connect(worker.onMiscFolderCreated)
+        dtd.createTitleClicked.connect(worker.onTitleFileCreated)
+        dtd.createChapterClicked.connect(worker.onChapterFileCreated)
+        dtd.createSceneClicked.connect(worker.onSceneFileCreated)
+        dtd.createSectionClicked.connect(worker.onSectionFileCreated)
+        dtd.createFileClicked.connect(worker.onMiscFileCreated)
 
         ded = self.data.ded
-        ded.wordCountChanged.connect(self.dtw.onWordCountChanged)
-        ded.refPreviewRequested.connect(self.dtw.onRefPreviewRequested)
+        ded.wordCountChanged.connect(worker.onWordCountChanged)
+        ded.refPreviewRequested.connect(worker.onRefPreviewRequested)
 
     def _setupEditorWorkerSlots(self):
+        worker = self.data.ded.worker
+        
         mmbd = self.data.mmbd
-        mmbd.dmSpellToggled.connect(self.dew.onSpellToggled)
-        mmbd.vmDocEditorTriggered.connect(self.dew.onFocusEditorTriggered)
+        mmbd.dmSpellToggled.connect(worker.onSpellToggled)
+        mmbd.vmDocEditorTriggered.connect(worker.onFocusEditorTriggered)
 
         dtd = self.data.dtd
-        dtd.fileOpened.connect(self.dew.onFileOpened)
-        dtd.fileRemoved.connect(self.dew.onFileRemoved)
-        dtd.fileMoved.connect(self.dew.onFileMoved)
-        dtd.fileRenamed.connect(self.dew.onFileRenamed)
+        dtd.fileOpened.connect(worker.onFileOpened)
+        dtd.fileRemoved.connect(worker.onFileRemoved)
+        dtd.fileMoved.connect(worker.onFileMoved)
+        dtd.fileRenamed.connect(worker.onFileRenamed)
 
         ded = self.data.ded
-        ded.stateChanged.connect(self.dew.onStateChanged)
-        ded.stateBufferChanged.connect(self.dew.onStateBufferChanged)
-        ded.closeDocClicked.connect(self.dew.onCloseDocument)
-        ded.showRefPopupClicked.connect(self.dew.onShowRefPopupClicked)
-        ded.showRefPreviewClicked.connect(self.dew.onShowRefPreviewClicked)
-        ded.editorResized.connect(self.dew.onEditorResized)
-        ded.contextMenuRequested.connect(self.dew.onContxtMenuRequested)
-        ded.showSearchTriggered.connect(self.dew.onSearchTriggered)
-        ded.searchChanged.connect(self.dew.onSearchChanged)
-        ded.nextSearchClicked.connect(self.dew.onNextSearch)
-        ded.prevSearchCliced.connect(self.dew.onPrevSearch)
-        ded.replaceClicked.connect(self.dew.onReplaceSearch)
-        ded.replaceAllClicked.connect(self.dew.onReplaceAllSearch)
-        ded.closeSearchClicked.connect(self.dew.onSearchTriggered)
+        ded.stateChanged.connect(worker.onStateChanged)
+        ded.stateBufferChanged.connect(worker.onStateBufferChanged)
+        ded.closeDocClicked.connect(worker.onCloseDocument)
+        ded.showRefPopupClicked.connect(worker.onShowRefPopupClicked)
+        ded.showRefPreviewClicked.connect(worker.onShowRefPreviewClicked)
+        ded.editorResized.connect(worker.onEditorResized)
+        ded.contextMenuRequested.connect(worker.onContxtMenuRequested)
+        ded.showSearchTriggered.connect(worker.onSearchTriggered)
+        ded.searchChanged.connect(worker.onSearchChanged)
+        ded.nextSearchClicked.connect(worker.onNextSearch)
+        ded.prevSearchCliced.connect(worker.onPrevSearch)
+        ded.replaceClicked.connect(worker.onReplaceSearch)
+        ded.replaceAllClicked.connect(worker.onReplaceAllSearch)
+        ded.closeSearchClicked.connect(worker.onSearchTriggered)
 
     def _setupPreviewWorkerSlots(self):
+        worker = self.data.dpd.worker
+        
         mmbd = self.data.mmbd
-        mmbd.vmDocPreviewTriggered.connect(self.dpw.onFocusPreviewTriggered)
-        mmbd.dmRefreshPreview.connect(self.dpw.onRefreshTriggered)
-        mmbd.dmTogglePreview.connect(self.dpw.onToggleTriggered)
+        mmbd.vmDocPreviewTriggered.connect(worker.onFocusPreviewTriggered)
+        mmbd.dmRefreshPreview.connect(worker.onRefreshTriggered)
+        mmbd.dmTogglePreview.connect(worker.onToggleTriggered)
 
         dtd = self.data.dtd
-        dtd.fileRemoved.connect(self.dpw.onFileRemoved)
-        dtd.fileRenamed.connect(self.dpw.onFileRenamed)
-        dtd.previewRequested.connect(self.dpw.onFilePreviewed)
+        dtd.fileRemoved.connect(worker.onFileRemoved)
+        dtd.fileRenamed.connect(worker.onFileRenamed)
+        dtd.previewRequested.connect(worker.onFilePreviewed)
 
         dpd = self.data.dpd
-        dpd.closeTabRequested.connect(self.dpw.onCloseTabRequested)
+        dpd.closeTabRequested.connect(worker.onCloseTabRequested)
 
     @pyqtSlot()
     def _onNewProject(self):
@@ -223,8 +221,8 @@ class Core(QObject):
 
         self.setup(CoreData(self))
 
-        self.mmbw.onNewProject()
-        self.dtw.onNewProject()
+        self.data.mmbd.worker.onNewProject()
+        self.data.dtd.worker.onNewProject()
 
         self._onSaveProject()
 
@@ -247,18 +245,18 @@ class Core(QObject):
 
         self.setup(data)
 
-        self.mmbw.onOpenProject()
-        self.dtw.onOpenProject()
+        self.data.mmbd.worker.onOpenProject()
+        self.data.dtd.worker.onOpenProject()
 
-        refManager = self.dew.refManager
+        refManager = self.data.ded.worker.refManager
         StartupParser.run(refManager)
 
-        self.mww.showStatusBarMsg("Project opened...", 1500)
+        self.mwd.worker.showStatusBarMsg("Project opened...", 1500)
 
     @pyqtSlot()
     def _onSaveDocument(self):
-        if self.dew.onSaveDocument():
-            self.mww.showStatusBarMsg("Document saved...", 1500)
+        if self.data.ded.worker.onSaveDocument():
+            self.mwd.worker.showStatusBarMsg("Document saved...", 1500)
 
     @pyqtSlot()
     def _onSaveProject(self):
@@ -270,7 +268,7 @@ class Core(QObject):
         if not Serialize.write(ProjectConfig.filePath(), self.data):
             return False
             
-        self.mww.showStatusBarMsg("Project saved...", 1500)
+        self.mwd.worker.showStatusBarMsg("Project saved...", 1500)
             
         return True
 
@@ -310,7 +308,7 @@ class Core(QObject):
         exporter = EpubExporter()
         exporter.export(tw, self.mwd.view)
 
-        self.mww.showStatusBarMsg("Novel exported...", 1500)
+        self.mwd.worker.showStatusBarMsg("Novel exported...", 1500)
 
     @pyqtSlot()
     def _onCloseProject(self):

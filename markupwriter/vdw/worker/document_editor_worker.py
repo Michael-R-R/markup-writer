@@ -4,6 +4,7 @@ import os, re
 
 from PyQt6.QtCore import (
     QObject,
+    pyqtSignal,
     pyqtSlot,
     QSize,
     QThreadPool,
@@ -25,15 +26,17 @@ from markupwriter.common.referencetag import RefTagManager
 from markupwriter.common.syntax import BEHAVIOUR
 from markupwriter.gui.contextmenus.doceditor import EditorContextMenu
 
-import markupwriter.vdw.delegate as d
+import markupwriter.vdw.view as v
 import markupwriter.gui.widgets as w
 
 
 class DocumentEditorWorker(QObject):
-    def __init__(self, ded: d.DocumentEditorDelegate, parent: QObject | None) -> None:
+    refPreviewRequested = pyqtSignal(str)
+    
+    def __init__(self, dev: v.DocumentEditorView, parent: QObject | None) -> None:
         super().__init__(parent)
 
-        self.ded = ded
+        self.dev = dev
         self.refManager = RefTagManager()
         self.parser = EditorParser()
         self.threadPool = QThreadPool(self)
@@ -49,7 +52,7 @@ class DocumentEditorWorker(QObject):
         te.wordCountChanged.emit(uuid, count)
 
     def findTagAtPos(self, pos: QPoint):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
 
         cursor = te.cursorForPosition(pos)
         cpos = cursor.positionInBlock()
@@ -86,12 +89,12 @@ class DocumentEditorWorker(QObject):
     
     @pyqtSlot()
     def onFocusEditorTriggered(self):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         te.setFocus()
     
     @pyqtSlot(bool)
     def onSpellToggled(self, isToggled: bool):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         highlighter = te.highlighter
         
         highlighter.setBehaviourEnable(BEHAVIOUR.spellCheck, isToggled)
@@ -99,12 +102,12 @@ class DocumentEditorWorker(QObject):
         
     @pyqtSlot(str)
     def onStateChanged(self, text: str):
-        sb = self.ded.view.statusBar
+        sb = self.dev.statusBar
         sb.normLabel.setText(text)
         
     @pyqtSlot(str)
     def onStateBufferChanged(self, text: str):
-        sb = self.ded.view.statusBar
+        sb = self.dev.statusBar
         sb.permLabel.setText(text)
 
     @pyqtSlot()
@@ -124,7 +127,7 @@ class DocumentEditorWorker(QObject):
 
     @pyqtSlot(str, list)
     def onFileOpened(self, uuid: str, paths: list[str]):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         if te.docUUID == uuid:
             return
 
@@ -135,20 +138,20 @@ class DocumentEditorWorker(QObject):
             self.onFileRemoved("", uuid)
             return
 
-        eb = self.ded.view.editorBar
+        eb = self.dev.editorBar
         eb.addPath(paths)
         eb.addCloseAction()
 
         self._runTokenizer()
 
-        sb = self.ded.view.searchBox
+        sb = self.dev.searchBox
         if sb.isVisible():
             text = sb.searchInput.text()
             sb.onSearchChanged(text)
 
     @pyqtSlot(str, str)
     def onFileRemoved(self, title: str, uuid: str):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         self.parser.popPrevUUID(uuid, self.refManager)
         if te.docUUID != uuid:
             return
@@ -156,18 +159,18 @@ class DocumentEditorWorker(QObject):
 
     @pyqtSlot(str, list)
     def onFileMoved(self, uuid: str, paths: list[str]):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         if te.docUUID != uuid:
             return
-        eb = self.ded.view.editorBar
+        eb = self.dev.editorBar
         eb.addPath(paths)
 
     @pyqtSlot(str, str, str)
     def onFileRenamed(self, uuid: str, old: str, new: str):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         if te.docUUID != uuid:
             return
-        eb = self.ded.view.editorBar
+        eb = self.dev.editorBar
         eb.replaceInPath(old, new)
 
     @pyqtSlot(QPoint)
@@ -180,9 +183,9 @@ class DocumentEditorWorker(QObject):
         if uuid is None:
             return
 
-        popup = w.PopupPreviewWidget(uuid, self.ded.view)
+        popup = w.PopupPreviewWidget(uuid, self.dev)
         popup.previewButton.clicked.connect(
-            lambda: self.ded.refPreviewRequested.emit(uuid)
+            lambda: self.refPreviewRequested.emit(uuid)
         )
 
         size = popup.sizeHint()
@@ -203,7 +206,7 @@ class DocumentEditorWorker(QObject):
         if uuid is None:
             return
 
-        self.ded.refPreviewRequested.emit(uuid)
+        self.refPreviewRequested.emit(uuid)
 
     @pyqtSlot(QSize)
     def onEditorResized(self, _: QSize):
@@ -211,7 +214,7 @@ class DocumentEditorWorker(QObject):
 
     @pyqtSlot(QPoint)
     def onContxtMenuRequested(self, pos: QPoint):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         if te.isReadOnly():
             return
 
@@ -223,13 +226,13 @@ class DocumentEditorWorker(QObject):
 
     @pyqtSlot()
     def onSearchTriggered(self):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         if not te.hasOpenDocument():
             return
 
-        sb = self.ded.view.searchBox
+        sb = self.dev.searchBox
         if sb.toggle():
-            self.ded.view.adjustSearchBoxPos()
+            self.dev.adjustSearchBoxPos()
             sb.searchInput.setFocus()
             sb.onSearchChanged(sb.searchInput.text())
         else:
@@ -240,8 +243,8 @@ class DocumentEditorWorker(QObject):
 
     @pyqtSlot(str, bool)
     def onSearchChanged(self, text: str, doHighlight: bool):
-        te = self.ded.view.textEdit
-        sb = self.ded.view.searchBox
+        te = self.dev.textEdit
+        sb = self.dev.searchBox
 
         found = list()
         if text != "":
@@ -274,11 +277,11 @@ class DocumentEditorWorker(QObject):
         if not self._runSearch(0):
             return
 
-        sb = self.ded.view.searchBox
+        sb = self.dev.searchBox
         searchText = sb.searchInput.text()
         replaceText = sb.replaceInput.text()
 
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         cursor = te.textCursor()
         cursor.beginEditBlock()
         cursor.removeSelectedText()
@@ -292,11 +295,11 @@ class DocumentEditorWorker(QObject):
 
     @pyqtSlot()
     def onReplaceAllSearch(self):
-        sb = self.ded.view.searchBox
+        sb = self.dev.searchBox
         searchText = sb.searchInput.text()
         replaceText = sb.replaceInput.text()
 
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         doc = te.document()
         cursor = te.textCursor()
         cursor.setPosition(0)
@@ -318,14 +321,14 @@ class DocumentEditorWorker(QObject):
         sb.setFound(list())
 
     def _resetWidgets(self):
-        eb = self.ded.view.editorBar
-        te = self.ded.view.textEdit
+        eb = self.dev.editorBar
+        te = self.dev.textEdit
 
         eb.reset()
         te.reset()
 
     def _readFromDisk(self, uuid: str) -> bool:
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         path = ProjectConfig.contentPath()
         if path is None:
             te.reset()
@@ -347,7 +350,7 @@ class DocumentEditorWorker(QObject):
         return True
 
     def _writeToDisk(self) -> bool:
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         if not te.hasOpenDocument():
             return False
 
@@ -367,7 +370,7 @@ class DocumentEditorWorker(QObject):
         return True
 
     def _resizeMargins(self):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
 
         mSize = QGuiApplication.primaryScreen().size()
         mW = mSize.width()
@@ -385,7 +388,7 @@ class DocumentEditorWorker(QObject):
         te.setViewportMargins(wW, wH, wW, wH)
 
     def _runTokenizer(self):
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         if not te.hasOpenDocument():
             return
 
@@ -397,11 +400,11 @@ class DocumentEditorWorker(QObject):
         self.threadPool.start(tokenizer)
 
     def _runSearch(self, direction: int) -> bool:
-        te = self.ded.view.textEdit
+        te = self.dev.textEdit
         cursor = te.textCursor()
         cpos = cursor.position()
 
-        sb = self.ded.view.searchBox
+        sb = self.dev.searchBox
         found = sb.runMatch(cpos, direction)
         if found is None:
             return False

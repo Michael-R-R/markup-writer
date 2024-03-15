@@ -5,20 +5,20 @@ from PyQt6.QtCore import (
     pyqtSlot,
 )
 
-import markupwriter.vdw.delegate as d
+import markupwriter.vdw.view as v
 
 
 class MainWindowWorker(QObject):
-    def __init__(self, mwd: d.MainWindowDelegate, parent: QObject | None) -> None:
+    def __init__(self, mwv: v.MainWindowView, parent: QObject | None) -> None:
         super().__init__(parent)
 
-        self.mwd = mwd
+        self.mwv = mwv
         
     def showStatusBarMsg(self, msg: str, msecs: int):
-        sb = self.mwd.view.statusBar()
+        sb = self.mwv.statusBar()
         sb.showMessage(msg, msecs)
         
     @pyqtSlot(str)
     def onShowPermMsg(self, msg: str):
-        sb = self.mwd.view.statusBarWidget
+        sb = self.mwv.statusBarWidget
         sb.normLabel.setText(msg)

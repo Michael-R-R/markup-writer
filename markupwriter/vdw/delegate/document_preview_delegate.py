@@ -7,6 +7,7 @@ from PyQt6.QtCore import (
 )
 
 import markupwriter.vdw.view as v
+import markupwriter.vdw.worker as w
 
 
 class DocumentPreviewDelegate(QObject):
@@ -18,6 +19,7 @@ class DocumentPreviewDelegate(QObject):
         super().__init__(parent)
 
         self.view = v.DocumentPreviewView(None)
+        self.worker = w.DocumentPreviewWorker(self.view, self)
         
         self._setupViewConnections()
 

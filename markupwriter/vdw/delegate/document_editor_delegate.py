@@ -9,6 +9,7 @@ from PyQt6.QtCore import (
 )
 
 import markupwriter.vdw.view as v
+import markupwriter.vdw.worker as w
 
 
 class DocumentEditorDelegate(QObject):
@@ -37,6 +38,7 @@ class DocumentEditorDelegate(QObject):
         super().__init__(parent)
 
         self.view = v.DocumentEditorView(None)
+        self.worker = w.DocumentEditorWorker(self.view, self)
 
         self._setupViewConnections()
 
@@ -64,6 +66,9 @@ class DocumentEditorDelegate(QObject):
         sb.replaceAction.triggered.connect(lambda: self.replaceClicked.emit())
         sb.replaceAllAction.triggered.connect(lambda: self.replaceAllClicked.emit())
         sb.closeAction.triggered.connect(lambda: self.closeSearchClicked.emit())
+        
+        worker = self.worker
+        worker.refPreviewRequested.connect(lambda x: self.refPreviewRequested.emit(x))
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.view

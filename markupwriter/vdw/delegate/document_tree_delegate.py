@@ -8,6 +8,7 @@ from PyQt6.QtCore import (
 )
 
 import markupwriter.vdw.view as v
+import markupwriter.vdw.worker as w
 import markupwriter.gui.menus.doctree as dtm
 
 
@@ -42,6 +43,7 @@ class DocumentTreeDelegate(QObject):
         super().__init__(parent)
 
         self.view = v.DocumentTreeView(None)
+        self.worker = w.DocumentTreeWorker(self.view, self)
 
         self._setupViewConnections()
 

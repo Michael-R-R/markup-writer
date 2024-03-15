@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import (
 )
 
 import markupwriter.vdw.view as v
+import markupwriter.vdw.worker as w
 
 
 class MainWindowDelegate(QObject):
@@ -19,7 +20,9 @@ class MainWindowDelegate(QObject):
     
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
+        
         self.view = v.MainWindowView(None)
+        self.worker = w.MainWindowWorker(self.view, self)
         
         self._setupViewConnections()
         

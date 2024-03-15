@@ -1,24 +1,24 @@
 from PyQt6.QtCore import QObject, pyqtSlot
 from PyQt6.QtWidgets import QWidget
 
-import markupwriter.vdw.delegate as d
+import markupwriter.vdw.view as v
 import markupwriter.gui.widgets as w
 
 
 class DocumentPreviewWorker(QObject):
-    def __init__(self, dpd: d.DocumentPreviewDelegate, parent: QObject | None) -> None:
+    def __init__(self, dpv: v.DocumentPreviewView, parent: QObject | None) -> None:
         super().__init__(parent)
         
-        self.dpd = dpd
+        self.dpv = dpv
         
     @pyqtSlot()
     def onFocusPreviewTriggered(self):
-        tw = self.dpd.view.tabWidget
+        tw = self.dpv.tabWidget
         tw.setFocus()
         
     @pyqtSlot()
     def onRefreshTriggered(self):
-        tw = self.dpd.view.tabWidget
+        tw = self.dpv.tabWidget
         index = tw.currentIndex()
         widget: w.PreviewWidget = tw.widget(index)
         if widget is None:
@@ -28,7 +28,7 @@ class DocumentPreviewWorker(QObject):
     
     @pyqtSlot()
     def onToggleTriggered(self):
-        tw = self.dpd.view.tabWidget
+        tw = self.dpv.tabWidget
         index = tw.currentIndex()
         widget: w.PreviewWidget = tw.widget(index)
         if widget is None:
@@ -38,7 +38,7 @@ class DocumentPreviewWorker(QObject):
         
     @pyqtSlot(int)
     def onCloseTabRequested(self, index: int):
-        tw = self.dpd.view.tabWidget
+        tw = self.dpv.tabWidget
         tw.removeTab(index)
         
     @pyqtSlot(str, str)
@@ -46,7 +46,7 @@ class DocumentPreviewWorker(QObject):
         index = self._findPageIndex(title, uuid)
         if index < 0:
             return
-        tw = self.dpd.view.tabWidget
+        tw = self.dpv.tabWidget
         tw.removeTab(index)
     
     @pyqtSlot(str, str, str)
@@ -54,22 +54,22 @@ class DocumentPreviewWorker(QObject):
         index = self._findPageIndex(old, uuid)
         if index < 0:
             return
-        tw = self.dpd.view.tabWidget
+        tw = self.dpv.tabWidget
         widget: w.PreviewWidget = tw.widget(index)
         widget.title = new
         tw.setTabText(index, new)
     
     @pyqtSlot(str, str)
     def onFilePreviewed(self, title: str, uuid: str):
-        width = self.dpd.view.size().width()
+        width = self.dpv.size().width()
         if width <= 0:
-            self.dpd.showViewRequested.emit()
+            self.dpv.showViewRequested.emit()
 
-        widget = w.PreviewWidget(title, uuid, self.dpd.view)
+        widget = w.PreviewWidget(title, uuid, self.dpv)
         self._addTabPage(title, uuid, widget)
     
     def _addTabPage(self, title: str, uuid: str, widget: QWidget):
-        tw = self.dpd.view.tabWidget
+        tw = self.dpv.tabWidget
         index = self._findPageIndex(title, uuid)
         if index > -1:
             tw.setCurrentIndex(index)
@@ -79,7 +79,7 @@ class DocumentPreviewWorker(QObject):
         tw.setCurrentWidget(widget)
         
     def _findPageIndex(self, title: str, uuid: str) -> int:
-        tw = self.dpd.view.tabWidget
+        tw = self.dpv.tabWidget
         for i in range(tw.count()):
             widget: w.PreviewWidget = tw.widget(i)
             if widget is None:

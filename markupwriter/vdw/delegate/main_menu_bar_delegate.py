@@ -7,6 +7,7 @@ from PyQt6.QtCore import (
 )
 
 import markupwriter.vdw.view as v
+import markupwriter.vdw.worker as w
 
 
 class MainMenuBarDelegate(QObject):
@@ -33,6 +34,7 @@ class MainMenuBarDelegate(QObject):
         super().__init__(parent)
 
         self.view = v.MainMenuBarView(None)
+        self.worker = w.MainMenuBarWorker(self.view, self)
 
         self._setupFileMenuConnections()
 

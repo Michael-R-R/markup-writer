@@ -22,25 +22,25 @@ from markupwriter.gui.dialogs.modal import (
 from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 
-import markupwriter.vdw.delegate as d
+import markupwriter.vdw.view as v
 import markupwriter.gui.dialogs.modal as dm
 import markupwriter.gui.widgets as w
 import markupwriter.support.doctree.item as ti
 
 
 class DocumentTreeWorker(QObject):
-    def __init__(self, dtd: d.DocumentTreeDelegate, parent: QObject | None) -> None:
+    def __init__(self, dtv: v.DocumentTreeView, parent: QObject | None) -> None:
         super().__init__(parent)
 
-        self.dtd = dtd
+        self.dtv = dtv
         
     def onNewProject(self):
-        tb = self.dtd.view.treeBar
+        tb = self.dtv.treeBar
         tb.navUpAction.setEnabled(True)
         tb.navDownAction.setEnabled(True)
         tb.itemMenuAction.setEnabled(True)
         
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         tcm = tw.treeContextMenu
         tcm.itemMenu.setEnabled(True)
         
@@ -52,17 +52,17 @@ class DocumentTreeWorker(QObject):
         tw.add(ti.TrashFolderItem())
         
     def onOpenProject(self):
-        tb = self.dtd.view.treeBar
+        tb = self.dtv.treeBar
         tb.navUpAction.setEnabled(True)
         tb.navDownAction.setEnabled(True)
         tb.itemMenuAction.setEnabled(True)
         
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         tcm = tw.treeContextMenu
         tcm.itemMenu.setEnabled(True)
         
     def refreshParentWordCounts(self, child: QTreeWidgetItem, owc: int, wc: int):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         
         item = child.parent()
         while item is not None:
@@ -72,7 +72,7 @@ class DocumentTreeWorker(QObject):
             item = item.parent()
         
     def refreshAllWordCounts(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         
         def helper(pitem: QTreeWidgetItem) -> int:
             pw: ti.BaseTreeItem = tw.itemWidget(pitem, 0)
@@ -91,7 +91,7 @@ class DocumentTreeWorker(QObject):
             helper(item)
             
     def findTrashFolder(self) -> QTreeWidgetItem | None:
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         
         for i in range(tw.topLevelItemCount() - 1, -1, -1):
             item = tw.topLevelItem(i)
@@ -114,7 +114,7 @@ class DocumentTreeWorker(QObject):
     
     @pyqtSlot()
     def onImportTxtFile(self):
-        dialog = dm.ImportDialog("", self.dtd.view)
+        dialog = dm.ImportDialog("", self.dtv)
         if dialog.exec() != 1:
             return
         
@@ -128,14 +128,14 @@ class DocumentTreeWorker(QObject):
             ErrorDialog.run("ERROR: cannot write file contents", None)
             return
         
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         tw.blockSignals(True)
         tw.add(dialog.value)
         tw.blockSignals(False)
     
     @pyqtSlot()
     def onFocusTreeTriggered(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         tw.setFocus()
         tw.setExpanded(tw.currentIndex(), True)
         
@@ -163,7 +163,7 @@ class DocumentTreeWorker(QObject):
         
     @pyqtSlot(QPoint)
     def onContextMenuRequested(self, pos: QPoint):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         
         item = tw.itemAt(pos)
         widget: ti.BaseTreeItem = tw.itemWidget(item, 0)
@@ -183,30 +183,30 @@ class DocumentTreeWorker(QObject):
         
     @pyqtSlot()
     def onNavItemUp(self):
-        self.dtd.view.treeWidget.translate(-1)
+        self.dtv.treeWidget.translate(-1)
     
     @pyqtSlot()
     def onNavItemDown(self):
-        self.dtd.view.treeWidget.translate(1)
+        self.dtv.treeWidget.translate(1)
     
     @pyqtSlot()
     def onPreviewItem(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = tw.currentItem()
         if item is None:
             return
 
         widget: ti.BaseTreeItem = tw.itemWidget(item, 0)
-        self.dtd.previewRequested.emit(widget.title(), widget.UUID())
+        tw.filePreviewed.emit(widget.title(), widget.UUID())
     
     @pyqtSlot()
     def onRenamedItem(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = tw.currentItem()
         if item is None:
             return
         
-        name = StrDialog.run("Rename", "", self.dtd.view)
+        name = StrDialog.run("Rename", "", self.dtv)
         if name is None:
             return
         
@@ -214,12 +214,12 @@ class DocumentTreeWorker(QObject):
     
     @pyqtSlot()
     def onTrashItem(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = tw.currentItem()
         if item is None:
             return
         
-        if not YesNoDialog.run("Move to trash?", self.dtd.view):
+        if not YesNoDialog.run("Move to trash?", self.dtv):
             return
         
         trash = self.findTrashFolder()
@@ -230,7 +230,7 @@ class DocumentTreeWorker(QObject):
     
     @pyqtSlot()
     def onRecoverItem(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = tw.currentItem()
         if item is None:
             return
@@ -239,12 +239,12 @@ class DocumentTreeWorker(QObject):
     
     @pyqtSlot()
     def onEmptyTrash(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = tw.currentItem()
         if item is None:
             return
 
-        if not YesNoDialog.run("Empty trash?", self.dtd.view):
+        if not YesNoDialog.run("Empty trash?", self.dtv):
             return
 
         for i in range(item.childCount() - 1, -1, -1):
@@ -252,70 +252,70 @@ class DocumentTreeWorker(QObject):
 
     @pyqtSlot()
     def onNovelFolderCreated(self):
-        title = StrDialog.run("Novel Name", "Novel", self.dtd.view)
+        title = StrDialog.run("Novel Name", "Novel", self.dtv)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = ti.NovelFolderItem(title, tw)
         tw.add(item)
 
     @pyqtSlot()
     def onMiscFolderCreated(self):
-        title = StrDialog.run("Folder Name", "Folder", self.dtd.view)
+        title = StrDialog.run("Folder Name", "Folder", self.dtv)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = ti.MiscFolderItem(title, tw)
         tw.add(item)
 
     @pyqtSlot()
     def onTitleFileCreated(self):
-        title = StrDialog.run("Title Name", "Title", self.dtd.view)
+        title = StrDialog.run("Title Name", "Title", self.dtv)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = ti.TitleFileItem(title, tw)
         tw.add(item)
 
     @pyqtSlot()
     def onChapterFileCreated(self):
-        title = StrDialog.run("Chapter Name", "Chapter", self.dtd.view)
+        title = StrDialog.run("Chapter Name", "Chapter", self.dtv)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = ti.ChapterFileItem(title, tw)
         tw.add(item)
 
     @pyqtSlot()
     def onSceneFileCreated(self):
-        title = StrDialog.run("Scene Name", "Scene", self.dtd.view)
+        title = StrDialog.run("Scene Name", "Scene", self.dtv)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = ti.SceneFileItem(title, tw)
         tw.add(item)
 
     @pyqtSlot()
     def onSectionFileCreated(self):
-        title = StrDialog.run("Section Name", "Section", self.dtd.view)
+        title = StrDialog.run("Section Name", "Section", self.dtv)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = ti.SectionFileItem(title, tw)
         tw.add(item)
 
     @pyqtSlot()
     def onMiscFileCreated(self):
-        title = StrDialog.run("Misc. Name", "Misc.", self.dtd.view)
+        title = StrDialog.run("Misc. Name", "Misc.", self.dtv)
         if title is None:
             return
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         item = ti.MiscFileItem(title, tw)
         tw.add(item)
         
     @pyqtSlot(str, int)
     def onWordCountChanged(self, uuid: str, count: int):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         widget = tw.findWidget(uuid)
         if widget is None:
             return
@@ -330,15 +330,15 @@ class DocumentTreeWorker(QObject):
         
     @pyqtSlot(str)
     def onRefPreviewRequested(self, uuid: str):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         widget: ti.BaseTreeItem = tw.findWidget(uuid)
         if widget is None:
             return
-        self.dtd.previewRequested.emit(widget.title(), uuid)
+        tw.filePreviewed.emit(widget.title(), uuid)
         
     @pyqtSlot()
     def onTelescopeTriggered(self):
-        tw = self.dtd.view.treeWidget
+        tw = self.dtv.treeWidget
         telescope = w.TelescopeWidget(tw, tw)
         telescope.resize(800, 400)
         telescope.show()

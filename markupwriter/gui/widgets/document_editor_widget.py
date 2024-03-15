@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import re
+import os, re
 
 from PyQt6.QtCore import (
     Qt,
