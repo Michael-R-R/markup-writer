@@ -2,7 +2,6 @@
 
 from PyQt6.QtCore import (
     Qt,
-    QDataStream,
     QSize,
 )
 
@@ -64,15 +63,3 @@ class DocumentEditorBarWidget(QWidget):
         
     def addCloseAction(self):
         self.toolBar.addAction(self.closeAction)
-    
-    def __rlshift__(self, sout: QDataStream) -> QDataStream:
-        sout.writeQString(self.pathLabel.text())
-        return sout
-
-    def __rrshift__(self, sin: QDataStream) -> QDataStream:
-        pathText = sin.readQString()
-        if pathText != "":
-            self.pathLabel.setText(pathText)
-            self.addCloseAction()
-        
-        return sin

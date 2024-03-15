@@ -127,6 +127,9 @@ class DocumentEditorWorker(QObject):
 
     @pyqtSlot(str, list)
     def onFileOpened(self, uuid: str, paths: list[str]):
+        if uuid == "":
+            return
+        
         te = self.dev.textEdit
         if te.docUUID == uuid:
             return
