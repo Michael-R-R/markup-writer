@@ -81,6 +81,9 @@ class DocumentTreeDelegate(QObject):
 
         im = icm.itemMenu
         self._setupItemMenuConnections(im)
+        
+        worker = self.worker
+        worker.filePreviewed.connect(lambda x, y: self.previewRequested.emit(x, y))
 
     def _setupItemMenuConnections(self, im: dtm.ItemMenu):
         im.novelAction.triggered.connect(lambda: self.createNovelClicked.emit())

@@ -352,6 +352,7 @@ class DocumentTreeWidget(QTreeWidget):
                 iChild = iParent.child(i)
                 wChild: ti.BaseTreeItem = self.itemWidget(iChild, 0)
                 sOut.writeQString(wChild.__class__.__name__)
+                sout.writeBool(iChild.isExpanded())
                 helper(sOut, iChild)
                 sOut << wChild
                 
@@ -365,6 +366,7 @@ class DocumentTreeWidget(QTreeWidget):
             iParent = self.topLevelItem(i)
             wParent: ti.BaseTreeItem = self.itemWidget(iParent, 0)
             sout.writeQString(wParent.__class__.__name__)
+            sout.writeBool(iParent.isExpanded())
             sout << wParent
 
             # Child level items
@@ -375,17 +377,21 @@ class DocumentTreeWidget(QTreeWidget):
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
 
         # recursive helper
-        def helper(sIn: QDataStream, iParent: QTreeWidgetItem):
-            cCount = sIn.readInt()
+        def helper(sin: QDataStream, iParent: QTreeWidgetItem):
+            cCount = sin.readInt()
 
             for _ in range(cCount):
-                type = sIn.readQString()
+                type = sin.readQString()
+                isExpanded = sin.readBool()
                 cwidget: ti.BaseTreeItem = TreeItemFactory.make(type)
-                helper(sIn, cwidget.item)
-                sIn >> cwidget
+                helper(sin, cwidget.item)
+                sin >> cwidget
 
                 iParent.addChild(cwidget.item)
                 self.setItemWidget(cwidget.item, 0, cwidget)
+                
+                if isExpanded:
+                    self.expandItem(cwidget.item)
 
                 self.fileAdded.emit(cwidget.UUID())
                 
@@ -396,6 +402,7 @@ class DocumentTreeWidget(QTreeWidget):
         # Top level items
         for _ in range(iCount):
             type = sin.readQString()
+            isExpanded = sin.readBool()
             pwidget: ti.BaseTreeItem = TreeItemFactory.make(type)
             sin >> pwidget
 
@@ -404,6 +411,9 @@ class DocumentTreeWidget(QTreeWidget):
 
             self.addTopLevelItem(pwidget.item)
             self.setItemWidget(pwidget.item, 0, pwidget)
+            
+            if isExpanded:
+                self.expandItem(pwidget.item)
 
             self.fileAdded.emit(pwidget.UUID())
 

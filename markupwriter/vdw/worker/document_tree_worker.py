@@ -4,6 +4,7 @@ import os
 
 from PyQt6.QtCore import (
     QObject,
+    pyqtSignal,
     pyqtSlot,
     QPoint,
 )
@@ -29,6 +30,8 @@ import markupwriter.support.doctree.item as ti
 
 
 class DocumentTreeWorker(QObject):
+    filePreviewed = pyqtSignal(str, str)
+    
     def __init__(self, dtv: v.DocumentTreeView, parent: QObject | None) -> None:
         super().__init__(parent)
 
@@ -197,7 +200,7 @@ class DocumentTreeWorker(QObject):
             return
 
         widget: ti.BaseTreeItem = tw.itemWidget(item, 0)
-        tw.filePreviewed.emit(widget.title(), widget.UUID())
+        self.filePreviewed.emit(widget.title(), widget.UUID())
     
     @pyqtSlot()
     def onRenamedItem(self):
@@ -334,7 +337,7 @@ class DocumentTreeWorker(QObject):
         widget: ti.BaseTreeItem = tw.findWidget(uuid)
         if widget is None:
             return
-        tw.filePreviewed.emit(widget.title(), uuid)
+        self.filePreviewed.emit(widget.title(), uuid)
         
     @pyqtSlot()
     def onTelescopeTriggered(self):
