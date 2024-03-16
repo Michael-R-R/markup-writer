@@ -43,9 +43,10 @@ class CoreData(QObject):
         mwd.worker.setMenuBar(self.mmbd.view)
         mwd.worker.setCentralWidget(self.cwd.view)
 
-        self.cwd.insertWidgetLHS(0, self.dtd.view)
-        self.cwd.insertWidgetRHS(0, self.ded.view)
-        self.cwd.addWidgetRHS(self.dpd.view)
+        cww = self.cwd.worker
+        cww.insertWidgetLHS(0, self.dtd.view)
+        cww.insertWidgetRHS(0, self.ded.view)
+        cww.addWidgetRHS(self.dpd.view)
         
         self.mmbd.setup()
         self.cwd.setup()

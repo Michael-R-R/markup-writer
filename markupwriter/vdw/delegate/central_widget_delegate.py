@@ -10,9 +10,11 @@ from PyQt6.QtWidgets import (
 )
 
 from . import BaseDelegate
+
 from markupwriter.config import AppConfig
 
 import markupwriter.vdw.view as v
+import markupwriter.vdw.worker as w
 
 
 class CentralWidgetDelegate(BaseDelegate):
@@ -20,6 +22,7 @@ class CentralWidgetDelegate(BaseDelegate):
         super().__init__(parent)
         
         self.view = v.CentralWidgetView(None)
+        self.worker = w.CentralWidgetWorker(self.view, self)
         
         self.setupConnections()
         
@@ -27,29 +30,11 @@ class CentralWidgetDelegate(BaseDelegate):
         dts = AppConfig.docTreeSize
         des = AppConfig.docEditorSize
         dps = AppConfig.docPreviewSize
-        self.setSizesLHS([dts.width(), des.width() + dps.width()])
-        self.setSizesRHS([des.width(), dps.width()])
+        self.worker.setSizesLHS([dts.width(), des.width() + dps.width()])
+        self.worker.setSizesRHS([des.width(), dps.width()])
         
     def setupConnections(self):
         pass
-        
-    def insertWidgetLHS(self, i: int, widget: QWidget):
-        self.view.lhSplitter.insertWidget(i, widget)
-        
-    def insertWidgetRHS(self, i: int, widget: QWidget):
-        self.view.rhSplitter.insertWidget(i, widget)
-        
-    def addWidgetLHS(self, widget: QWidget):
-        self.view.lhSplitter.addWidget(widget)
-        
-    def addWidgetRHS(self, widget: QWidget):
-        self.view.rhSplitter.addWidget(widget)
-        
-    def setSizesLHS(self, sizes: list[int]):
-        self.view.lhSplitter.setSizes(sizes)
-        
-    def setSizesRHS(self, sizes: list[int]):
-        self.view.rhSplitter.setSizes(sizes)
         
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.view
