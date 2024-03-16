@@ -6,8 +6,8 @@ to support large novel organization needs.
 Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a href="https://github.com/vkbo/novelWriter">novelWriter</a>, and <a href="https://github.com/NvChad/NvChad">NvChad</a>
 
 # Showcase
-<video src="https://github.com/Michael-R-R/markup-writer/assets/54217603/a6d5950c-af11-4f22-b1bc-2011abc55a86" width="320" height="200" controls preload></video>
-<p align=center><img align=center src="https://github.com/Michael-R-R/markup-writer/assets/54217603/c0eccbbd-4697-44ec-bd22-a5801ee004b7"></p>
+<video src="https://github.com/Michael-R-R/markup-writer/assets/54217603/eac84838-eb4f-425c-9871-9e4044077db7" width="320" height="200" controls preload></video>
+<p align=center><img align=center src="https://github.com/Michael-R-R/markup-writer/assets/54217603/985f98c6-d791-4ad4-88f1-783ab7f3aa61"></p>
 <p align=center><img align=center src="https://github.com/Michael-R-R/markup-writer/assets/54217603/fc7a7e4f-5310-4907-b62a-956d4af5922c"></p>
 
 ## Features
