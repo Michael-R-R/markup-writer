@@ -83,14 +83,8 @@ class DocumentEditorWidget(QPlainTextEdit):
         text = File.read(path)
         if text is None:
             return False
-        
-        cpos = 0
-        found = re.search(r"^cpos:.+", text)
-        if found is not None:
-            cpos = int(found.group(0)[5:])
-            text = text[found.end() + 1 :]
             
-        self.setText(uuid, text, cpos)
+        self.setText(uuid, text)
         
         return True
         
@@ -127,10 +121,16 @@ class DocumentEditorWidget(QPlainTextEdit):
     def hasOpenDocument(self) -> bool:
         return self.docUUID != ""
         
-    def setText(self, uuid: str, text: str, cpos: int):
+    def setText(self, uuid: str, text: str):
         if uuid == "":
             self.reset()
             return
+        
+        cpos = 0
+        found = re.search(r"^cpos:.+", text)
+        if found is not None:
+            cpos = int(found.group(0)[5:])
+            text = text[found.end() + 1 :]
         
         self.docUUID = uuid
         self.setPlainText(text)
