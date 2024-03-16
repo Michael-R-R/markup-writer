@@ -29,6 +29,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.common.syntax import Highlighter
+from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 
 import markupwriter.support.doceditor as de
@@ -235,8 +236,16 @@ class DocumentEditorWidget(QPlainTextEdit):
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.spellChecker
+        sout.writeQString(self.docUUID)
         return sout
 
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
         sin >> self.spellChecker
+        
+        uuid = sin.readQString()
+        if ProjectConfig.hasActiveProject():
+            cpath = ProjectConfig.contentPath()
+            path = os.path.join(cpath, uuid)
+            self.read(uuid, path)
+        
         return sin

@@ -2,6 +2,7 @@
 
 from PyQt6.QtCore import (
     Qt,
+    QDataStream,
     QSize,
 )
 
@@ -47,14 +48,28 @@ class DocumentEditorBarWidget(QWidget):
         self.toolBar.clear()
         
     def addPath(self, text: str):
+        if text == "":
+            return
+        
         self.reset()
         self.pathLabel.setText(text)
         self.addCloseAction()
         
     def replaceInPath(self, old: str, new: str):
+        if new == "":
+            return
+        
         text = self.pathLabel.text()
         text = text.replace(old, new)
         self.pathLabel.setText(text)
         
     def addCloseAction(self):
         self.toolBar.addAction(self.closeAction)
+        
+    def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        sout.writeQString(self.pathLabel.text())
+        return sout
+
+    def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        self.addPath(sin.readQString())
+        return sin

@@ -51,9 +51,11 @@ class DocumentEditorView(QWidget):
         return super().resizeEvent(e)
     
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
+        sout << self.editorBar
         sout << self.textEdit
         return sout
 
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
+        sin >> self.editorBar
         sin >> self.textEdit
         return sin
