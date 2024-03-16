@@ -29,6 +29,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.common.syntax import Highlighter
+from markupwriter.common.util import File
 
 import markupwriter.support.doceditor as de
 import markupwriter.support.doceditor.state as s
@@ -74,6 +75,42 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setEnabled(False)
         self.docUUID = ""
         self.docStatusChanged.emit(False)
+        
+    def read(self, uuid: str, path: str) -> bool:
+        if uuid == "":
+            return False,
+        
+        text = File.read(path)
+        if text is None:
+            return False
+        
+        cpos = 0
+        found = re.search(r"^cpos:.+", text)
+        if found is not None:
+            cpos = int(found.group(0)[5:])
+            text = text[found.end() + 1 :]
+            
+        self.setText(uuid, text, cpos)
+        
+        return True
+        
+    def write(self, path: str) -> bool:
+        if not self.hasOpenDocument():
+            return False
+        
+        cpos = self.textCursor().position()
+        text = self.toPlainText()
+        text = f"cpos:{cpos}\n{text}"
+        
+        return File.write(path, text)
+    
+    def checkWordCount(self):
+        if not self.hasOpenDocument():
+            return
+        
+        count = len(re.findall(r"\S+", self.toPlainText()))
+        
+        self.wordCountChanged.emit(self.docUUID, count)
 
     def cursorToEnd(self):
         cursor = self.textCursor()
@@ -90,7 +127,7 @@ class DocumentEditorWidget(QPlainTextEdit):
     def hasOpenDocument(self) -> bool:
         return self.docUUID != ""
         
-    def setDocumentText(self, uuid: str, text: str, cpos: int):
+    def setText(self, uuid: str, text: str, cpos: int):
         if uuid == "":
             self.reset()
             return

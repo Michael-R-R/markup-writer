@@ -46,15 +46,10 @@ class DocumentEditorBarWidget(QWidget):
         self.pathLabel.clear()
         self.toolBar.clear()
         
-    def addPath(self, paths: list[str]):
-        text = ""
-        count = len(paths)
-        for i in range(count - 1):
-            text += "{} \u203a ".format(paths[i])
-
-        text += "{}".format(paths[count - 1])
-
+    def addPath(self, text: str):
+        self.reset()
         self.pathLabel.setText(text)
+        self.addCloseAction()
         
     def replaceInPath(self, old: str, new: str):
         text = self.pathLabel.text()

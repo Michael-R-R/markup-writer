@@ -41,16 +41,6 @@ class DocumentEditorWorker(QObject):
         self.parser = EditorParser()
         self.threadPool = QThreadPool(self)
 
-    def runWordCount(self, te: w.DocumentEditorWidget):
-        if not te.hasOpenDocument():
-            return
-
-        uuid = te.docUUID
-        text = te.toPlainText()
-        count = len(re.findall(r"\S+", text))
-
-        te.wordCountChanged.emit(uuid, count)
-
     def findTagAtPos(self, pos: QPoint):
         te = self.dev.textEdit
 
@@ -117,10 +107,14 @@ class DocumentEditorWorker(QObject):
 
     @pyqtSlot()
     def onSaveDocument(self) -> bool:
-        status = self._writeToDisk()
-        if not status:
+        te = self.dev.textEdit
+        
+        cpath = ProjectConfig.contentPath()
+        path = os.path.join(cpath, te.docUUID)
+        if not te.write(path):
             return False
 
+        te.checkWordCount()
         self._runTokenizer()
 
         return True
@@ -133,17 +127,21 @@ class DocumentEditorWorker(QObject):
         te = self.dev.textEdit
         if te.docUUID == uuid:
             return
-
-        self._writeToDisk()
+        
+        cpath = ProjectConfig.contentPath()
+        
+        path = os.path.join(cpath, te.docUUID)
+        te.write(path)
+        te.checkWordCount()
         self._runTokenizer()
 
-        if not self._readFromDisk(uuid):
+        path = os.path.join(cpath, uuid)
+        if not te.read(uuid, path):
             self.onFileRemoved("", uuid)
             return
 
         eb = self.dev.editorBar
-        eb.addPath(paths)
-        eb.addCloseAction()
+        eb.addPath(self._buildPath(paths))
 
         self._runTokenizer()
 
@@ -166,7 +164,7 @@ class DocumentEditorWorker(QObject):
         if te.docUUID != uuid:
             return
         eb = self.dev.editorBar
-        eb.addPath(paths)
+        eb.addPath(self._buildPath(paths))
 
     @pyqtSlot(str, str, str)
     def onFileRenamed(self, uuid: str, old: str, new: str):
@@ -330,48 +328,6 @@ class DocumentEditorWorker(QObject):
         eb.reset()
         te.reset()
 
-    def _readFromDisk(self, uuid: str) -> bool:
-        te = self.dev.textEdit
-        path = ProjectConfig.contentPath()
-        if path is None:
-            te.reset()
-            return False
-
-        path = os.path.join(path, uuid)
-        content = File.read(path)
-        if content is None:
-            return False
-
-        cpos = 0
-        found = re.search(r"^cpos:.+", content)
-        if found is not None:
-            cpos = int(found.group(0)[5:])
-            content = content[found.end() + 1 :]
-
-        te.setDocumentText(uuid, content, cpos)
-
-        return True
-
-    def _writeToDisk(self) -> bool:
-        te = self.dev.textEdit
-        if not te.hasOpenDocument():
-            return False
-
-        path = ProjectConfig.contentPath()
-        if path is None:
-            return False
-
-        content = "cpos:{}\n".format(te.textCursor().position())
-        content += te.toPlainText()
-
-        path = os.path.join(path, te.docUUID)
-        if not File.write(path, content):
-            return False
-
-        self.runWordCount(te)
-
-        return True
-
     def _resizeMargins(self):
         te = self.dev.textEdit
 
@@ -389,6 +345,16 @@ class DocumentEditorWorker(QObject):
         wH = int(te.height() * 0.1)
 
         te.setViewportMargins(wW, wH, wW, wH)
+        
+    def _buildPath(self, paths: list[str]) -> str:
+        text = ""
+        count = len(paths)
+        for i in range(count - 1):
+            text += "{} \u203a ".format(paths[i])
+
+        text += "{}".format(paths[count - 1])
+        
+        return text
 
     def _runTokenizer(self):
         te = self.dev.textEdit
