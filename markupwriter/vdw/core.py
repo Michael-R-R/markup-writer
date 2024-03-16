@@ -82,7 +82,6 @@ class Core(QObject):
 
     def setup(self, data: CoreData):
         self.data = data
-        self.data.setup(self.mwd)
 
         self._setupCoreSlots()
         self._setupMainWindowWorkerSlots()
@@ -90,6 +89,8 @@ class Core(QObject):
         self._setupTreeWorkerSlots()
         self._setupEditorWorkerSlots()
         self._setupPreviewWorkerSlots()
+        
+        self.data.setup(self.mwd)
 
         self.setWindowTitle()
 

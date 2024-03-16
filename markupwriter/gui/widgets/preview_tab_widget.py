@@ -60,6 +60,9 @@ class PreviewTabWidget(QTabWidget):
         super().tabRemoved(index)
         
         self.countChanged.emit(self.count())
+        
+    def emitTabCount(self):
+        self.countChanged.emit(self.count())
     
     @pyqtSlot(int)
     def _onCurrentChanged(self, index: int):

@@ -26,7 +26,7 @@ class DocumentPreviewDelegate(BaseDelegate):
         self.setupConnections()
         
     def setup(self):
-        pass
+        self.view.tabWidget.emitTabCount()
 
     def setupConnections(self):
         tw = self.view.tabWidget
