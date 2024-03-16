@@ -11,11 +11,13 @@ from PyQt6.QtWidgets import (
     QMenuBar,
 )
 
+from . import BaseDelegate
+
 import markupwriter.vdw.view as v
 import markupwriter.vdw.worker as w
 
 
-class MainWindowDelegate(QObject):
+class MainWindowDelegate(BaseDelegate):
     viewClosing = pyqtSignal()
     
     def __init__(self, parent: QObject | None) -> None:
@@ -24,21 +26,12 @@ class MainWindowDelegate(QObject):
         self.view = v.MainWindowView(None)
         self.worker = w.MainWindowWorker(self.view, self)
         
-        self._setupViewConnections()
+        self.setupConnections()
         
-    def showMainView(self):
-        self.view.show()
+    def setup(self):
+        pass
         
-    def setWindowTitle(self, title: str | None):
-        self.view.setWindowTitle(title)
-        
-    def setMenuBar(self, menuBar: QMenuBar):
-        self.view.setMenuBar(menuBar)
-        
-    def setCentralWidget(self, widget: QWidget):
-        self.view.setCentralWidget(widget)
-        
-    def _setupViewConnections(self):
+    def setupConnections(self):
         self.view.closing.connect(lambda: self.viewClosing.emit())
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:

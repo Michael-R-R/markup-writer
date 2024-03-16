@@ -5,6 +5,11 @@ from PyQt6.QtCore import (
     pyqtSlot,
 )
 
+from PyQt6.QtWidgets import (
+    QWidget,
+    QMenuBar,
+)
+
 import markupwriter.vdw.view as v
 
 
@@ -13,6 +18,15 @@ class MainWindowWorker(QObject):
         super().__init__(parent)
 
         self.mwv = mwv
+        
+    def setMenuBar(self, menubar: QMenuBar):
+        self.mwv.setMenuBar(menubar)
+        
+    def setCentralWidget(self, widget: QWidget):
+        self.mwv.setCentralWidget(widget)
+        
+    def setWindowTitle(self, title: str | None):
+        self.mwv.setWindowTitle(title)
         
     def showStatusBarMsg(self, msg: str, msecs: int):
         sb = self.mwv.statusBar()

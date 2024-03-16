@@ -6,11 +6,13 @@ from PyQt6.QtCore import (
     pyqtSignal,
 )
 
+from . import BaseDelegate
+
 import markupwriter.vdw.view as v
 import markupwriter.vdw.worker as w
 
 
-class DocumentPreviewDelegate(QObject):
+class DocumentPreviewDelegate(BaseDelegate):
     showViewRequested = pyqtSignal()
     closeTabRequested = pyqtSignal(int)
     tabCountChanged = pyqtSignal(int)
@@ -21,9 +23,12 @@ class DocumentPreviewDelegate(QObject):
         self.view = v.DocumentPreviewView(None)
         self.worker = w.DocumentPreviewWorker(self.view, self)
         
-        self._setupViewConnections()
+        self.setupConnections()
+        
+    def setup(self):
+        pass
 
-    def _setupViewConnections(self):
+    def setupConnections(self):
         tw = self.view.tabWidget
         tw.tabCloseRequested.connect(lambda x: self.closeTabRequested.emit(x))
         tw.countChanged.connect(lambda x: self.tabCountChanged.emit(x))

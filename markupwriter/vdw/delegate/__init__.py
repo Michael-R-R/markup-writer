@@ -1,3 +1,4 @@
+from .base_delegate import BaseDelegate
 from .main_window_delegate import MainWindowDelegate
 from .main_menu_bar_delegate import MainMenuBarDelegate
 from .central_widget_delegate import CentralWidgetDelegate

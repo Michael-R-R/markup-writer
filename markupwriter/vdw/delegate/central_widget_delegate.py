@@ -9,14 +9,29 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from . import BaseDelegate
+from markupwriter.config import AppConfig
+
 import markupwriter.vdw.view as v
 
 
-class CentralWidgetDelegate(QObject):
+class CentralWidgetDelegate(BaseDelegate):
     def __init__(self, parent: QObject | None) -> None:
         super().__init__(parent)
         
         self.view = v.CentralWidgetView(None)
+        
+        self.setupConnections()
+        
+    def setup(self):
+        dts = AppConfig.docTreeSize
+        des = AppConfig.docEditorSize
+        dps = AppConfig.docPreviewSize
+        self.setSizesLHS([dts.width(), des.width() + dps.width()])
+        self.setSizesRHS([des.width(), dps.width()])
+        
+    def setupConnections(self):
+        pass
         
     def insertWidgetLHS(self, i: int, widget: QWidget):
         self.view.lhSplitter.insertWidget(i, widget)

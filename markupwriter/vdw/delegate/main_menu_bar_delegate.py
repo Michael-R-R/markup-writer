@@ -6,11 +6,13 @@ from PyQt6.QtCore import (
     pyqtSignal,
 )
 
+from . import BaseDelegate
+
 import markupwriter.vdw.view as v
 import markupwriter.vdw.worker as w
 
 
-class MainMenuBarDelegate(QObject):
+class MainMenuBarDelegate(BaseDelegate):
     fmNewTriggered = pyqtSignal()
     fmOpenTriggered = pyqtSignal()
     fmSaveDocTriggered = pyqtSignal()
@@ -35,10 +37,13 @@ class MainMenuBarDelegate(QObject):
 
         self.view = v.MainMenuBarView(None)
         self.worker = w.MainMenuBarWorker(self.view, self)
+        
+        self.setupConnections()
+        
+    def setup(self):
+        pass
 
-        self._setupFileMenuConnections()
-
-    def _setupFileMenuConnections(self):
+    def setupConnections(self):
         fm = self.view.fileMenu
         fm.newProjAction.triggered.connect(lambda: self.fmNewTriggered.emit())
         fm.openProjAction.triggered.connect(lambda: self.fmOpenTriggered.emit())

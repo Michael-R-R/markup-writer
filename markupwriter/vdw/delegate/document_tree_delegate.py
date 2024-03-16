@@ -7,12 +7,14 @@ from PyQt6.QtCore import (
     QPoint,
 )
 
+from . import BaseDelegate
+
 import markupwriter.vdw.view as v
 import markupwriter.vdw.worker as w
 import markupwriter.gui.menus.doctree as dtm
 
 
-class DocumentTreeDelegate(QObject):
+class DocumentTreeDelegate(BaseDelegate):
     fileAdded = pyqtSignal(str)
     fileRemoved = pyqtSignal(str, str)
     fileOpened = pyqtSignal(str, list)
@@ -44,10 +46,13 @@ class DocumentTreeDelegate(QObject):
 
         self.view = v.DocumentTreeView(None)
         self.worker = w.DocumentTreeWorker(self.view, self)
+        
+        self.setupConnections()
 
-        self._setupViewConnections()
+    def setup(self):
+        pass
 
-    def _setupViewConnections(self):
+    def setupConnections(self):
         tb = self.view.treeBar
         tb.navUpAction.triggered.connect(lambda: self.navUpClicked.emit())
         tb.navDownAction.triggered.connect(lambda: self.navDownClicked.emit())

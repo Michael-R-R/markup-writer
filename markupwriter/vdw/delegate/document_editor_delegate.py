@@ -8,11 +8,13 @@ from PyQt6.QtCore import (
     QPoint,
 )
 
+from . import BaseDelegate
+
 import markupwriter.vdw.view as v
 import markupwriter.vdw.worker as w
 
 
-class DocumentEditorDelegate(QObject):
+class DocumentEditorDelegate(BaseDelegate):
     closeDocClicked = pyqtSignal()
 
     stateChanged = pyqtSignal(str)
@@ -39,10 +41,13 @@ class DocumentEditorDelegate(QObject):
 
         self.view = v.DocumentEditorView(None)
         self.worker = w.DocumentEditorWorker(self.view, self)
+        
+        self.setupConnections()
+        
+    def setup(self):
+        pass
 
-        self._setupViewConnections()
-
-    def _setupViewConnections(self):
+    def setupConnections(self):
         ed = self.view.editorBar
         ed.closeAction.triggered.connect(lambda: self.closeDocClicked.emit())
 

@@ -40,18 +40,18 @@ class CoreData(QObject):
         self.dpd = d.DocumentPreviewDelegate(self)
 
     def setup(self, mwd: d.MainWindowDelegate):
-        mwd.setMenuBar(self.mmbd.view)
-        mwd.setCentralWidget(self.cwd.view)
+        mwd.worker.setMenuBar(self.mmbd.view)
+        mwd.worker.setCentralWidget(self.cwd.view)
 
         self.cwd.insertWidgetLHS(0, self.dtd.view)
         self.cwd.insertWidgetRHS(0, self.ded.view)
         self.cwd.addWidgetRHS(self.dpd.view)
-
-        dts = AppConfig.docTreeSize
-        des = AppConfig.docEditorSize
-        dps = AppConfig.docPreviewSize
-        self.cwd.setSizesLHS([dts.width(), des.width() + dps.width()])
-        self.cwd.setSizesRHS([des.width(), dps.width()])
+        
+        self.mmbd.setup()
+        self.cwd.setup()
+        self.dtd.setup()
+        self.ded.setup()
+        self.dpd.setup()
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.mmbd
@@ -93,7 +93,7 @@ class Core(QObject):
         self.setWindowTitle()
 
     def run(self):
-        self.mwd.showMainView()
+        self.mwd.view.show()
 
     def reset(self):
         ProjectConfig.projectName = None
@@ -102,7 +102,7 @@ class Core(QObject):
 
     def setWindowTitle(self):
         title = "{} - {}".format(AppConfig.APP_NAME, ProjectConfig.projectName)
-        self.mwd.setWindowTitle(title)
+        self.mwd.worker.setWindowTitle(title)
 
     def _setupCoreSlots(self):
         mwd = self.mwd
