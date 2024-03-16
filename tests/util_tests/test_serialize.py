@@ -27,10 +27,10 @@ def testSerialize_write():
     assert(Serialize.write("./resources/.tests/testSerialize.bin", s))
 
 def testSerialize_read():
-    s = Serialize.read(TestSquare, "")
+    s = Serialize.newRead(TestSquare, "")
     assert(s == None)
 
-    s = Serialize.read(TestSquare, "./resources/.tests/testSerialize.bin")
+    s = Serialize.newRead(TestSquare, "./resources/.tests/testSerialize.bin")
     assert(s != None)
     assert(s.w == 10)
     assert(s.h == 10)

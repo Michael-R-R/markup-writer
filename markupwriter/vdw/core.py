@@ -76,7 +76,7 @@ class Core(QObject):
         super().__init__(parent)
 
         self.mwd = d.MainWindowDelegate(self)
-        self.data = None
+        self.data: CoreData = None
 
         self.setup(CoreData(self))
 
@@ -240,12 +240,13 @@ class Core(QObject):
         ProjectConfig.projectName = info[0]
         ProjectConfig.dir = info[1]
 
-        data: CoreData = Serialize.read(CoreData, ProjectConfig.filePath())
+        data = CoreData(self)
+        self.setup(data)
+        
+        data = Serialize.existRead(data, ProjectConfig.filePath())
         if data is None:
             self.reset()
             return
-
-        self.setup(data)
 
         self.data.mmbd.worker.onOpenProject()
         self.data.dtd.worker.onOpenProject()

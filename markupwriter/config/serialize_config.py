@@ -8,9 +8,9 @@ from .hotkey_config import HotkeyConfig
 
 class SerializeConfig(object):
     def read():
-        Serialize.read(AppConfig, AppConfig.INI_PATH)
-        Serialize.read(HighlighterConfig, HighlighterConfig.INI_PATH)
-        Serialize.read(HotkeyConfig, HotkeyConfig.INI_PATH)
+        Serialize.newRead(AppConfig, AppConfig.INI_PATH)
+        Serialize.newRead(HighlighterConfig, HighlighterConfig.INI_PATH)
+        Serialize.newRead(HotkeyConfig, HotkeyConfig.INI_PATH)
 
     def write():
         Serialize.write(AppConfig.INI_PATH, AppConfig())

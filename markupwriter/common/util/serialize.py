@@ -19,7 +19,7 @@ class Serialize(object):
     _masterFormat = 0x00000001
     _masterVersion = 1
 
-    def read(type: Type[T], path: str) -> T | None:
+    def newRead(type: Type[T], path: str) -> T | None:
         inFile = QFile(path)
         if not inFile.open(QIODevice.OpenModeFlag.ReadOnly):
             return None
@@ -39,6 +39,30 @@ class Serialize(object):
         inStream.setVersion(Serialize._qtVersion)
 
         obj = type()
+        inStream >> obj
+
+        inFile.close()
+
+        return obj
+    
+    def existRead(obj: T, path: str) -> T | None:
+        inFile = QFile(path)
+        if not inFile.open(QIODevice.OpenModeFlag.ReadOnly):
+            return None
+
+        inStream = QDataStream(inFile)
+
+        # Check if the format is supported
+        format = inStream.readInt()
+        if format != Serialize._masterFormat:
+            return None
+
+        # Check if the version is supported
+        version = inStream.readInt()
+        if version != Serialize._masterVersion:
+            return None
+
+        inStream.setVersion(Serialize._qtVersion)
         inStream >> obj
 
         inFile.close()
