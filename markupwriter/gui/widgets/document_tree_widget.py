@@ -392,8 +392,6 @@ class DocumentTreeWidget(QTreeWidget):
                 
                 if isExpanded:
                     self.expandItem(cwidget.item)
-
-                self.fileAdded.emit(cwidget.UUID())
                 
         # End helper
 
@@ -414,7 +412,5 @@ class DocumentTreeWidget(QTreeWidget):
             
             if isExpanded:
                 self.expandItem(pwidget.item)
-
-            self.fileAdded.emit(pwidget.UUID())
 
         return sin
