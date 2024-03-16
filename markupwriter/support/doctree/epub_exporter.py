@@ -13,11 +13,11 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.config import AppConfig, ProjectConfig
 from markupwriter.common.util import File
-from markupwriter.gui.dialogs.modal import ExportDialog, ErrorDialog
 from markupwriter.common.tokenizers import XHtmlExportTokenizer
 from markupwriter.common.parsers import XHtmlParser
 
 import markupwriter.gui.widgets as w
+import markupwriter.gui.dialogs.modal as dm
 
 
 class EpubExporter(object):
@@ -31,14 +31,14 @@ class EpubExporter(object):
         self.imgPath = ""
 
     def export(self, tw: w.DocumentTreeWidget, parent: QWidget | None):
-        widget = ExportDialog(tw, parent)
+        widget = dm.ExportDialog(tw, parent)
         if widget.exec() != 1:
             return
 
         exportDir = widget.dir
         item = widget.value
         if item is None:
-            ErrorDialog.run("Error: selected item is 'None'", None)
+            dm.ErrorDialog.run("Error: selected item is 'None'", None)
             return
 
         self._setupPaths(exportDir)
@@ -197,4 +197,4 @@ class EpubExporter(object):
             os.rename(zipPath + ".zip", zipPath + ".epub")
 
         except Exception as e:
-            ErrorDialog.run(str(e), None)
+            dm.ErrorDialog.run(str(e), None)

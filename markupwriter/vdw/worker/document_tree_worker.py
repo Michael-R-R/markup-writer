@@ -26,6 +26,7 @@ from markupwriter.common.util import File
 import markupwriter.vdw.view as v
 import markupwriter.gui.dialogs.modal as dm
 import markupwriter.gui.widgets as w
+import markupwriter.support.doctree as dt
 import markupwriter.support.doctree.item as ti
 
 
@@ -135,6 +136,13 @@ class DocumentTreeWorker(QObject):
         tw.blockSignals(True)
         tw.add(dialog.value)
         tw.blockSignals(False)
+        
+    @pyqtSlot()
+    def onExportNovel(self):
+        tw = self.dtv.treeWidget
+        
+        e = dt.EpubExporter()
+        e.export(tw, tw)
     
     @pyqtSlot()
     def onFocusTreeTriggered(self):

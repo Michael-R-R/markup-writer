@@ -12,7 +12,6 @@ from PyQt6.QtWidgets import (
 
 from markupwriter.support.core import (
     ProjectHelper,
-    EpubExporter,
     StartupParser,
 )
 
@@ -116,7 +115,6 @@ class Core(QObject):
         mmbd.fmSaveDocTriggered.connect(self._onSaveDocument)
         mmbd.fmSaveTriggered.connect(self._onSaveProject)
         mmbd.fmSaveAsTriggered.connect(self._onSaveAsProject)
-        mmbd.fmExportTriggered.connect(self._onExport)
         mmbd.fmCloseTriggered.connect(self._onCloseProject)
         mmbd.fmExitTriggered.connect(self._onExit)
         
@@ -137,6 +135,7 @@ class Core(QObject):
         
         mmbd = self.data.mmbd
         mmbd.fmImportTxtTriggered.connect(worker.onImportTxtFile)
+        mmbd.fmExportTriggered.connect(worker.onExportNovel)
         mmbd.vmDocTreeTriggered.connect(worker.onFocusTreeTriggered)
         mmbd.vmTelescopeTriggered.connect(worker.onTelescopeTriggered)
 
@@ -303,15 +302,6 @@ class Core(QObject):
             return
 
         self.setWindowTitle()
-
-    @pyqtSlot()
-    def _onExport(self):
-        tw = self.data.dtd.view.treeWidget
-
-        exporter = EpubExporter()
-        exporter.export(tw, self.mwd.view)
-
-        self.mwd.worker.showStatusBarMsg("Novel exported...", 1500)
 
     @pyqtSlot()
     def _onCloseProject(self):
