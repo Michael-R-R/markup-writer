@@ -13,6 +13,7 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a hre
 ## Features
 + Open source
 + Free forever
++ Autosave
 + Fast document opening/saving
 + Fast navigation
 + Vim-like editor
