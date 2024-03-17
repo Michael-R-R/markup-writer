@@ -59,6 +59,8 @@ class EditorContextMenu(BaseContextMenu):
             cursor.select(QTextCursor.SelectionType.WordUnderCursor)
             self._textEdit.setTextCursor(cursor)
             word = self._textEdit.textCursor().selectedText()
+            if word == "":
+                return
 
             actions = self._menu.actions()
             self._menu.insertSeparator(actions[0])

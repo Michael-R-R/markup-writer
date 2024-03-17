@@ -10,7 +10,6 @@ from PyQt6.QtCore import (
 )
 
 from PyQt6.QtWidgets import (
-    QTreeWidgetItem,
     QApplication,
 )
 
@@ -64,57 +63,6 @@ class DocumentTreeWorker(QObject):
         tw = self.dtv.treeWidget
         tcm = tw.treeContextMenu
         tcm.itemMenu.setEnabled(True)
-        
-    def refreshParentWordCounts(self, child: QTreeWidgetItem, owc: int, wc: int):
-        tw = self.dtv.treeWidget
-        
-        item = child.parent()
-        while item is not None:
-            widget: ti.BaseTreeItem = tw.itemWidget(item, 0)
-            twc = widget.totalWordCount() - owc + wc
-            widget.setTotalWordCount(twc)
-            item = item.parent()
-        
-    def refreshAllWordCounts(self):
-        tw = self.dtv.treeWidget
-        
-        def helper(pitem: QTreeWidgetItem) -> int:
-            pw: ti.BaseTreeItem = tw.itemWidget(pitem, 0)
-            twc = pw.wordCount()
-
-            for j in range(pitem.childCount()):
-                citem = pitem.child(j)
-                twc += helper(citem)
-
-            pw.setTotalWordCount(twc)
-
-            return twc
-
-        for i in range(tw.topLevelItemCount()):
-            item = tw.topLevelItem(i)
-            helper(item)
-            
-    def findTrashFolder(self) -> QTreeWidgetItem | None:
-        tw = self.dtv.treeWidget
-        
-        for i in range(tw.topLevelItemCount() - 1, -1, -1):
-            item = tw.topLevelItem(i)
-            widget = tw.itemWidget(item, 0)
-            if isinstance(widget, ti.TrashFolderItem):
-                return item
-
-        return None
-            
-    def isInTrash(self, item: QTreeWidgetItem) -> bool:
-        trash = self.findTrashFolder()
-
-        prev = None
-        curr = item.parent()
-        while curr is not None:
-            prev = curr
-            curr = curr.parent()
-
-        return prev == trash
     
     @pyqtSlot()
     def onImportTxtFile(self):
@@ -166,11 +114,13 @@ class DocumentTreeWorker(QObject):
         path = os.path.join(path, uuid)
         File.remove(path)
 
-        self.refreshAllWordCounts()
+        tw = self.dtv.treeWidget
+        tw.refreshAllWordCounts()
         
     @pyqtSlot()
     def onDragDropDone(self):
-        self.refreshAllWordCounts()
+        tw = self.dtv.treeWidget
+        tw.refreshAllWordCounts()
         
     @pyqtSlot(QPoint)
     def onContextMenuRequested(self, pos: QPoint):
@@ -187,7 +137,7 @@ class DocumentTreeWorker(QObject):
             tw.trashContextMenu.onShowMenu(pos, args)
         else:
             isFile = widget.hasFlag(ti.ITEM_FLAG.file)
-            inTrash = self.isInTrash(item)
+            inTrash = tw.isInTrash(item)
             isMutable = widget.hasFlag(ti.ITEM_FLAG.mutable)
             args = [isFile, inTrash, isMutable]
             tw.itemContextMenu.onShowMenu(pos, args)
@@ -233,7 +183,7 @@ class DocumentTreeWorker(QObject):
         if not YesNoDialog.run("Move to trash?", self.dtv):
             return
         
-        trash = self.findTrashFolder()
+        trash = tw.findTrashFolder()
         if trash is None:
             return
 
@@ -337,7 +287,7 @@ class DocumentTreeWorker(QObject):
         widget.setWordCount(count)
         widget.setTotalWordCount(twc)
 
-        self.refreshParentWordCounts(widget.item, owc, count)
+        tw.refreshParentWordCounts(widget.item, owc, count)
         
     @pyqtSlot(str)
     def onRefPreviewRequested(self, uuid: str):

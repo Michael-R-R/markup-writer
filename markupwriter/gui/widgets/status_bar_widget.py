@@ -16,3 +16,4 @@ class StatusBarWidget(QStatusBar):
         
         self.addWidget(self.normLabel)
         self.addPermanentWidget(self.permLabel)
+        self.setSizeGripEnabled(False)

@@ -90,6 +90,7 @@ class Core(QObject):
         self._setupPreviewWorkerSlots()
         
         self.data.setup(self.mwd)
+        self.mwd.setup()
 
         self.setWindowTitle()
 
@@ -107,6 +108,8 @@ class Core(QObject):
 
     def _setupCoreSlots(self):
         mwd = self.mwd
+        mwd.autoSaveDocTriggered.connect(self._onSaveDocument)
+        mwd.autoSaveProTriggered.connect(self._onSaveProject)
         mwd.viewClosing.connect(self._onAppClosing)
 
         mmbd = self.data.mmbd
@@ -123,6 +126,9 @@ class Core(QObject):
 
     def _setupMenuBarWorkerSlots(self):
         worker = self.data.mmbd.worker
+        
+        mmbd = self.data.mmbd
+        mmbd.dmHighlightToggled.connect(worker.onToggleHighlighting)
         
         ded = self.data.ded
         ded.docStatusChanged.connect(worker.onDocumentStatusChanged)
@@ -167,6 +173,7 @@ class Core(QObject):
         worker = self.data.ded.worker
         
         mmbd = self.data.mmbd
+        mmbd.dmHighlightToggled.connect(worker.onHighlightToggled)
         mmbd.dmSpellToggled.connect(worker.onSpellToggled)
         mmbd.vmDocEditorTriggered.connect(worker.onFocusEditorTriggered)
 
@@ -250,14 +257,19 @@ class Core(QObject):
         self.data.mmbd.worker.onOpenProject()
         self.data.dtd.worker.onOpenProject()
 
-        refManager = self.data.ded.worker.refManager
-        StartupParser.run(refManager)
+        te = self.data.ded.view.textEdit
+        StartupParser.run(te.refManager)
 
         self.mwd.worker.showStatusBarMsg("Project opened...", 1500)
 
     @pyqtSlot()
     def _onSaveDocument(self):
-        if self.data.ded.worker.onSaveDocument():
+        if not ProjectConfig.hasActiveProject():
+            return
+        
+        dew = self.data.ded.worker
+        if dew.onSaveDocument():
+            self.mwd.worker.startAutoSaveDocTimer()
             self.mwd.worker.showStatusBarMsg("Document saved...", 1500)
 
     @pyqtSlot()
@@ -270,6 +282,7 @@ class Core(QObject):
         if not Serialize.write(ProjectConfig.filePath(), self.data):
             return False
             
+        self.mwd.worker.startAutoSaveProjTimer()
         self.mwd.worker.showStatusBarMsg("Project saved...", 1500)
             
         return True

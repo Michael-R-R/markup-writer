@@ -28,8 +28,10 @@ from PyQt6.QtWidgets import (
     QFrame,
 )
 
-from markupwriter.common.syntax import Highlighter
 from markupwriter.config import ProjectConfig
+from markupwriter.common.syntax import Highlighter
+from markupwriter.common.referencetag import RefTagManager
+from markupwriter.common.parsers import EditorParser
 from markupwriter.common.util import File
 
 import markupwriter.support.doceditor as de
@@ -52,6 +54,8 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.plainDocument = de.PlainDocument(self)
         self.spellChecker = de.SpellCheck()
         self.highlighter = Highlighter(self.plainDocument, self.spellChecker.endict)
+        self.refManager = RefTagManager()
+        self.parser = EditorParser()
         self.searchHotkey = QAction("search", self)
         self.canResizeMargins = True
         self.docUUID = ""
@@ -147,6 +151,50 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.state.enter()
         
         self.state.changedState.connect(self.onChangedState)
+        
+    def findTagAtPos(self, pos: QPoint) -> str | None:
+        cursor = self.cursorForPosition(pos)
+        cpos = cursor.positionInBlock()
+        textBlock = cursor.block().text()
+        if cpos <= 0 or cpos >= len(textBlock):
+            return None
+
+        found = re.search(r"@(ref|pov|loc)(\(.*\))", textBlock)
+        if found is None:
+            return None
+
+        rcomma = textBlock.rfind(",", 0, cpos)
+        fcomma = textBlock.find(",", cpos)
+        tag = None
+
+        # single tag
+        if rcomma < 0 and fcomma < 0:
+            rindex = textBlock.rfind("(", 0, cpos)
+            lindex = textBlock.find(")", cpos)
+            tag = textBlock[rindex + 1 : lindex].strip()
+        # tag start
+        elif rcomma < 0 and fcomma > -1:
+            index = textBlock.rfind("(", 0, cpos)
+            tag = textBlock[index + 1 : fcomma].strip()
+        # tag middle
+        elif rcomma > -1 and fcomma > -1:
+            tag = textBlock[rcomma + 1 : fcomma].strip()
+        # tag end
+        elif rcomma > -1 and fcomma < 0:
+            index = textBlock.find(")", cpos)
+            tag = textBlock[rcomma + 1 : index].strip()
+
+        return tag
+        
+    def findRefUUID(self, refTag: str) -> str | None:
+        return self.refManager.findUUID(refTag)
+        
+    def popParserUUID(self, uuid: str):
+        self.parser.popPrevUUID(uuid, self.refManager)
+        
+    @pyqtSlot(str, dict)
+    def runParser(self, uuid: str, tokens: dict[str, list[str]]):
+        self.parser.run(uuid, tokens, self.refManager)
     
     @pyqtSlot(s.STATE)
     def onChangedState(self, state: s.STATE):

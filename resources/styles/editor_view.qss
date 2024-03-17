@@ -1,3 +1,7 @@
 QPlainTextEdit {
     background-color: rgb(36, 36, 36);
 }
+
+QStatusBar {
+    border: 2px solid rgb(28, 28, 28);
+}

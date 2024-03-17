@@ -23,6 +23,7 @@ class MainMenuBarDelegate(BaseDelegate):
     fmCloseTriggered = pyqtSignal()
     fmExitTriggered = pyqtSignal()
 
+    dmHighlightToggled = pyqtSignal(bool)
     dmSpellToggled = pyqtSignal(bool)
     dmRefreshPreview = pyqtSignal()
     dmTogglePreview = pyqtSignal()
@@ -37,9 +38,9 @@ class MainMenuBarDelegate(BaseDelegate):
 
         self.view = v.MainMenuBarView(None)
         self.worker = w.MainMenuBarWorker(self.view, self)
-        
+
         self.setupConnections()
-        
+
     def setup(self):
         pass
 
@@ -56,6 +57,7 @@ class MainMenuBarDelegate(BaseDelegate):
         fm.exitAction.triggered.connect(lambda: self.fmExitTriggered.emit())
 
         dm = self.view.docMenu
+        dm.toggleHighlighting.toggled.connect(lambda x: self.dmHighlightToggled.emit(x))
         dm.toggleSpell.toggled.connect(lambda x: self.dmSpellToggled.emit(x))
         dm.refreshPreview.triggered.connect(lambda: self.dmRefreshPreview.emit())
         dm.togglePreview.triggered.connect(lambda: self.dmTogglePreview.emit())

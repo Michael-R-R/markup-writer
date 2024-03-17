@@ -46,3 +46,8 @@ class MainMenuBarWorker(QObject):
         status = count > 0
         dm.refreshPreview.setEnabled(status)
         dm.togglePreview.setEnabled(status)
+        
+    @pyqtSlot(bool)
+    def onToggleHighlighting(self, status: bool):
+        dm = self.mmbv.docMenu
+        dm.toggleSpell.setEnabled(status)
