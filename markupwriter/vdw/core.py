@@ -267,7 +267,9 @@ class Core(QObject):
         if not ProjectConfig.hasActiveProject():
             return
         
-        if self.data.ded.worker.onSaveDocument():
+        dew = self.data.ded.worker
+        if dew.onSaveDocument():
+            self.mwd.worker.startAutoSaveDocTimer()
             self.mwd.worker.showStatusBarMsg("Document saved...", 1500)
 
     @pyqtSlot()
@@ -280,6 +282,7 @@ class Core(QObject):
         if not Serialize.write(ProjectConfig.filePath(), self.data):
             return False
             
+        self.mwd.worker.startAutoSaveProjTimer()
         self.mwd.worker.showStatusBarMsg("Project saved...", 1500)
             
         return True

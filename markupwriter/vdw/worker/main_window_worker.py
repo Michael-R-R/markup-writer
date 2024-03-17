@@ -32,6 +32,12 @@ class MainWindowWorker(QObject):
         sb = self.mwv.statusBar()
         sb.showMessage(msg, msecs)
         
+    def startAutoSaveDocTimer(self):
+        self.mwv.autoSaveDocTimer.start()
+        
+    def startAutoSaveProjTimer(self):
+        self.mwv.autoSaveProTimer.start()
+        
     @pyqtSlot(str)
     def onShowPermMsg(self, msg: str):
         sb = self.mwv.statusBarWidget
