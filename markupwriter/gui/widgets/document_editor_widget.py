@@ -152,6 +152,40 @@ class DocumentEditorWidget(QPlainTextEdit):
         
         self.state.changedState.connect(self.onChangedState)
         
+    def findTagAtPos(self, pos: QPoint) -> str | None:
+        cursor = self.cursorForPosition(pos)
+        cpos = cursor.positionInBlock()
+        textBlock = cursor.block().text()
+        if cpos <= 0 or cpos >= len(textBlock):
+            return None
+
+        found = re.search(r"@(ref|pov|loc)(\(.*\))", textBlock)
+        if found is None:
+            return None
+
+        rcomma = textBlock.rfind(",", 0, cpos)
+        fcomma = textBlock.find(",", cpos)
+        tag = None
+
+        # single tag
+        if rcomma < 0 and fcomma < 0:
+            rindex = textBlock.rfind("(", 0, cpos)
+            lindex = textBlock.find(")", cpos)
+            tag = textBlock[rindex + 1 : lindex].strip()
+        # tag start
+        elif rcomma < 0 and fcomma > -1:
+            index = textBlock.rfind("(", 0, cpos)
+            tag = textBlock[index + 1 : fcomma].strip()
+        # tag middle
+        elif rcomma > -1 and fcomma > -1:
+            tag = textBlock[rcomma + 1 : fcomma].strip()
+        # tag end
+        elif rcomma > -1 and fcomma < 0:
+            index = textBlock.find(")", cpos)
+            tag = textBlock[rcomma + 1 : index].strip()
+
+        return tag
+        
     def findRefUUID(self, refTag: str) -> str | None:
         return self.refManager.findUUID(refTag)
         

@@ -116,6 +116,11 @@ class Highlighter(QSyntaxHighlighter):
             return False
         self._behaviours.pop(type)
         return True
+    
+    def toggleBehaviours(self):
+        for key in self._behaviours:
+            b = self._behaviours[key]
+            b.isEnabled = not b.isEnabled
 
     def setBehaviourEnable(self, type: BEHAVIOUR, val: bool):
         if not type in self._behaviours:
