@@ -193,6 +193,51 @@ class DocumentTreeWidget(QTreeWidget):
 
         return buildList
 
+    def refreshParentWordCounts(self, child: QTreeWidgetItem, owc: int, wc: int):
+        item = child.parent()
+        while item is not None:
+            widget: ti.BaseTreeItem = self.itemWidget(item, 0)
+            twc = widget.totalWordCount() - owc + wc
+            widget.setTotalWordCount(twc)
+            item = item.parent()
+        
+    def refreshAllWordCounts(self):
+        def helper(pitem: QTreeWidgetItem) -> int:
+            pw: ti.BaseTreeItem = self.itemWidget(pitem, 0)
+            twc = pw.wordCount()
+
+            for j in range(pitem.childCount()):
+                citem = pitem.child(j)
+                twc += helper(citem)
+
+            pw.setTotalWordCount(twc)
+
+            return twc
+
+        for i in range(self.topLevelItemCount()):
+            item = self.topLevelItem(i)
+            helper(item)
+            
+    def findTrashFolder(self) -> QTreeWidgetItem | None:
+        for i in range(self.topLevelItemCount() - 1, -1, -1):
+            item = self.topLevelItem(i)
+            widget = self.itemWidget(item, 0)
+            if isinstance(widget, ti.TrashFolderItem):
+                return item
+
+        return None
+            
+    def isInTrash(self, item: QTreeWidgetItem) -> bool:
+        trash = self.findTrashFolder()
+
+        prev = None
+        curr = item.parent()
+        while curr is not None:
+            prev = curr
+            curr = curr.parent()
+
+        return prev == trash
+
     def findWidget(self, uuid: str) -> ti.BaseTreeItem | None:
         def helper(item: QTreeWidgetItem) -> ti.BaseTreeItem | None:
             for i in range(item.childCount()):
