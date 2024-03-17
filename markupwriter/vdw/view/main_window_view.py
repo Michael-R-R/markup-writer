@@ -3,6 +3,7 @@
 from PyQt6.QtCore import (
     QDataStream,
     pyqtSignal,
+    QTimer,
 )
 
 from PyQt6.QtGui import (
@@ -27,6 +28,9 @@ class MainWindowView(QMainWindow):
     def __init__(self, parent: QWidget | None) -> None:
         super().__init__(parent)
         
+        self.autoSaveDocTimer = QTimer(self)
+        self.autoSaveProTimer = QTimer(self)
+        
         self.statusBarWidget = w.StatusBarWidget("", "", self)
         
         self.setWindowIcon(Icon.BOOKS) # TODO get better app icon
@@ -34,6 +38,9 @@ class MainWindowView(QMainWindow):
         self.setStatusBar(self.statusBarWidget)
         self.setStyleSheet(Style.MAIN_WINDOW)
         self.resize(AppConfig.mainWindowSize)
+        
+        self.autoSaveDocTimer.setInterval(180000) # 3 minutes
+        self.autoSaveProTimer.setInterval(600000) # 10 minutes
         
     def resizeEvent(self, e: QResizeEvent | None) -> None:
         AppConfig.mainWindowSize = e.size()

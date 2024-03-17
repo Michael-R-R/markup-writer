@@ -90,6 +90,7 @@ class Core(QObject):
         self._setupPreviewWorkerSlots()
         
         self.data.setup(self.mwd)
+        self.mwd.setup()
 
         self.setWindowTitle()
 
@@ -107,6 +108,8 @@ class Core(QObject):
 
     def _setupCoreSlots(self):
         mwd = self.mwd
+        mwd.autoSaveDocTriggered.connect(self._onSaveDocument)
+        mwd.autoSaveProTriggered.connect(self._onSaveProject)
         mwd.viewClosing.connect(self._onAppClosing)
 
         mmbd = self.data.mmbd
@@ -261,6 +264,9 @@ class Core(QObject):
 
     @pyqtSlot()
     def _onSaveDocument(self):
+        if not ProjectConfig.hasActiveProject():
+            return
+        
         if self.data.ded.worker.onSaveDocument():
             self.mwd.worker.showStatusBarMsg("Document saved...", 1500)
 
