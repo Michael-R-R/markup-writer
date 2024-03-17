@@ -250,8 +250,8 @@ class Core(QObject):
         self.data.mmbd.worker.onOpenProject()
         self.data.dtd.worker.onOpenProject()
 
-        refManager = self.data.ded.worker.refManager
-        StartupParser.run(refManager)
+        te = self.data.ded.view.textEdit
+        StartupParser.run(te.refManager)
 
         self.mwd.worker.showStatusBarMsg("Project opened...", 1500)
 

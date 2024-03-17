@@ -19,10 +19,7 @@ from PyQt6.QtGui import (
 )
 
 from markupwriter.config import ProjectConfig
-from markupwriter.common.util import File
 from markupwriter.common.tokenizers import EditorTokenizer
-from markupwriter.common.parsers import EditorParser
-from markupwriter.common.referencetag import RefTagManager
 from markupwriter.common.syntax import BEHAVIOUR
 from markupwriter.gui.contextmenus.doceditor import EditorContextMenu
 
@@ -37,8 +34,6 @@ class DocumentEditorWorker(QObject):
         super().__init__(parent)
 
         self.dev = dev
-        self.refManager = RefTagManager()
-        self.parser = EditorParser()
         self.threadPool = QThreadPool(self)
 
     def findTagAtPos(self, pos: QPoint):
@@ -153,7 +148,7 @@ class DocumentEditorWorker(QObject):
     @pyqtSlot(str, str)
     def onFileRemoved(self, title: str, uuid: str):
         te = self.dev.textEdit
-        self.parser.popPrevUUID(uuid, self.refManager)
+        te.popParserUUID(uuid)
         if te.docUUID != uuid:
             return
         self._resetWidgets()
@@ -180,11 +175,12 @@ class DocumentEditorWorker(QObject):
         if tag is None:
             return
 
-        uuid = self.refManager.findUUID(tag)
+        te = self.dev.textEdit
+        uuid = te.findRefUUID(tag)
         if uuid is None:
             return
 
-        popup = w.PopupPreviewWidget(uuid, self.dev)
+        popup = w.PopupPreviewWidget(uuid, te)
         popup.previewButton.clicked.connect(
             lambda: self.refPreviewRequested.emit(uuid)
         )
@@ -203,7 +199,8 @@ class DocumentEditorWorker(QObject):
         if tag is None:
             return
 
-        uuid = self.refManager.findUUID(tag)
+        te = self.dev.textEdit
+        uuid = te.findRefUUID(tag)
         if uuid is None:
             return
 
@@ -346,9 +343,12 @@ class DocumentEditorWorker(QObject):
 
         te.setViewportMargins(wW, wH, wW, wH)
         
-    def _buildPath(self, paths: list[str]) -> str:
-        text = ""
+    def _buildPath(self, paths: list[str]) -> str | None:
         count = len(paths)
+        if count < 1:
+            return None
+        
+        text = ""
         for i in range(count - 1):
             text += "{} \u203a ".format(paths[i])
 
@@ -365,7 +365,7 @@ class DocumentEditorWorker(QObject):
         text = te.toPlainText()
 
         tokenizer = EditorTokenizer(uuid, text, self)
-        tokenizer.signals.result.connect(self._runParser)
+        tokenizer.signals.result.connect(te.runParser)
         self.threadPool.start(tokenizer)
 
     def _runSearch(self, direction: int) -> bool:
@@ -383,7 +383,3 @@ class DocumentEditorWorker(QObject):
         te.setTextCursor(cursor)
 
         return True
-
-    @pyqtSlot(str, dict)
-    def _runParser(self, uuid: str, tokens: dict[str, list[str]]):
-        self.parser.run(uuid, tokens, self.refManager)

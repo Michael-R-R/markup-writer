@@ -31,6 +31,7 @@ class AppConfig(BaseConfig):
         AppConfig.APP_NAME = "Markup Writer"
         AppConfig.APP_EXTENSION = ".mwf"
         AppConfig.ICON_SIZE = QSize(18, 18)
+        
         AppConfig.mainWindowSize = QSize(800, 600)
         AppConfig.docTreeSize = QSize(100, 100)
         AppConfig.docEditorSize = QSize(100, 100)

@@ -28,8 +28,10 @@ from PyQt6.QtWidgets import (
     QFrame,
 )
 
-from markupwriter.common.syntax import Highlighter
 from markupwriter.config import ProjectConfig
+from markupwriter.common.syntax import Highlighter
+from markupwriter.common.referencetag import RefTagManager
+from markupwriter.common.parsers import EditorParser
 from markupwriter.common.util import File
 
 import markupwriter.support.doceditor as de
@@ -52,6 +54,8 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.plainDocument = de.PlainDocument(self)
         self.spellChecker = de.SpellCheck()
         self.highlighter = Highlighter(self.plainDocument, self.spellChecker.endict)
+        self.refManager = RefTagManager()
+        self.parser = EditorParser()
         self.searchHotkey = QAction("search", self)
         self.canResizeMargins = True
         self.docUUID = ""
@@ -147,6 +151,16 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.state.enter()
         
         self.state.changedState.connect(self.onChangedState)
+        
+    def findRefUUID(self, refTag: str) -> str | None:
+        return self.refManager.findUUID(refTag)
+        
+    def popParserUUID(self, uuid: str):
+        self.parser.popPrevUUID(uuid, self.refManager)
+        
+    @pyqtSlot(str, dict)
+    def runParser(self, uuid: str, tokens: dict[str, list[str]]):
+        self.parser.run(uuid, tokens, self.refManager)
     
     @pyqtSlot(s.STATE)
     def onChangedState(self, state: s.STATE):
