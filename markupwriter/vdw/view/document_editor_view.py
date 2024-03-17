@@ -25,7 +25,7 @@ class DocumentEditorView(QWidget):
         
         self.editorBar = w.DocumentEditorBarWidget(self)
         self.textEdit = w.DocumentEditorWidget(self)
-        self.statusBar = w.StatusBarWidget("-- NORMAL --", "", self)
+        self.statusBar = w.StatusBarWidget("NORMAL", "", self)
         self.searchBox = w.SearchBoxWidget(self.textEdit)
         
         self.searchBox.hide()
