@@ -16,6 +16,10 @@ class DocMainMenu(QMenu):
     def __init__(self, parent: QWidget | None):
         super().__init__("Document", parent)
 
+        self.toggleHighlighting = QAction("Highlighting", self)
+        self.toggleHighlighting.setCheckable(True)
+        self.toggleHighlighting.setChecked(True)
+
         self.toggleSpell = QAction("Spell Check", self)
         self.toggleSpell.setCheckable(True)
         self.toggleSpell.setChecked(True)
@@ -28,6 +32,7 @@ class DocMainMenu(QMenu):
         self.togglePreview.setShortcut(HotkeyConfig.togglePreview)
         self.togglePreview.setEnabled(False)
 
+        self.addAction(self.toggleHighlighting)
         self.addAction(self.toggleSpell)
         self.addSeparator()
         self.addAction(self.refreshPreview)

@@ -41,13 +41,21 @@ class DocumentEditorWorker(QObject):
     def onFocusEditorTriggered(self):
         te = self.dev.textEdit
         te.setFocus()
-    
+        
     @pyqtSlot(bool)
-    def onSpellToggled(self, isToggled: bool):
+    def onHighlightToggled(self, status: bool):
         te = self.dev.textEdit
         highlighter = te.highlighter
         
-        highlighter.setBehaviourEnable(BEHAVIOUR.spellCheck, isToggled)
+        highlighter.toggleBehaviours()
+        highlighter.rehighlight()
+    
+    @pyqtSlot(bool)
+    def onSpellToggled(self, status: bool):
+        te = self.dev.textEdit
+        highlighter = te.highlighter
+        
+        highlighter.setBehaviourEnable(BEHAVIOUR.spellCheck, status)
         highlighter.rehighlight()
         
     @pyqtSlot(str)
