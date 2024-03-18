@@ -1,6 +1,6 @@
 -C package
 -s dir
 -t deb
--n "Markup Writer"
+-n "markup-writer"
 -v 0.1.0
--p markupwriter.deb
+-p markup-writer.deb
