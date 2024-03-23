@@ -12,6 +12,14 @@ p {
     text-align: center;
 }
 
+.cover img {	
+    padding: 0;
+    display: block;
+    margin: 0 auto;
+    max-height: 100%;
+    max-width: 100%;
+}
+
 .image {
     display: block;
     width: 90%;
@@ -20,14 +28,6 @@ p {
     margin-top: 16px;
     margin-bottom: 16px;
     text-align: center;
-}
-
-.cover img {	
-    padding: 0;
-    display: block;
-    margin: 0 auto;
-    max-height: 100%;
-    max-width: 100%;
 }
 
 .title {

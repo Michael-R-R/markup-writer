@@ -61,10 +61,12 @@ class File(object):
         return info.exists()
     
     def fileName(path: str) -> str:
+        # file name = example.txt
         info = QFileInfo(path)
         return info.fileName()
     
     def fileExtension(path: str) -> str | None:
+        # file ext = .txt
         info = QFileInfo(path)
         if info.isDir():
             return None

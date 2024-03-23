@@ -1,9 +1,11 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="bookid" version="3.0">
 <metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <dc:title></dc:title>
-    <dc:creator></dc:creator>
     <dc:language>en</dc:language>
+    <dc:title>%title%</dc:title>
+    <dc:creator opf:file-as="%author%" opf:role="aut">%author%</dc:creator>
+    <dc:publisher>%publisher%</dc:publisher>
+    <dc:date>%date%</dc:date>
     <dc:type>Text</dc:type>
 </metadata>
 
