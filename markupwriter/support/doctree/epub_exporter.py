@@ -36,7 +36,6 @@ class EpubExporter(object):
         self.fontsPath = ""
         self.imgPath = ""
         
-
     def export(self, tw: w.DocumentTreeWidget, parent: QWidget | None):
         widget = dm.ExportDialog(tw, parent)
         if widget.exec() != 1:
@@ -190,13 +189,15 @@ class EpubExporter(object):
         if self.coverPath != "":
             name = File.fileName(self.coverPath)
             ext = File.fileExtension(self.coverPath)
-            manifest += f"<item id='cover' properties='cover-image' href='images/{name}' media-type='image/{ext}'/>\n"
+            mtype = self._getMediaType(ext)
+            manifest += f"<item id='cover' properties='cover-image' href='images/{name}' media-type='image/{mtype}'/>\n"
 
         # add img resources to manifest
         names = File.findAllFiles(self.imgPath)
         for n in names:
             ext = File.fileExtension(n)
-            manifest += f"<item id='{n}' href='images/{n}' media-type='image/{ext}'/>\n"
+            mtype = self._getMediaType(ext)
+            manifest += f"<item id='{n}' href='images/{n}' media-type='image/{mtype}'/>\n"
 
         manifest = textwrap.indent(manifest, "\t")
         spine = textwrap.indent(spine, "\t")
@@ -213,6 +214,14 @@ class EpubExporter(object):
 
         wpath = os.path.join(self.oebpsPath, "content.opf")
         File.write(wpath, opf)
+
+    def _getMediaType(self, ext: str) -> str | None:
+        match ext:
+            case "jpg": return "jpeg"
+            case "jpeg": return "jpeg"
+            case "png": return "png"
+            
+        return None
 
     def _mkEPUB3(self):
         try:
