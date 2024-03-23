@@ -27,7 +27,7 @@ class EpubExporter(object):
         self.title = ""
         self.author = ""
         self.publisher = ""
-        
+
         self.wd = ""
         self.exportDir = ""
         self.metaPath = ""
@@ -35,7 +35,7 @@ class EpubExporter(object):
         self.cssPath = ""
         self.fontsPath = ""
         self.imgPath = ""
-        
+
     def export(self, tw: w.DocumentTreeWidget, parent: QWidget | None):
         widget = dm.ExportDialog(tw, parent)
         if widget.exec() != 1:
@@ -46,7 +46,7 @@ class EpubExporter(object):
         if item is None:
             dm.ErrorDialog.run("Error: selected item is 'None'", None)
             return
-        
+
         self.coverPath = widget.coverImgEdit.text()
         self.title = widget.titleEdit.text()
         self.author = widget.authorEdit.text()
@@ -56,7 +56,7 @@ class EpubExporter(object):
         self._mkDirectories()
         self._mkFiles()
         self._create(tw, item)
-        
+
     def _setupPaths(self, rootDir: str):
         self.wd = AppConfig.WORKING_DIR
         self.rootDir = rootDir
@@ -91,7 +91,7 @@ class EpubExporter(object):
         src = os.path.join(self.wd, "resources/templates/css/base.css")
         dst = os.path.join(self.cssPath, "base.css")
         shutil.copyfile(src, dst)
-        
+
         # cover image
         if File.exists(self.coverPath):
             src = self.coverPath
@@ -126,11 +126,11 @@ class EpubExporter(object):
             title = "{}_{}".format(count, c[0].title()) if len(c) > 0 else ""
             if title == "":
                 continue
-            
+
             page = self._mkPage(cbody)
             self._mkPageResources(title, page)
-            manifest += self._parsePageManifest(title)
-            spine += self._parseSpine(title)
+            manifest += self.mkManifestPageItem(title)
+            spine += self.mkSpineItem(title)
             count += 1
 
         self._mkContentOPF(manifest, spine)
@@ -171,20 +171,18 @@ class EpubExporter(object):
         path = os.path.join(self.textPath, fName)
         File.write(path, page)
 
-    def _parsePageManifest(self, title: str) -> str:
-        return "<item id='{}' href='text/{}.xhtml' media-type='application/xhtml+xml'/>\n".format(
-            title, title
-        )
+    def mkManifestPageItem(self, title: str) -> str:
+        return f"<item id='{title}' href='text/{title}.xhtml' media-type='application/xhtml+xml'/>\n"
 
-    def _parseSpine(self, title: str) -> str:
-        return "<itemref idref='{}'/>\n".format(title)
+    def mkSpineItem(self, title: str) -> str:
+        return f"<itemref idref='{title}'/>\n"
 
     def _mkContentOPF(self, manifest: str, spine: str):
         # add css resources to manifest
         names = File.findAllFiles(self.cssPath)
         for n in names:
             manifest += f"<item id='{n}' href='css/{n}' media-type='text/css'/>\n"
-            
+
         # add cover img to manifest
         if self.coverPath != "":
             name = File.fileName(self.coverPath)
@@ -197,7 +195,9 @@ class EpubExporter(object):
         for n in names:
             ext = File.fileExtension(n)
             mtype = self._getMediaType(ext)
-            manifest += f"<item id='{n}' href='images/{n}' media-type='image/{mtype}'/>\n"
+            manifest += (
+                f"<item id='{n}' href='images/{n}' media-type='image/{mtype}'/>\n"
+            )
 
         manifest = textwrap.indent(manifest, "\t")
         spine = textwrap.indent(spine, "\t")
@@ -217,10 +217,13 @@ class EpubExporter(object):
 
     def _getMediaType(self, ext: str) -> str | None:
         match ext:
-            case "jpg": return "jpeg"
-            case "jpeg": return "jpeg"
-            case "png": return "png"
-            
+            case "jpg":
+                return "jpeg"
+            case "jpeg":
+                return "jpeg"
+            case "png":
+                return "png"
+
         return None
 
     def _mkEPUB3(self):
