@@ -29,6 +29,7 @@ class ExportDialog(QDialog):
         super().__init__(parent)
 
         self.setWindowTitle("Export (EPUB3)")
+        self.setFixedSize(600, 300)
 
         self.exportDir = ""
         self.value: QTreeWidgetItem = None
@@ -46,7 +47,7 @@ class ExportDialog(QDialog):
         self.coverImgEdit.setPlaceholderText("Select cover image...")
         self.coverImgEdit.setReadOnly(True)
         self.coverImgButton = QToolButton()
-        self.coverImgButton.setIcon(Icon.MISC_FILE)
+        self.coverImgButton.setIcon(Icon.MISC_FOLDER)
 
         self.authorEdit = QLineEdit("")
         self.titleEdit = QLineEdit("")
@@ -54,8 +55,8 @@ class ExportDialog(QDialog):
 
         self.gLayout = QGridLayout(self)
         self.gLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
-        self.gLayout.addWidget(self.dirEdit, 0, 0)
-        self.gLayout.addWidget(self.dirButton, 0, 1, Qt.AlignmentFlag.AlignRight)
+        self.gLayout.addWidget(self.dirButton, 0, 0, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.dirEdit, 0, 1)
 
         self.dirButton.clicked.connect(self._onDirButtonClicked)
         self.coverImgButton.clicked.connect(self._onImgButtonClicked)
@@ -88,17 +89,17 @@ class ExportDialog(QDialog):
         self.coverImgEdit.setText(path[0])
 
     def _buildWidgets(self):
-        self.gLayout.addWidget(self.coverImgEdit, 1, 0)
-        self.gLayout.addWidget(self.coverImgButton, 1, 1, Qt.AlignmentFlag.AlignRight)
+        self.gLayout.addWidget(self.coverImgButton, 1, 0, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.coverImgEdit, 1, 1)
 
-        self.gLayout.addWidget(self.authorEdit, 2, 0)
-        self.gLayout.addWidget(QLabel("Author"), 2, 1, Qt.AlignmentFlag.AlignRight)
+        self.gLayout.addWidget(QLabel("Author"), 2, 0, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.authorEdit, 2, 1)
 
-        self.gLayout.addWidget(self.titleEdit, 3, 0)
-        self.gLayout.addWidget(QLabel("Title"), 3, 1, Qt.AlignmentFlag.AlignRight)
+        self.gLayout.addWidget(QLabel("Title"), 3, 0, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.titleEdit, 3, 1)
 
-        self.gLayout.addWidget(self.publisherEdit, 4, 0)
-        self.gLayout.addWidget(QLabel("Publisher"), 4, 1, Qt.AlignmentFlag.AlignRight)
+        self.gLayout.addWidget(QLabel("Publisher"), 4, 0, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.publisherEdit, 4, 1)
 
         row = 5
         for i in range(self._tree.topLevelItemCount()):
