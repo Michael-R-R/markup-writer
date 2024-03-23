@@ -33,6 +33,7 @@ class XHtmlTokenizer(QRunnable):
         self.replaceDict = {
             r"@b\((\n|.)*?\)": self._replaceBold,
             r"@i\((\n|.)*?\)": self._replaceItal,
+            r"@bi\((\n|.)*?\)": self._replaceBoldItal,
         }
 
         self.removeDict = dict()
@@ -67,6 +68,9 @@ class XHtmlTokenizer(QRunnable):
 
     def _replaceItal(self, tag: str):
         self._replaceFormat(tag, "<i>?</i>")
+        
+    def _replaceBoldItal(self, tag: str):
+        self._replaceFormat(tag, "<b><i>?</i></b>")
 
     def _replaceFormat(self, tag: str, htmlTag: str):
         it = re.finditer(tag, self.text, re.MULTILINE)
@@ -120,10 +124,8 @@ class XHtmlPreviewTokenizer(XHtmlTokenizer):
         super().__init__(text, parent)
         
         self.ignoreSet = {
-            "@tag",
-            "@ref",
-            "@pov",
-            "@loc",
+            "@tag", "@ref",
+            "@pov", "@loc",
         }
 
         self.removeDict = {

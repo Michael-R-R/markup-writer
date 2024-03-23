@@ -7,6 +7,11 @@ p {
     margin: 0;
 }
 
+.cover {
+    display: block;
+    text-align: center;
+}
+
 .image {
     display: block;
     width: 90%;
@@ -15,6 +20,14 @@ p {
     margin-top: 16px;
     margin-bottom: 16px;
     text-align: center;
+}
+
+.cover img {	
+    padding: 0;
+    display: block;
+    margin: 0 auto;
+    max-height: 100%;
+    max-width: 100%;
 }
 
 .title {
@@ -57,5 +70,5 @@ p {
 }
 
 .newPage {
-	page-break-before: left;
+	page-break-before: always;
 }
