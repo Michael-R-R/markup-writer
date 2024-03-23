@@ -5,11 +5,10 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[
-        ("resources/configs", "./resources/configs"),
-        ("resources/icons", "./resources/icons"),
-        ("resources/styles", "./resources/styles")
-    ],
+    datas=[('resources/icons', './resources/icons'),
+           ('resources/styles', './resources/styles'),
+           ('resources/templates', './resources/templates'),
+           ('resources/configs', './resources/configs'),],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -24,7 +23,8 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='MarkupWriter',
+    name='markup-writer',
+    icon='markup-writer.svg',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -36,6 +36,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
+
 coll = COLLECT(
     exe,
     a.binaries,
@@ -43,10 +44,10 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='MarkupWriter',
+    name='markup-writer',
 )
 
-main = BUNDLE(coll,
-    name='Markup Writer.app',
-    icon=None,
-    bundle_identifier=None)
+app = BUNDLE(coll,
+             name='markup-writer.app',
+             icon='markup-writer.svg',
+             bundle_identifier=None)

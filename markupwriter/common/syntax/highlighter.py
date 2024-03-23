@@ -38,8 +38,8 @@ class Highlighter(QSyntaxHighlighter):
         parenRegex = r"\(|\)"
         commentRegex = r"%(.*)"
         multiComRegex = [r"<#", r"#>"]
-        keywordRegex = r"@(tag|ref|pov|loc|img|vspace|newpage|alignl|alignc|alignr)"
-        formattingRegex = r"@\b(b|i)\b"
+        keywordRegex = r"@(tag|ref|pov|loc|cover|img|vspace|newpage|alignl|alignc|alignr)"
+        formattingRegex = r"@\b(b|i|bi)\b"
         headerRegex = r"^@(title|chapter|scene|section)"
         mdHeadersRegex = r"^#{1,4}"
         mdListsRegex = r"^(-|\+)"
@@ -168,7 +168,7 @@ class HighlightSpellBehaviour(HighlightBehaviour):
         )
         self.enchantDict = enchantDict
 
-        exclude = "tag|ref|pov|loc|img|title|chapter|scene|section"
+        exclude = "tag|ref|pov|loc|cover|img|title|chapter|scene|section"
         self.excludeRegex = re.compile(r"@({})\(.*?\)".format(exclude))
 
     def process(self, highlighter: Highlighter, text: str):

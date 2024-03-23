@@ -10,10 +10,10 @@ Name=Markup Writer
 Comment=A novel writing application.
 
 # The path (folder) in which the executable is run
-Path=/opt/MarkupWriter
+Path=/opt/markup-writer
 
 # The executable (can include arguments)
-Exec=/opt/MarkupWriter/MarkupWriter
+Exec=/opt/markup-writer/markup-writer
 
 # The icon for the entry, use the target filesystem path.
-Icon=MarkupWriter
+Icon=markup-writer

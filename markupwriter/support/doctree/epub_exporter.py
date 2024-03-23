@@ -4,7 +4,8 @@ import os
 import re
 import shutil
 import textwrap
-import shutil
+
+from datetime import datetime
 
 from PyQt6.QtWidgets import (
     QWidget,
@@ -22,6 +23,11 @@ import markupwriter.gui.dialogs.modal as dm
 
 class EpubExporter(object):
     def __init__(self) -> None:
+        self.coverPath = ""
+        self.title = ""
+        self.author = ""
+        self.publisher = ""
+
         self.wd = ""
         self.exportDir = ""
         self.metaPath = ""
@@ -35,11 +41,16 @@ class EpubExporter(object):
         if widget.exec() != 1:
             return
 
-        exportDir = widget.dir
+        exportDir = widget.exportDir
         item = widget.value
         if item is None:
             dm.ErrorDialog.run("Error: selected item is 'None'", None)
             return
+
+        self.coverPath = widget.coverImgEdit.text()
+        self.title = widget.titleEdit.text()
+        self.author = widget.authorEdit.text()
+        self.publisher = widget.publisherEdit.text()
 
         self._setupPaths(exportDir)
         self._mkDirectories()
@@ -81,6 +92,12 @@ class EpubExporter(object):
         dst = os.path.join(self.cssPath, "base.css")
         shutil.copyfile(src, dst)
 
+        # cover image
+        if File.exists(self.coverPath):
+            src = self.coverPath
+            dst = os.path.join(self.imgPath, File.fileName(src))
+            shutil.copyfile(src, dst)
+
     def _create(self, tw: w.DocumentTreeWidget, item: QTreeWidgetItem):
         contentPath = ProjectConfig.contentPath()
         manifest = ""
@@ -109,11 +126,11 @@ class EpubExporter(object):
             title = "{}_{}".format(count, c[0].title()) if len(c) > 0 else ""
             if title == "":
                 continue
-            
+
             page = self._mkPage(cbody)
             self._mkPageResources(title, page)
-            manifest += self._parsePageManifest(title)
-            spine += self._parseSpine(title)
+            manifest += self.mkManifestPageItem(title)
+            spine += self.mkSpineItem(title)
             count += 1
 
         self._mkContentOPF(manifest, spine)
@@ -154,28 +171,32 @@ class EpubExporter(object):
         path = os.path.join(self.textPath, fName)
         File.write(path, page)
 
-    def _parsePageManifest(self, title: str) -> str:
-        return "<item id='{}' href='text/{}.xhtml' media-type='application/xhtml+xml'/>\n".format(
-            title, title
-        )
+    def mkManifestPageItem(self, title: str) -> str:
+        return f"<item id='{title}' href='text/{title}.xhtml' media-type='application/xhtml+xml'/>\n"
 
-    def _parseSpine(self, title: str) -> str:
-        return "<itemref idref='{}'/>\n".format(title)
+    def mkSpineItem(self, title: str) -> str:
+        return f"<itemref idref='{title}'/>\n"
 
     def _mkContentOPF(self, manifest: str, spine: str):
         # add css resources to manifest
         names = File.findAllFiles(self.cssPath)
         for n in names:
-            manifest += "<item id='{}' href='css/{}' media-type='text/css'/>\n".format(
-                n, n
-            )
+            manifest += f"<item id='{n}' href='css/{n}' media-type='text/css'/>\n"
+
+        # add cover img to manifest
+        if self.coverPath != "":
+            name = File.fileName(self.coverPath)
+            ext = File.fileExtension(self.coverPath)
+            mtype = self._getMediaType(ext)
+            manifest += f"<item id='cover' properties='cover-image' href='images/{name}' media-type='image/{mtype}'/>\n"
 
         # add img resources to manifest
         names = File.findAllFiles(self.imgPath)
         for n in names:
             ext = File.fileExtension(n)
-            manifest += "<item id='{}' href='images/{}' media-type='image/{}'/>\n".format(
-                n, n, ext
+            mtype = self._getMediaType(ext)
+            manifest += (
+                f"<item id='{n}' href='images/{n}' media-type='image/{mtype}'/>\n"
             )
 
         manifest = textwrap.indent(manifest, "\t")
@@ -184,11 +205,26 @@ class EpubExporter(object):
         # create content.opf
         tpath = os.path.join(self.wd, "resources/templates/OEBPS/content.opf")
         opf: str = File.read(tpath)
+        opf = opf.replace(r"%title%", self.title)
+        opf = opf.replace(r"%author%", self.author)
+        opf = opf.replace(r"%publisher%", self.publisher)
+        opf = opf.replace(r"%date%", datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
         opf = opf.replace(r"%manifest%", manifest)
         opf = opf.replace(r"%spine%", spine)
 
         wpath = os.path.join(self.oebpsPath, "content.opf")
         File.write(wpath, opf)
+
+    def _getMediaType(self, ext: str) -> str | None:
+        match ext:
+            case "jpg":
+                return "jpeg"
+            case "jpeg":
+                return "jpeg"
+            case "png":
+                return "png"
+
+        return None
 
     def _mkEPUB3(self):
         try:
