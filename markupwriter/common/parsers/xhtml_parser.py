@@ -103,8 +103,6 @@ class XHtmlParser(QRunnable):
         htmlText = f"<p class='cover'><img src='{text}' alt='' width='512'/></p>\n"
         self.body += htmlText
         
-        self._processNewPage("1")
-        
     def _processImg(self, text: str):
         htmlText = "<p class='image'><img src='{}' alt='' width='512'/></p>\n".format(text)
         self.body += htmlText

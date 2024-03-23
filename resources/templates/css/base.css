@@ -10,6 +10,7 @@ p {
 .cover {
     display: block;
     text-align: center;
+    break-before: always;
 }
 
 .cover img {	
@@ -70,5 +71,5 @@ p {
 }
 
 .newPage {
-	page-break-before: always;
+	break-before: always;
 }
