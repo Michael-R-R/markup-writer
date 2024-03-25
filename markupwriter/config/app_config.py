@@ -41,8 +41,7 @@ class AppConfig(BaseConfig):
     def reset(wd: str):
         AppConfig.init(wd)
 
-
-    def setWindowTitle(projectName: str | None) -> str:
+    def mkWindowTitle(projectName: str | None) -> str:
         return "{} - {}".format(AppConfig.APP_NAME, projectName)
 
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
