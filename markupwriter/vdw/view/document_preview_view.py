@@ -25,6 +25,7 @@ class DocumentPreviewView(QWidget):
         
         self.tabWidget = w.PreviewTabWidget(self)
         
+        
         self.gLayout = QGridLayout(self)
         self.gLayout.addWidget(self.tabWidget, 0, 0)
         

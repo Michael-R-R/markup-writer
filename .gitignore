@@ -10,3 +10,4 @@ resources/.tests/
 resources/configs/
 
 *.deb
+.bugs

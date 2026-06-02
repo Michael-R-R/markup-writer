@@ -42,8 +42,8 @@ class File(object):
         except Exception as e:
             print(str(e))
             return False
-        finally:
-            return True
+        
+        return True
     
     def findAllFiles(path: str) -> list[str]:
         info = QFileInfo(path)
