@@ -1,16 +1,38 @@
-QWidget
+QFrame
+{
+    border: 2px solid rgb(28, 28, 28);
+    border-radius: 10px;
+}
+
+QTabWidget QWidget
+{
+    margin: 0px;
+    padding: 0;
+    border: 0px;
+    border-radius: 10px;
+}
+
+QTabWidget > QFrame
 {
     border: 0px;
+    border-radius: 10px;
 }
 
-QTabWidget
+QTabWidget::pane 
 {
-    padding: 0;
+    border: 0px;
+    border-radius: 10px;
+    padding: 0px;
+    margin: 0px;
 }
 
-QTextEdit
+QTabWidget QTextEdit
 {
     font: 11pt "Courier New";
+    color: white;
+    border: 1px solid rgb(32, 32, 32);
+    border-radius: 8px;
+    background-color: rgba(32, 32, 32, 0.95);
 }
 
 QPushButton

@@ -227,14 +227,6 @@ QTabWidget::pane
 {
     border: 2px solid rgb(28, 28, 28);
     border-radius: 10px;
-    padding: 4px;
-    top: 2px;
-}
-
-QTabWidget > QWidget
-{
-    background: rgba(0, 0, 0, 0%);
-    border-radius: 8px;
 }
 
 QTabBar::tab 

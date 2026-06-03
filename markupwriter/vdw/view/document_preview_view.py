@@ -11,6 +11,7 @@ from PyQt6.QtGui import (
 from PyQt6.QtWidgets import (
     QWidget,
     QGridLayout,
+    QFrame,
 )
 
 from markupwriter.config import AppConfig
@@ -25,9 +26,15 @@ class DocumentPreviewView(QWidget):
         
         self.tabWidget = w.PreviewTabWidget(self)
         
-        
-        self.gLayout = QGridLayout(self)
+        self.borderFrame = QFrame(self)
+        self.borderFrame.setFrameShape(QFrame.Shape.Box)
+        self.borderFrame.setFrameShadow(QFrame.Shadow.Plain)
+
+        self.gLayout = QGridLayout(self.borderFrame)
         self.gLayout.addWidget(self.tabWidget, 0, 0)
+
+        self.mainLayout = QGridLayout(self)
+        self.mainLayout.addWidget(self.borderFrame, 0, 0)
         
         self.setStyleSheet(Style.PREVIEW_VIEW)
     
