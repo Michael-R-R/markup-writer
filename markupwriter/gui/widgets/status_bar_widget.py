@@ -17,6 +17,8 @@ class StatusBarWidget(QStatusBar):
         self.normLabel = QLabel(normMsg, self)
         self.permLabel = QLabel(permMsg, self)
 
+        self.permLabel.setStyleSheet("background-color: transparent;")
+
         self.addWidget(self.normLabel)
         self.addPermanentWidget(self.permLabel)
         self.setSizeGripEnabled(False)

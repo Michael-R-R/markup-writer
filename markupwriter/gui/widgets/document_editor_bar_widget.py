@@ -27,6 +27,8 @@ class DocumentEditorBarWidget(QWidget):
         super().__init__(parent)
 
         self.pathLabel = QLabel("", self)
+        self.pathLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.pathLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.toolBar = QToolBar(self)
         self.toolBar.setIconSize(QSize(18, 18))
