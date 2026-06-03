@@ -73,6 +73,11 @@ QStatusBar
 	border-radius: 0px;
 }
 
+QStatusBar::item 
+{ 
+    border: none; 
+}
+
 QPushButton
 {
    color: white;
