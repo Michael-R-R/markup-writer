@@ -200,19 +200,23 @@ class Core(QObject):
         ded.closeSearchClicked.connect(worker.onSearchTriggered)
 
     def _setupPreviewWorkerSlots(self):
-        worker = self.data.dpd.worker
+        dpd = self.data.dpd
+        worker = dpd.worker
         
+        # main menu bar delegate
         mmbd = self.data.mmbd
         mmbd.vmDocPreviewTriggered.connect(worker.onFocusPreviewTriggered)
         mmbd.dmRefreshPreview.connect(worker.onRefreshTriggered)
         mmbd.dmTogglePreview.connect(worker.onToggleTriggered)
 
+        # document tree delegate
         dtd = self.data.dtd
         dtd.fileRemoved.connect(worker.onFileRemoved)
         dtd.fileRenamed.connect(worker.onFileRenamed)
         dtd.previewRequested.connect(worker.onFilePreviewed)
 
-        dpd = self.data.dpd
+        # document preview delegate
+        dpd.showViewRequested.connect(lambda: self.data.cwd.worker.showRHS(self.data.ded.view.size().width()))
         dpd.closeTabRequested.connect(worker.onCloseTabRequested)
 
     @pyqtSlot()
