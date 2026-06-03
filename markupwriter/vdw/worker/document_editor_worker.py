@@ -47,7 +47,7 @@ class DocumentEditorWorker(QObject):
         te = self.dev.textEdit
         highlighter = te.highlighter
         
-        highlighter.toggleBehaviours()
+        highlighter.toggleBehaviours(status)
         highlighter.rehighlight()
     
     @pyqtSlot(bool)
