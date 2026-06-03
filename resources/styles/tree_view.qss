@@ -1,0 +1,19 @@
+QFrame
+{
+    border: 2px solid rgb(28, 28, 28);
+    border-radius: 10px;
+}
+
+QLabel
+{
+    border: 0px;
+    border-radius: 0px;
+}
+
+QTreeWidget
+{
+    border: 0px;
+    border-radius: 0px;
+    padding: 0px;
+    margin: 0px;
+}

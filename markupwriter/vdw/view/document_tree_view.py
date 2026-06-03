@@ -11,6 +11,7 @@ from PyQt6.QtGui import (
 from PyQt6.QtWidgets import (
     QWidget,
     QGridLayout,
+    QFrame,
 )
 
 from markupwriter.config import AppConfig
@@ -25,10 +26,17 @@ class DocumentTreeView(QWidget):
         
         self.treeBar = w.DocumentTreeBarWidget(self)
         self.treeWidget = w.DocumentTreeWidget(self)
+
+        self.borderFrame = QFrame(self)
+        self.borderFrame.setFrameShape(QFrame.Shape.Box)
+        self.borderFrame.setFrameShadow(QFrame.Shadow.Plain)
         
-        self.gLayout = QGridLayout(self)
+        self.gLayout = QGridLayout(self.borderFrame)
         self.gLayout.addWidget(self.treeBar, 0, 0)
         self.gLayout.addWidget(self.treeWidget, 1, 0)
+        
+        self.mainLayout = QGridLayout(self)
+        self.mainLayout.addWidget(self.borderFrame, 0, 0)
         
         self.setStyleSheet(Style.TREE_VIEW)
         

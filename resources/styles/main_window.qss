@@ -223,75 +223,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
     background: none;
 }
 
-QTabWidget::pane 
-{
-    border: 2px solid rgb(28, 28, 28);
-    border-radius: 10px;
-}
 
-QTabBar::tab 
-{
-    background-color: rgb(32, 32, 32);
-	color: white;
-	border-style: solid;
-	border-width: 1px;
-	border-color: rgb(24, 24, 24);
-	border-bottom: none;
-	padding: 5px;
-	padding-left: 15px;
-	padding-right: 15px;
-}
-
-QTabBar::tab:!selected
-{
-	color: #b1b1b1;
-	border-bottom-style: solid;
-	background-color: rgb(28, 28, 28);
-    margin-top: 2px;
-}
-
-QTabBar::tab:selected
-{
-    margin-left: -4px;
-    margin-right: -4px;
-	margin-bottom: 0px;
-}
-
-QTabBar::tab:!selected:hover
-{
-	border-top-color: rgb(144, 144, 144);
-}
-
-QTabBar::tab:first:selected
-{
-    margin-left: 0;
-}
-
-QTabBar::tab:last
-{
-	margin-right: 0; 
-}
-
-QTabBar::tab:only-one
-{
-    margin: 0;
-}
-
-QTabBar::tab:first
-{
-    border-top-left-radius: 10px;
-}
-
-QTabBar::tab:last
-{
-    border-top-right-radius: 10px;
-}
-
-QTabBar::tab:only-one
-{
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
 
 QTreeView
 {
