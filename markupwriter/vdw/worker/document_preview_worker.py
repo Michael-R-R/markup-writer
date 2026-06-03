@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QObject, pyqtSlot
+from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt6.QtWidgets import QWidget
 
 import markupwriter.vdw.view as v
@@ -6,6 +6,8 @@ import markupwriter.gui.widgets as w
 
 
 class DocumentPreviewWorker(QObject):
+    showViewRequested = pyqtSignal()
+
     def __init__(self, dpv: v.DocumentPreviewView, parent: QObject | None) -> None:
         super().__init__(parent)
         
@@ -63,7 +65,7 @@ class DocumentPreviewWorker(QObject):
     def onFilePreviewed(self, title: str, uuid: str):
         width = self.dpv.size().width()
         if width <= 0:
-            self.dpv.showViewRequested.emit()
+            self.showViewRequested.emit()
 
         widget = w.PreviewWidget(title, uuid, self.dpv)
         self._addTabPage(title, uuid, widget)

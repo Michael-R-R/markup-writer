@@ -30,8 +30,11 @@ class DocumentPreviewDelegate(BaseDelegate):
 
     def setupConnections(self):
         tw = self.view.tabWidget
+        
         tw.tabCloseRequested.connect(lambda x: self.closeTabRequested.emit(x))
         tw.countChanged.connect(lambda x: self.tabCountChanged.emit(x))
+
+        self.worker.showViewRequested.connect(lambda: self.showViewRequested.emit())
 
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         sout << self.view
