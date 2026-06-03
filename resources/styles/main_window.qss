@@ -62,6 +62,11 @@ QMenu::item:disabled
     background-color: rgba(0, 0, 0, 0%);
 }
 
+QMenu::icon 
+{
+    margin-left: 10px;
+}
+
 QToolBar
 {
     color: white;
