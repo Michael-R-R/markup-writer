@@ -94,7 +94,7 @@ QPushButton
    min-width: 80px;
    border-style: solid;
    border-width: 1px;
-   border-radius: 2px;
+   border-radius: 5px;
    border-color: rgb(28, 28, 28);
    padding: 1px;
 }
@@ -225,8 +225,16 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 
 QTabWidget::pane 
 {
-	border: 2px solid rgb(28, 28, 28);
-    border-radius: 2px;
+    border: 2px solid rgb(28, 28, 28);
+    border-radius: 10px;
+    padding: 4px;
+    top: 2px;
+}
+
+QTabWidget > QWidget
+{
+    background: rgba(0, 0, 0, 0%);
+    border-radius: 8px;
 }
 
 QTabBar::tab 
@@ -234,7 +242,6 @@ QTabBar::tab
     background-color: rgb(32, 32, 32);
 	color: white;
 	border-style: solid;
-	border-radius: 2px;
 	border-width: 1px;
 	border-color: rgb(24, 24, 24);
 	border-bottom: none;
@@ -278,11 +285,28 @@ QTabBar::tab:only-one
     margin: 0;
 }
 
+QTabBar::tab:first
+{
+    border-top-left-radius: 10px;
+}
+
+QTabBar::tab:last
+{
+    border-top-right-radius: 10px;
+}
+
+QTabBar::tab:only-one
+{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
 QTreeView
 {
 	color: white;
 	background-color: rgb(40, 40, 40);
 	border: 2px solid rgb(28, 28, 28);
+    border-radius: 10px;
 	padding: 8px;
 }
 
@@ -303,7 +327,7 @@ QPlainTextEdit
 	color: white;
 	background-color: rgb(32, 32, 32);
 	border: 0px;
-    border-radius: 2px;
+    border-radius: 10px;
 }
 
 QLabel
