@@ -139,11 +139,11 @@ class DocumentEditorWidget(QPlainTextEdit):
             self.reset()
             return
         
+        cpos = 0
         configText = Regex.getDocumentConfig(text)
         if configText is not None:
+            cpos = Regex.getCPos(configText)
             text = Regex.getDocumentText(text)
-
-        cpos = Regex.getCPos(configText)
         
         self.docUUID = uuid
         self.setPlainText(text)
