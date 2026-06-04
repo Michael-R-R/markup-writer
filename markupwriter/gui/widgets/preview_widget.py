@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import ProjectConfig
-from markupwriter.common.util import File
+from markupwriter.common.util import File, Regex
 from markupwriter.common.syntax import Highlighter
 from markupwriter.common.tokenizers import XHtmlPreviewTokenizer
 from markupwriter.common.parsers import XHtmlParser
@@ -30,7 +30,7 @@ class PreviewWidget(QWidget):
 
         self.title = title
         self.uuid = uuid
-        self.plainText = File.read(path)
+        self.plainText = self._cleanTextFromPath(path)
         self.html = ""
         self.isPlainText = False
         self.prevVal = 0
@@ -80,7 +80,7 @@ class PreviewWidget(QWidget):
 
         vbValue = self.textedit.verticalScrollBar().value()
 
-        text = File.read(path)
+        text = self._cleanTextFromPath(path)
         self.plainText = text
         self.html = ""
         if self.isPlainText:
@@ -99,6 +99,17 @@ class PreviewWidget(QWidget):
             self._setPlainText(self.plainText)
         else:
             self._runHtmlTokenizer()
+
+    def _cleanTextFromPath(self, path: str) -> str:
+        text = File.read(path)
+        if text is None:
+            return ""
+
+        cleaned = Regex.getDocumentText(text)
+        if cleaned is None:
+            return ""
+        
+        return cleaned
 
     def _setPlainText(self, text: str):
         self.plainText = text

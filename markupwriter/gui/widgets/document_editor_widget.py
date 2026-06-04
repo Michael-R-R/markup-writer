@@ -139,17 +139,11 @@ class DocumentEditorWidget(QPlainTextEdit):
             self.reset()
             return
         
-        # Extract out document configs
-        configText = ""
-        configMatch = Regex.findDocumentConfig(text)
-        if configMatch is not None:
-            configText = configMatch.group(1)   
-            text = text[configMatch.end() + 1 :]
+        configText = Regex.getDocumentConfig(text)
+        if configText is not None:
+            text = Regex.getDocumentText(text)
 
-        cpos = 0
-        cposMatch = Regex.findCPos(configText)
-        if cposMatch is not None:
-            cpos = int(cposMatch.group(0)[5:])
+        cpos = Regex.getCPos(configText)
         
         self.docUUID = uuid
         self.setPlainText(text)
