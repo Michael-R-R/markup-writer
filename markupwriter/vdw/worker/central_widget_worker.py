@@ -35,6 +35,12 @@ class CentralWidgetWorker(QObject):
     def setSizesRHS(self, sizes: list[int]):
         self.cwv.rhSplitter.setSizes(sizes)
 
+    def showLHS(self, editorSize: int | None):
+            if editorSize is None:
+                self.cwv.lhSplitter.setSizes([200, 100])
+            else:
+                self.cwv.lhSplitter.setSizes([int(editorSize / 2), int(editorSize / 2)])
+
     def showRHS(self, editorSize: int | None):
         if editorSize is None:
             self.cwv.rhSplitter.setSizes([200, 100])

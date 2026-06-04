@@ -1,30 +1,56 @@
-QWidget
-{
+QTextEdit {
     border: 0px;
 }
 
-QTabWidget
+QTabBar::tab 
 {
-    padding: 0;
+	border-style: solid;
+	border-width: 1px;
+	padding: 5px;
+	padding-left: 15px;
+	padding-right: 15px;
 }
 
-QTextEdit
+QTabBar::tab:!selected
 {
-    font: 11pt "Courier New";
+	border-bottom-style: solid;
+    margin-top: 2px;
 }
 
-QPushButton
+QTabBar::tab:selected
 {
-    border: 1px solid rgb(28, 28, 28);
+    margin-left: -4px;
+    margin-right: -4px;
+	margin-bottom: 0px;
 }
 
-QToolButton
+QTabBar::tab:first:selected
 {
-    background: rgba(0, 0, 0, 0%);
-    border-radius: 4px;
+    margin-left: 0;
 }
 
-QToolButton::hover
+QTabBar::tab:last
 {
-   background: rgba(144, 144, 144, 20%);
+	margin-right: 0; 
+}
+
+QTabBar::tab:only-one
+{
+    margin: 0;
+}
+
+QTabBar::tab:first
+{
+    border-top-left-radius: 10px;
+}
+
+QTabBar::tab:last
+{
+    border-top-right-radius: 10px;
+}
+
+QTabBar::tab:only-one
+{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }

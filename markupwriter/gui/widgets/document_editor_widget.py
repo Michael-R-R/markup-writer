@@ -32,7 +32,7 @@ from markupwriter.config import ProjectConfig
 from markupwriter.common.syntax import Highlighter
 from markupwriter.common.referencetag import RefTagManager
 from markupwriter.common.parsers import EditorParser
-from markupwriter.common.util import File
+from markupwriter.common.util import File, Regex
 
 import markupwriter.support.doceditor as de
 import markupwriter.support.doceditor.state as s
@@ -64,6 +64,8 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.searchHotkey.setShortcut(shortcut)
         self.addAction(self.searchHotkey)
 
+        self.plainDocument.setDocumentMargin(12)
+
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
         self.setMouseTracking(True)
@@ -72,7 +74,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setTabStopDistance(20.0)
-        
+
         self.setState(s.NormalEditorState(self, self))
 
     def reset(self):
@@ -98,8 +100,14 @@ class DocumentEditorWidget(QPlainTextEdit):
             return False
         
         cpos = self.textCursor().position()
-        text = self.toPlainText()
-        text = f"cpos:{cpos}\n{text}"
+
+        currentText = self.toPlainText()
+
+        configText = "[CONFIG]\n"
+        configText += f"cpos:{cpos}\n"
+        configText += "[CONFIG END]\n"
+
+        text = configText + currentText
         
         return File.write(path, text)
     
@@ -132,10 +140,10 @@ class DocumentEditorWidget(QPlainTextEdit):
             return
         
         cpos = 0
-        found = re.search(r"^cpos:.+", text)
-        if found is not None:
-            cpos = int(found.group(0)[5:])
-            text = text[found.end() + 1 :]
+        configText = Regex.getDocumentConfig(text)
+        if configText is not None:
+            cpos = Regex.getCPos(configText)
+            text = Regex.getDocumentText(text)
         
         self.docUUID = uuid
         self.setPlainText(text)

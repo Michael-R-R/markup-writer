@@ -7,6 +7,9 @@ from PyQt6.QtCore import (
 
 from PyQt6.QtWidgets import (
     QDialog,
+    QSizePolicy,
+    QHBoxLayout,
+    QSpacerItem,
     QWidget,
     QGridLayout,
     QTreeWidget,
@@ -29,7 +32,7 @@ class ExportDialog(QDialog):
         super().__init__(parent)
 
         self.setWindowTitle("Export (EPUB3)")
-        self.setFixedSize(600, 300)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.exportDir = ""
         self.value: QTreeWidgetItem = None
@@ -37,11 +40,19 @@ class ExportDialog(QDialog):
         self._tree = tree
         self._isBuilt = False
 
+        self.gLayout = QGridLayout(self)
+        self.gLayout.setRowStretch(0, 0)
+        self.gLayout.setColumnStretch(0, 0)
+        self.gLayout.setColumnStretch(1, 1)
+
+        self.dirButton = QToolButton(self)
+        self.dirButton.setIcon(Icon.MISC_FOLDER)
         self.dirEdit = QLineEdit("", self)
         self.dirEdit.setReadOnly(True)
         self.dirEdit.setPlaceholderText("Select directory...")
-        self.dirButton = QToolButton(self)
-        self.dirButton.setIcon(Icon.MISC_FOLDER)
+
+        self.gLayout.addWidget(self.dirButton, 0, 0, 1, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.dirEdit, 0, 1, 1, Qt.AlignmentFlag.AlignLeft)
 
         self.coverImgEdit = QLineEdit("")
         self.coverImgEdit.setPlaceholderText("Select cover image...")
@@ -49,14 +60,14 @@ class ExportDialog(QDialog):
         self.coverImgButton = QToolButton()
         self.coverImgButton.setIcon(Icon.MISC_FOLDER)
 
+        self.authorLabel = QLabel("Author")
         self.authorEdit = QLineEdit("")
-        self.titleEdit = QLineEdit("")
-        self.publisherEdit = QLineEdit("")
 
-        self.gLayout = QGridLayout(self)
-        self.gLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
-        self.gLayout.addWidget(self.dirButton, 0, 0, Qt.AlignmentFlag.AlignLeft)
-        self.gLayout.addWidget(self.dirEdit, 0, 1)
+        self.titleLabel = QLabel("Title")
+        self.titleEdit = QLineEdit("")
+
+        self.publisherLabel = QLabel("Publisher")
+        self.publisherEdit = QLineEdit("")
 
         self.dirButton.clicked.connect(self._onDirButtonClicked)
         self.coverImgButton.clicked.connect(self._onImgButtonClicked)
@@ -89,17 +100,17 @@ class ExportDialog(QDialog):
         self.coverImgEdit.setText(path[0])
 
     def _buildWidgets(self):
-        self.gLayout.addWidget(self.coverImgButton, 1, 0, Qt.AlignmentFlag.AlignLeft)
-        self.gLayout.addWidget(self.coverImgEdit, 1, 1)
+        self.gLayout.addWidget(self.coverImgButton, 1, 0, 1, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.coverImgEdit, 1, 1, 1, Qt.AlignmentFlag.AlignLeft)
 
-        self.gLayout.addWidget(QLabel("Author"), 2, 0, Qt.AlignmentFlag.AlignLeft)
-        self.gLayout.addWidget(self.authorEdit, 2, 1)
+        self.gLayout.addWidget(self.authorLabel, 2, 0, 1, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.authorEdit, 2, 1, 1, Qt.AlignmentFlag.AlignLeft)
 
-        self.gLayout.addWidget(QLabel("Title"), 3, 0, Qt.AlignmentFlag.AlignLeft)
-        self.gLayout.addWidget(self.titleEdit, 3, 1)
+        self.gLayout.addWidget(self.titleLabel, 3, 0, 1, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.titleEdit, 3, 1, 1, Qt.AlignmentFlag.AlignLeft)
 
-        self.gLayout.addWidget(QLabel("Publisher"), 4, 0, Qt.AlignmentFlag.AlignLeft)
-        self.gLayout.addWidget(self.publisherEdit, 4, 1)
+        self.gLayout.addWidget(self.publisherLabel, 4, 0, 1, Qt.AlignmentFlag.AlignLeft)
+        self.gLayout.addWidget(self.publisherEdit, 4, 1, 1, Qt.AlignmentFlag.AlignLeft)
 
         row = 5
         for i in range(self._tree.topLevelItemCount()):
@@ -116,6 +127,8 @@ class ExportDialog(QDialog):
                 )
                 row += 1
                 
+        self.gLayout.addItem(QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding), row, 0, 1, -1)
+
         self._isBuilt = True
 
     def _onItemSelected(self, item: QTreeWidgetItem):

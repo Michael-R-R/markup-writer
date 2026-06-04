@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import ProjectConfig
-from markupwriter.common.util import File
+from markupwriter.common.util import File, Regex
 from . import DocumentEditorWidget
 
 
@@ -35,7 +35,7 @@ class PopupPreviewWidget(QWidget):
         self.textEdit.setEnabled(True)
         self.textEdit.setReadOnly(True)
         path = os.path.join(ProjectConfig.contentPath(), uuid)
-        self.textEdit.setPlainText(File.read(path))
+        self.textEdit.setPlainText(Regex.getDocumentText(File.read(path)))
         
         self.gLayout = QGridLayout(self)
         self.gLayout.addWidget(self.previewButton, 0, 0)

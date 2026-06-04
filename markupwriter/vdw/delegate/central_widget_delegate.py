@@ -27,11 +27,12 @@ class CentralWidgetDelegate(BaseDelegate):
         self.setupConnections()
         
     def setup(self):
-        dts = AppConfig.docTreeSize
-        des = AppConfig.docEditorSize
-        dps = AppConfig.docPreviewSize
-        self.worker.setSizesLHS([dts.width(), des.width() + dps.width()])
-        self.worker.setSizesRHS([des.width(), dps.width()])
+        mms = AppConfig.mainWindowSize
+        dts = int(mms.width() * 0.05)
+        des = int(mms.width() * 0.70)
+        dps = int(mms.width() * 0.25)
+        self.worker.setSizesLHS([dts, des])
+        self.worker.setSizesRHS([des, dps])
         
     def setupConnections(self):
         pass

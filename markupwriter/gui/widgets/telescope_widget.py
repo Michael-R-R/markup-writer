@@ -21,7 +21,7 @@ from PyQt6.QtWidgets import (
     QListWidgetItem,
 )
 
-from markupwriter.common.util import File
+from markupwriter.common.util import File, Regex
 from markupwriter.config import ProjectConfig
 
 import markupwriter.support.doctree.item as ti
@@ -109,7 +109,7 @@ class TelescopeWidget(QWidget):
         
         widget: ti.BaseTreeItem = self.collection[key]
         path = ProjectConfig.contentPath() + widget.UUID()
-        content = File.read(path)
+        content = Regex.getDocumentText(File.read(path))
         if content is None:
             return
         

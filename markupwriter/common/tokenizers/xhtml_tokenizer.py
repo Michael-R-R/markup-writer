@@ -122,14 +122,9 @@ class XHtmlTokenizer(QRunnable):
 class XHtmlPreviewTokenizer(XHtmlTokenizer):
     def __init__(self, text: str, parent: QObject | None) -> None:
         super().__init__(text, parent)
-        
-        self.ignoreSet = {
-            "@tag", "@ref",
-            "@pov", "@loc",
-        }
 
         self.removeDict = {
-            r"^cpos:.*": self._processRemove,
+            r"^@(tag|ref|pov|loc)(\(.*\))": self._processRemove,
         }
 
     def _process(self):
