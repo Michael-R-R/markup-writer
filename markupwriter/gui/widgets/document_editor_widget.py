@@ -32,7 +32,7 @@ from markupwriter.config import ProjectConfig
 from markupwriter.common.syntax import Highlighter
 from markupwriter.common.referencetag import RefTagManager
 from markupwriter.common.parsers import EditorParser
-from markupwriter.common.util import File
+from markupwriter.common.util import File, Regex
 
 import markupwriter.support.doceditor as de
 import markupwriter.support.doceditor.state as s
@@ -141,16 +141,15 @@ class DocumentEditorWidget(QPlainTextEdit):
         
         # Extract out document configs
         configText = ""
-        found = re.search(r"\[CONFIG\](.*?)\[CONFIG END\]", text, re.DOTALL)
-        if found is not None:
-            configText = found.group(1)
-            text = text[found.end() + 1 :]
+        configMatch = Regex.findDocumentConfig(text)
+        if configMatch is not None:
+            configText = configMatch.group(1)   
+            text = text[configMatch.end() + 1 :]
 
         cpos = 0
-        found = re.search(r"^cpos:.+", configText, re.MULTILINE)
-        if found is not None:
-            cpos = int(found.group(0)[5:])
-            print(cpos)
+        cposMatch = Regex.findCPos(configText)
+        if cposMatch is not None:
+            cpos = int(cposMatch.group(0)[5:])
         
         self.docUUID = uuid
         self.setPlainText(text)
