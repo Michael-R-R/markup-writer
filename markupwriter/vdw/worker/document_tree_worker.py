@@ -167,7 +167,11 @@ class DocumentTreeWorker(QObject):
         if item is None:
             return
         
-        name = StrDialog.run("Rename", "", self.dtv)
+        widget = tw.itemWidget(item, 0)
+        if widget is None:
+            return
+
+        name = StrDialog.run("Rename", widget.title(), self.dtv)
         if name is None:
             return
         
