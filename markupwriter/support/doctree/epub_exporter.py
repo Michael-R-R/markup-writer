@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import AppConfig, ProjectConfig
-from markupwriter.common.util import File
+from markupwriter.common.util import File, Regex
 from markupwriter.common.tokenizers import XHtmlExportTokenizer
 from markupwriter.common.parsers import XHtmlParser
 
@@ -110,7 +110,7 @@ class EpubExporter(object):
             cbody = ""
             for file in c:
                 path = os.path.join(contentPath, file.UUID())
-                text = File.read(path)
+                text = Regex.getDocumentText(File.read(path))
                 if text is None:
                     continue
 
