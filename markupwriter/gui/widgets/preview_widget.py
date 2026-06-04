@@ -3,6 +3,7 @@
 import os
 
 from PyQt6.QtCore import (
+    Qt,
     pyqtSlot,
     QThreadPool,
 )
@@ -39,6 +40,7 @@ class PreviewWidget(QWidget):
         self.highlighter = Highlighter(self.textedit.document(), None)
         self.textedit.setReadOnly(True)
         self.textedit.setTabStopDistance(20.0)
+        self.textedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.refreshButton = QPushButton("Refresh", self)
         self.refreshButton.clicked.connect(self.refreshContent)

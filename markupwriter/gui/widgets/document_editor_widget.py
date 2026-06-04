@@ -64,6 +64,8 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.searchHotkey.setShortcut(shortcut)
         self.addAction(self.searchHotkey)
 
+        self.plainDocument.setDocumentMargin(12)
+
         self.setDocument(self.plainDocument)
         self.setEnabled(False)
         self.setMouseTracking(True)
@@ -72,7 +74,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setTabStopDistance(20.0)
-        
+
         self.setState(s.NormalEditorState(self, self))
 
     def reset(self):

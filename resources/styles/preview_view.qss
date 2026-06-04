@@ -1,38 +1,11 @@
-QFrame
-{
-    border: 2px solid rgb(28, 28, 28);
-    border-radius: 10px;
-}
-
-QTabWidget QWidget 
-{
-    border: 0px solid rgb(36, 36, 36);
-    border-radius: 8px;
-}
-
-QTabWidget QTextEdit
-{
-    font: 11pt "Courier New";
-    color: white;
-    border: 0px solid rgb(36, 36, 36);
-    border-radius: 8px;
-    background-color: rgb(36, 36, 36);
-}
-
-QTabWidget::pane 
-{
-    border: 0px solid rgb(28, 28, 28);
-    border-radius: 10px;
+QTextEdit {
+    border: 0px;
 }
 
 QTabBar::tab 
 {
-    background-color: rgb(32, 32, 32);
-	color: white;
 	border-style: solid;
 	border-width: 1px;
-	border-color: rgb(24, 24, 24);
-	border-bottom: none;
 	padding: 5px;
 	padding-left: 15px;
 	padding-right: 15px;
@@ -40,9 +13,7 @@ QTabBar::tab
 
 QTabBar::tab:!selected
 {
-	color: #b1b1b1;
 	border-bottom-style: solid;
-	background-color: rgb(28, 28, 28);
     margin-top: 2px;
 }
 
@@ -51,11 +22,6 @@ QTabBar::tab:selected
     margin-left: -4px;
     margin-right: -4px;
 	margin-bottom: 0px;
-}
-
-QTabBar::tab:!selected:hover
-{
-	border-top-color: rgb(144, 144, 144);
 }
 
 QTabBar::tab:first:selected
@@ -87,20 +53,4 @@ QTabBar::tab:only-one
 {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-}
-
-QPushButton
-{
-    border: 1px solid rgb(28, 28, 28);
-}
-
-QToolButton
-{
-    background: rgba(0, 0, 0, 0%);
-    border-radius: 4px;
-}
-
-QToolButton::hover
-{
-   background: rgba(144, 144, 144, 20%);
 }
