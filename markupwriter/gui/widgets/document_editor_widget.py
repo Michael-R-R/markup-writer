@@ -100,8 +100,14 @@ class DocumentEditorWidget(QPlainTextEdit):
             return False
         
         cpos = self.textCursor().position()
-        text = self.toPlainText()
-        text = f"cpos:{cpos}\n{text}"
+
+        currentText = self.toPlainText()
+
+        configText = "[CONFIG]\n"
+        configText += f"cpos:{cpos}\n"
+        configText += "[CONFIG END]\n"
+
+        text = configText + currentText
         
         return File.write(path, text)
     
@@ -133,11 +139,18 @@ class DocumentEditorWidget(QPlainTextEdit):
             self.reset()
             return
         
+        # Extract out document configs
+        configText = ""
+        found = re.search(r"\[CONFIG\](.*?)\[CONFIG END\]", text, re.DOTALL)
+        if found is not None:
+            configText = found.group(1)
+            text = text[found.end() + 1 :]
+
         cpos = 0
-        found = re.search(r"^cpos:.+", text)
+        found = re.search(r"^cpos:.+", configText, re.MULTILINE)
         if found is not None:
             cpos = int(found.group(0)[5:])
-            text = text[found.end() + 1 :]
+            print(cpos)
         
         self.docUUID = uuid
         self.setPlainText(text)
