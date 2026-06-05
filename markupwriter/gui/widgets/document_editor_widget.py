@@ -43,7 +43,7 @@ class DocumentEditorWidget(QPlainTextEdit):
     stateBufferChanged = pyqtSignal(str)
     docStatusChanged = pyqtSignal(bool)
     showRefPopupClicked = pyqtSignal(QPoint)
-    showRefPreviewClicked = pyqtSignal(QPoint)
+    showRefTagClicked = pyqtSignal(QPoint)
     wordCountChanged = pyqtSignal(str, int)
     resized = pyqtSignal(QSize)
 
@@ -271,7 +271,7 @@ class DocumentEditorWidget(QPlainTextEdit):
                 return None
         elif e.modifiers() == (ctrl | alt):
             if e.button() == button:
-                self.showRefPreviewClicked.emit(e.pos())
+                self.showRefTagClicked.emit(e.pos())
                 return None
 
         return super().mousePressEvent(e)

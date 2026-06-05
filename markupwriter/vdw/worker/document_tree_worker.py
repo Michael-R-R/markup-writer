@@ -151,7 +151,7 @@ class DocumentTreeWorker(QObject):
         self.dtv.treeWidget.translate(1)
     
     @pyqtSlot()
-    def onPreviewTabItem(self):
+    def onPreviewCurrentTabItem(self):
         tw = self.dtv.treeWidget
         item = tw.currentItem()
         if item is None:
@@ -161,7 +161,7 @@ class DocumentTreeWorker(QObject):
         self.filePreviewed.emit(widget.title(), widget.UUID())
 
     @pyqtSlot()
-    def onPreviewWindowItem(self):
+    def onPreviewWindowCurrentItem(self):
         tw = self.dtv.treeWidget
         item = tw.currentItem()
         if item is None:
@@ -305,13 +305,23 @@ class DocumentTreeWorker(QObject):
         tw.refreshParentWordCounts(widget.item, owc, count)
         
     @pyqtSlot(str)
-    def onRefPreviewRequested(self, uuid: str):
+    def onRefTagPreviewTabRequested(self, uuid: str):
         tw = self.dtv.treeWidget
         widget: ti.BaseTreeItem = tw.findWidget(uuid)
         if widget is None:
             return
         self.filePreviewed.emit(widget.title(), uuid)
-        
+
+    @pyqtSlot(str)
+    def onRefTagPreviewWindowRequested(self, uuid: str):
+        tw = self.dtv.treeWidget
+        widget: ti.BaseTreeItem = tw.findWidget(uuid)
+        if widget is None:
+            return
+
+        widget = w.PreviewWindowWidget(widget.title(), uuid, tw)
+        widget.show()
+
     @pyqtSlot()
     def onTelescopeTriggered(self):
         tw = self.dtv.treeWidget

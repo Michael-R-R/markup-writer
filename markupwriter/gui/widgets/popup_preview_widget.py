@@ -26,8 +26,11 @@ class PopupPreviewWidget(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setFixedSize(400, 200)
         
-        self.previewButton = QPushButton("Preview...", self)
-        self.previewButton.clicked.connect(lambda: self.close())
+        self.previewTabButton = QPushButton("Preview tab...", self)
+        self.previewTabButton.clicked.connect(lambda: self.close())
+
+        self.previewWindowButton = QPushButton("Preview window...", self)
+        self.previewWindowButton.clicked.connect(lambda: self.close())
 
         self.textEdit = DocumentEditorWidget(self)
         self.textEdit.canResizeMargins = False
@@ -38,8 +41,9 @@ class PopupPreviewWidget(QWidget):
         self.textEdit.setPlainText(Regex.getDocumentText(File.read(path)))
         
         self.gLayout = QGridLayout(self)
-        self.gLayout.addWidget(self.previewButton, 0, 0)
-        self.gLayout.addWidget(self.textEdit, 1, 0)
+        self.gLayout.addWidget(self.previewTabButton, 0, 0)
+        self.gLayout.addWidget(self.previewWindowButton, 0, 1)
+        self.gLayout.addWidget(self.textEdit, 1, 0, 1, 2)
         
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.close()

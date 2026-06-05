@@ -152,8 +152,8 @@ class Core(QObject):
         dtd.contextMenuRequested.connect(worker.onContextMenuRequested)
         dtd.navUpClicked.connect(worker.onNavItemUp)
         dtd.navDownClicked.connect(worker.onNavItemDown)
-        dtd.cmPreviewTabClicked.connect(worker.onPreviewTabItem)
-        dtd.cmPreviewWindowClicked.connect(worker.onPreviewWindowItem)
+        dtd.cmPreviewTabClicked.connect(worker.onPreviewCurrentTabItem)
+        dtd.cmPreviewWindowClicked.connect(worker.onPreviewWindowCurrentItem)
         dtd.cmRenameClicked.connect(worker.onRenamedItem)
         dtd.cmToTrashClicked.connect(worker.onTrashItem)
         dtd.cmRecoverClicked.connect(worker.onRecoverItem)
@@ -168,7 +168,8 @@ class Core(QObject):
 
         ded = self.data.ded
         ded.wordCountChanged.connect(worker.onWordCountChanged)
-        ded.refPreviewRequested.connect(worker.onRefPreviewRequested)
+        ded.refPreviewTabRequested.connect(worker.onRefTagPreviewTabRequested)
+        ded.refPreviewWindowRequested.connect(worker.onRefTagPreviewWindowRequested)
 
     def _setupEditorWorkerSlots(self):
         worker = self.data.ded.worker
@@ -189,7 +190,7 @@ class Core(QObject):
         ded.stateBufferChanged.connect(worker.onStateBufferChanged)
         ded.closeDocClicked.connect(worker.onCloseDocument)
         ded.showRefPopupClicked.connect(worker.onShowRefPopupClicked)
-        ded.showRefPreviewClicked.connect(worker.onShowRefPreviewClicked)
+        ded.showRefTagClicked.connect(worker.onShowRefTagClicked)
         ded.editorResized.connect(worker.onEditorResized)
         ded.contextMenuRequested.connect(worker.onContxtMenuRequested)
         ded.showSearchTriggered.connect(worker.onSearchTriggered)
