@@ -27,6 +27,7 @@ class DocumentPreviewView(QWidget):
         self.tabWidget = w.PreviewTabWidget(self)
         
         self.borderFrame = QFrame(self)
+        self.borderFrame.setObjectName("borderFrame")
         self.borderFrame.setFrameShape(QFrame.Shape.Box)
         self.borderFrame.setFrameShadow(QFrame.Shadow.Plain)
 

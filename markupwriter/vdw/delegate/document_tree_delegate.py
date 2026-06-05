@@ -27,7 +27,8 @@ class DocumentTreeDelegate(BaseDelegate):
     navUpClicked = pyqtSignal()
     navDownClicked = pyqtSignal()
 
-    cmPreviewClicked = pyqtSignal()
+    cmPreviewTabClicked = pyqtSignal()
+    cmPreviewWindowClicked = pyqtSignal()
     cmRenameClicked = pyqtSignal()
     cmToTrashClicked = pyqtSignal()
     cmRecoverClicked = pyqtSignal()
@@ -70,7 +71,8 @@ class DocumentTreeDelegate(BaseDelegate):
         )
 
         icm = tw.itemContextMenu
-        icm.previewAction.triggered.connect(lambda: self.cmPreviewClicked.emit())
+        icm.previewTabAction.triggered.connect(lambda: self.cmPreviewTabClicked.emit())
+        icm.previewWindowAction.triggered.connect(lambda: self.cmPreviewWindowClicked.emit())
         icm.renameAction.triggered.connect(lambda: self.cmRenameClicked.emit())
         icm.toTrashAction.triggered.connect(lambda: self.cmToTrashClicked.emit())
         icm.recoverAction.triggered.connect(lambda: self.cmRecoverClicked.emit())

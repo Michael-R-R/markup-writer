@@ -127,7 +127,10 @@ class PreviewTabWidget(QTabWidget):
             
     def __rlshift__(self, sout: QDataStream) -> QDataStream:
         count = self.count()
+        cindex = self.currentIndex()
+        
         sout.writeInt(count)
+        sout.writeInt(cindex)
         
         for i in range(count):
             widget: w.PreviewWidget = self.widget(i)
@@ -138,11 +141,15 @@ class PreviewTabWidget(QTabWidget):
     
     def __rrshift__(self, sin: QDataStream) -> QDataStream:
         count = sin.readInt()
+        cindex = sin.readInt()
         
-        for _ in range(count):
+        for i in range(count):
             title = sin.readQString()
             uuid = sin.readQString()
             widget = w.PreviewWidget(title, uuid, self)
             self.addTab(widget, title)
+            self.setCurrentIndex(i)
+
+        self.setCurrentIndex(cindex)
         
         return sin

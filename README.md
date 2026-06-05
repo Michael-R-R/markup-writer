@@ -74,3 +74,21 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a hre
 | `k`            | Scroll preview up (select mode)                           |
 | `o`            | Open file (select mode)                                   |
 | `p`            | Preview file (select mode)                                |
+
+## Markup Tags
+| Tag            | Description                                               |
+| -------------- | --------------------------------------------------------- |
+|  `@tag`        | Creates a tag that can be referenced in other documents   |
+|  `@char`       | Reference a character tag (works like @ref)               |
+|  `@loc`        | Reference a location tag (works like @ref)                |
+|  `@ref`        | Reference a tag                                           |
+|  `@title`      | Creates a Header 1                                        |
+|  `@chapter`    | Creates a Header 2                                        |
+|  `@scene`      | Creates a line break adding '***' to the document         |
+|  `@section`    | Creates empty line break                                  |
+|  `@i`          | Italicize                                                 |
+|  `@b`          | Bold                                                      |
+|  `@alignl`     | Align left                                                |
+|  `@alignc`     | Align center                                              |
+|  `@alignr`     | Align right                                               |
+|  `@img`        | Import an image                                           |

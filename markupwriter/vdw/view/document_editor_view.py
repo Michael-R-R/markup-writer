@@ -32,6 +32,7 @@ class DocumentEditorView(QWidget):
         self.searchBox.hide()
 
         self.borderFrame = QFrame(self)
+        self.borderFrame.setObjectName("borderFrame")
         self.borderFrame.setFrameShape(QFrame.Shape.Box)
         self.borderFrame.setFrameShadow(QFrame.Shadow.Plain)
 
