@@ -25,6 +25,7 @@ exe = EXE(
     exclude_binaries=True,
     name='Markup Writer',
     icon='resources\\icons\\build\\books.ico',
+    contents_directory='data',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -43,5 +44,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='main',
+    name='Markup Writer',
 )
