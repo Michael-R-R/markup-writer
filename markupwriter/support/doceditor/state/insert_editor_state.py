@@ -27,6 +27,7 @@ class InsertEditorState(s.BaseEditorState):
         
         self.funcDict = {
             "(": self._lparen,
+            "backspace": self._backspace,
             "esc": self._esc,
         }
         
@@ -44,8 +45,7 @@ class InsertEditorState(s.BaseEditorState):
     def process(self, e: QKeyEvent) -> bool:
         ckey: str = Key.get(e.modifiers(), e.key())
         if ckey in self.funcDict:
-            self.funcDict[ckey]()
-            return True
+            return self.funcDict[ckey]()
         
         return False
 
@@ -53,6 +53,31 @@ class InsertEditorState(s.BaseEditorState):
         cursor = self.editor.textCursor()
         cursor.insertText("()")
         cursor.movePosition(QTextCursor.MoveOperation.Left)
+        self.editor.setTextCursor(cursor)
+
+        return True
+
+    def _backspace(self) -> bool:
+        cursor = self.editor.textCursor()
+
+        # get the character to the left of the cursor
+        cursor.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.KeepAnchor)
+        lcharacter = cursor.selectedText()
+        cursor.clearSelection()
+        if lcharacter != "(":
+            return False
+
+        # get the character to the right of the cursor original position
+        cursor.movePosition(QTextCursor.MoveOperation.Right)
+        cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.KeepAnchor)
+        rcharacter = cursor.selectedText()
+        cursor.clearSelection()
+        if rcharacter != ")":
+            return False
+        
+        # delete the parentheses
+        cursor.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.KeepAnchor, 2)
+        cursor.removeSelectedText()
         self.editor.setTextCursor(cursor)
 
         return True
