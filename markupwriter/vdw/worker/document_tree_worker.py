@@ -151,7 +151,7 @@ class DocumentTreeWorker(QObject):
         self.dtv.treeWidget.translate(1)
     
     @pyqtSlot()
-    def onPreviewItem(self):
+    def onPreviewTabItem(self):
         tw = self.dtv.treeWidget
         item = tw.currentItem()
         if item is None:
@@ -159,6 +159,17 @@ class DocumentTreeWorker(QObject):
 
         widget: ti.BaseTreeItem = tw.itemWidget(item, 0)
         self.filePreviewed.emit(widget.title(), widget.UUID())
+
+    @pyqtSlot()
+    def onPreviewWindowItem(self):
+        tw = self.dtv.treeWidget
+        item = tw.currentItem()
+        if item is None:
+            return
+
+        item: ti.BaseTreeItem = tw.itemWidget(item, 0)
+        widget = w.PreviewWindowWidget(item.title(), item.UUID(), tw)
+        widget.show()
     
     @pyqtSlot()
     def onRenamedItem(self):
