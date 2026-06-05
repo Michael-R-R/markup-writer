@@ -1,13 +1,30 @@
 # Description
-In-development plain-text with rich-text previewing support novel writing application. Aims to deliver 
+In-development, vim-like text editor with rich-text previewing support. Built for large novel construction. Powered by custom mark up language. Aims to deliver 
 a distraction free presentation with easy to use in-text markup language, fast document switching, and a set of tools
 to support large novel organization needs.
 
 Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a href="https://github.com/vkbo/novelWriter">novelWriter</a>, and <a href="https://github.com/NvChad/NvChad">NvChad</a>
 
-# Showcase
+No AI slop
+
+No installation required
+
+# Showcase (old build)
 <video src="https://github.com/Michael-R-R/markup-writer/assets/54217603/eac84838-eb4f-425c-9871-9e4044077db7" width="320" height="200" controls preload></video>
-<p align=center><img align=center src="https://github.com/Michael-R-R/markup-writer/assets/54217603/985f98c6-d791-4ad4-88f1-783ab7f3aa61"></p>
+
+## Main Window
+<img width="1817" height="870" alt="main window" src="https://github.com/user-attachments/assets/59f71e34-ee7b-4c0c-ae0c-bcb19063dee4" />
+
+## Main + Preview Windows
+<img width="1852" height="987" alt="main + previews" src="https://github.com/user-attachments/assets/613ea974-5a2a-4ee1-8ff4-d927e1266aae" />
+
+## Editor Tags Preview
+<img width="1817" height="871" alt="editor tag preview" src="https://github.com/user-attachments/assets/9261bb51-5a21-4f68-9a11-f85b021ac1f1" />
+
+## Telescope Preview
+<img width="1819" height="870" alt="telescope" src="https://github.com/user-attachments/assets/901a57a0-7711-41bc-986f-a9ecf62b4a74" />
+
+## EPUB Exporter
 <p align=center><img align=center src="https://github.com/Michael-R-R/markup-writer/assets/54217603/fc7a7e4f-5310-4907-b62a-956d4af5922c"></p>
 
 ## Features
@@ -43,7 +60,6 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a hre
 | `o`            | Open item                                                 |
 | `p`            | Preview item                                              |
 
-
 ## Document Editor
 | Mappings       | Action                                                    |
 | -------------- | --------------------------------------------------------- |
@@ -60,7 +76,6 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a hre
 | `j`            | Scroll content down                                       |
 | `k`            | Scroll content up                                         |
 | `l`            | Scroll content right                                      |
-
 
 ## Telescope
 | Mappings       | Action                                                    |
@@ -92,3 +107,6 @@ Inspired by <a href="https://github.com/KDE/ghostwriter">ghostwriter</a>, <a hre
 |  `@alignc`     | Align center                                              |
 |  `@alignr`     | Align right                                               |
 |  `@img`        | Import an image                                           |
+
+## Contributions
+Not accepting contributions at this time
