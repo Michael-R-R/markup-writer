@@ -7,7 +7,7 @@ dist/
 package/
 
 resources/.tests/
-resources/configs/
+resources/configs/*.ini
 
 *.deb
 .bugs
