@@ -19,6 +19,7 @@ class PreviewWindowWidget(QWidget):
         self.setWindowTitle(title)
         self.resize(800, 900)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
         self.previewWidget = PreviewWidget(title, uuid, self)
 
