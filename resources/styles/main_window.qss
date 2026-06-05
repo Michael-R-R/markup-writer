@@ -1,3 +1,8 @@
+QFrame#borderFrame {
+    border: 2px solid rgb(75, 75, 75);
+    border-radius: 3px;
+}
+
 QStatusBar::item  { 
     border: none; 
 }
