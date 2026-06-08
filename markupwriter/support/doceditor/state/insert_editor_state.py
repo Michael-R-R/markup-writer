@@ -29,6 +29,7 @@ class InsertEditorState(s.BaseEditorState):
             "(": self._lparen,
             "backspace": self._backspace,
             "esc": self._esc,
+            "tab": self._tab,
         }
         
         if append:
@@ -84,5 +85,19 @@ class InsertEditorState(s.BaseEditorState):
 
     def _esc(self) -> bool:
         self.changedState.emit(s.STATE.normal)
+
+        return True
+    
+    def _tab(self) -> bool:
+        cursor = self.editor.textCursor()
+
+        # get the character to the right of the cursor original position
+        cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.KeepAnchor)
+        rcharacter = cursor.selectedText()
+        cursor.clearSelection()
+        if rcharacter != ")":
+            return False
+        
+        self.editor.setTextCursor(cursor)
 
         return True

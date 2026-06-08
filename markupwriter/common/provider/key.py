@@ -34,8 +34,9 @@ class Key(object):
         Qt.Key.Key_8: "8",
         Qt.Key.Key_9: "9",
         Qt.Key.Key_Backspace: "backspace",
-        Qt.Key.Key_Space: "spc",
         Qt.Key.Key_Escape: "esc",
+        Qt.Key.Key_Space: "spc",
+        Qt.Key.Key_Tab: "tab"
     }
 
     _shiftDict: dict[Qt.Key, str] = {
