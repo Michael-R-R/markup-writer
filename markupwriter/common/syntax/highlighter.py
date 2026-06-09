@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from enum import auto, Enum
-import re, enchant
+import enchant, regex
 
 from PyQt6.QtGui import (
     QSyntaxHighlighter,
@@ -23,6 +23,7 @@ class BEHAVIOUR(Enum):
     comment = auto()
     multicomment = auto()
     keyword = auto()
+    underline = auto()
     formatting = auto()
     header = auto()
     searchText = auto()
@@ -35,10 +36,14 @@ class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument | None, endict: enchant.Dict | None):
         super().__init__(document)
 
+        keywords = "tag|ref|char|loc|cover|img|vspace|newpage|alignl|alignc|alignr"
+        keywordsUnderline = "ref|char|loc"
+
         parenRegex = r"\(|\)"
         commentRegex = r"%(.*)"
         multiComRegex = [r"<#", r"#>"]
-        keywordRegex = r"@(tag|ref|char|loc|cover|img|vspace|newpage|alignl|alignc|alignr)"
+        keywordRegex = r'@({})'.format(keywords)
+        underlineRegex = r'(?<=@(?:{})\(|,\s*)[A-Za-z0-9_]+(?:\s+[A-Za-z0-9_]+)*(?=\s*(?:,|\)))'.format(keywordsUnderline)
         formattingRegex = r"@\b(b|i|bi)\b"
         headerRegex = r"^@(title|chapter|scene|section)"
         mdHeadersRegex = r"^#{1,4}"
@@ -72,6 +77,11 @@ class Highlighter(QSyntaxHighlighter):
         self.addBehaviour(
             BEHAVIOUR.keyword,
             HighlightExprBehaviour(HighlighterConfig.keywordCol, keywordRegex),
+        )
+
+        self.addBehaviour(
+            BEHAVIOUR.underline,
+            HighlightUnderlineBehaviour(QColor(255, 255, 255), underlineRegex)
         )
 
         self.addBehaviour(
@@ -143,7 +153,7 @@ class Highlighter(QSyntaxHighlighter):
 
 class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
-        self._expr = re.compile(expr)
+        self._expr = regex.compile(expr)
         self.isEnabled = True
 
         self.format = QTextCharFormat()
@@ -156,7 +166,7 @@ class HighlightBehaviour(object):
         self.format.setForeground(QBrush(color))
 
     def setExpression(self, expr: str):
-        self._expr = re.compile(expr)
+        self._expr = regex.compile(expr)
 
 
 class HighlightSpellBehaviour(HighlightBehaviour):
@@ -169,7 +179,7 @@ class HighlightSpellBehaviour(HighlightBehaviour):
         self.enchantDict = enchantDict
 
         exclude = "tag|ref|char|loc|cover|img|title|chapter|scene|section"
-        self.excludeRegex = re.compile(r"@({})\(.*?\)".format(exclude))
+        self.excludeRegex = regex.compile(r"@({})\(.*?\)".format(exclude))
 
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
@@ -198,7 +208,7 @@ class HighlightWordBehaviour(HighlightBehaviour):
             return
 
         for word in self._wordSet:
-            it = re.finditer(word, text)
+            it = regex.finditer(word, text)
             for found in it:
                 start = found.start()
                 end = found.end() - start
@@ -238,11 +248,31 @@ class HighlightExprBehaviour(HighlightBehaviour):
             highlighter.setFormat(start, end, self.format)
 
 
+class HighlightUnderlineBehaviour(HighlightBehaviour):
+    def __init__(self, color: QColor, expr: str):
+        super().__init__(color, expr)
+
+        self.format.setUnderlineColor(QColor(255, 255, 255))
+        self.format.setUnderlineStyle(QTextCharFormat.UnderlineStyle.SingleUnderline)
+
+    def process(self, highlighter: Highlighter, text):
+        if not self.isEnabled:
+            return
+        
+        it = self._expr.finditer(text)
+        for w in it:
+            start = w.start()
+            end = w.end() - start
+            highlighter.setFormat(start, end, self.format)
+        
+
+
+
 class HighlightMultiExprBehaviour(HighlightBehaviour):
     def __init__(self, color: QColor, expr: str, end: str):
         super().__init__(color, expr)
 
-        self._endExpr = re.compile(end)
+        self._endExpr = regex.compile(end)
 
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
