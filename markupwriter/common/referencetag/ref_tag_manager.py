@@ -35,3 +35,6 @@ class RefTagManager:
 
     def tagExists(self, tag: str) -> bool:
         return tag in self._refTagDict
+    
+    def getTags(self) -> dict[str, str]:
+        return self._refTagDict

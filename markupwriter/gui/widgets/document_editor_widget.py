@@ -29,7 +29,7 @@ from PyQt6.QtWidgets import (
 )
 
 from markupwriter.config import ProjectConfig
-from markupwriter.common.syntax import Highlighter
+from markupwriter.common.syntax import Highlighter, BEHAVIOUR
 from markupwriter.common.referencetag import RefTagManager
 from markupwriter.common.parsers import EditorParser
 from markupwriter.common.util import File, Regex
@@ -53,8 +53,8 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.state: s.BaseEditorState = None
         self.plainDocument = de.PlainDocument(self)
         self.spellChecker = de.SpellCheck()
-        self.highlighter = Highlighter(self.plainDocument, self.spellChecker.endict)
         self.refManager = RefTagManager()
+        self.highlighter = Highlighter(self.plainDocument, self.refManager, self.spellChecker.endict)
         self.parser = EditorParser()
         self.searchHotkey = QAction("search", self)
         self.canResizeMargins = True
@@ -203,6 +203,7 @@ class DocumentEditorWidget(QPlainTextEdit):
     @pyqtSlot(str, dict)
     def runParser(self, uuid: str, tokens: dict[str, list[str]]):
         self.parser.run(uuid, tokens, self.refManager)
+        self.highlighter.rehighlight()
     
     @pyqtSlot(s.STATE)
     def onChangedState(self, state: s.STATE):

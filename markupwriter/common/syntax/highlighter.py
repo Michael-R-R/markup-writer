@@ -13,9 +13,8 @@ from PyQt6.QtGui import (
     QFont,
 )
 
-from markupwriter.config import (
-    HighlighterConfig,
-)
+from markupwriter.config import HighlighterConfig
+from markupwriter.common.referencetag import RefTagManager
 
 
 class BEHAVIOUR(Enum):
@@ -33,7 +32,7 @@ class BEHAVIOUR(Enum):
 
 
 class Highlighter(QSyntaxHighlighter):
-    def __init__(self, document: QTextDocument | None, endict: enchant.Dict | None):
+    def __init__(self, document: QTextDocument | None, refManager: RefTagManager | None, endict: enchant.Dict | None):
         super().__init__(document)
 
         keywords = "tag|ref|char|loc|cover|img|vspace|newpage|alignl|alignc|alignr"
@@ -50,6 +49,12 @@ class Highlighter(QSyntaxHighlighter):
         mdListsRegex = r"^(-|\+)"
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
+
+        if refManager is not None:
+            self.addBehaviour(
+            BEHAVIOUR.underline,
+            HighlightUnderlineBehaviour(QColor(255, 255, 255), underlineRegex, refManager)
+        )
 
         if endict is not None:
             self.addBehaviour(
@@ -80,11 +85,6 @@ class Highlighter(QSyntaxHighlighter):
         )
 
         self.addBehaviour(
-            BEHAVIOUR.underline,
-            HighlightUnderlineBehaviour(QColor(255, 255, 255), underlineRegex)
-        )
-
-        self.addBehaviour(
             BEHAVIOUR.formatting,
             HighlightExprBehaviour(HighlighterConfig.formattingCol, formattingRegex),
         )
@@ -112,8 +112,8 @@ class Highlighter(QSyntaxHighlighter):
         self.addBehaviour(BEHAVIOUR.searchText, searchedWordBehaviour)
 
     def highlightBlock(self, text: str | None) -> None:
-        for _, val in self._behaviours.items():
-            val.process(self, text)
+        for _, behaviour in self._behaviours.items():
+            behaviour.process(self, text)
 
     def addBehaviour(self, type: BEHAVIOUR, val: HighlightBehaviour) -> bool:
         if type in self._behaviours:
@@ -142,6 +142,7 @@ class Highlighter(QSyntaxHighlighter):
     ) -> (
         HighlightWordBehaviour
         | HighlightSpellBehaviour
+        | HighlightUnderlineBehaviour
         | HighlightExprBehaviour
         | HighlightMultiExprBehaviour
         | None
@@ -233,6 +234,33 @@ class HighlightWordBehaviour(HighlightBehaviour):
         return word in self._wordSet
 
 
+class HighlightUnderlineBehaviour(HighlightBehaviour):
+    def __init__(self, color: QColor, expr: str, refManager: RefTagManager):
+        super().__init__(color, expr)
+
+        self._refManager = refManager
+
+        self.format.setUnderlineColor(QColor(255, 255, 255))
+        self.format.setUnderlineStyle(QTextCharFormat.UnderlineStyle.SingleUnderline)
+
+    def process(self, highlighter: Highlighter, text):
+        if not self.isEnabled:
+            return
+        
+        tagDict = self._refManager.getTags()
+        
+        it = self._expr.finditer(text)
+        for w in it:
+            word = w.group()
+            word = word.strip()
+            if not word in tagDict:
+                continue
+
+            start = w.start()
+            end = w.end() - start
+            highlighter.setFormat(start, end, self.format)
+
+
 class HighlightExprBehaviour(HighlightBehaviour):
     def __init__(self, color: QColor, expr: str):
         super().__init__(color, expr)
@@ -246,26 +274,6 @@ class HighlightExprBehaviour(HighlightBehaviour):
             start = w.start()
             end = w.end() - start
             highlighter.setFormat(start, end, self.format)
-
-
-class HighlightUnderlineBehaviour(HighlightBehaviour):
-    def __init__(self, color: QColor, expr: str):
-        super().__init__(color, expr)
-
-        self.format.setUnderlineColor(QColor(255, 255, 255))
-        self.format.setUnderlineStyle(QTextCharFormat.UnderlineStyle.SingleUnderline)
-
-    def process(self, highlighter: Highlighter, text):
-        if not self.isEnabled:
-            return
-        
-        it = self._expr.finditer(text)
-        for w in it:
-            start = w.start()
-            end = w.end() - start
-            highlighter.setFormat(start, end, self.format)
-        
-
 
 
 class HighlightMultiExprBehaviour(HighlightBehaviour):
