@@ -41,8 +41,8 @@ class Highlighter(QSyntaxHighlighter):
         parenRegex = r"\(|\)"
         commentRegex = r"%(.*)"
         multiComRegex = [r"<#", r"#>"]
-        keywordRegex = r'@({})'.format(keywords)
-        underlineRegex = r'(?<=@(?:{})\(|,\s*)[A-Za-z0-9_]+(?:\s+[A-Za-z0-9_]+)*(?=\s*(?:,|\)))'.format(keywordsUnderline)
+        keywordRegex = r"@({})".format(keywords)
+        underlineRegex = r"(?<=@(?:{})\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))".format(keywordsUnderline)
         formattingRegex = r"@\b(b|i|bi)\b"
         headerRegex = r"^@(title|chapter|scene|section)"
         mdHeadersRegex = r"^#{1,4}"
