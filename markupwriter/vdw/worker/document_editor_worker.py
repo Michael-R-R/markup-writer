@@ -150,7 +150,6 @@ class DocumentEditorWorker(QObject):
         if tag is None:
             return
 
-        te = self.dev.textEdit
         uuid = te.findRefUUID(tag)
         if uuid is None:
             InfoDialog.run("Tag does not exist", te)
@@ -167,7 +166,7 @@ class DocumentEditorWorker(QObject):
         size = popup.sizeHint()
         cpos = QCursor.pos()
         x = cpos.x() - int((size.width() / 2))
-        y = cpos.y() - int(size.height() / 1.25)
+        y = cpos.y() - int(size.height() / 2)
 
         popup.move(QPoint(x, y))
         popup.show()

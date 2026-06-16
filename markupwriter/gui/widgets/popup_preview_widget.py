@@ -45,6 +45,7 @@ class PopupPreviewWidget(QWidget):
         self.gLayout.addWidget(self.previewWindowButton, 0, 1)
         self.gLayout.addWidget(self.textEdit, 1, 0, 1, 2)
         
-    def leaveEvent(self, a0: QEvent | None) -> None:
+    def leaveEvent(self, e: QEvent | None) -> None:
         self.close()
-        super().leaveEvent(a0)
+        super().leaveEvent(e)
+
