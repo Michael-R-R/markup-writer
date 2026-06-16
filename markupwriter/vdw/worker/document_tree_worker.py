@@ -9,8 +9,8 @@ from PyQt6.QtCore import (
     QPoint,
 )
 
-from PyQt6.QtWidgets import (
-    QApplication,
+from PyQt6.QtGui import (
+    QGuiApplication,
 )
 
 from markupwriter.gui.dialogs.modal import (
@@ -19,7 +19,7 @@ from markupwriter.gui.dialogs.modal import (
     ErrorDialog,
 )
 
-from markupwriter.config import ProjectConfig
+from markupwriter.config import AppConfig, ProjectConfig
 from markupwriter.common.util import File
 
 import markupwriter.vdw.view as v
@@ -329,5 +329,8 @@ class DocumentTreeWorker(QObject):
         telescope.resize(800, 400)
         telescope.show()
         
-        center = QApplication.primaryScreen().availableGeometry().center() / 2
-        telescope.move(center)
+        center = QGuiApplication.topLevelWindows()[0].frameGeometry().center()
+        gFrame = telescope.frameGeometry()
+        gFrame.moveCenter(center)
+
+        telescope.move(gFrame.topLeft())
