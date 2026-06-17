@@ -20,6 +20,7 @@ class HighlighterConfig(BaseConfig):
     formattingCol: QColor = None
     headerCol: QColor = None
     keywordCol: QColor = None
+    inTextTagCol: QColor = None
     searchedCol: QColor = None
     mdHeadersCol: QColor = None
     mdListsCol: QColor = None
@@ -32,6 +33,7 @@ class HighlighterConfig(BaseConfig):
         HighlighterConfig.formattingCol = QColor(255, 153, 0)
         HighlighterConfig.headerCol = QColor(66, 113, 174)
         HighlighterConfig.keywordCol = QColor(217, 140, 179)
+        HighlighterConfig.inTextTagCol = QColor(140, 216, 159)
         HighlighterConfig.searchedCol = QColor(255, 153, 0)
         HighlighterConfig.mdHeadersCol = QColor(64, 191, 142)
         HighlighterConfig.mdListsCol = QColor(230, 153, 255)
@@ -45,6 +47,7 @@ class HighlighterConfig(BaseConfig):
         sOut << HighlighterConfig.formattingCol
         sOut << HighlighterConfig.headerCol
         sOut << HighlighterConfig.keywordCol
+        sOut << HighlighterConfig.inTextTagCol
         sOut << HighlighterConfig.searchedCol
         sOut << HighlighterConfig.mdHeadersCol
         sOut << HighlighterConfig.mdListsCol
@@ -56,6 +59,7 @@ class HighlighterConfig(BaseConfig):
         sIn >> HighlighterConfig.formattingCol
         sIn >> HighlighterConfig.headerCol
         sIn >> HighlighterConfig.keywordCol
+        sIn >> HighlighterConfig.inTextTagCol
         sIn >> HighlighterConfig.searchedCol
         sIn >> HighlighterConfig.mdHeadersCol
         sIn >> HighlighterConfig.mdListsCol

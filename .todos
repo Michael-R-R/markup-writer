@@ -1,2 +1,5 @@
 [x] Fix telescope popup location to align to the center of the application window
-[] fix ctrl+lmb click tags closing right away on Linux OS
+[x] fix ctrl+lmb click tags closing right away on Linux OS
+[] highlight ref tags in text
+[] fix spacing between label and ">" for tree context menu items
+[] implement not counting tags as words

@@ -23,6 +23,7 @@ class BEHAVIOUR(Enum):
     multicomment = auto()
     keyword = auto()
     underline = auto()
+    tagInText = auto()
     formatting = auto()
     header = auto()
     searchText = auto()
@@ -36,13 +37,15 @@ class Highlighter(QSyntaxHighlighter):
         super().__init__(document)
 
         keywords = "tag|ref|char|loc|cover|img|vspace|newpage|alignl|alignc|alignr"
-        keywordsUnderline = "ref|char|loc"
+        underlineTags = "ref|char|loc"
+        intextTags = "char|loc"
 
         parenRegex = r"\(|\)"
         commentRegex = r"%(.*)"
         multiComRegex = [r"<#", r"#>"]
         keywordRegex = r"@({})".format(keywords)
-        underlineRegex = r"(?<=@(?:{})\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))".format(keywordsUnderline)
+        underlineTagsRegex = r"(?<=@(?:{})\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))".format(underlineTags)
+        intextTagsRegex = r"(?<=@(?:{})\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))".format(intextTags)
         formattingRegex = r"@\b(b|i|bi)\b"
         headerRegex = r"^@(title|chapter|scene|section)"
         mdHeadersRegex = r"^#{1,4}"
@@ -53,8 +56,11 @@ class Highlighter(QSyntaxHighlighter):
         if refManager is not None:
             self.addBehaviour(
             BEHAVIOUR.underline,
-            HighlightUnderlineBehaviour(QColor(255, 255, 255), underlineRegex, refManager)
-        )
+            HighlightUnderlineTagsBehaviour(QColor(255, 255, 255), underlineTagsRegex, refManager))
+
+            self.addBehaviour(
+            BEHAVIOUR.tagInText,
+            HighlightTagsInTextBehaviour(HighlighterConfig.inTextTagCol, intextTagsRegex, refManager))
 
         if endict is not None:
             self.addBehaviour(
@@ -143,6 +149,7 @@ class Highlighter(QSyntaxHighlighter):
         HighlightWordBehaviour
         | HighlightSpellBehaviour
         | HighlightUnderlineBehaviour
+        | HighlightTagsInTextBehaviour
         | HighlightExprBehaviour
         | HighlightMultiExprBehaviour
         | None
@@ -180,13 +187,13 @@ class HighlightSpellBehaviour(HighlightBehaviour):
         self.enchantDict = enchantDict
 
         exclude = "tag|ref|char|loc|cover|img|title|chapter|scene|section"
-        self.excludeRegex = regex.compile(r"@({})\(.*?\)".format(exclude))
+        self._excludeRegex = regex.compile(r"@({})\(.*?\)".format(exclude))
 
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
             return
 
-        check = self.excludeRegex.search(text)
+        check = self._excludeRegex.search(text)
         if check is not None:
             return
 
@@ -234,7 +241,7 @@ class HighlightWordBehaviour(HighlightBehaviour):
         return word in self._wordSet
 
 
-class HighlightUnderlineBehaviour(HighlightBehaviour):
+class HighlightUnderlineTagsBehaviour(HighlightBehaviour):
     def __init__(self, color: QColor, expr: str, refManager: RefTagManager):
         super().__init__(color, expr)
 
@@ -243,12 +250,13 @@ class HighlightUnderlineBehaviour(HighlightBehaviour):
         self.format.setUnderlineColor(QColor(255, 255, 255))
         self.format.setUnderlineStyle(QTextCharFormat.UnderlineStyle.SingleUnderline)
 
-    def process(self, highlighter: Highlighter, text):
+    def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
             return
         
         tagDict = self._refManager.getTags()
         
+        # underline tags within parentheses
         it = self._expr.finditer(text)
         for w in it:
             word = w.group()
@@ -256,6 +264,50 @@ class HighlightUnderlineBehaviour(HighlightBehaviour):
             if not word in tagDict:
                 continue
 
+            start = w.start()
+            end = w.end() - start
+            highlighter.setFormat(start, end, self.format)
+
+
+class HighlightTagsInTextBehaviour(HighlightBehaviour):
+    def __init__(self, color: QColor, expr: str, refManager: RefTagManager):
+        super().__init__(color, expr)
+
+        self._refManager = refManager
+
+        exclude = "tag|ref|char|loc|cover|img|title|chapter|scene|section"
+        self._excludeRegex = regex.compile(r"@({})\(.*?\)".format(exclude))
+
+        self._charRegStr = ""
+        self._locRegStr = ""
+        self._fullRegStr = ""
+
+    def process(self, highlighter: Highlighter, text: str):
+        if not self.isEnabled:
+            return
+
+        allTags = self._expr.findall(text)
+        if len(allTags) > 0:
+
+            tagDict = self._refManager.getTags()
+            
+            if text.find("@char") > -1:
+                self._charRegStr = "|".join(regex.escape(word) for word in allTags if word in tagDict)
+            elif text.find("@loc") > -1:
+                self._locRegStr = "|".join(regex.escape(word) for word in allTags if word in tagDict)
+        
+            self._fullRegStr = f"{self._charRegStr}|{self._locRegStr}"
+
+        if len(self._fullRegStr) < 1:
+            return
+
+        check = self._excludeRegex.search(text)
+        if check is not None:
+            return
+
+        match = regex.compile(r"({})".format(self._fullRegStr))
+        it = match.finditer(text)
+        for w in it:
             start = w.start()
             end = w.end() - start
             highlighter.setFormat(start, end, self.format)
