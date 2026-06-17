@@ -305,7 +305,7 @@ class HighlightTagsInTextBehaviour(HighlightBehaviour):
         if check is not None:
             return
 
-        match = regex.compile(r"({})".format(self._fullRegStr))
+        match = regex.compile(r"\b({})\b".format(self._fullRegStr))
         it = match.finditer(text)
         for w in it:
             start = w.start()
