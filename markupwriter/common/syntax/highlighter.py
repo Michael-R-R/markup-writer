@@ -254,14 +254,12 @@ class HighlightUnderlineTagsBehaviour(HighlightBehaviour):
         if not self.isEnabled:
             return
         
-        tagDict = self._refManager.getTags()
-        
         # underline tags within parentheses
         it = self._expr.finditer(text)
         for w in it:
             word = w.group()
             word = word.strip()
-            if not word in tagDict:
+            if not self._refManager.tagExists(word):
                 continue
 
             start = w.start()
@@ -288,13 +286,11 @@ class HighlightTagsInTextBehaviour(HighlightBehaviour):
 
         allTags = self._expr.findall(text)
         if len(allTags) > 0:
-
-            tagDict = self._refManager.getTags()
             
             if text.find("@char") > -1:
-                self._charRegStr = "|".join(regex.escape(word) for word in allTags if word in tagDict)
+                self._charRegStr = "|".join(regex.escape(word) for word in allTags if self._refManager.tagExists(word))
             elif text.find("@loc") > -1:
-                self._locRegStr = "|".join(regex.escape(word) for word in allTags if word in tagDict)
+                self._locRegStr = "|".join(regex.escape(word) for word in allTags if self._refManager.tagExists(word))
         
             self._fullRegStr = f"{self._charRegStr}|{self._locRegStr}"
 

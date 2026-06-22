@@ -29,8 +29,8 @@ class ImportDialog(QDialog):
         super().__init__(parent)
         
         self.setWindowTitle("Create Item")
-        self.setSizePolicy(QSizePolicy.Policy.Expanding,
-                           QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.setFixedSize(400, 200)
         
         self.path: str = None
         self.value: ti.BaseFileItem = None
@@ -60,7 +60,6 @@ class ImportDialog(QDialog):
         hLayout.addWidget(self._dirButton)
         
         self._vLayout = QVBoxLayout(self)
-        self._vLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
         self._vLayout.addLayout(hLayout)
         
         self._cancelButton.clicked.connect(self.onCancelClicked)
