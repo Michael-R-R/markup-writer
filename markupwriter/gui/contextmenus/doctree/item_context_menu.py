@@ -49,7 +49,9 @@ class ItemContextMenu(BaseContextMenu):
         inTrash: bool = args[1]
         isMutable: bool = args[2]
 
+        self.previewMenu.setEnabled(isFile)
         self.previewTabAction.setEnabled(isFile)
+        self.previewWindowAction.setEnabled(isFile)
         self.renameAction.setEnabled(isMutable)
         self.toTrashAction.setEnabled((not inTrash) and isMutable)
         self.recoverAction.setEnabled(inTrash)
