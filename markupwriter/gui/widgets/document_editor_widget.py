@@ -167,7 +167,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         if cpos <= 0 or cpos >= len(textBlock):
             return None
 
-        found = re.search(r"@(ref|char|loc)(\(.*\))", textBlock)
+        found = re.search(r"@(ref|plot|tl|char|loc|obj)(\(.*\))", textBlock)
         if found is None:
             return None
 

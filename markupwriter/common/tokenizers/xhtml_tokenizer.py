@@ -124,7 +124,7 @@ class XHtmlPreviewTokenizer(XHtmlTokenizer):
         super().__init__(text, parent)
 
         self.removeDict = {
-            r"^@(tag|ref|char|loc)(\(.*\))": self._processRemove,
+            r"^@(tag|ref|plot|tl|char|loc|obj)(\(.*\))": self._processRemove,
         }
 
     def _process(self):
@@ -145,7 +145,7 @@ class XHtmlExportTokenizer(XHtmlTokenizer):
 
         self.removeDict = {
             r"^cpos:.*": self._processRemove,
-            r"^@(tag|ref|char|loc)(\(.*\))": self._processRemove,
+            r"^@(tag|ref|plot|tl|char|loc|obj)(\(.*\))": self._processRemove,
             r"%.*": self._processRemove,
             r"<#(\n|.)*?#>": self._processRemove,
         }
