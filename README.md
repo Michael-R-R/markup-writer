@@ -15,6 +15,9 @@ No installation required
 ## Main Window
 <img width="1817" height="870" alt="main window" src="https://github.com/user-attachments/assets/59f71e34-ee7b-4c0c-ae0c-bcb19063dee4" />
 
+## In Text Reference Highlighting
+<img width="1477" height="775" alt="intext-highlight" src="https://github.com/user-attachments/assets/5da4e8ed-bade-4f8c-964d-250b1eeff3bb" />
+
 ## Main + Preview Windows
 <img width="1852" height="987" alt="main + previews" src="https://github.com/user-attachments/assets/613ea974-5a2a-4ee1-8ff4-d927e1266aae" />
 
