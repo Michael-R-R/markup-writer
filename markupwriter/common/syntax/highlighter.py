@@ -156,6 +156,7 @@ class HighlightBehaviour(object):
 class HighlightSpellBehaviour(HighlightBehaviour):
     def __init__(self, color: QColor, expr: str, enchantDict: enchant.Dict):
         super().__init__(color, expr)
+        self.isEnabled = False
         self.format.setUnderlineColor(QColor(255, 0, 0))
         self.format.setUnderlineStyle(
             QTextCharFormat.UnderlineStyle.SpellCheckUnderline
