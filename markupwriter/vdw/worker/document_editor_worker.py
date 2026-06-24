@@ -29,7 +29,8 @@ import markupwriter.gui.widgets as w
 
 
 class DocumentEditorWorker(QObject):
-    refPreviewRequested = pyqtSignal(str)
+    refPreviewTabRequested = pyqtSignal(str)
+    refPreviewWindowRequested = pyqtSignal(str)
     
     def __init__(self, dev: v.DocumentEditorView, parent: QObject | None) -> None:
         super().__init__(parent)
@@ -149,27 +150,29 @@ class DocumentEditorWorker(QObject):
         if tag is None:
             return
 
-        te = self.dev.textEdit
         uuid = te.findRefUUID(tag)
         if uuid is None:
             InfoDialog.run("Tag does not exist", te)
             return
 
         popup = w.PopupPreviewWidget(uuid, te)
-        popup.previewButton.clicked.connect(
-            lambda: self.refPreviewRequested.emit(uuid)
+        popup.previewTabButton.clicked.connect(
+            lambda: self.refPreviewTabRequested.emit(uuid)
+        )
+        popup.previewWindowButton.clicked.connect(
+            lambda: self.refPreviewWindowRequested.emit(uuid)
         )
 
         size = popup.sizeHint()
         cpos = QCursor.pos()
         x = cpos.x() - int((size.width() / 2))
-        y = cpos.y() - int(size.height() / 1.25)
+        y = cpos.y() - int(size.height() / 2)
 
         popup.move(QPoint(x, y))
         popup.show()
 
     @pyqtSlot(QPoint)
-    def onShowRefPreviewClicked(self, pos: QPoint):
+    def onShowRefTagClicked(self, pos: QPoint):
         te = self.dev.textEdit
         tag = te.findTagAtPos(pos)
         if tag is None:
@@ -181,7 +184,7 @@ class DocumentEditorWorker(QObject):
             InfoDialog.run("Tag does not exist", te)
             return
 
-        self.refPreviewRequested.emit(uuid)
+        self.refPreviewTabRequested.emit(uuid)
 
     @pyqtSlot(QSize)
     def onEditorResized(self, _: QSize):

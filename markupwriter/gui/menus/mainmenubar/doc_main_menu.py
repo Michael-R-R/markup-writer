@@ -22,7 +22,7 @@ class DocMainMenu(QMenu):
 
         self.toggleSpell = QAction("Spell Check", self)
         self.toggleSpell.setCheckable(True)
-        self.toggleSpell.setChecked(True)
+        self.toggleSpell.setChecked(False)
 
         self.refreshPreview = QAction("Refresh Preview", self)
         self.refreshPreview.setShortcut(HotkeyConfig.refreshPreview)

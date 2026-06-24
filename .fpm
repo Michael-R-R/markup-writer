@@ -1,0 +1,6 @@
+-C package
+-s dir
+-t pacman
+-n "Markup Writer"
+-v 0.1.0
+-p fpm-dist/Markup\ Writer\ 0.1.0\ Arch.pkg.tar.zst

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from enum import auto, Enum
-import re, enchant
+import enchant, regex
 
 from PyQt6.QtGui import (
     QSyntaxHighlighter,
@@ -13,9 +13,8 @@ from PyQt6.QtGui import (
     QFont,
 )
 
-from markupwriter.config import (
-    HighlighterConfig,
-)
+from markupwriter.config import HighlighterConfig
+from markupwriter.common.referencetag import RefTagManager
 
 
 class BEHAVIOUR(Enum):
@@ -23,6 +22,17 @@ class BEHAVIOUR(Enum):
     comment = auto()
     multicomment = auto()
     keyword = auto()
+    plotKeyword = auto()
+    timelineKeyword = auto()
+    charKeyword = auto()
+    locKeyword = auto()
+    objectKeyword = auto()
+    underline = auto()
+    plotInText = auto()
+    tlInText = auto()
+    charInText = auto()
+    locInText = auto()
+    objInText = auto()
     formatting = auto()
     header = auto()
     searchText = auto()
@@ -32,13 +42,27 @@ class BEHAVIOUR(Enum):
 
 
 class Highlighter(QSyntaxHighlighter):
-    def __init__(self, document: QTextDocument | None, endict: enchant.Dict | None):
+    def __init__(self, document: QTextDocument | None, refManager: RefTagManager | None, endict: enchant.Dict | None):
         super().__init__(document)
+
+        keywords = "tag|ref|cover|img|vspace|newpage|alignl|alignc|alignr"
+        underlineTags = "ref|plot|tl|char|loc|obj"
 
         parenRegex = r"\(|\)"
         commentRegex = r"%(.*)"
         multiComRegex = [r"<#", r"#>"]
-        keywordRegex = r"@(tag|ref|char|loc|cover|img|vspace|newpage|alignl|alignc|alignr)"
+        keywordRegex = r"@({})".format(keywords)
+        plotRegex = r"@(plot)"
+        timelineRegex = r"@(tl)"
+        charRegex = r"@(char)"
+        locRegex = r"@(loc)"
+        objectRegex = r"@(obj)"
+        underlineTagsRegex = r"(?<=@(?:{})\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))".format(underlineTags)
+        plotInTextRegex = r"(?<=@(?:plot)\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))"
+        timelineInTextRegex = r"(?<=@(?:tl)\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))"
+        charInTextRegex = r"(?<=@(?:char)\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))"
+        locInTextRegex = r"(?<=@(?:loc)\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))"
+        objInTextRegex = r"(?<=@(?:obj)\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))"
         formattingRegex = r"@\b(b|i|bi)\b"
         headerRegex = r"^@(title|chapter|scene|section)"
         mdHeadersRegex = r"^#{1,4}"
@@ -46,64 +70,35 @@ class Highlighter(QSyntaxHighlighter):
 
         self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
 
+        if refManager is not None:
+            self.addBehaviour(BEHAVIOUR.underline, HighlightUnderlineTagsBehaviour(QColor(255, 255, 255), underlineTagsRegex, refManager))
+            self.addBehaviour(BEHAVIOUR.plotInText, HighlightTagsInTextBehaviour(HighlighterConfig.plotCol, plotInTextRegex, refManager))
+            self.addBehaviour(BEHAVIOUR.tlInText, HighlightTagsInTextBehaviour(HighlighterConfig.timelineCol, timelineInTextRegex, refManager))
+            self.addBehaviour(BEHAVIOUR.charInText, HighlightTagsInTextBehaviour(HighlighterConfig.charCol, charInTextRegex, refManager))
+            self.addBehaviour(BEHAVIOUR.locInText, HighlightTagsInTextBehaviour(HighlighterConfig.locCol, locInTextRegex, refManager))
+            self.addBehaviour(BEHAVIOUR.objInText, HighlightTagsInTextBehaviour(HighlighterConfig.objectCol, objInTextRegex, refManager))
+
         if endict is not None:
-            self.addBehaviour(
-                BEHAVIOUR.spellCheck,
-                HighlightSpellBehaviour(QColor(255, 255, 255), r"(?iu)[\w\']+", endict),
-            )
+            self.addBehaviour(BEHAVIOUR.spellCheck, HighlightSpellBehaviour(QColor(255, 255, 255), r"(?iu)[\w\']+", endict))
 
-        self.addBehaviour(
-            BEHAVIOUR.paren,
-            HighlightExprBehaviour(HighlighterConfig.parenCol, parenRegex),
-        )
-
-        self.addBehaviour(
-            BEHAVIOUR.comment,
-            HighlightExprBehaviour(HighlighterConfig.commentCol, commentRegex),
-        )
-
-        self.addBehaviour(
-            BEHAVIOUR.multicomment,
-            HighlightMultiExprBehaviour(
-                HighlighterConfig.commentCol, multiComRegex[0], multiComRegex[1]
-            ),
-        )
-
-        self.addBehaviour(
-            BEHAVIOUR.keyword,
-            HighlightExprBehaviour(HighlighterConfig.keywordCol, keywordRegex),
-        )
-
-        self.addBehaviour(
-            BEHAVIOUR.formatting,
-            HighlightExprBehaviour(HighlighterConfig.formattingCol, formattingRegex),
-        )
-
-        self.addBehaviour(
-            BEHAVIOUR.mdHeaders,
-            HighlightExprBehaviour(HighlighterConfig.mdHeadersCol, mdHeadersRegex),
-        )
-
-        self.addBehaviour(
-            BEHAVIOUR.mdLists,
-            HighlightExprBehaviour(HighlighterConfig.mdListsCol, mdListsRegex),
-        )
-
-        # Headers
-        headerBehaviour = HighlightExprBehaviour(
-            HighlighterConfig.headerCol, headerRegex
-        )
-        headerBehaviour.format.setFontWeight(QFont.Weight.Bold)
-        self.addBehaviour(BEHAVIOUR.header, headerBehaviour)
-
-        # Searched word
-        searchedWordBehaviour = HighlightWordBehaviour(QColor(255, 255, 255), set())
-        searchedWordBehaviour.format.setBackground(HighlighterConfig.searchedCol)
-        self.addBehaviour(BEHAVIOUR.searchText, searchedWordBehaviour)
+        self.addBehaviour(BEHAVIOUR.paren, HighlightExprBehaviour(HighlighterConfig.parenCol, parenRegex))
+        self.addBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, commentRegex))
+        self.addBehaviour(BEHAVIOUR.multicomment, HighlightMultiExprBehaviour(HighlighterConfig.commentCol, multiComRegex[0], multiComRegex[1]))
+        self.addBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.keywordCol, keywordRegex))
+        self.addBehaviour(BEHAVIOUR.plotKeyword, HighlightExprBehaviour(HighlighterConfig.plotCol, plotRegex))
+        self.addBehaviour(BEHAVIOUR.timelineKeyword, HighlightExprBehaviour(HighlighterConfig.timelineCol, timelineRegex))
+        self.addBehaviour(BEHAVIOUR.charKeyword, HighlightExprBehaviour(HighlighterConfig.charCol, charRegex))
+        self.addBehaviour(BEHAVIOUR.locKeyword, HighlightExprBehaviour(HighlighterConfig.locCol, locRegex))
+        self.addBehaviour(BEHAVIOUR.objectKeyword, HighlightExprBehaviour(HighlighterConfig.objectCol, objectRegex))
+        self.addBehaviour(BEHAVIOUR.formatting, HighlightExprBehaviour(HighlighterConfig.formattingCol, formattingRegex))
+        self.addBehaviour(BEHAVIOUR.mdHeaders, HighlightExprBehaviour(HighlighterConfig.mdHeadersCol, mdHeadersRegex))
+        self.addBehaviour(BEHAVIOUR.mdLists, HighlightExprBehaviour(HighlighterConfig.mdListsCol, mdListsRegex))
+        self.addBehaviour(BEHAVIOUR.header, HighlightHeaderBehaviour(HighlighterConfig.headerCol, headerRegex))
+        self.addBehaviour(BEHAVIOUR.searchText, HighlightWordBehaviour(QColor(255,255,255), HighlighterConfig.searchedCol, set()))
 
     def highlightBlock(self, text: str | None) -> None:
-        for _, val in self._behaviours.items():
-            val.process(self, text)
+        for _, behaviour in self._behaviours.items():
+            behaviour.process(self, text)
 
     def addBehaviour(self, type: BEHAVIOUR, val: HighlightBehaviour) -> bool:
         if type in self._behaviours:
@@ -127,15 +122,7 @@ class Highlighter(QSyntaxHighlighter):
             return
         self._behaviours[type].isEnabled = val
 
-    def getBehaviour(
-        self, type: BEHAVIOUR
-    ) -> (
-        HighlightWordBehaviour
-        | HighlightSpellBehaviour
-        | HighlightExprBehaviour
-        | HighlightMultiExprBehaviour
-        | None
-    ):
+    def getBehaviour(self, type: BEHAVIOUR) -> HighlightWordBehaviourNone | None:
         if not type in self._behaviours:
             return None
         return self._behaviours[type]
@@ -143,39 +130,47 @@ class Highlighter(QSyntaxHighlighter):
 
 class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
-        self._expr = re.compile(expr)
+        self._expr = regex.compile(expr)
         self.isEnabled = True
 
         self.format = QTextCharFormat()
         self.format.setForeground(QBrush(color))
 
     def process(self, highlighter: Highlighter, text: str):
-        raise NotImplementedError()
+        if not self.isEnabled:
+            return
+
+        it = self._expr.finditer(text)
+        for w in it:
+            start = w.start()
+            end = w.end() - start
+            highlighter.setFormat(start, end, self.format)
 
     def setColor(self, color: QColor):
         self.format.setForeground(QBrush(color))
 
     def setExpression(self, expr: str):
-        self._expr = re.compile(expr)
+        self._expr = regex.compile(expr)
 
 
 class HighlightSpellBehaviour(HighlightBehaviour):
     def __init__(self, color: QColor, expr: str, enchantDict: enchant.Dict):
         super().__init__(color, expr)
+        self.isEnabled = False
         self.format.setUnderlineColor(QColor(255, 0, 0))
         self.format.setUnderlineStyle(
             QTextCharFormat.UnderlineStyle.SpellCheckUnderline
         )
         self.enchantDict = enchantDict
 
-        exclude = "tag|ref|char|loc|cover|img|title|chapter|scene|section"
-        self.excludeRegex = re.compile(r"@({})\(.*?\)".format(exclude))
+        exclude = "tag|ref|plot|tl|char|loc|obj|cover|img|title|chapter|scene|section"
+        self._excludeRegex = regex.compile(r"@({})\(.*?\)".format(exclude))
 
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
             return
 
-        check = self.excludeRegex.search(text)
+        check = self._excludeRegex.search(text)
         if check is not None:
             return
 
@@ -189,8 +184,11 @@ class HighlightSpellBehaviour(HighlightBehaviour):
 
 
 class HighlightWordBehaviour(HighlightBehaviour):
-    def __init__(self, color: QColor, wordSet: set):
+    def __init__(self, color: QColor, bgColor: QColor, wordSet: set):
         super().__init__(color, "")
+
+        self.format.setBackground(bgColor)
+
         self._wordSet = wordSet
 
     def process(self, highlighter: Highlighter, text: str):
@@ -198,7 +196,7 @@ class HighlightWordBehaviour(HighlightBehaviour):
             return
 
         for word in self._wordSet:
-            it = re.finditer(word, text)
+            it = regex.finditer(word, text)
             for found in it:
                 start = found.start()
                 end = found.end() - start
@@ -223,26 +221,88 @@ class HighlightWordBehaviour(HighlightBehaviour):
         return word in self._wordSet
 
 
-class HighlightExprBehaviour(HighlightBehaviour):
-    def __init__(self, color: QColor, expr: str):
+class HighlightUnderlineTagsBehaviour(HighlightBehaviour):
+    def __init__(self, color: QColor, expr: str, refManager: RefTagManager):
         super().__init__(color, expr)
+
+        self._refManager = refManager
+
+        self.format.setUnderlineColor(QColor(255, 255, 255))
+        self.format.setUnderlineStyle(QTextCharFormat.UnderlineStyle.SingleUnderline)
+
+    def process(self, highlighter: Highlighter, text: str):
+        if not self.isEnabled:
+            return
+        
+        # underline tags within parentheses
+        it = self._expr.finditer(text)
+        for w in it:
+            word = w.group()
+            word = word.strip()
+            if not self._refManager.tagExists(word):
+                continue
+
+            start = w.start()
+            end = w.end() - start
+            highlighter.setFormat(start, end, self.format)
+
+
+class HighlightTagsInTextBehaviour(HighlightBehaviour):
+    def __init__(self, color: QColor, expr: str, refManager: RefTagManager):
+        super().__init__(color, expr)
+
+        self._refManager = refManager
+
+        self._excludeRegex = regex.compile(r"@([a-zA-Z1-9].*)\(.*?\)")
+
+        self._fullRegStr = ""
 
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:
             return
 
-        it = self._expr.finditer(text)
+        allTags = self._expr.findall(text)
+        if len(allTags) > 0:
+            self._fullRegStr = "|".join(regex.escape(word) for word in allTags if self._refManager.tagExists(word))
+
+        if len(self._fullRegStr) < 1:
+            return
+
+        check = self._excludeRegex.search(text)
+        if check is not None:
+            return
+
+        match = regex.compile(r"\b({})\b".format(self._fullRegStr))
+        it = match.finditer(text)
         for w in it:
             start = w.start()
             end = w.end() - start
             highlighter.setFormat(start, end, self.format)
 
 
+class HighlightExprBehaviour(HighlightBehaviour):
+    def __init__(self, color: QColor, expr: str):
+        super().__init__(color, expr)
+
+    def process(self, highlighter: Highlighter, text: str):
+        super().process(highlighter, text)
+
+
+class HighlightHeaderBehaviour(HighlightBehaviour):
+    def __init__(self, color: QColor, expr: str):
+        super().__init__(color, expr)
+
+        self.format.setFontWeight(QFont.Weight.Bold)
+
+    def process(self, highlighter: Highlighter, text: str):
+        super().process(highlighter, text)
+
+
 class HighlightMultiExprBehaviour(HighlightBehaviour):
     def __init__(self, color: QColor, expr: str, end: str):
         super().__init__(color, expr)
 
-        self._endExpr = re.compile(end)
+        self._endExpr = regex.compile(end)
 
     def process(self, highlighter: Highlighter, text: str):
         if not self.isEnabled:

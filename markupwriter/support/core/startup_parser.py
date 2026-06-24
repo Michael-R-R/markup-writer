@@ -5,12 +5,11 @@ import os
 from markupwriter.config import ProjectConfig
 from markupwriter.common.util import File
 from markupwriter.common.tokenizers import EditorTokenizer
+from markupwriter.gui.widgets import DocumentEditorWidget
 from markupwriter.common.parsers import EditorParser
-from markupwriter.common.referencetag import RefTagManager
-
 
 class StartupParser(object):
-    def run(refManager: RefTagManager):
+    def run(editor: DocumentEditorWidget):
         cpath = ProjectConfig.contentPath()
         if cpath is None:
             return
@@ -25,4 +24,6 @@ class StartupParser(object):
             tokenizer.run()
             
             parser = EditorParser()
-            parser.run(uuid, tokenizer.tokens, refManager)
+            parser.run(uuid, tokenizer.tokens, editor.refManager)
+
+        editor.highlighter.rehighlight()

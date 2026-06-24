@@ -37,7 +37,7 @@ class PreviewWidget(QWidget):
         self.threadPool = QThreadPool(parent)
 
         self.textedit = QTextEdit(self)
-        self.highlighter = Highlighter(self.textedit.document(), None)
+        self.highlighter = Highlighter(self.textedit.document(), None, None)
         self.textedit.setReadOnly(True)
         self.textedit.setTabStopDistance(20.0)
         self.textedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
