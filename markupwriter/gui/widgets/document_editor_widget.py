@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, re
+import os, regex
 
 from PyQt6.QtCore import (
     Qt,
@@ -115,7 +115,12 @@ class DocumentEditorWidget(QPlainTextEdit):
         if not self.hasOpenDocument():
             return
         
-        count = len(re.findall(r"\S+", self.toPlainText()))
+        lExclude = r"tag|ref|plot|tl|char|loc|obj|img|title|chapter|scene|section"
+        rExclude = r"i|b|alignl|alignc|alignr"
+        findRegex = r"\b(?<!@({})(?:\([^)]*)?)(?<!@)(?!({})\b)\w+\b".format(lExclude, rExclude)
+        
+        found = regex.findall(findRegex, self.toPlainText())
+        count = len(found)
         
         self.wordCountChanged.emit(self.docUUID, count)
 
@@ -167,7 +172,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         if cpos <= 0 or cpos >= len(textBlock):
             return None
 
-        found = re.search(r"@(ref|plot|tl|char|loc|obj)(\(.*\))", textBlock)
+        found = regex.search(r"@(ref|plot|tl|char|loc|obj)(\(.*\))", textBlock)
         if found is None:
             return None
 
@@ -229,7 +234,7 @@ class DocumentEditorWidget(QPlainTextEdit):
 
     def insertFromMimeData(self, source: QMimeData | None) -> None:
         if source.hasUrls():
-            extRegex = re.compile(r"\b\.(jpeg|jpg|png|gif)\b")
+            extRegex = regex.compile(r"\b\.(jpeg|jpg|png|gif)\b")
             for url in source.urls():
                 imgPath = url.path()
                 found = extRegex.search(imgPath)

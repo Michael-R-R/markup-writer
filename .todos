@@ -2,6 +2,6 @@
 [x] fix ctrl+lmb click tags closing right away on Linux OS
 [x] highlight ref tags in text
 [] fix spacing between label and ">" for tree context menu items
-[] implement not counting tags as words
+[x] implement not counting tags as words
 [x] fix import dialog box being too small on Linux
 [x] preview -> window should not be enabled when right clicking on folder
