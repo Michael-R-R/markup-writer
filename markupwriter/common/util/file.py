@@ -71,3 +71,7 @@ class File(object):
         if info.isDir():
             return None
         return info.suffix()
+
+    def canonicalPath(path: str) -> str:
+        info = QFileInfo(path)
+        return info.canonicalPath()

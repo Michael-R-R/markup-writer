@@ -25,6 +25,10 @@ from markupwriter.common.util import (
     Serialize,
 )
 
+from markupwriter.gui.dialogs.modal import (
+    ErrorDialog,
+)
+
 import markupwriter.vdw.delegate as d
 
 
@@ -115,6 +119,7 @@ class Core(QObject):
         mmbd = self.data.mmbd
         mmbd.fmNewTriggered.connect(self._onNewProject)
         mmbd.fmOpenTriggered.connect(self._onOpenProject)
+        mmbd.fmOpenRecentTriggered.connect(self._onOpenRecent)
         mmbd.fmSaveDocTriggered.connect(self._onSaveDocument)
         mmbd.fmSaveTriggered.connect(self._onSaveProject)
         mmbd.fmSaveAsTriggered.connect(self._onSaveAsProject)
@@ -235,6 +240,9 @@ class Core(QObject):
 
         self.setup(CoreData(self))
 
+        path = ProjectConfig.filePath()
+        AppConfig.updateOpenRecently(path)
+
         self.data.mmbd.worker.onNewProject()
         self.data.dtd.worker.onNewProject()
 
@@ -255,13 +263,47 @@ class Core(QObject):
         data = CoreData(self)
         self.setup(data)
         
-        data = Serialize.existRead(data, ProjectConfig.filePath())
+        path = ProjectConfig.filePath()
+        data = Serialize.existRead(data, path)
+        if data is None:
+            self.reset()
+            return
+
+        AppConfig.updateOpenRecently(path)
+
+        self.data.mmbd.worker.onOpenProject()
+        self.data.dtd.worker.onOpenProject()
+
+        te = self.data.ded.view.textEdit
+        StartupParser.run(te)
+
+        self.mwd.worker.showStatusBarMsg("Project opened...", 1500)
+
+    @pyqtSlot(str)
+    def _onOpenRecent(self, path: str):
+        if not self._onCloseProject():
+            return
+
+        if not File.exists(path):
+            ErrorDialog.run("Project file does not exist", self.mwd.view)
+            return
+
+        ProjectConfig.projectName = File.fileName(path)
+        ProjectConfig.dir = File.canonicalPath(path)
+
+        data = CoreData(self)
+        self.setup(data)
+        
+        path = ProjectConfig.filePath()
+        data = Serialize.existRead(data, path)
         if data is None:
             self.reset()
             return
 
         self.data.mmbd.worker.onOpenProject()
         self.data.dtd.worker.onOpenProject()
+
+        AppConfig.updateOpenRecently(path)
 
         te = self.data.ded.view.textEdit
         StartupParser.run(te)

@@ -10,6 +10,7 @@ from PyQt6.QtGui import (
 )
 
 from markupwriter.config import (
+    AppConfig,
     HotkeyConfig,
 )
 
@@ -18,8 +19,11 @@ class FileMainMenu(QMenu):
     def __init__(self, parent: QWidget | None):
         super().__init__("File", parent)
 
+        self.openedRecentlyActionList = []
+
         self.newProjAction = QAction("New Project...", self)
-        self.openProjAction = QAction("Open Project...", self)
+        self.openProjAction = QAction("Open Project", self)
+        self.openRecentMenu = QMenu("Open Recent...", self)
         self.saveDocAction = QAction("Save Document", self)
         self.saveProjAction = QAction("Save Project", self)
         self.saveProjAsAction = QAction("Save Project As...", self)
@@ -34,6 +38,7 @@ class FileMainMenu(QMenu):
         self.addAction(self.newProjAction)
         self.addSeparator()
         self.addAction(self.openProjAction)
+        self.addMenu(self.openRecentMenu)
         self.addSeparator()
         self.addAction(self.saveDocAction)
         self.addSeparator()
@@ -54,9 +59,15 @@ class FileMainMenu(QMenu):
         self.closeProjAction.setShortcut(HotkeyConfig.closeProject)
         self.exitAction.setShortcut(HotkeyConfig.exitApplication)
         
+        self.openRecentMenu.setEnabled(len(AppConfig.openedRecently) > 0)
         self.saveDocAction.setEnabled(False)
         self.saveProjAction.setEnabled(False)
         self.saveProjAsAction.setEnabled(False)
         self.importMenu.setEnabled(False)
         self.exportAction.setEnabled(False)
         self.closeProjAction.setEnabled(False)
+
+        for path in AppConfig.openedRecently:
+            action = QAction(path, self)
+            self.openedRecentlyActionList.append(action)
+            self.openRecentMenu.addAction(action)
