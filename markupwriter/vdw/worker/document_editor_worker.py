@@ -100,9 +100,9 @@ class DocumentEditorWorker(QObject):
         cpath = ProjectConfig.contentPath()
         
         path = os.path.join(cpath, te.docUUID)
-        te.write(path)
-        te.checkWordCount()
-        self._runTokenizer()
+        if te.write(path):
+            te.checkWordCount()
+            self._runTokenizer()
 
         path = os.path.join(cpath, uuid)
         if not te.read(uuid, path):

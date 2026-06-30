@@ -5,4 +5,6 @@
 [x] implement not counting tags as words
 [x] fix import dialog box being too small on Linux
 [x] preview -> window should not be enabled when right clicking on folder
-[] implement "open recent" file action
+[x] implement "open recent" file action
+[x] implement isDirty check for current document. If not dirty no need to perform a save operation.
+[] BUG: turning on highlighter reenables spell check when it is suppose to be disabled

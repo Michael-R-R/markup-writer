@@ -59,6 +59,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.searchHotkey = QAction("search", self)
         self.canResizeMargins = True
         self.docUUID = ""
+        self.isDirty = False
 
         shortcut = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F)
         self.searchHotkey.setShortcut(shortcut)
@@ -77,10 +78,14 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         self.setState(s.NormalEditorState(self, self))
 
+        self.plainDocument.contentsChange.connect(self.contentsChangeUpdate)
+        self.modificationChanged.connect(self.modificationMade)
+
     def reset(self):
         self.clear()
         self.setEnabled(False)
         self.docUUID = ""
+        self.isDirty = False
         self.docStatusChanged.emit(False)
         
     def read(self, uuid: str, path: str) -> bool:
@@ -97,6 +102,11 @@ class DocumentEditorWidget(QPlainTextEdit):
         
     def write(self, path: str) -> bool:
         if not self.hasOpenDocument():
+            print("No document opened. Will not save...")
+            return False
+
+        if not self.isDirty:
+            print("No changes made to document. Will not save...")
             return False
         
         cpos = self.textCursor().position()
@@ -108,6 +118,10 @@ class DocumentEditorWidget(QPlainTextEdit):
         configText += "[CONFIG END]\n"
 
         text = configText + currentText
+
+        self.isDirty = False
+
+        print("Saving document...")
         
         return File.write(path, text)
     
@@ -205,6 +219,16 @@ class DocumentEditorWidget(QPlainTextEdit):
     def popParserUUID(self, uuid: str):
         self.parser.popPrevUUID(uuid, self.refManager)
         
+    @pyqtSlot(int, int, int)
+    def contentsChangeUpdate(self, pos: int, removed: int, added: int):
+        print("Updating dirty document:", (removed > 0 or added > 0))
+        self.isDirty = (removed > 0 or added > 0)
+    
+    @pyqtSlot(bool)
+    def modificationMade(self, dirty: bool):
+        print("Updating dirty document:", dirty)
+        self.isDirty = dirty
+
     @pyqtSlot(str, dict)
     def runParser(self, uuid: str, tokens: dict[str, list[str]]):
         self.parser.run(uuid, tokens, self.refManager)
