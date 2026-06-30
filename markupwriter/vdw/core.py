@@ -132,9 +132,6 @@ class Core(QObject):
     def _setupMenuBarWorkerSlots(self):
         worker = self.data.mmbd.worker
         
-        mmbd = self.data.mmbd
-        mmbd.dmHighlightToggled.connect(worker.onToggleHighlighting)
-        
         ded = self.data.ded
         ded.docStatusChanged.connect(worker.onDocumentStatusChanged)
         

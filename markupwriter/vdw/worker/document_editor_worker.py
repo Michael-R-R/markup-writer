@@ -48,7 +48,7 @@ class DocumentEditorWorker(QObject):
         te = self.dev.textEdit
         highlighter = te.highlighter
         
-        highlighter.toggleBehaviours(status)
+        highlighter.toggleNormalBehaviours(status)
         highlighter.rehighlight()
     
     @pyqtSlot(bool)
@@ -56,7 +56,7 @@ class DocumentEditorWorker(QObject):
         te = self.dev.textEdit
         highlighter = te.highlighter
         
-        highlighter.setBehaviourEnable(BEHAVIOUR.spellCheck, status)
+        highlighter.toggleSpellCheckBehaviour()
         highlighter.rehighlight()
         
     @pyqtSlot(str)
@@ -215,7 +215,7 @@ class DocumentEditorWorker(QObject):
             sb.onSearchChanged(sb.searchInput.text())
         else:
             highlighter = te.highlighter
-            behaviour = highlighter.getBehaviour(BEHAVIOUR.searchText)
+            behaviour = highlighter.getNormalBehaviour(BEHAVIOUR.searchText)
             behaviour.clear()
             highlighter.rehighlight()
 
@@ -231,7 +231,7 @@ class DocumentEditorWorker(QObject):
 
         if doHighlight:
             highlighter = te.highlighter
-            behaviour = highlighter.getBehaviour(BEHAVIOUR.searchText)
+            behaviour = highlighter.getNormalBehaviour(BEHAVIOUR.searchText)
             if len(found) > 0:
                 behaviour.clear()
                 behaviour.add(text)
