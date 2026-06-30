@@ -36,9 +36,11 @@ class BEHAVIOUR(Enum):
     formatting = auto()
     header = auto()
     searchText = auto()
-    spellCheck = auto()
     mdHeaders = auto()
     mdLists = auto()
+
+class SPECIAL_BEHAVIOUR(Enum):
+    spellCheck = auto()
 
 
 class Highlighter(QSyntaxHighlighter):
@@ -69,7 +71,7 @@ class Highlighter(QSyntaxHighlighter):
         mdListsRegex = r"^(-|\+)"
 
         self._normalBehaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
-        self._specialBehaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
+        self._specialBehaviours: dict[SPECIAL_BEHAVIOUR, HighlightBehaviour] = dict()
 
         if refManager is not None:
             self.addNormalBehaviour(BEHAVIOUR.underline, HighlightUnderlineTagsBehaviour(QColor(255, 255, 255), underlineTagsRegex, refManager))
@@ -80,7 +82,7 @@ class Highlighter(QSyntaxHighlighter):
             self.addNormalBehaviour(BEHAVIOUR.objInText, HighlightTagsInTextBehaviour(HighlighterConfig.objectCol, objInTextRegex, refManager))
 
         if endict is not None:
-            self._specialBehaviours[BEHAVIOUR.spellCheck] = HighlightSpellBehaviour(QColor(255, 255, 255), r"(?iu)[\w\']+", endict)
+            self._specialBehaviours[SPECIAL_BEHAVIOUR.spellCheck] = HighlightSpellBehaviour(QColor(255, 255, 255), r"(?iu)[\w\']+", endict)
 
         self.addNormalBehaviour(BEHAVIOUR.paren, HighlightExprBehaviour(HighlighterConfig.parenCol, parenRegex))
         self.addNormalBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, commentRegex))
@@ -132,11 +134,11 @@ class Highlighter(QSyntaxHighlighter):
         return self._normalBehaviours[type]
 
     def toggleSpellCheckBehaviour(self):
-        if self._specialBehaviours[BEHAVIOUR.spellCheck] is None:
+        if self._specialBehaviours[SPECIAL_BEHAVIOUR.spellCheck] is None:
             return
 
-        status = self._specialBehaviours[BEHAVIOUR.spellCheck].isEnabled
-        self._specialBehaviours[BEHAVIOUR.spellCheck].isEnabled = not status
+        status = self._specialBehaviours[SPECIAL_BEHAVIOUR.spellCheck].isEnabled
+        self._specialBehaviours[SPECIAL_BEHAVIOUR.spellCheck].isEnabled = not status
 
 class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
