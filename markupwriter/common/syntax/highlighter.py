@@ -100,10 +100,10 @@ class Highlighter(QSyntaxHighlighter):
         self.addNormalBehaviour(BEHAVIOUR.searchText, HighlightWordBehaviour(QColor(255,255,255), HighlighterConfig.searchedCol, set()))
 
     def highlightBlock(self, text: str | None) -> None:
-        for _, behaviour in self._normalBehaviours.items():
+        for _, behaviour in self._specialBehaviours.items():
             behaviour.process(self, text)
 
-        for _, behaviour in self._specialBehaviours.items():
+        for _, behaviour in self._normalBehaviours.items():
             behaviour.process(self, text)
 
     def addNormalBehaviour(self, type: BEHAVIOUR, val: HighlightBehaviour) -> bool:

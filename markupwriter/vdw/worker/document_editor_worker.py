@@ -98,7 +98,7 @@ class DocumentEditorWorker(QObject):
             return
         
         cpath = ProjectConfig.contentPath()
-        
+
         path = os.path.join(cpath, te.docUUID)
         if te.write(path):
             te.checkWordCount()
@@ -112,6 +112,7 @@ class DocumentEditorWorker(QObject):
         eb = self.dev.editorBar
         eb.addPath(self._buildPath(paths))
 
+        te.checkWordCount()
         self._runTokenizer()
 
         sb = self.dev.searchBox

@@ -47,12 +47,24 @@ class DocumentTreeWorker(QObject):
         tcm = tw.treeContextMenu
         tcm.itemMenu.setEnabled(True)
         
+        tutorialPath = "{}/resources/newproject/tutorial.txt".format(AppConfig.WORKING_DIR)
+        text = File.read(tutorialPath)
+        if text is not None:
+            tutorialFile = ti.MiscFileItem("Tutorial")
+            contentPath = os.path.join(ProjectConfig.contentPath(), tutorialFile.UUID())
+            if File.write(contentPath, text):
+                readmeNovel = ti.NovelFolderItem("README")
+                tw.add(readmeNovel)
+                tw.add(tutorialFile)
+                tw.moveTo(tutorialFile.item, readmeNovel.item)
+
         tw.add(ti.PlotFolderItem())
         tw.add(ti.TimelineFolderItem())
         tw.add(ti.CharsFolderItem())
         tw.add(ti.LocFolderItem())
         tw.add(ti.ObjFolderItem())
         tw.add(ti.TrashFolderItem())
+        tw.clearSelection()
         
     def onOpenProject(self):
         tb = self.dtv.treeBar
@@ -81,9 +93,7 @@ class DocumentTreeWorker(QObject):
             return
         
         tw = self.dtv.treeWidget
-        tw.blockSignals(True)
         tw.add(dialog.value)
-        tw.blockSignals(False)
         
     @pyqtSlot()
     def onExportNovel(self):
@@ -103,7 +113,11 @@ class DocumentTreeWorker(QObject):
         path = ProjectConfig.contentPath()
         if path is None:
             return
+
         path = os.path.join(path, uuid)
+        if File.exists(path):
+            return
+
         File.write(path, "")
     
     @pyqtSlot(str, str)

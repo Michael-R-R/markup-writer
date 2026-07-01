@@ -1,0 +1,144 @@
+@title(Tutorial)
+
+Hi! Welcome to the "Markup Writer" Tutorial. In this tutorial I will walk you through how to use this application, the common markup tags, and operations that you will be using the most. You can also refer back to this document in case you ever need a refresh on what a specific markup tag or hotkey does.
+
+@title(Application)
+
+This is the section to give you a quick run down about how this application works. It will include some of my philosophy behind my ideas and the most useful hotkeys to know.
+
+"Markup Writer" was created in order to tailor to my specific writing needs that I wasn't completely happy with in other software. The main idea was to have an application that "stays out of the way" while retaining the need for heavy note taking, referencing, and quick mode of operation.
+
+With those ideas in mind I wanted to create a text editor that gives power to the user; whether the user uses all the features or just a few. The main designs were inspired by other software such as: vim text editor, ghostwriter, novelWriter, and NvChad. 
+
+To start, it is important for you to understand how the text editor portion of this application works. There are 3 different modes that the text editor can be in at any given time (just like vim): NORMAL, INSERT, VISUAL.
+
+NORMAL mode = This is the starting mode. In this mode you cannot type normal text into the document. But instead allows you to enter in commands. These commands will be listed later in the tutorial. You can return back to this mode by hitting "ESC" on your keyboard.
+
+INSERT mode = This is the mode where you can enter text into your document. You enter this mode by hitting the "i" key from NORMAL mode.
+
+VISUAL mode = This mode allows you to select text with commands, which can then be copied and cut all at once with another command. You enter this mode by hitting the "v" key from NORMAL mode.
+
+This application has 3 main windows: Project Content, Document Editor, and Preview Tab. Each window has its own set of hot keys that will be listed later in this tutorial.
+
+Project Content(left window) = This is where all your organization takes place. It has folders and files that you use to make this happen. One of the most important folders is the "Novel" folder. This is a special folder that your document files will be stored in. Once your novel is complete it can be selected to be exported as a EPUB file from the file menu.
+
+Document Editor(middle window) = This is the text editor for writing your files.
+
+Preview Tab(right window) = This is the window for getting a preview of your files in both HTML and plain text. Any number of tabs can be opened.
+
+Each of these windows can be resized by clicking and dragging on the space between either of the window spaces.  They can also be fully collapsed by dragging them to the furthest edges.
+
+To begin writing first create a "Novel" folder and then add any type of file into that folder. Files can be added to other files too to create a "parent child" relationship. After adding a file it should have opened automatically in the editor; if not, just double click the file. To begin typing hit the "i" key and then you are ready! Remember you can always navigate back to the NORMAL mode by hitting the "ESC" key.
+
+@title(Markup Tags)
+
+"Markup Writer" is powered by a custom markup language. These tags are meant to be easy to remember and easy to type. You have already seen one markup tag previously: "@title". If you haven't already, then I recommend you open this file in the preview tab. Simply right click the document file to the left in the Project Content window, and select "Preview > Tab/Window". This will open the file to the right which will give us a rich text preview of the formatting. You can update the preview at anytime by saving your current document with "CTRL+S" and then selecting "Refresh" in the preview tab/window. "CTRL+R" will also refresh the current preview tab to the right.
+
+Markup tags will provide you with 2 main functions: formatting plain text to rich text and allowing you to create "reference tags". 
+
+Below is an exhaustive list of all the markup tags for the current application version, followed by a brief description:
+
+% This is a single line comment and will not be exported when exporting your novel
+
+@title(Title Formatting) = Creates a center aligned H1 header
+@chapter(Chapter Formatting) = Creates a center aligned H2 header
+@scene(Scene Formatting) = Creates "***" line break that is center aligned
+@section(Section Formatting) = Creates an empty line break
+
+@alignl(This will align text to the left)
+@alignc(This will align text in the center)
+@alignr(This will align text to the right)
+
+@vspace(5) = This will add # amount of vertical empty space
+@newpage(1) = This will add # amount of empty new pages when exporting to EPUB
+
+@cover(path to image...) = This will add a cover image when exporting to EPUB
+@img(path to image...) = This will insert an image
+
+@b(In-text bold)
+@i(In-text italicizing)
+@b(@i(Combine for both bold and italicize))
+@i(@b(Order does not matter))
+
+This is how @b(bold) and @i(italicize) work in a sentence.
+
+@b(@i(Bold and italicize
+even work
+over multiple lines.))
+
+	This text will be exported with the indented tab.
+
+% @tag is used to create a reference to a document. Any other document can then import that tag to reference.
+% Tags are delimited by commas and are case sensitive. You can also have tags with spaces in them.
+% Tags are updated on document save.
+@tag(Tutorial) 
+@tag(Works, with, undercase, and, spaced words)
+@tag(plot, timeline, character, location, object)
+
+% @ref is used to reference a created tag. This can be interacted with in 2 different ways.
+% 1.) CTRL + Left Mouse Click on the underlined text to open up a small preview of the referenced document
+% 2.) CTRL + ALT + Left Mouse Click on the underlined text to open up the referenced document as a preview tab
+@ref(Tutorial)
+@ref(Works, with, undercase, and, spaced words) 
+
+% @plot, @tl, @char, @loc, and @obj function the same way as @ref, but have more of a semantic meaning.
+% @plot = reference to plot info
+% @tl = reference to timeline info
+% @char = reference to character info
+% @loc = reference to location info
+% @obj = reference to objects info
+@plot(plot)
+@tl(timeline)
+@char(character)
+@loc(location)
+@obj(object)
+
+There is even in-text highlighting for the special reference tags linked in a document: plot, timeline, character, location, and object.
+
+@title(Hotkeys)
+
+Below you can find the exhaustive list of all the hotkeys for your current application version:
+
+% Project Content
+F1 = focus in, aka make this window the active one
+w = previous item
+s = next item
+o = open item
+p = preview item
+
+% Document Editor
+F2 = focus in, aka make this window the active one
+ESC = enter NORMAL mode
+i = enter INSERT mode
+v = enter VISUAL mode
+TAB = will jump out of parentheses if the text cursor is at the end of the text and to the left of ")"
+CTRL + R = refresh preview tab
+CTRL + T = toggle between plain and rich text in the preview tab
+
+% Preview Tab
+F3 = focus in, aka make this window the active one
+a = previous tab
+d = next tab
+h = scroll content left
+j = scroll content down
+k = scroll content up
+l = scroll content right
+
+% Telescope
+CTRL + p = open telescope
+ESC = close telescope
+enter = toggle between search and select mode
+w (select mode) = previous item
+s (select mode) = next item
+j (select mode) = scroll preview content down
+k (select mode) = scroll preview content up
+o (select mode) = open file
+p (select mode) = preview file
+
+@title(The End)
+
+You have reached the end of this tutorial! I know that it may seem like a lot at first, but I guarantee that with a little bit of practice and determination you will begin to find all the hotkeys and markup tags to be intuitive and easy to remember; at least that is my hope. 
+
+If you are ever confused about something or want to contact me about the application, please post to Github at the following link: https://github.com/Michael-R-R/markup-writer/issues
+
+Happy writing.
