@@ -2,7 +2,7 @@
 
 Hi! Welcome to the "Markup Writer" Tutorial. In this tutorial I will walk you through how to use this application, the common markup tags, and operations that you will be using the most. You can also refer back to this document in case you ever need a refresh on what a specific markup tag or hotkey does.
 
-@title(Application)
+@chapter(Application)
 
 This is the section to give you a quick run down about how this application works. It will include some of my philosophy behind my ideas and the most useful hotkeys to know.
 
@@ -30,9 +30,9 @@ Each of these windows can be resized by clicking and dragging on the space betwe
 
 To begin writing first create a "Novel" folder and then add any type of file into that folder. Files can be added to other files too to create a "parent child" relationship. After adding a file it should have opened automatically in the editor; if not, just double click the file. To begin typing hit the "i" key and then you are ready! Remember you can always navigate back to the NORMAL mode by hitting the "ESC" key.
 
-@title(Markup Tags)
+@chapter(Markup Tags)
 
-"Markup Writer" is powered by a custom markup language. These tags are meant to be easy to remember and easy to type. You have already seen one markup tag previously: "@title". If you haven't already, then I recommend you open this file in the preview tab. Simply right click the document file to the left in the Project Content window, and select "Preview > Tab/Window". This will open the file to the right which will give us a rich text preview of the formatting. You can update the preview at anytime by saving your current document with "CTRL+S" and then selecting "Refresh" in the preview tab/window. "CTRL+R" will also refresh the current preview tab to the right.
+"Markup Writer" is powered by a custom markup language. These tags are meant to be easy to remember and easy to type. You have already seen two markup tags previously: "@title" and "@chapter". If you haven't already, then I recommend you open this file in the preview tab. Simply right click the document file to the left in the Project Content window, and select "Preview > Tab/Window". This will open the file to the right which will give us a rich text preview of the formatting. You can update the preview at anytime by saving your current document with "CTRL+S" and then selecting "Refresh" in the preview tab/window. "CTRL+R" will also refresh the current preview tab to the right.
 
 Markup tags will provide you with 2 main functions: formatting plain text to rich text and allowing you to create "reference tags". 
 
@@ -94,18 +94,18 @@ over multiple lines.))
 
 There is even in-text highlighting for the special reference tags linked in a document: plot, timeline, character, location, and object.
 
-@title(Hotkeys)
+@chapter(Hotkeys)
 
 Below you can find the exhaustive list of all the hotkeys for your current application version:
 
-% Project Content
+@chapter(Project Content)
 F1 = focus in, aka make this window the active one
 w = previous item
 s = next item
 o = open item
 p = preview item
 
-% Document Editor
+@chapter(Document Editor)
 F2 = focus in, aka make this window the active one
 ESC = enter NORMAL mode
 i = enter INSERT mode
@@ -114,7 +114,7 @@ TAB = will jump out of parentheses if the text cursor is at the end of the text 
 CTRL + R = refresh preview tab
 CTRL + T = toggle between plain and rich text in the preview tab
 
-% Preview Tab
+@chapter(Preview Tab)
 F3 = focus in, aka make this window the active one
 a = previous tab
 d = next tab
@@ -123,7 +123,7 @@ j = scroll content down
 k = scroll content up
 l = scroll content right
 
-% Telescope
+@chapter(Telescope)
 CTRL + p = open telescope
 ESC = close telescope
 enter = toggle between search and select mode
@@ -134,7 +134,7 @@ k (select mode) = scroll preview content up
 o (select mode) = open file
 p (select mode) = preview file
 
-@title(The End)
+@chapter(The End)
 
 You have reached the end of this tutorial! I know that it may seem like a lot at first, but I guarantee that with a little bit of practice and determination you will begin to find all the hotkeys and markup tags to be intuitive and easy to remember; at least that is my hope. 
 
