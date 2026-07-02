@@ -21,8 +21,8 @@ class Regex(object):
         match = Regex._findDocumentConfig(text)
         if match is not None:
             return text[match.end() + 1 :]
-        
-        return None
+
+        return text
     
     def _findDocumentConfig(text: str) -> re.Match[str] | None:
         found = re.search(r"\[CONFIG\](.*?)\[CONFIG END\]", text, re.DOTALL)

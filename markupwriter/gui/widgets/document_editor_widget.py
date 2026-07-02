@@ -78,8 +78,9 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         self.setState(s.NormalEditorState(self, self))
 
-        self.plainDocument.contentsChange.connect(self.contentsChangeUpdate)
-        self.modificationChanged.connect(self.modificationMade)
+        self.plainDocument.contentsChange.connect(self.contentsChangeUpdated)
+        self.cursorPositionChanged.connect(self.cursorPosUpdated)
+        self.modificationChanged.connect(self.modificationsUpdated)
 
     def reset(self):
         self.clear()
@@ -97,6 +98,8 @@ class DocumentEditorWidget(QPlainTextEdit):
             return False
             
         self.setText(uuid, text)
+
+        self.isDirty = False
         
         return True
         
@@ -220,13 +223,18 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.parser.popPrevUUID(uuid, self.refManager)
         
     @pyqtSlot(int, int, int)
-    def contentsChangeUpdate(self, pos: int, removed: int, added: int):
-        print("Updating dirty document:", (removed > 0 or added > 0))
+    def contentsChangeUpdated(self, pos: int, removed: int, added: int):
+        print("Updating dirty document(contents changed):", (removed > 0 or added > 0))
         self.isDirty = (removed > 0 or added > 0)
     
+    @pyqtSlot()
+    def cursorPosUpdated(self):
+        print("Updating dirty document(text cursor moved):", True)
+        self.isDirty = True
+
     @pyqtSlot(bool)
-    def modificationMade(self, dirty: bool):
-        print("Updating dirty document:", dirty)
+    def modificationsUpdated(self, dirty: bool):
+        print("Updating dirty document(modifications updated):", dirty)
         self.isDirty = dirty
 
     @pyqtSlot(str, dict)
