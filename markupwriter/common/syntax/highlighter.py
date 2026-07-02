@@ -67,8 +67,6 @@ class Highlighter(QSyntaxHighlighter):
         objInTextRegex = r"(?<=@(?:obj)\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))"
         formattingRegex = r"@\b(b|i|bi)\b"
         headerRegex = r"^@(title|chapter|scene|section)"
-        mdHeadersRegex = r"^#{1,4}"
-        mdListsRegex = r"^(-|\+)"
 
         self._normalBehaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
         self._specialBehaviours: dict[SPECIAL_BEHAVIOUR, HighlightBehaviour] = dict()
@@ -94,8 +92,6 @@ class Highlighter(QSyntaxHighlighter):
         self.addNormalBehaviour(BEHAVIOUR.locKeyword, HighlightExprBehaviour(HighlighterConfig.locCol, locRegex))
         self.addNormalBehaviour(BEHAVIOUR.objectKeyword, HighlightExprBehaviour(HighlighterConfig.objectCol, objectRegex))
         self.addNormalBehaviour(BEHAVIOUR.formatting, HighlightExprBehaviour(HighlighterConfig.formattingCol, formattingRegex))
-        self.addNormalBehaviour(BEHAVIOUR.mdHeaders, HighlightExprBehaviour(HighlighterConfig.mdHeadersCol, mdHeadersRegex))
-        self.addNormalBehaviour(BEHAVIOUR.mdLists, HighlightExprBehaviour(HighlighterConfig.mdListsCol, mdListsRegex))
         self.addNormalBehaviour(BEHAVIOUR.header, HighlightHeaderBehaviour(HighlighterConfig.headerCol, headerRegex))
         self.addNormalBehaviour(BEHAVIOUR.searchText, HighlightWordBehaviour(QColor(255,255,255), HighlighterConfig.searchedCol, set()))
 

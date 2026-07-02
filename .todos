@@ -8,8 +8,9 @@
 [x] implement "open recent" file action
 [x] implement isDirty check for current document. If not dirty no need to perform a save operation.
 [x] BUG: turning on highlighter reenables spell check when it is suppose to be disabled
-[] add basic tutorial file on new project creation
-[] fix "-" being highlighted
+[x] add basic tutorial file on new project creation
+[x] fix "-" being highlighted
 [] update HTML tokenizer+parser to better format for preview window
-[] process spell check first in the highlighter
+[x] process spell check first in the highlighter
 [] BUG: tutorial file doesn't show in preview tab on new project creation
+[] BUG: no path to image crashes application on epub export
