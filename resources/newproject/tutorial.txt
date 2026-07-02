@@ -99,6 +99,7 @@ There is even in-text highlighting for the special reference tags linked in a do
 Below you can find the exhaustive list of all the hotkeys for your current application version:
 
 @chapter(Project Content)
+
 F1 = focus in, aka make this window the active one
 w = previous item
 s = next item
@@ -106,6 +107,7 @@ o = open item
 p = preview item
 
 @chapter(Document Editor)
+
 F2 = focus in, aka make this window the active one
 ESC = enter NORMAL mode
 i = enter INSERT mode
@@ -115,6 +117,7 @@ CTRL + R = refresh preview tab
 CTRL + T = toggle between plain and rich text in the preview tab
 
 @chapter(Preview Tab)
+
 F3 = focus in, aka make this window the active one
 a = previous tab
 d = next tab
@@ -124,6 +127,7 @@ k = scroll content up
 l = scroll content right
 
 @chapter(Telescope)
+
 CTRL + p = open telescope
 ESC = close telescope
 enter = toggle between search and select mode

@@ -10,7 +10,7 @@
 [x] BUG: turning on highlighter reenables spell check when it is suppose to be disabled
 [x] add basic tutorial file on new project creation
 [x] fix "-" being highlighted
-[] update HTML tokenizer+parser to better format for preview window
+[x] update HTML tokenizer+parser to better format for preview window
 [x] process spell check first in the highlighter
 [x] BUG: tutorial file doesn't show in preview tab on new project creation
 [x] BUG: no path to image crashes application on epub export
