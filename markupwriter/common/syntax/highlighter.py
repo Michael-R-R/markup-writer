@@ -47,7 +47,7 @@ class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument | None, refManager: RefTagManager | None, endict: enchant.Dict | None):
         super().__init__(document)
 
-        keywords = "tag|ref|cover|img|vspace|newpage|alignl|alignc|alignr"
+        keywords = "tag|ref|img|vspace|newpage|alignl|alignc|alignr"
         underlineTags = "ref|plot|tl|char|loc|obj"
 
         parenRegex = r"\(|\)"
@@ -174,7 +174,7 @@ class HighlightSpellBehaviour(HighlightBehaviour):
         )
         self.enchantDict = enchantDict
 
-        exclude = "tag|ref|plot|tl|char|loc|obj|cover|img|title|chapter|scene|section"
+        exclude = "tag|ref|plot|tl|char|loc|obj|img|title|chapter|scene|section"
         self._excludeRegex = regex.compile(r"@({})\(.*?\)".format(exclude))
 
     def process(self, highlighter: Highlighter, text: str):

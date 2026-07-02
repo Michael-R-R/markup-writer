@@ -52,7 +52,6 @@ Below is an exhaustive list of all the markup tags for the current application v
 @vspace(5) = This will add # amount of vertical empty space
 @newpage(1) = This will add # amount of empty new pages when exporting to EPUB
 
-@cover(path to image...) = This will add a cover image when exporting to EPUB
 @img(path to image...) = This will insert an image
 
 @b(In-text bold)
