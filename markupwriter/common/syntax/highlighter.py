@@ -36,16 +36,18 @@ class BEHAVIOUR(Enum):
     formatting = auto()
     header = auto()
     searchText = auto()
-    spellCheck = auto()
     mdHeaders = auto()
     mdLists = auto()
+
+class SPECIAL_BEHAVIOUR(Enum):
+    spellCheck = auto()
 
 
 class Highlighter(QSyntaxHighlighter):
     def __init__(self, document: QTextDocument | None, refManager: RefTagManager | None, endict: enchant.Dict | None):
         super().__init__(document)
 
-        keywords = "tag|ref|cover|img|vspace|newpage|alignl|alignc|alignr"
+        keywords = "tag|ref|img|vspace|newpage|alignl|alignc|alignr"
         underlineTags = "ref|plot|tl|char|loc|obj"
 
         parenRegex = r"\(|\)"
@@ -65,68 +67,74 @@ class Highlighter(QSyntaxHighlighter):
         objInTextRegex = r"(?<=@(?:obj)\([^()]*?)(?! )([^,()]*\S)(?=\s*(?:,|\)))"
         formattingRegex = r"@\b(b|i|bi)\b"
         headerRegex = r"^@(title|chapter|scene|section)"
-        mdHeadersRegex = r"^#{1,4}"
-        mdListsRegex = r"^(-|\+)"
 
-        self._behaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
+        self._normalBehaviours: dict[BEHAVIOUR, HighlightBehaviour] = dict()
+        self._specialBehaviours: dict[SPECIAL_BEHAVIOUR, HighlightBehaviour] = dict()
 
         if refManager is not None:
-            self.addBehaviour(BEHAVIOUR.underline, HighlightUnderlineTagsBehaviour(QColor(255, 255, 255), underlineTagsRegex, refManager))
-            self.addBehaviour(BEHAVIOUR.plotInText, HighlightTagsInTextBehaviour(HighlighterConfig.plotCol, plotInTextRegex, refManager))
-            self.addBehaviour(BEHAVIOUR.tlInText, HighlightTagsInTextBehaviour(HighlighterConfig.timelineCol, timelineInTextRegex, refManager))
-            self.addBehaviour(BEHAVIOUR.charInText, HighlightTagsInTextBehaviour(HighlighterConfig.charCol, charInTextRegex, refManager))
-            self.addBehaviour(BEHAVIOUR.locInText, HighlightTagsInTextBehaviour(HighlighterConfig.locCol, locInTextRegex, refManager))
-            self.addBehaviour(BEHAVIOUR.objInText, HighlightTagsInTextBehaviour(HighlighterConfig.objectCol, objInTextRegex, refManager))
+            self.addNormalBehaviour(BEHAVIOUR.underline, HighlightUnderlineTagsBehaviour(QColor(255, 255, 255), underlineTagsRegex, refManager))
+            self.addNormalBehaviour(BEHAVIOUR.plotInText, HighlightTagsInTextBehaviour(HighlighterConfig.plotCol, plotInTextRegex, refManager))
+            self.addNormalBehaviour(BEHAVIOUR.tlInText, HighlightTagsInTextBehaviour(HighlighterConfig.timelineCol, timelineInTextRegex, refManager))
+            self.addNormalBehaviour(BEHAVIOUR.charInText, HighlightTagsInTextBehaviour(HighlighterConfig.charCol, charInTextRegex, refManager))
+            self.addNormalBehaviour(BEHAVIOUR.locInText, HighlightTagsInTextBehaviour(HighlighterConfig.locCol, locInTextRegex, refManager))
+            self.addNormalBehaviour(BEHAVIOUR.objInText, HighlightTagsInTextBehaviour(HighlighterConfig.objectCol, objInTextRegex, refManager))
 
         if endict is not None:
-            self.addBehaviour(BEHAVIOUR.spellCheck, HighlightSpellBehaviour(QColor(255, 255, 255), r"(?iu)[\w\']+", endict))
+            self._specialBehaviours[SPECIAL_BEHAVIOUR.spellCheck] = HighlightSpellBehaviour(QColor(255, 255, 255), r"(?iu)[\w\']+", endict)
 
-        self.addBehaviour(BEHAVIOUR.paren, HighlightExprBehaviour(HighlighterConfig.parenCol, parenRegex))
-        self.addBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, commentRegex))
-        self.addBehaviour(BEHAVIOUR.multicomment, HighlightMultiExprBehaviour(HighlighterConfig.commentCol, multiComRegex[0], multiComRegex[1]))
-        self.addBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.keywordCol, keywordRegex))
-        self.addBehaviour(BEHAVIOUR.plotKeyword, HighlightExprBehaviour(HighlighterConfig.plotCol, plotRegex))
-        self.addBehaviour(BEHAVIOUR.timelineKeyword, HighlightExprBehaviour(HighlighterConfig.timelineCol, timelineRegex))
-        self.addBehaviour(BEHAVIOUR.charKeyword, HighlightExprBehaviour(HighlighterConfig.charCol, charRegex))
-        self.addBehaviour(BEHAVIOUR.locKeyword, HighlightExprBehaviour(HighlighterConfig.locCol, locRegex))
-        self.addBehaviour(BEHAVIOUR.objectKeyword, HighlightExprBehaviour(HighlighterConfig.objectCol, objectRegex))
-        self.addBehaviour(BEHAVIOUR.formatting, HighlightExprBehaviour(HighlighterConfig.formattingCol, formattingRegex))
-        self.addBehaviour(BEHAVIOUR.mdHeaders, HighlightExprBehaviour(HighlighterConfig.mdHeadersCol, mdHeadersRegex))
-        self.addBehaviour(BEHAVIOUR.mdLists, HighlightExprBehaviour(HighlighterConfig.mdListsCol, mdListsRegex))
-        self.addBehaviour(BEHAVIOUR.header, HighlightHeaderBehaviour(HighlighterConfig.headerCol, headerRegex))
-        self.addBehaviour(BEHAVIOUR.searchText, HighlightWordBehaviour(QColor(255,255,255), HighlighterConfig.searchedCol, set()))
+        self.addNormalBehaviour(BEHAVIOUR.paren, HighlightExprBehaviour(HighlighterConfig.parenCol, parenRegex))
+        self.addNormalBehaviour(BEHAVIOUR.comment, HighlightExprBehaviour(HighlighterConfig.commentCol, commentRegex))
+        self.addNormalBehaviour(BEHAVIOUR.multicomment, HighlightMultiExprBehaviour(HighlighterConfig.commentCol, multiComRegex[0], multiComRegex[1]))
+        self.addNormalBehaviour(BEHAVIOUR.keyword, HighlightExprBehaviour(HighlighterConfig.keywordCol, keywordRegex))
+        self.addNormalBehaviour(BEHAVIOUR.plotKeyword, HighlightExprBehaviour(HighlighterConfig.plotCol, plotRegex))
+        self.addNormalBehaviour(BEHAVIOUR.timelineKeyword, HighlightExprBehaviour(HighlighterConfig.timelineCol, timelineRegex))
+        self.addNormalBehaviour(BEHAVIOUR.charKeyword, HighlightExprBehaviour(HighlighterConfig.charCol, charRegex))
+        self.addNormalBehaviour(BEHAVIOUR.locKeyword, HighlightExprBehaviour(HighlighterConfig.locCol, locRegex))
+        self.addNormalBehaviour(BEHAVIOUR.objectKeyword, HighlightExprBehaviour(HighlighterConfig.objectCol, objectRegex))
+        self.addNormalBehaviour(BEHAVIOUR.formatting, HighlightExprBehaviour(HighlighterConfig.formattingCol, formattingRegex))
+        self.addNormalBehaviour(BEHAVIOUR.header, HighlightHeaderBehaviour(HighlighterConfig.headerCol, headerRegex))
+        self.addNormalBehaviour(BEHAVIOUR.searchText, HighlightWordBehaviour(QColor(255,255,255), HighlighterConfig.searchedCol, set()))
 
     def highlightBlock(self, text: str | None) -> None:
-        for _, behaviour in self._behaviours.items():
+        for _, behaviour in self._specialBehaviours.items():
             behaviour.process(self, text)
 
-    def addBehaviour(self, type: BEHAVIOUR, val: HighlightBehaviour) -> bool:
-        if type in self._behaviours:
+        for _, behaviour in self._normalBehaviours.items():
+            behaviour.process(self, text)
+
+    def addNormalBehaviour(self, type: BEHAVIOUR, val: HighlightBehaviour) -> bool:
+        if type in self._normalBehaviours:
             return False
-        self._behaviours[type] = val
+        self._normalBehaviours[type] = val
         return True
 
-    def removeBehaviour(self, type: BEHAVIOUR) -> bool:
-        if not type in self._behaviours:
+    def removeNormalBehaviour(self, type: BEHAVIOUR) -> bool:
+        if not type in self._normalBehaviours:
             return False
-        self._behaviours.pop(type)
+        self._normalBehaviours.pop(type)
         return True
     
-    def toggleBehaviours(self, status: bool):
-        for key in self._behaviours:
-            b = self._behaviours[key]
+    def toggleNormalBehaviours(self, status: bool):
+        for key in self._normalBehaviours:
+            b = self._normalBehaviours[key]
             b.isEnabled = status
 
-    def setBehaviourEnable(self, type: BEHAVIOUR, val: bool):
-        if not type in self._behaviours:
+    def setNormalBehaviourEnable(self, type: BEHAVIOUR, val: bool):
+        if not type in self._normalBehaviours:
             return
-        self._behaviours[type].isEnabled = val
+        self._normalBehaviours[type].isEnabled = val
 
-    def getBehaviour(self, type: BEHAVIOUR) -> HighlightWordBehaviourNone | None:
-        if not type in self._behaviours:
+    def getNormalBehaviour(self, type: BEHAVIOUR) -> HighlightWordBehaviour | None:
+        if not type in self._normalBehaviours:
             return None
-        return self._behaviours[type]
+        return self._normalBehaviours[type]
 
+    def toggleSpellCheckBehaviour(self):
+        if self._specialBehaviours[SPECIAL_BEHAVIOUR.spellCheck] is None:
+            return
+
+        status = self._specialBehaviours[SPECIAL_BEHAVIOUR.spellCheck].isEnabled
+        self._specialBehaviours[SPECIAL_BEHAVIOUR.spellCheck].isEnabled = not status
 
 class HighlightBehaviour(object):
     def __init__(self, color: QColor, expr: str):
@@ -146,6 +154,9 @@ class HighlightBehaviour(object):
             end = w.end() - start
             highlighter.setFormat(start, end, self.format)
 
+    def getStatus(self) -> bool:
+        return self.isEnabled
+
     def setColor(self, color: QColor):
         self.format.setForeground(QBrush(color))
 
@@ -163,7 +174,7 @@ class HighlightSpellBehaviour(HighlightBehaviour):
         )
         self.enchantDict = enchantDict
 
-        exclude = "tag|ref|plot|tl|char|loc|obj|cover|img|title|chapter|scene|section"
+        exclude = "tag|ref|plot|tl|char|loc|obj|img|title|chapter|scene|section"
         self._excludeRegex = regex.compile(r"@({})\(.*?\)".format(exclude))
 
     def process(self, highlighter: Highlighter, text: str):

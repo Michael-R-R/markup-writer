@@ -48,7 +48,7 @@ class DocumentEditorWorker(QObject):
         te = self.dev.textEdit
         highlighter = te.highlighter
         
-        highlighter.toggleBehaviours(status)
+        highlighter.toggleNormalBehaviours(status)
         highlighter.rehighlight()
     
     @pyqtSlot(bool)
@@ -56,7 +56,7 @@ class DocumentEditorWorker(QObject):
         te = self.dev.textEdit
         highlighter = te.highlighter
         
-        highlighter.setBehaviourEnable(BEHAVIOUR.spellCheck, status)
+        highlighter.toggleSpellCheckBehaviour()
         highlighter.rehighlight()
         
     @pyqtSlot(str)
@@ -98,11 +98,11 @@ class DocumentEditorWorker(QObject):
             return
         
         cpath = ProjectConfig.contentPath()
-        
+
         path = os.path.join(cpath, te.docUUID)
-        te.write(path)
-        te.checkWordCount()
-        self._runTokenizer()
+        if te.write(path):
+            te.checkWordCount()
+            self._runTokenizer()
 
         path = os.path.join(cpath, uuid)
         if not te.read(uuid, path):
@@ -112,6 +112,7 @@ class DocumentEditorWorker(QObject):
         eb = self.dev.editorBar
         eb.addPath(self._buildPath(paths))
 
+        te.checkWordCount()
         self._runTokenizer()
 
         sb = self.dev.searchBox
@@ -215,7 +216,7 @@ class DocumentEditorWorker(QObject):
             sb.onSearchChanged(sb.searchInput.text())
         else:
             highlighter = te.highlighter
-            behaviour = highlighter.getBehaviour(BEHAVIOUR.searchText)
+            behaviour = highlighter.getNormalBehaviour(BEHAVIOUR.searchText)
             behaviour.clear()
             highlighter.rehighlight()
 
@@ -231,7 +232,7 @@ class DocumentEditorWorker(QObject):
 
         if doHighlight:
             highlighter = te.highlighter
-            behaviour = highlighter.getBehaviour(BEHAVIOUR.searchText)
+            behaviour = highlighter.getNormalBehaviour(BEHAVIOUR.searchText)
             if len(found) > 0:
                 behaviour.clear()
                 behaviour.add(text)

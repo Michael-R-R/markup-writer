@@ -40,7 +40,6 @@ class XHtmlParser(QRunnable):
             r"@alignr": self._processAlignR,
             r"@vspace": self._processVSpace,
             r"@newpage": self._processNewPage,
-            r"@cover": self._processCover,
             r"@img": self._processImg,
         }
 
@@ -97,10 +96,6 @@ class XHtmlParser(QRunnable):
             return
 
         htmlText = "<p class='newPage'>&#160;</p>\n" * int(text)
-        self.body += htmlText
-        
-    def _processCover(self, text: str):
-        htmlText = f"<p class='cover'><img src='{text}' alt='' width='512'/></p>\n"
         self.body += htmlText
         
     def _processImg(self, text: str):

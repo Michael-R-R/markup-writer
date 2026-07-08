@@ -3,6 +3,7 @@
 from PyQt6.QtCore import (
     Qt,
     pyqtSlot,
+    QSize,
 )
 
 from PyQt6.QtWidgets import (
@@ -32,6 +33,7 @@ class ExportDialog(QDialog):
         super().__init__(parent)
 
         self.setWindowTitle("Export (EPUB3)")
+        self.resize(400, 200)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.exportDir = ""

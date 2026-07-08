@@ -164,7 +164,11 @@ class EpubExporter(object):
             path = os.path.join(self.imgPath, name)
             if File.exists(path):
                 continue
-            shutil.copyfile(src, path)
+            
+            try:
+                shutil.copyfile(src, path)
+            except Exception as e:
+                print(str(e))
 
         # write page to disk
         fName = "{}.xhtml".format(title)

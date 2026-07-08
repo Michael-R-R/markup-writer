@@ -46,12 +46,17 @@ class File(object):
         return True
     
     def findAllFiles(path: str) -> list[str]:
-        info = QFileInfo(path)
-        if not info.isDir():
+        try:
+            info = QFileInfo(path)
+            if not info.isDir():
+                return list()
+            
+            qinfo = QDir(path)
+            return qinfo.entryList(QDir.Filter.Files)
+            
+        except Exception as e:
+            print(str(e))
             return list()
-        
-        qinfo = QDir(path)
-        return qinfo.entryList(QDir.Filter.Files)
     
     def remove(path: str) -> bool:
         return QFile.remove(path)
@@ -71,3 +76,7 @@ class File(object):
         if info.isDir():
             return None
         return info.suffix()
+
+    def canonicalPath(path: str) -> str:
+        info = QFileInfo(path)
+        return info.canonicalPath()

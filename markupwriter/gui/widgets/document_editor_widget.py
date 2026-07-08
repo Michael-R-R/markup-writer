@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, re
+import os, regex
 
 from PyQt6.QtCore import (
     Qt,
@@ -59,6 +59,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         self.searchHotkey = QAction("search", self)
         self.canResizeMargins = True
         self.docUUID = ""
+        self.isDirty = False
 
         shortcut = QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F)
         self.searchHotkey.setShortcut(shortcut)
@@ -77,10 +78,15 @@ class DocumentEditorWidget(QPlainTextEdit):
 
         self.setState(s.NormalEditorState(self, self))
 
+        self.plainDocument.contentsChange.connect(self.contentsChangeUpdated)
+        self.cursorPositionChanged.connect(self.cursorPosUpdated)
+        self.modificationChanged.connect(self.modificationsUpdated)
+
     def reset(self):
         self.clear()
         self.setEnabled(False)
         self.docUUID = ""
+        self.isDirty = False
         self.docStatusChanged.emit(False)
         
     def read(self, uuid: str, path: str) -> bool:
@@ -92,11 +98,18 @@ class DocumentEditorWidget(QPlainTextEdit):
             return False
             
         self.setText(uuid, text)
+
+        self.isDirty = False
         
         return True
         
     def write(self, path: str) -> bool:
         if not self.hasOpenDocument():
+            print("No document opened. Will not save...")
+            return False
+
+        if not self.isDirty:
+            print("No changes made to document. Will not save...")
             return False
         
         cpos = self.textCursor().position()
@@ -108,6 +121,10 @@ class DocumentEditorWidget(QPlainTextEdit):
         configText += "[CONFIG END]\n"
 
         text = configText + currentText
+
+        self.isDirty = False
+
+        print("Saving document...")
         
         return File.write(path, text)
     
@@ -115,7 +132,12 @@ class DocumentEditorWidget(QPlainTextEdit):
         if not self.hasOpenDocument():
             return
         
-        count = len(re.findall(r"\S+", self.toPlainText()))
+        lExclude = r"tag|ref|plot|tl|char|loc|obj|img|title|chapter|scene|section"
+        rExclude = r"i|b|alignl|alignc|alignr"
+        findRegex = r"\b(?<!@({})(?:\([^)]*)?)(?<!@)(?!({})\b)\w+\b".format(lExclude, rExclude)
+        
+        found = regex.findall(findRegex, self.toPlainText())
+        count = len(found)
         
         self.wordCountChanged.emit(self.docUUID, count)
 
@@ -167,7 +189,7 @@ class DocumentEditorWidget(QPlainTextEdit):
         if cpos <= 0 or cpos >= len(textBlock):
             return None
 
-        found = re.search(r"@(ref|plot|tl|char|loc|obj)(\(.*\))", textBlock)
+        found = regex.search(r"@(ref|plot|tl|char|loc|obj)(\(.*\))", textBlock)
         if found is None:
             return None
 
@@ -200,6 +222,21 @@ class DocumentEditorWidget(QPlainTextEdit):
     def popParserUUID(self, uuid: str):
         self.parser.popPrevUUID(uuid, self.refManager)
         
+    @pyqtSlot(int, int, int)
+    def contentsChangeUpdated(self, pos: int, removed: int, added: int):
+        print("Updating dirty document(contents changed):", (removed > 0 or added > 0))
+        self.isDirty = (removed > 0 or added > 0)
+    
+    @pyqtSlot()
+    def cursorPosUpdated(self):
+        print("Updating dirty document(text cursor moved):", True)
+        self.isDirty = True
+
+    @pyqtSlot(bool)
+    def modificationsUpdated(self, dirty: bool):
+        print("Updating dirty document(modifications updated):", dirty)
+        self.isDirty = dirty
+
     @pyqtSlot(str, dict)
     def runParser(self, uuid: str, tokens: dict[str, list[str]]):
         self.parser.run(uuid, tokens, self.refManager)
@@ -229,7 +266,7 @@ class DocumentEditorWidget(QPlainTextEdit):
 
     def insertFromMimeData(self, source: QMimeData | None) -> None:
         if source.hasUrls():
-            extRegex = re.compile(r"\b\.(jpeg|jpg|png|gif)\b")
+            extRegex = regex.compile(r"\b\.(jpeg|jpg|png|gif)\b")
             for url in source.urls():
                 imgPath = url.path()
                 found = extRegex.search(imgPath)

@@ -15,6 +15,7 @@ import markupwriter.vdw.worker as w
 class MainMenuBarDelegate(BaseDelegate):
     fmNewTriggered = pyqtSignal()
     fmOpenTriggered = pyqtSignal()
+    fmOpenRecentTriggered = pyqtSignal(str)
     fmSaveDocTriggered = pyqtSignal()
     fmSaveTriggered = pyqtSignal()
     fmSaveAsTriggered = pyqtSignal()
@@ -55,6 +56,9 @@ class MainMenuBarDelegate(BaseDelegate):
         fm.exportAction.triggered.connect(lambda: self.fmExportTriggered.emit())
         fm.closeProjAction.triggered.connect(lambda: self.fmCloseTriggered.emit())
         fm.exitAction.triggered.connect(lambda: self.fmExitTriggered.emit())
+        for action in fm.openedRecentlyActionList:
+            path = action.text()
+            action.triggered.connect(lambda _, path=path: self.fmOpenRecentTriggered.emit(path))
 
         dm = self.view.docMenu
         dm.toggleHighlighting.toggled.connect(lambda x: self.dmHighlightToggled.emit(x))

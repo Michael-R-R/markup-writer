@@ -22,6 +22,7 @@ class AppConfig(BaseConfig):
     docEditorSize: QSize = None
     docPreviewSize: QSize = None
     consoleSize: QSize = None
+    openedRecently: [] = None
 
     def init(wd: str):
         if AppConfig.WORKING_DIR is None:
@@ -37,6 +38,7 @@ class AppConfig(BaseConfig):
         AppConfig.docEditorSize = QSize(100, 100)
         AppConfig.docPreviewSize = QSize(100, 100)
         AppConfig.consoleSize = QSize(100, 100)
+        AppConfig.openedRecently = []
 
     def reset(wd: str):
         AppConfig.init(wd)
@@ -44,12 +46,32 @@ class AppConfig(BaseConfig):
     def mkWindowTitle(projectName: str | None) -> str:
         return "{} - {}".format(AppConfig.APP_NAME, projectName)
 
+    def updateOpenRecently(path: str):
+        path = path.strip()
+
+        try:
+            AppConfig.openedRecently.remove(path)
+        except:
+            print(path, "not in opened recently list")
+
+        size = len(AppConfig.openedRecently)
+        if size < 5:
+            AppConfig.openedRecently.insert(0, path)
+        else:
+            AppConfig.openedRecently.insert(0, path)
+            AppConfig.openedRecently.pop()
+
     def __rlshift__(self, sOut: QDataStream) -> QDataStream:
         sOut << AppConfig.mainWindowSize
         sOut << AppConfig.docTreeSize
         sOut << AppConfig.docEditorSize
         sOut << AppConfig.docPreviewSize
         sOut << AppConfig.consoleSize
+
+        sOut.writeInt(len(AppConfig.openedRecently))
+        for path in AppConfig.openedRecently:
+            sOut.writeQString(path)
+
         return sOut
 
     def __rrshift__(self, sIn: QDataStream) -> QDataStream:
@@ -58,4 +80,10 @@ class AppConfig(BaseConfig):
         sIn >> AppConfig.docEditorSize
         sIn >> AppConfig.docPreviewSize
         sIn >> AppConfig.consoleSize
+
+        recentlyOpenedSize = sIn.readInt()
+        for _ in range(recentlyOpenedSize):
+            path = sIn.readQString()
+            AppConfig.openedRecently.append(path)
+
         return sIn

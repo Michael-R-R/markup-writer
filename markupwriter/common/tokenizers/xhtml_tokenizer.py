@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import re
+import regex
 
 from PyQt6.QtCore import (
     QObject,
@@ -24,9 +24,9 @@ class XHtmlTokenizer(QRunnable):
         self.tokens: list[(str, str)] = list()  # tag, text
         self.signals = WorkerSignal(parent)
 
-        self.parenRegex = re.compile(r"(?<=\().*?(?=\))")
-        self.nlParenRegex = re.compile(r"(?<=\()(\n|.)*?(?=\))")
-        self.keywordRegex = re.compile(r"^@.*(?=\()")
+        self.parenRegex = regex.compile(r"(?<=\().*?(?=\))")
+        self.nlParenRegex = regex.compile(r"(?<=\()(\n|.)*?(?=\))")
+        self.keywordRegex = regex.compile(r"^@.*(?=\()")
         
         self.ignoreSet = set()
 
@@ -73,7 +73,7 @@ class XHtmlTokenizer(QRunnable):
         self._replaceFormat(tag, "<b><i>?</i></b>")
 
     def _replaceFormat(self, tag: str, htmlTag: str):
-        it = re.finditer(tag, self.text, re.MULTILINE)
+        it = regex.finditer(tag, self.text, regex.MULTILINE)
         for found in it:
             found = found.group(0)
             text = self.nlParenRegex.search(found)
@@ -96,11 +96,13 @@ class XHtmlTokenizer(QRunnable):
             self.text = self.text.replace(found, htmlText)
 
     def _processRemove(self, tag: str):
-        it = re.finditer(tag, self.text, re.MULTILINE)
+        it = regex.finditer(tag, self.text, regex.MULTILINE)
         for found in it:
             if found is None:
                 continue
             self.text = self.text.replace(found.group(0), "")
+
+        self.text = regex.sub(r"\n\s*\n", "\n\n", self.text)
 
     def _processKeyword(self, line: str) -> tuple[str, str]:
         keyword = self.keywordRegex.search(line)
@@ -154,9 +156,8 @@ class XHtmlExportTokenizer(XHtmlTokenizer):
         lines = self.text.splitlines()
         for line in lines:
             if line == "":
-                continue
-
-            if line.startswith("@"):
+                self.tokens.append(("p", "&nbsp;"))
+            elif line.startswith("@"):
                 token: tuple[str, str] = self._processKeyword(line)
                 self.tokens.append(token)
             else:
